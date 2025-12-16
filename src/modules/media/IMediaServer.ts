@@ -2,6 +2,8 @@
 import type {MediaItem} from "@/modules/media/types/media/MediaItem.ts";
 import type {MediaPerson} from "@/modules/media/types/person/MediaPerson.ts";
 import type {MediaPlaybackInfo} from "@/modules/media/types/playback/MediaPlaybackInfo.ts";
+import type {PaginatedResult, PaginationOptions} from "@/modules/media/types/common/MediaPage.ts";
+import type {MediaDetail} from "@/modules/media/types/detail/MediaDetail.ts";
 
 export interface IMediaServer {
   // 认证
@@ -11,8 +13,8 @@ export interface IMediaServer {
   getLibraries(): Promise<MediaItem[]>; // 获取根媒体库（电影、剧集等）
 
   // 内容浏览
-  getItems(parentId?: string, type?: 'Movie' | 'Series'): Promise<MediaItem[]>;
-  getItem(id: string): Promise<MediaItem>; // 获取详情（含元数据）
+  getItems(options: PaginationOptions,parentId?: string, type?: 'Movie' | 'Series'): Promise<PaginatedResult<MediaItem>>;
+  getItem(id: string): Promise<MediaDetail>; // 获取详情（含元数据）
 
   // 搜索
   search(query: string): Promise<MediaItem[]>;

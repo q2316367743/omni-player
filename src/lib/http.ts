@@ -22,8 +22,10 @@ const instance = axios.create({
 });
 
 instance.interceptors.response.use(e => {
-  console.error(e);
   return e;
+}, e => {
+  console.log(e);
+  return Promise.reject(e);
 } )
 
 export interface RequestConfig extends AxiosRequestConfig {

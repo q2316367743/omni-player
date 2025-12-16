@@ -6,4 +6,5 @@ export const APP_PASSWORD = "vpj13Q7AFKjpin"
 
 export const APP_DATA_DIR = () => appDataDir();
 export const APP_DATA_DB_PATH = async () => join(await APP_DATA_DIR(), "db.sqlite");
+export const APP_DATA_VAULT_PATH = async () => join(await APP_DATA_DIR(), "vault.hold");
 export const APP_DATA_STORE_PATH = async () => join(await APP_DATA_DIR(), "store.json");

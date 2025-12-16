@@ -7,7 +7,7 @@
         <t-menu-item :value="person">演员列表</t-menu-item>
       </t-head-menu>
     </t-header>
-    <t-content class="h-full relative">
+    <t-content class="h-full relative overflow-auto">
       <router-view />
     </t-content>
   </t-layout>

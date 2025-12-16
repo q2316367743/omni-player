@@ -1,74 +1,217 @@
-import {Client, Store, Stronghold} from '@tauri-apps/plugin-stronghold';
+import {Store} from '@tauri-apps/plugin-store';
 // 当设置 `"withGlobalTauri": true` 时，你可以用
 // const { Client, Stronghold } = window.__TAURI__.stronghold;
-import {appDataDir} from '@tauri-apps/api/path';
-import {APP_NAME, APP_PASSWORD} from "@/global/Constants.ts";
+import {APP_DATA_VAULT_PATH, APP_PASSWORD} from "@/global/Constants.ts";
 // 当设置 `"withGlobalTauri": true` 时，你可以用
 // const { appDataDir } = window.__TAURI__.path;
 
+// 加密工具类
+class CryptoUtil {
+  private static readonly ALGORITHM = 'AES-GCM';
+  private static readonly KEY_LENGTH = 256;
+  private static readonly IV_LENGTH = 12; // GCM 推荐的 IV 长度
+
+  // 加密数据
+  static async encrypt(data: string, password: string): Promise<string> {
+    try {
+      const encoder = new TextEncoder();
+      const dataBuffer = encoder.encode(data);
+      
+      // 生成随机的 IV 和 salt
+      const iv = crypto.getRandomValues(new Uint8Array(this.IV_LENGTH));
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      
+      // 使用固定的 salt 生成密钥
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(password),
+        { name: 'PBKDF2' },
+        false,
+        ['deriveKey']
+      );
+      
+      const key = await crypto.subtle.deriveKey(
+        {
+          name: 'PBKDF2',
+          salt: salt,
+          iterations: 100000,
+          hash: 'SHA-256'
+        },
+        keyMaterial,
+        {
+          name: this.ALGORITHM,
+          length: this.KEY_LENGTH
+        },
+        false,
+        ['encrypt', 'decrypt']
+      );
+      
+      // 加密数据
+      const encryptedBuffer = await crypto.subtle.encrypt(
+        {
+          name: this.ALGORITHM,
+          iv: iv
+        },
+        key,
+        dataBuffer
+      );
+
+      // 组合 salt、IV 和加密数据，并进行 Base64 编码
+      const combined = new Uint8Array(salt.length + iv.length + encryptedBuffer.byteLength);
+      combined.set(salt, 0);
+      combined.set(iv, salt.length);
+      combined.set(new Uint8Array(encryptedBuffer), salt.length + iv.length);
+      
+      return btoa(String.fromCharCode(...combined));
+    } catch (error) {
+      console.error('加密失败:', error);
+      throw new Error('数据加密失败');
+    }
+  }
+
+  // 解密数据
+  static async decrypt(encryptedData: string, password: string): Promise<string> {
+    try {
+      // Base64 解码
+      const combined = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
+      
+      // 分离 salt、IV 和加密数据
+      const salt = combined.slice(0, 16);
+      const iv = combined.slice(16, 16 + this.IV_LENGTH);
+      const encrypted = combined.slice(16 + this.IV_LENGTH);
+      
+      // 使用提取的 salt 生成密钥
+      const encoder = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(password),
+        { name: 'PBKDF2' },
+        false,
+        ['deriveKey']
+      );
+      
+      const key = await crypto.subtle.deriveKey(
+        {
+          name: 'PBKDF2',
+          salt: salt,
+          iterations: 100000,
+          hash: 'SHA-256'
+        },
+        keyMaterial,
+        {
+          name: this.ALGORITHM,
+          length: this.KEY_LENGTH
+        },
+        false,
+        ['encrypt', 'decrypt']
+      );
+      
+      // 解密数据
+      const decryptedBuffer = await crypto.subtle.decrypt(
+        {
+          name: this.ALGORITHM,
+          iv: iv
+        },
+        key,
+        encrypted
+      );
+
+      const decoder = new TextDecoder();
+      return decoder.decode(decryptedBuffer);
+    } catch (error) {
+      console.error('解密失败:', error);
+      throw new Error('数据解密失败');
+    }
+  }
+}
+
 
 class StrongholdWrapper {
-  private stronghold: Stronghold | null = null;
-  private client: Client | null = null;
   private store: Store | null = null;
+  private customEncryptionKey: string = '';
 
-  private async getStronghold() {
-    if (!this.stronghold) {
-      const vaultPath = `${await appDataDir()}/vault.hold`;
-      this.stronghold = await Stronghold.load(vaultPath, APP_PASSWORD);
-    }
-    return this.stronghold;
+  // 设置自定义加密密钥
+  setEncryptionKey(key: string) {
+    this.customEncryptionKey = key;
   }
 
-  private async getClient() {
-    if (!this.client) {
-      const stronghold = await this.getStronghold();
-      try {
-        this.client = await stronghold.loadClient(APP_NAME);
-      } catch {
-        this.client = await stronghold.createClient(APP_NAME);
-      }
-    }
-    return this.client;
+  // 获取当前使用的加密密钥
+  private getEncryptionKey(): string {
+    // 优先使用自定义密钥，否则使用应用默认密码
+    return this.customEncryptionKey || APP_PASSWORD;
   }
+
 
   private async getStore() {
     if (!this.store) {
-      const client = await this.getClient();
-      this.store = client.getStore();
+      this.store = await Store.load(await APP_DATA_VAULT_PATH());
     }
     return this.store;
   }
 
+
   /**
-   * 插入一条记录
+   * 插入一条记录（加密存储）
    * @param key 键
    * @param value 值
    * @param timeout 超时时间，默认0，不超时
    */
   async insertRecord(key: string, value: string, timeout = 0) {
     const store = await this.getStore();
-    const data = Array.from(new TextEncoder().encode(JSON.stringify({
-      timeout,
-      value,
-      start: Date.now()
-    })));
-    console.log('插入，key: ', key)
-    await store.insert(key, data);
+    
+    try {
+      // 加密值
+      const encryptedValue = await CryptoUtil.encrypt(value, this.getEncryptionKey());
+      
+      // 存储加密后的数据
+      await store.set(key, JSON.stringify({
+        timeout,
+        value: encryptedValue,
+        start: Date.now(),
+        encrypted: true // 标记数据已加密
+      }));
+    } catch (error) {
+      console.error(`插入记录失败 [${key}]:`, error);
+      throw new Error(`无法安全存储数据: ${error instanceof Error ? error.message : '未知错误'}`);
+    }
   }
 
   async getRecord(key: string): Promise<string | null> {
     const store = await this.getStore();
-    const data = await store.get(key);
-    console.log('获取，key: ', key)
+    const data = await store.get<string>(key);
     if (!data) return null;
-    const text = new TextDecoder().decode(new Uint8Array(data));
-    const obj = JSON.parse(text);
-    if (obj.timeout > 0 && Date.now() - obj.start > obj.timeout) {
-      await store.remove(key);
+    
+    try {
+      const obj = JSON.parse(data);
+      
+      // 检查超时
+      if (obj.timeout > 0 && Date.now() - obj.start > obj.timeout) {
+        await store.delete(key);
+        return null;
+      }
+
+      // 如果数据已加密，进行解密
+      if (obj.encrypted) {
+        try {
+          return await CryptoUtil.decrypt(obj.value, this.getEncryptionKey());
+        } catch (decryptError) {
+          console.error(`解密失败 [${key}]:`, decryptError);
+          // 如果解密失败，可能是密钥不匹配，返回 null
+          return null;
+        }
+      }
+      
+      // 兼容旧版本未加密的数据
+      return obj.value;
+    } catch (error) {
+      console.error(`获取记录失败 [${key}]:`, error);
       return null;
     }
-    return obj.value;
+  }
+
+  async removeRecord(key: string) {
+    const store = await this.getStore();
+    await store.delete(key);
   }
 
   async getMediaRecord(serviceId: string, key: string) {
@@ -80,17 +223,13 @@ class StrongholdWrapper {
   }
 
   async removeMediaRecord(serviceId: string, key: string) {
-    const store = await this.getStore();
-    await store.remove(`/media/${serviceId}/${key}`);
+    await this.removeRecord(`/media/${serviceId}/${key}`);
   }
 
 }
 
-let strongholdWrapper: StrongholdWrapper | null = null;
+const strongholdWrapper = new StrongholdWrapper();
 
 export const useStronghold = () => {
-  if (!strongholdWrapper) {
-    strongholdWrapper = new StrongholdWrapper();
-  }
   return strongholdWrapper;
 }

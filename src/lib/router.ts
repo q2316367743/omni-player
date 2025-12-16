@@ -34,6 +34,10 @@ export const router = createRouter({
       path: ':id/home',
       component: () => import('@/pages/media/home/index.vue')
     },{
+      name: '媒体中心 - 影视详情',
+      path: ':id/detail/:mediaId',
+      component: () => import('@/pages/media/detail/index.vue')
+    },{
       name: '媒体中心 - 分类',
       path: ':id/category',
       component: () => import('@/pages/media/category/index.vue')

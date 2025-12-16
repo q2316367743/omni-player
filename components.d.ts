@@ -13,34 +13,46 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    MediaCard: typeof import('./src/components/media/MediaCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TButton: typeof import('tdesign-vue-next')['Button']
     TContent: typeof import('tdesign-vue-next')['Content']
     THeader: typeof import('tdesign-vue-next')['Header']
     THeadMenu: typeof import('tdesign-vue-next')['HeadMenu']
+    TIcon: typeof import('tdesign-vue-next')['Icon']
     TLayout: typeof import('tdesign-vue-next')['Layout']
     TLink: typeof import('tdesign-vue-next')['Link']
     TList: typeof import('tdesign-vue-next')['List']
     TListItem: typeof import('tdesign-vue-next')['ListItem']
     TListItemMeta: typeof import('tdesign-vue-next')['ListItemMeta']
+    TLoading: typeof import('tdesign-vue-next')['Loading']
     TMenuItem: typeof import('tdesign-vue-next')['MenuItem']
+    TPagination: typeof import('tdesign-vue-next')['Pagination']
+    TSpace: typeof import('tdesign-vue-next')['Space']
+    TTag: typeof import('tdesign-vue-next')['Tag']
   }
 }
 
 // For TSX support
 declare global {
   const HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+  const MediaCard: typeof import('./src/components/media/MediaCard.vue')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
   const TButton: typeof import('tdesign-vue-next')['Button']
   const TContent: typeof import('tdesign-vue-next')['Content']
   const THeader: typeof import('tdesign-vue-next')['Header']
   const THeadMenu: typeof import('tdesign-vue-next')['HeadMenu']
+  const TIcon: typeof import('tdesign-vue-next')['Icon']
   const TLayout: typeof import('tdesign-vue-next')['Layout']
   const TLink: typeof import('tdesign-vue-next')['Link']
   const TList: typeof import('tdesign-vue-next')['List']
   const TListItem: typeof import('tdesign-vue-next')['ListItem']
   const TListItemMeta: typeof import('tdesign-vue-next')['ListItemMeta']
+  const TLoading: typeof import('tdesign-vue-next')['Loading']
   const TMenuItem: typeof import('tdesign-vue-next')['MenuItem']
+  const TPagination: typeof import('tdesign-vue-next')['Pagination']
+  const TSpace: typeof import('tdesign-vue-next')['Space']
+  const TTag: typeof import('tdesign-vue-next')['Tag']
 }

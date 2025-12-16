@@ -13,18 +13,17 @@ export function openMediaServerEdit(old?: MediaServer) {
   })
   const update = !!old;
 
+
   if (old) {
-    Promise.all([
-      useStronghold().getMediaRecord(old.id, "username"),
-      useStronghold().getMediaRecord(old.id, "password")
-    ]).then(([usernameRes, passwordRes]) => {
-      server.value.username = usernameRes || '';
-      server.value.password = passwordRes || '';
-    })
+    (async () => {
+      server.value.username = await useStronghold().getMediaRecord(old.id, "username") || '';
+      server.value.password = await useStronghold().getMediaRecord(old.id, "password") || '';
+    })().catch(e => MessageUtil.error("初始化密码信息失败", e))
   }
 
   const plugin = DialogPlugin({
     header: (update ? "修改" : "新增") + "媒体服务器",
+    confirmBtn: update ? "修改" : "新增",
     placement: "center",
     default: () => <Form data={server.value}>
       <FormItem label={'名称'} labelAlign={"top"}>

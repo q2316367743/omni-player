@@ -25,6 +25,7 @@
     "store:allow-save",
     "store:allow-load",
     "stronghold:default",
+    "stronghold:allow-remove-store-record",
     {
       "identifier": "http:default",
       "allow": [
