@@ -1,4 +1,4 @@
-import type {MediaItem} from "@/media/types/media/MediaItem.ts";
+import type {MediaItem} from "@/modules/media/types/media/MediaItem.ts";
 
 /**
  * Plex 特有扩展字段

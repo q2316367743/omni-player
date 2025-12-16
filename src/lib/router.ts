@@ -25,6 +25,23 @@ export const router = createRouter({
       path: 'server',
       component: () => import('@/pages/admin/server/index.vue')
     }]
+  }, {
+    name: "媒体中心",
+    path: "/media",
+    component: () => import('@/layouts/media.vue'),
+    children: [{
+      name: '媒体中心 - 首页',
+      path: ':id/home',
+      component: () => import('@/pages/media/home/index.vue')
+    },{
+      name: '媒体中心 - 分类',
+      path: ':id/category',
+      component: () => import('@/pages/media/category/index.vue')
+    },{
+      name: '媒体中心 - 演员',
+      path: ':id/person',
+      component: () => import('@/pages/media/person/index.vue')
+    }]
   }]
 });
 

@@ -11,7 +11,7 @@ const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), vueJsx(), UnoCSS(),
+  plugins: [vue(), vueJsx(),
     AutoImport({
       resolvers: [TDesignResolver({
         library: 'vue-next'
@@ -22,7 +22,7 @@ export default defineConfig({
       resolvers: [TDesignResolver({
         library: 'vue-next'
       })],
-    })],
+    }), UnoCSS()],
   // prevent vite from obscuring rust errors
   clearScreen: false,
   resolve: {

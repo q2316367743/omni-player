@@ -53,12 +53,14 @@ class StrongholdWrapper {
       value,
       start: Date.now()
     })));
+    console.log('插入，key: ', key)
     await store.insert(key, data);
   }
 
   async getRecord(key: string): Promise<string | null> {
     const store = await this.getStore();
     const data = await store.get(key);
+    console.log('获取，key: ', key)
     if (!data) return null;
     const text = new TextDecoder().decode(new Uint8Array(data));
     const obj = JSON.parse(text);

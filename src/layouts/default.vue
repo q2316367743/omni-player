@@ -1,5 +1,5 @@
 <template>
-  <t-layout>
+  <t-layout class="h-full w-full">
     <t-header>
       <router-link to="/">
         <t-button>管理</t-button>

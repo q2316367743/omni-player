@@ -15,6 +15,16 @@ declare module 'vue' {
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TButton: typeof import('tdesign-vue-next')['Button']
+    TContent: typeof import('tdesign-vue-next')['Content']
+    THeader: typeof import('tdesign-vue-next')['Header']
+    THeadMenu: typeof import('tdesign-vue-next')['HeadMenu']
+    TLayout: typeof import('tdesign-vue-next')['Layout']
+    TLink: typeof import('tdesign-vue-next')['Link']
+    TList: typeof import('tdesign-vue-next')['List']
+    TListItem: typeof import('tdesign-vue-next')['ListItem']
+    TListItemMeta: typeof import('tdesign-vue-next')['ListItemMeta']
+    TMenuItem: typeof import('tdesign-vue-next')['MenuItem']
   }
 }
 
@@ -23,4 +33,14 @@ declare global {
   const HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
+  const TButton: typeof import('tdesign-vue-next')['Button']
+  const TContent: typeof import('tdesign-vue-next')['Content']
+  const THeader: typeof import('tdesign-vue-next')['Header']
+  const THeadMenu: typeof import('tdesign-vue-next')['HeadMenu']
+  const TLayout: typeof import('tdesign-vue-next')['Layout']
+  const TLink: typeof import('tdesign-vue-next')['Link']
+  const TList: typeof import('tdesign-vue-next')['List']
+  const TListItem: typeof import('tdesign-vue-next')['ListItem']
+  const TListItemMeta: typeof import('tdesign-vue-next')['ListItemMeta']
+  const TMenuItem: typeof import('tdesign-vue-next')['MenuItem']
 }

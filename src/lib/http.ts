@@ -21,6 +21,11 @@ const instance = axios.create({
   // 配置代理等信息
 });
 
+instance.interceptors.response.use(e => {
+  console.error(e);
+  return e;
+} )
+
 export interface RequestConfig extends AxiosRequestConfig {
 
 }

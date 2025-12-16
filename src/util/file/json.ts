@@ -1,4 +1,4 @@
-import { stringifyJsonWithBigIntSupport } from "$/util";
+import { stringifyJsonWithBigIntSupport } from "@/util";
 
 /**
  * 格式化 JSON 字符串，保留 Long 类型的原始字符串表示，避免类型丢失。

@@ -1,7 +1,7 @@
 // services/MediaServer.ts
-import type {MediaItem} from "@/media/types/media/MediaItem.ts";
-import type {MediaPerson} from "@/media/types/person/MediaPerson.ts";
-import type {MediaPlaybackInfo} from "@/media/types/playback/MediaPlaybackInfo.ts";
+import type {MediaItem} from "@/modules/media/types/media/MediaItem.ts";
+import type {MediaPerson} from "@/modules/media/types/person/MediaPerson.ts";
+import type {MediaPlaybackInfo} from "@/modules/media/types/playback/MediaPlaybackInfo.ts";
 
 export interface IMediaServer {
   // 认证

@@ -1,4 +1,4 @@
-import type {MediaPlaybackInfo} from "@/media/types/playback/MediaPlaybackInfo.ts";
+import type {MediaPlaybackInfo} from "@/modules/media/types/playback/MediaPlaybackInfo.ts";
 
 export interface MediaPlaybackInfoPlex extends MediaPlaybackInfo {
   // Plex 特有

@@ -1,14 +1,14 @@
 // src/services/jellyfin/JellyfinClient.ts
 
-import type {IMediaServer} from '@/media/IMediaServer.ts';
-import type {MediaItemJellyfin} from '@/media/types/media/MediaItem.jellyfin';
-import type {MediaPersonJellyfin} from '@/media/types/person/MediaPerson.jellyfin';
-import type {MediaPlaybackInfoJellyfin} from '@/media/types/playback//MediaPlaybackInfo.jellyfin';
+import type {IMediaServer} from '@/modules/media/IMediaServer.ts';
+import type {MediaItemJellyfin} from '@/modules/media/types/media/MediaItem.jellyfin';
+import type {MediaPersonJellyfin} from '@/modules/media/types/person/MediaPerson.jellyfin';
+import type {MediaPlaybackInfoJellyfin} from '@/modules/media/types/playback//MediaPlaybackInfo.jellyfin';
 import {normalizeMediaItem, normalizePerson} from './utils';
 import type {MediaServer} from "@/entity/MediaServer.ts";
 import {useStronghold} from "@/lib/Stronghold.ts";
-import type {MediaItem} from "@/media/types/media/MediaItem";
-import type {MediaPerson} from "@/media/types/person/MediaPerson";
+import type {MediaItem} from "@/modules/media/types/media/MediaItem";
+import type {MediaPerson} from "@/modules/media/types/person/MediaPerson";
 import {postAction, requestAction, type RequestConfig, type Method} from "@/lib/http.ts";
 
 export class JellyfinClient implements IMediaServer {
@@ -26,9 +26,9 @@ export class JellyfinClient implements IMediaServer {
    * 认证用户
    */
   async authenticate(): Promise<void> {
-    const username = useStronghold().getMediaRecord(this.server.id, 'username');
-    const password = useStronghold().getMediaRecord(this.server.id, 'password');
-    const {data: res} = await postAction(`${this.baseUrl}/Users/AuthenticateByName`, {
+    const username = await useStronghold().getMediaRecord(this.server.id, 'username');
+    const password = await useStronghold().getMediaRecord(this.server.id, 'password');
+    const {data, status} = await postAction(`${this.baseUrl}/Users/AuthenticateByName`, {
       Username: username,
       Pw: password
     }, {
@@ -38,9 +38,9 @@ export class JellyfinClient implements IMediaServer {
       },
     });
 
-    if (!res.ok) throw new Error('Authentication failed');
+    if (status !== 200) throw new Error('Authentication failed');
 
-    const data = await res.json();
+
     this.accessToken = data.AccessToken;
     this.userId = data.User.Id;
   }

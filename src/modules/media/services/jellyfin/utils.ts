@@ -1,7 +1,7 @@
 // src/services/jellyfin/utils.ts
 
-import type {MediaItemJellyfin} from '@/media/types/media/MediaItem.jellyfin';
-import type {MediaPersonJellyfin} from '@/media/types/person/MediaPerson.jellyfin';
+import type {MediaItemJellyfin} from '@/modules/media/types/media/MediaItem.jellyfin';
+import type {MediaPersonJellyfin} from '@/modules/media/types/person/MediaPerson.jellyfin';
 
 /**
  * 将 Jellyfin API 返回的 Item 转换为 MediaItemJellyfin

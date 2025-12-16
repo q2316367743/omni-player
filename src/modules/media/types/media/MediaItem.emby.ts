@@ -1,4 +1,4 @@
-import type {MediaItem} from "@/media/types/media/MediaItem.ts";
+import type {MediaItem} from "@/modules/media/types/media/MediaItem.ts";
 
 /**
  * Emby 与 Jellyfin 高度兼容，字段几乎一致

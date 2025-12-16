@@ -1,4 +1,4 @@
-import type {MediaPerson} from "@/media/types/person/MediaPerson.ts";
+import type {MediaPerson} from "@/modules/media/types/person/MediaPerson.ts";
 
 export interface MediaPersonJellyfin extends MediaPerson {
 
