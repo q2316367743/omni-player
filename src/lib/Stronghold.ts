@@ -40,9 +40,19 @@ class StrongholdWrapper {
     return this.store;
   }
 
-  async insertRecord(key: string, value: string) {
+  /**
+   * 插入一条记录
+   * @param key 键
+   * @param value 值
+   * @param timeout 超时时间，默认0，不超时
+   */
+  async insertRecord(key: string, value: string, timeout = 0) {
     const store = await this.getStore();
-    const data = Array.from(new TextEncoder().encode(value));
+    const data = Array.from(new TextEncoder().encode(JSON.stringify({
+      timeout,
+      value,
+      start: Date.now()
+    })));
     await store.insert(key, data);
   }
 
@@ -50,7 +60,26 @@ class StrongholdWrapper {
     const store = await this.getStore();
     const data = await store.get(key);
     if (!data) return null;
-    return new TextDecoder().decode(new Uint8Array(data));
+    const text = new TextDecoder().decode(new Uint8Array(data));
+    const obj = JSON.parse(text);
+    if (obj.timeout > 0 && Date.now() - obj.start > obj.timeout) {
+      await store.remove(key);
+      return null;
+    }
+    return obj.value;
+  }
+
+  async getMediaRecord(serviceId: string, key: string) {
+    return await this.getRecord(`/media/${serviceId}/${key}`);
+  }
+
+  async setMediaRecord(serviceId: string, key: string, value: string, timeout?: number) {
+    return await this.insertRecord(`/media/${serviceId}/${key}`, value, timeout);
+  }
+
+  async removeMediaRecord(serviceId: string, key: string) {
+    const store = await this.getStore();
+    await store.remove(`/media/${serviceId}/${key}`);
   }
 
 }

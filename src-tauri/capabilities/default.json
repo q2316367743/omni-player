@@ -8,12 +8,33 @@
   "permissions": [
     "core:default",
     "dialog:default",
-    "fs:default",
+    {
+      "identifier": "fs:default",
+      "allow": [
+        {
+          "path": "$APPDATA/*"
+        }
+      ]
+    },
     "log:default",
     "opener:default",
     "os:default",
     "shell:default",
-    "store:default",
-    "stronghold:default"
+    "store:allow-get",
+    "store:allow-set",
+    "store:allow-save",
+    "store:allow-load",
+    "stronghold:default",
+    {
+      "identifier": "http:default",
+      "allow": [
+        {
+          "url": "https://*"
+        },
+        {
+          "url": "http://*"
+        }
+      ]
+    }
   ]
 }

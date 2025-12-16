@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "omni-player",
-  "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "version": "0.0.1",
+  "identifier": "omni-player.esion.xyz",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5123",
@@ -13,8 +13,8 @@
     "windows": [
       {
         "title": "omni-player",
-        "width": 800,
-        "height": 600,
+        "width": 1200,
+        "height": 800,
         "resizable": true,
         "fullscreen": false
       }
