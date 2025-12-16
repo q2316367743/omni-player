@@ -1,0 +1,1 @@
+export type YesOrNo = 1 | 0;
