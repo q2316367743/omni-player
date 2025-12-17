@@ -9,6 +9,8 @@ export interface MediaServerInsert {
   isEnabled: boolean;
 
   url: string;
+  // 顺序
+  sequence: number;
 
 }
 
@@ -36,5 +38,6 @@ export function buildMediaServerInsert(): MediaServerInsert {
     url: '',
     isEnabled: true,
     type: 'jellyfin',
+    sequence: 0
   }
 }

@@ -1,5 +1,5 @@
 import {buildMediaServerInsert, type MediaServer, type MediaServerEdit} from "@/entity/MediaServer.ts";
-import {DialogPlugin, Form, FormItem, Input, Radio, RadioGroup} from "tdesign-vue-next";
+import {DialogPlugin, Form, FormItem, Input, InputNumber, Radio, RadioGroup} from "tdesign-vue-next";
 import {useStronghold} from "@/lib/Stronghold.ts";
 import {useMediaServerStore} from "@/store";
 import MessageUtil from "@/util/model/MessageUtil.ts";
@@ -28,6 +28,9 @@ export function openMediaServerEdit(old?: MediaServer) {
     default: () => <Form data={server.value}>
       <FormItem label={'名称'} labelAlign={"top"}>
         <Input v-model={server.value.name} clearable/>
+      </FormItem>
+      <FormItem label={'排序'} labelAlign={"top"} help={"越小越靠前"}>
+        <InputNumber v-model={server.value.sequence}/>
       </FormItem>
       <FormItem label={'类型'} labelAlign={"top"}>
         <RadioGroup v-model={server.value.type}>

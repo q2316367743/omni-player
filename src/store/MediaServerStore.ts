@@ -48,6 +48,7 @@ export const useMediaServerStore = defineStore('media-server', () => {
     servers.value[index] = {
       ...servers.value[index]!,
       ...other,
+      updated_at: Date.now(),
     };
     await useStore().save(LocalName.LIST_MEDIA_SERVER, servers.value);
     // 更新用户名密码

@@ -12,10 +12,15 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    EmptyResult: typeof import('./src/components/Result/EmptyResult.vue')['default']
+    InfoResult: typeof import('./src/components/Result/InfoResult.vue')['default']
+    LoadingResult: typeof import('./src/components/Result/LoadingResult.vue')['default']
     MediaCard: typeof import('./src/components/media/MediaCard.vue')['default']
+    PageLayout: typeof import('./src/components/PageLayout/PageLayout.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SubPageLayout: typeof import('./src/components/PageLayout/SubPageLayout.vue')['default']
+    SuccessResult: typeof import('./src/components/Result/SuccessResult.vue')['default']
     TButton: typeof import('tdesign-vue-next')['Button']
     TContent: typeof import('tdesign-vue-next')['Content']
     THeader: typeof import('tdesign-vue-next')['Header']
@@ -36,10 +41,15 @@ declare module 'vue' {
 
 // For TSX support
 declare global {
-  const HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+  const EmptyResult: typeof import('./src/components/Result/EmptyResult.vue')['default']
+  const InfoResult: typeof import('./src/components/Result/InfoResult.vue')['default']
+  const LoadingResult: typeof import('./src/components/Result/LoadingResult.vue')['default']
   const MediaCard: typeof import('./src/components/media/MediaCard.vue')['default']
+  const PageLayout: typeof import('./src/components/PageLayout/PageLayout.vue')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
+  const SubPageLayout: typeof import('./src/components/PageLayout/SubPageLayout.vue')['default']
+  const SuccessResult: typeof import('./src/components/Result/SuccessResult.vue')['default']
   const TButton: typeof import('tdesign-vue-next')['Button']
   const TContent: typeof import('tdesign-vue-next')['Content']
   const THeader: typeof import('tdesign-vue-next')['Header']

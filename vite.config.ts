@@ -9,6 +9,10 @@ import {TDesignResolver} from '@tdesign-vue-next/auto-import-resolver';
 
 const host = process.env.TAURI_DEV_HOST;
 
+function _resolve(dir: string) {
+  return resolve(__dirname, dir);
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [vue(), vueJsx(),
@@ -27,7 +31,7 @@ export default defineConfig({
   clearScreen: false,
   resolve: {
     alias: {
-      "@": resolve("src"),
+      "@": _resolve("src"),
     }
   },
   server: {
@@ -62,5 +66,15 @@ export default defineConfig({
     minify: !process.env.TAURI_ENV_DEBUG ? 'esbuild' : false,
     // produce sourcemaps for debug builds
     sourcemap: !!process.env.TAURI_ENV_DEBUG,
+
+    rolldownOptions: {
+      input: {
+        main: _resolve('index.html'),
+        'player-media': _resolve('player-media.html'),
+        'player-network': _resolve('player-network.html'),
+        'player-file': _resolve('player-file.html'),
+      },
+    },
+
   },
 })

@@ -12,6 +12,7 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "omni-player",
         "width": 1200,
         "height": 800,
@@ -34,7 +35,10 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "createUpdaterArtifacts": true
+    "createUpdaterArtifacts": true,
+    "resources": [
+      "lib/**/*"
+    ]
   },
   "plugins": {
     "updater": {

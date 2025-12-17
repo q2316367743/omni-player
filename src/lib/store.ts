@@ -5,7 +5,21 @@ import {APP_DATA_STORE_PATH} from "@/global/Constants";
 class StoreWrapper {
   private store: Store | null = null;
 
-  private async getStore() {
+  private promiseChain: Promise<unknown> = Promise.resolve();
+
+  async getStore(): Promise<Store> {
+    // 将新的 SQL 调用追加到 Promise 链尾部
+    this.promiseChain = this.promiseChain
+      .then(() => this._getStore())
+      .catch((err) => {
+        console.error('get store error:', err);
+        throw err; // 保证错误能被调用者捕获
+      });
+
+    return this.promiseChain as Promise<Store>;
+  }
+
+  private async _getStore() {
     if (!this.store) {
       this.store = await Store.load(await APP_DATA_STORE_PATH());
     }
