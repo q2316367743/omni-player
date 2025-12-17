@@ -246,7 +246,7 @@ useInfiniteScroll(containerRef, loadMoreData, {
 });
 
 // 监听路由参数变化
-watch(() => route.params.id, () => {
+onMounted(() => {
   // 重置所有状态
   categoryId.value = '';
   page.value = 1;
@@ -258,7 +258,13 @@ watch(() => route.params.id, () => {
 
   // 重新加载数据
   loadData();
-}, { immediate: true });
+})
+</script>
+
+<script lang="ts">
+export default {
+  name: "NetworkHome"
+}
 </script>
 
 <style scoped lang="less">

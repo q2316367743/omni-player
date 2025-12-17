@@ -38,7 +38,9 @@
         >
           <div class="mx-auto max-w-7xl px-4 lg:px-8 py-3 flex items-center gap-3">
             <t-button theme="default" variant="outline" shape="circle" @click="router.back()">
-              <t-icon name="chevron-left" />
+              <template #icon>
+                <chevron-left-icon />
+              </template>
             </t-button>
             <div class="min-w-0 flex-1">
               <div class="truncate text-sm text-slate-600 dark:text-slate-300">
@@ -47,11 +49,15 @@
               <div class="truncate text-lg font-semibold">{{ detail.title || '未命名' }}</div>
             </div>
             <t-button theme="primary" class="shadow-lg" @click="openPlayer">
-              <t-icon name="play" class="mr-2" />
+              <template #icon>
+                <play-icon />
+              </template>
               播放
             </t-button>
             <t-button theme="default" variant="outline" @click="loadDetail">
-              <t-icon name="refresh" class="mr-2" />
+              <template #icon>
+                <refresh-icon />
+              </template>
               刷新
             </t-button>
           </div>
@@ -76,12 +82,14 @@
                       v-else
                       class="h-full w-full bg-gradient-to-br from-indigo-500/40 via-fuchsia-500/30 to-cyan-500/40 flex items-center justify-center"
                     >
-                      <t-icon name="image" class="text-5xl text-white/60" />
+                      <image-icon class="text-5xl text-white/60" />
                     </div>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
                     <div class="absolute inset-0 flex items-center justify-center">
                       <t-button theme="primary" shape="circle" size="large" class="shadow-xl" @click="openPlayer">
-                        <t-icon name="play" class="text-xl" />
+                        <template #icon>
+                          <play-icon />
+                        </template>
                       </t-button>
                     </div>
 
@@ -108,7 +116,9 @@
                         shape="round"
                         class="border-0 bg-black/35 text-white"
                       >
-                        <t-icon name="calendar" class="mr-1" />
+                        <template #icon>
+                          <calendar-icon />
+                        </template>
                         {{ detail.releaseYear }}
                       </t-tag>
                       <t-tag
@@ -118,7 +128,9 @@
                         shape="round"
                         class="border-0 bg-black/35 text-white"
                       >
-                        <t-icon name="location" class="mr-1" />
+                        <template #icon>
+                          <location-icon />
+                        </template>
                         {{ detail.region }}
                       </t-tag>
                       <t-tag
@@ -128,7 +140,9 @@
                         shape="round"
                         class="border-0 bg-black/35 text-white"
                       >
-                        <t-icon name="translate" class="mr-1" />
+                        <template #icon>
+                          <translate-icon />
+                        </template>
                         {{ detail.language }}
                       </t-tag>
                     </div>
@@ -139,11 +153,15 @@
                     <div v-if="detail.subtitle" class="mt-1 text-sm text-white/70">{{ detail.subtitle }}</div>
                     <div class="mt-4 grid grid-cols-2 gap-3">
                       <t-button theme="primary" block class="shadow-lg" @click="openPlayer">
-                        <t-icon name="play" class="mr-2" />
+                        <template #icon>
+                          <play-icon />
+                        </template>
                         播放
                       </t-button>
                       <t-button theme="default" variant="outline" block @click="loadDetail">
-                        <t-icon name="refresh" class="mr-2" />
+                        <template #icon>
+                          <refresh-icon />
+                        </template>
                         刷新
                       </t-button>
                     </div>
@@ -159,19 +177,20 @@
                   </div>
                   <div class="mt-3 grid grid-cols-2 gap-3 text-sm text-white/80">
                     <div class="flex items-center gap-2">
-                      <t-icon name="time" class="text-white/70" />
+                      <time-icon class="text-white/70" />
+
                       <span>{{ detail.duration || '未知时长' }}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                      <t-icon name="video" class="text-white/70" />
+                      <video-icon class="text-white/70" />
                       <span>{{ detail.total ? `${detail.total}集` : '未知集数' }}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                      <t-icon name="calendar" class="text-white/70" />
+                      <calendar-icon class="text-white/70" />
                       <span>{{ detail.releaseDate || '未知上映' }}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                      <t-icon name="layers" class="text-white/70" />
+                      <layers-icon class="text-white/70" />
                       <span>{{ detail.chapters?.length ? `${detail.chapters.length}个播放源` : '无播放源' }}</span>
                     </div>
                   </div>
@@ -349,6 +368,15 @@ import { useNetworkServerStore } from "@/store";
 import { getNetworkListItem, setNetworkListItem } from "../components/detail";
 import MessageUtil from "@/util/model/MessageUtil";
 import { createWindows } from "@/lib/windows";
+import {
+  CalendarIcon,
+  ChevronLeftIcon,
+  ImageIcon, LayersIcon,
+  LocationIcon,
+  PlayIcon,
+  RefreshIcon, TimeIcon,
+  TranslateIcon, VideoIcon
+} from "tdesign-icons-vue-next";
 
 const route = useRoute();
 const router = useRouter();
@@ -374,29 +402,6 @@ const contentText = computed(() => {
   const raw = detail.value?.content || "";
   return stripHtml(raw);
 });
-
-const buildFallbackItem = (id: string): NetworkListItem => {
-  return {
-    id,
-    type: "Movie",
-    cover: "",
-    title: "",
-    subtitle: "",
-    types: [],
-    actors: [],
-    directors: [],
-    writers: [],
-    remark: "",
-    releaseDate: "",
-    total: 0,
-    region: "",
-    language: "",
-    releaseYear: "",
-    duration: "",
-    content: "",
-    chapters: [],
-  };
-};
 
 const loadDetail = async () => {
   loading.value = true;

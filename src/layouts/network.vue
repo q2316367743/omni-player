@@ -15,7 +15,11 @@
       </t-head-menu>
     </t-header>
     <t-content class="h-full relative overflow-auto">
-      <router-view/>
+      <router-view v-slot="{ Component, route }">
+        <keep-alive :include="['NetworkHome']">
+          <component :is="Component" :key="route.fullPath"/>
+        </keep-alive>
+      </router-view>
     </t-content>
   </t-layout>
 </template>

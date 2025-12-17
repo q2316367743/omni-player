@@ -51,9 +51,9 @@ export const router = createRouter({
     path: "/network",
     component: () => import('@/layouts/network.vue'),
     children: [{
-      name: '网络服务 - 首页',
+      name: 'NetworkHome',
       path: ':id/home',
-      component: () => import('@/pages/network/home/index.vue')
+      component: () => import('@/pages/network/home/NetworkHome.vue')
     },{
       name: '网络服务 - 影视详情',
       path: ':id/detail/:mediaId',
