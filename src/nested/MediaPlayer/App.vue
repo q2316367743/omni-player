@@ -178,7 +178,7 @@ const muted = ref(false);
 
 const controlsVisible = ref(true);
 const hoveringControls = ref(false);
-let hideTimer: ReturnType<typeof window.setTimeout> | undefined;
+let hideTimer: ReturnType<typeof window.setTimeout> | undefined = undefined;
 
 const isFullscreen = ref(false);
 const progressDraft = ref(0);
@@ -234,7 +234,7 @@ function scheduleHide() {
   clearHideTimer();
   if (hoveringControls.value) return;
   if (paused.value) return;
-  hideTimer = window.setTimeout(() => {
+  hideTimer = setTimeout(() => {
     if (!hoveringControls.value && !paused.value) controlsVisible.value = false;
   }, 1500);
 }

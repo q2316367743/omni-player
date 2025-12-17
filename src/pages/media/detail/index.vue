@@ -390,7 +390,7 @@
 import type {MediaDetail} from "@/modules/media/types/detail/MediaDetail.ts";
 import {useMediaServerStore} from "@/store";
 import MessageUtil from "@/util/model/MessageUtil.ts";
-import {ChevronLeftIcon, HeartFilledIcon, HeartIcon, MoreIcon, PlayIcon, RefreshIcon} from "tdesign-icons-vue-next";
+import {ChevronLeftIcon, HeartFilledIcon, HeartIcon, MoreIcon, PlayIcon} from "tdesign-icons-vue-next";
 import {createWindows} from "@/lib/windows.ts";
 
 const route = useRoute();
