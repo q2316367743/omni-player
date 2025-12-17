@@ -8,5 +8,9 @@ export const LocalName = {
   KEY_PLAYER_VIDEO_INDEX: "/key/player/video/index",
 
   // 全局设置
-  KEY_SETTING_GLOBAL: "/key/setting/global"
+  KEY_SETTING_GLOBAL: "/key/setting/global",
+
+  PAGE_MEDIA_HOME_SORT_BY: "/page/media/home/sortBy",
+
+  PAGE_MEDIA_HOME_SORT_ORDER: "/page/media/home/sortOrder"
 }

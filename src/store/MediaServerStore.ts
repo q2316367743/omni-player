@@ -53,6 +53,8 @@ export const useMediaServerStore = defineStore('media-server', () => {
     await useStronghold().removeMediaRecord(server.id, "username");
     await useStronghold().removeMediaRecord(server.id, "password");
     serverClientMap.delete(server.id);
+    localStorage.removeItem(`${LocalName.PAGE_MEDIA_HOME_SORT_BY}/${server.id}`)
+    localStorage.removeItem(`${LocalName.PAGE_MEDIA_HOME_SORT_ORDER}/${server.id}`)
   }
 
   const updateServer = async (server: MediaServerEdit, id: string) => {

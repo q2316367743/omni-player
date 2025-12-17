@@ -18,12 +18,12 @@ export const router = createRouter({
   }, {
     name: "管理后台",
     path: "/admin",
-    redirect: '/admin/server',
+    redirect: '/admin/global-setting',
     component: () => import('@/layouts/admin.vue'),
     children: [{
-      name: '服务器管理',
-      path: 'server',
-      component: () => import('@/pages/admin/server/index.vue')
+      name: '管理后台-全局设置',
+      path: 'global-setting',
+      component: () => import('@/pages/admin/global-setting/index.vue')
     }]
   }, {
     name: "媒体中心",

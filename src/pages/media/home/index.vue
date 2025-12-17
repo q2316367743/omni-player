@@ -3,7 +3,18 @@
     <!-- 粘性页面头部 -->
     <div class="sticky-header">
       <div class="page-header">
-        <h1 class="page-title">影视墙</h1>
+        <div class="sort-controls">
+          <t-select
+            v-model="sortBy"
+            :options="sortOptions"
+            size="medium"
+            :clearable="false"
+            class="sort-select"
+          />
+          <t-button size="medium" variant="outline" @click="toggleSortOrder">
+            {{ sortOrderLabel }}
+          </t-button>
+        </div>
         <div class="page-stats">
           <span class="stat-item">
             <t-icon name="video"/>
@@ -33,14 +44,12 @@
 
       <!-- 影视网格 -->
       <div v-else class="media-content">
-        <div class="media-grid" ref="mediaGridRef">
+        <div class="media-grid" >
           <MediaCard
             v-for="item in items"
             :key="item.id"
             :item="item"
             @click="goToDetail"
-            @mouseenter="hoveredItem = $event"
-            @mouseleave="hoveredItem = null"
           />
         </div>
 
@@ -68,11 +77,15 @@
 <script lang="ts" setup>
 import {useMediaServerStore} from '@/store';
 import type {MediaItem} from '@/modules/media/types/media/MediaItem.ts';
-import {MessagePlugin} from 'tdesign-vue-next';
+import MessageUtil from "@/util/model/MessageUtil.ts"
 import MediaCard from '@/components/media/MediaCard.vue';
+import {MediaPageSortOptions, type MediaPageSortBy} from '@/modules/media/types/common/MediaPage.ts';
+import {LocalName} from "@/global/LocalName.ts";
 
 const route = useRoute();
 const router = useRouter();
+
+const clientId = route.params.id as string;
 
 // 无限滚动状态
 const page = ref(1);
@@ -80,19 +93,21 @@ const pageSize = ref(20);
 const total = ref(0);
 const hasMore = ref(true);
 
+const sortOptions = MediaPageSortOptions;
+const sortBy = useLocalStorage<MediaPageSortBy>(`${LocalName.PAGE_MEDIA_HOME_SORT_BY}/${clientId}`, 'SortName');
+const sortOrder = useLocalStorage<'Ascending' | 'Descending'>(`${LocalName.PAGE_MEDIA_HOME_SORT_ORDER}/${clientId}`, 'Ascending');
+const sortOrderLabel = computed(() => (sortOrder.value === 'Ascending' ? '升序' : '降序'));
+
 // 数据状态
 const items = ref<MediaItem[]>([]);
 const loading = ref(false);
 const loadingMore = ref(false);
 const error = ref<string>('');
 const loadMoreError = ref<string>('');
-const hoveredItem = ref<MediaItem | null>(null);
-
-// DOM引用
-const mediaGridRef = ref<HTMLElement | null>(null);
 
 // 滚动节流控制
 let isLoading = false;
+let pendingReload = false;
 
 // 加载数据（初始加载或重置）
 const loadData = async () => {
@@ -103,10 +118,12 @@ const loadData = async () => {
   isLoading = true;
 
   try {
-    const client = await useMediaServerStore().getServerClient(route.params.id as string);
+    const client = await useMediaServerStore().getServerClient(clientId);
     const res = await client.getItems({
       page: 1, // 重置为第一页
-      pageSize: pageSize.value
+      pageSize: pageSize.value,
+      sortBy: sortBy.value,
+      sortOrder: sortOrder.value,
     });
 
     console.log('Initial load response:', res);
@@ -122,10 +139,15 @@ const loadData = async () => {
     window.scrollTo({top: 0, behavior: 'smooth'});
   } catch (err) {
     error.value = err instanceof Error ? err.message : '加载数据失败';
-    MessagePlugin.error('加载影视数据失败');
+    MessageUtil.error('加载影视数据失败');
   } finally {
     loading.value = false;
     isLoading = false;
+
+    if (pendingReload) {
+      pendingReload = false;
+      queueMicrotask(loadData);
+    }
   }
 };
 
@@ -145,10 +167,12 @@ const loadMoreData = async () => {
     const nextPage = page.value + 1;
     console.log('Loading page:', nextPage);
 
-    const client = await useMediaServerStore().getServerClient(route.params.id as string);
+    const client = await useMediaServerStore().getServerClient(clientId);
     const res = await client.getItems({
       page: nextPage,
-      pageSize: pageSize.value
+      pageSize: pageSize.value,
+      sortBy: sortBy.value,
+      sortOrder: sortOrder.value,
     });
 
     console.log('Load more response:', res);
@@ -164,7 +188,7 @@ const loadMoreData = async () => {
   } catch (err) {
     console.error('Load more error:', err);
     loadMoreError.value = err instanceof Error ? err.message : '加载更多数据失败';
-    MessagePlugin.error('加载更多数据失败');
+    MessageUtil.error('加载更多数据失败');
   } finally {
     loadingMore.value = false;
     isLoading = false;
@@ -174,13 +198,25 @@ const loadMoreData = async () => {
 
 // 跳转到详情页
 const goToDetail = (item: MediaItem) => {
-  router.push(`/media/${route.params.id}/detail/${item.id}`);
+  router.push(`/media/${clientId}/detail/${item.id}`);
 };
 
 const mediaWallContainerRef = ref();
 useInfiniteScroll(mediaWallContainerRef, loadMoreData, {
   distance: 10
 })
+
+const toggleSortOrder = () => {
+  sortOrder.value = sortOrder.value === 'Ascending' ? 'Descending' : 'Ascending';
+};
+
+watch([sortBy, sortOrder], () => {
+  if (isLoading) {
+    pendingReload = true;
+    return;
+  }
+  loadData();
+});
 
 // 监听路由参数变化
 watch(() => route.params.id, () => {
@@ -209,7 +245,7 @@ export default {
   background: linear-gradient(135deg, var(--td-bg-color-container) 0%, var(--td-bg-color-secondarycontainer) 100%);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--td-border-level-1-color);
-  padding: 24px 24px 16px;
+  padding: 12px;
   margin-bottom: 16px;
 }
 
@@ -221,13 +257,14 @@ export default {
   margin: 0 auto;
 }
 
-.page-title {
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--td-brand-color) 0%, var(--td-brand-color-hover) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0;
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sort-select {
+  width: 180px;
 }
 
 .page-stats {

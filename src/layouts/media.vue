@@ -10,7 +10,7 @@
           </t-button>
         </template>
         <t-menu-item :value="home">全部视频</t-menu-item>
-        <t-menu-item :value="category">分类查询</t-menu-item>
+        <t-menu-item :value="category">已收藏</t-menu-item>
         <t-menu-item :value="person">演员列表</t-menu-item>
       </t-head-menu>
     </t-header>

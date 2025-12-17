@@ -22,6 +22,7 @@ import MessageBoxUtil from "@/util/model/MessageBoxUtil.tsx";
 import type {PaginatedResult, PaginationOptions} from "@/modules/media/types/common/MediaPage.ts";
 import type {MediaDetailJellyfin} from "@/modules/media/types/detail/MediaDetail.jellyfin.ts";
 
+
 export class JellyfinClient implements IMediaServer {
   private readonly server: MediaServer;
   private readonly baseUrl: string;
@@ -164,26 +165,50 @@ export class JellyfinClient implements IMediaServer {
   /**
    * 获取子项（支持 parentId 和 type 过滤）
    */
-  async getItems(pagination: PaginationOptions, parentId?: string, type?: 'Movie' | 'Series'): Promise<PaginatedResult<MediaItem>> {
-    let url = `/Users/${this.userId}/Items?`;
-    const params: Record<string, string> = {};
+  async getItems(options: PaginationOptions, parentId?: string, type?: 'Movie' | 'Series'): Promise<PaginatedResult<MediaItem>> {
+    const {
+      page = 1,
+      pageSize = 50,
+      sortBy = 'SortName',       // Jellyfin 默认按名称排序
+      sortOrder = 'Ascending',
+      isUnplayed,
+      isFavorite,
+      genres,
+      years
+    } = options || {};
+    const params: Record<string, string> = {
+      Recursive: 'true',
+      Fields: 'ProviderIds,UserData,Genres,Overview,DateCreated,DateLastSaved',
+      ImageTypeLimit: '1',
+      EnableImageTypes: 'Primary,Backdrop',
+      // 👇 关键：排序
+      SortBy: sortBy,
+      SortOrder: sortOrder,
+    };
+
+    // 高级过滤（可选）
+    if (isUnplayed) params['IsUnplayed'] = 'true';
+    if (isFavorite) params['IsFavorite'] = 'true';
+    if (genres?.length) {
+      genres.forEach(g => params['Genres'] = g);
+    }
+    if (years?.length) {
+      // Jellyfin 支持 Year 参数（单值或范围需多次请求，此处简化为单年）
+      years.forEach(y => params['Years'] = y.toString());
+    }
+
 
     if (parentId) params['ParentId'] = parentId;
     if (type) {
       params['IncludeItemTypes'] = type === 'Movie' ? 'Movie' : 'Series';
     }
-    params['Recursive'] = 'true';
-    params['Fields'] = 'ProviderIds,UserData,Genres,Overview,DateCreated,DateLastSaved';
-    params['ImageTypeLimit'] = '1';
-    params['EnableImageTypes'] = 'Primary,Backdrop';
 
-    const {page = 1, pageSize = 50} = pagination;
     const startIndex = (page - 1) * pageSize;
     // 👇 关键：分页参数
     params['StartIndex'] = startIndex.toString();
     params['Limit'] = pageSize.toString();
 
-    const data = await this.getAction(url, params);
+    const data = await this.getAction(`/Users/${this.userId}/Items`, params);
     const items = data.Items.map((item: any) =>
       normalizeMediaItem({...item, ServerUrl: this.baseUrl})
     );

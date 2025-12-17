@@ -1,4 +1,4 @@
-export type PlayerModeType = "h5" | "mpv" | "potplayer" | "vlc" | "other";
+export type PlayerModeType = "h5" | "mpv" | "potplayer" | "vlc" | "custom";
 
 export interface GlobalSetting {
 
