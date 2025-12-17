@@ -20,7 +20,10 @@ export default defineConfig({
       resolvers: [TDesignResolver({
         library: 'vue-next'
       })],
-      imports: ['vue', '@vueuse/core', 'vue-router']
+      imports: ['vue', '@vueuse/core', 'vue-router'],
+      eslintrc: {
+        enabled: true,
+      }
     }),
     Components({
       resolvers: [TDesignResolver({

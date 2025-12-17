@@ -25,13 +25,12 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {useMediaServerStore} from "@/store";
-import {openMediaServerEdit} from "@/pages/home/func/MediaServerEdit.tsx";
-import type {MediaServer} from "@/entity/MediaServer.ts";
+import { useMediaServerStore, useNetworkServerStore } from "@/store";
+import { openMediaServerEdit } from "@/pages/home/func/MediaServerEdit.tsx";
+import type { MediaServer } from "@/entity/MediaServer.ts";
 import MessageBoxUtil from "@/util/model/MessageBoxUtil.tsx";
 import MessageUtil from "@/util/model/MessageUtil.ts";
-import {useNetworkServerStore} from "@/store/NetworkServerStore.ts";
-import {openNetworkServerEdit} from "@/pages/home/func/NetworkServerEdit.tsx";
+import { openNetworkServerEdit } from "@/pages/home/func/NetworkServerEdit.tsx";
 
 const router = useRouter();
 
@@ -56,6 +55,4 @@ const jumpNetwork = (id: string) => {
   router.push(`/network/${id}/home`)
 }
 </script>
-<style scoped lang="less">
-
-</style>
+<style scoped lang="less"></style>

@@ -6,11 +6,11 @@
         <div class="page-title">{{ client?.props.name }}</div>
         <div class="page-stats">
           <span class="stat-item">
-            <t-icon name="video"/>
+            <t-icon name="video" />
             已加载 {{ currentItems.length }} 部作品
           </span>
           <span v-if="total > 0" class="stat-item">
-            <t-icon name="list"/>
+            <t-icon name="list" />
             总计 {{ total }} 部
           </span>
         </div>
@@ -35,13 +35,11 @@
       </div>
 
       <!-- 初始加载状态 -->
-      <div v-if="loading && currentItems.length === 0" class="loading-container">
-        <t-loading text="正在加载视频数据..."/>
-      </div>
+      <t-loading v-if="loading && currentItems.length === 0" text="正在加载视频数据..." class="w-full !pr-232px" />
 
       <!-- 错误状态 -->
       <div v-else-if="error && currentItems.length === 0" class="error-container">
-        <t-icon name="error-circle" class="error-icon"/>
+        <t-icon name="error-circle" class="error-icon" />
         <p class="error-message">{{ error }}</p>
         <t-button theme="primary" @click="loadData">重新加载</t-button>
       </div>
@@ -50,33 +48,19 @@
       <div v-else class="video-content">
         <div class="video-grid" ref="gridRef">
           <!-- 推荐视频 -->
-          <HomeRecommendCard
-            v-for="item in recommends"
-            :item="item"
-            :key="`recommend-${item.id}`"
-            @click="goToDetail"
-            @mouseenter="hoveredItem = $event"
-            @mouseleave="hoveredItem = null"
-          />
+          <HomeRecommendCard v-for="item in recommends" :item="item" :key="`recommend-${item.id}`" @click="goToDetail"
+            @mouseenter="hoveredItem = $event" @mouseleave="hoveredItem = null" />
           <!-- 常规视频 -->
-          <HomeVideoCard
-            v-for="item in items"
-            :item="item"
-            :key="`video-${item.id}`"
-            @click="goToDetail"
-            @mouseenter="hoveredItem = $event"
-            @mouseleave="hoveredItem = null"
-          />
+          <HomeVideoCard v-for="item in items" :item="item" :key="`video-${item.id}`" @click="goToDetail"
+            @mouseenter="hoveredItem = $event" @mouseleave="hoveredItem = null" />
         </div>
 
         <!-- 加载更多提示 -->
-        <div v-if="loadingMore" class="loading-more">
-          <t-loading text="正在加载更多..." size="small"/>
-        </div>
+        <t-loading v-if="loadingMore" text="正在加载更多..." size="small" class="w-full"/>
 
         <!-- 加载完成提示 -->
         <div v-if="!hasMore && currentItems.length > 0" class="load-complete">
-          <t-icon name="check-circle" class="complete-icon"/>
+          <t-icon name="check-circle" class="complete-icon" />
           <span>已加载全部 {{ total }} 部作品</span>
         </div>
 
@@ -92,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { useNetworkServerStore } from '@/store/NetworkServerStore';
+import { useNetworkServerStore } from '@/store';
 import type { NetworkRecommend } from '@/modules/network/types/NetworkRecommend';
 import type { NetworkCategory } from '@/modules/network/types/NetworkCategory';
 import type { INetworkServer } from '@/modules/network/INetworkServer';
@@ -150,12 +134,12 @@ const loadData = async () => {
 
   try {
     client = await useNetworkServerStore().getServerClient(networkId);
-    
+
     if (categoryId.value) {
       // 加载分类视频
       const res = await client.getVideos(categoryId.value, 1);
       console.log(`分类视频「${categoryId.value}」响应:`, res);
-      
+
       items.value = res.data;
       total.value = res.total;
       hasMore.value = res.data.length >= pageSize.value;
@@ -164,7 +148,7 @@ const loadData = async () => {
       // 加载首页推荐
       const res = await client.home(1);
       console.log('首页推荐响应:', res);
-      
+
       recommends.value = res.recommends;
       categories.value = res.categories;
       total.value = res.total;
@@ -209,7 +193,7 @@ const loadMoreData = async () => {
       // 加载更多分类视频
       const res = await client.getVideos(categoryId.value, nextPage);
       console.log('更多分类视频响应:', res);
-      
+
       // 追加新数据到现有数组
       items.value.push(...res.data);
       total.value = res.total;
@@ -219,7 +203,7 @@ const loadMoreData = async () => {
       // 加载更多推荐（通常推荐不会分页，这里作为兼容处理）
       const res = await client.home(nextPage);
       console.log('更多推荐响应:', res);
-      
+
       recommends.value.push(...res.recommends);
       total.value = res.total;
       hasMore.value = res.recommends.length >= pageSize.value;
@@ -251,7 +235,7 @@ watch(categoryId, () => {
   hasMore.value = true;
   recommends.value = [];
   items.value = [];
-  
+
   // 重新加载数据
   loadData();
 });
@@ -271,7 +255,7 @@ watch(() => route.params.id, () => {
   recommends.value = [];
   items.value = [];
   categories.value = [];
-  
+
   // 重新加载数据
   loadData();
 }, { immediate: true });
@@ -338,7 +322,7 @@ watch(() => route.params.id, () => {
   width: 240px;
   height: calc(100vh - 148px);
   position: sticky;
-  top: 80px;
+  top: 72px;
 }
 
 .category-menu {
@@ -425,7 +409,7 @@ watch(() => route.params.id, () => {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 20px;
   }
-  
+
 }
 
 @media (max-width: 768px) {
@@ -443,17 +427,17 @@ watch(() => route.params.id, () => {
   .page-title {
     font-size: 28px;
   }
-  
+
   .content-area {
     flex-direction: column;
     padding: 0;
     gap: 16px;
   }
-  
+
   .category-section {
     width: 100%;
   }
-  
+
   .video-grid {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 16px;
@@ -465,7 +449,7 @@ watch(() => route.params.id, () => {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 12px;
   }
-  
+
   .sticky-header {
     padding: 16px 16px 12px;
   }

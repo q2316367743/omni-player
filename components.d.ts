@@ -39,6 +39,8 @@ declare module 'vue' {
     TPagination: typeof import('tdesign-vue-next')['Pagination']
     TSpace: typeof import('tdesign-vue-next')['Space']
     TSubmenu: typeof import('tdesign-vue-next')['Submenu']
+    TTabPanel: typeof import('tdesign-vue-next')['TabPanel']
+    TTabs: typeof import('tdesign-vue-next')['Tabs']
     TTag: typeof import('tdesign-vue-next')['Tag']
   }
 }
@@ -72,5 +74,7 @@ declare global {
   const TPagination: typeof import('tdesign-vue-next')['Pagination']
   const TSpace: typeof import('tdesign-vue-next')['Space']
   const TSubmenu: typeof import('tdesign-vue-next')['Submenu']
+  const TTabPanel: typeof import('tdesign-vue-next')['TabPanel']
+  const TTabs: typeof import('tdesign-vue-next')['Tabs']
   const TTag: typeof import('tdesign-vue-next')['Tag']
 }

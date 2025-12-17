@@ -1,14 +1,14 @@
-import {XMLParser} from 'fast-xml-parser';
-import type {NetworkServer} from "@/entity/NetworkServer.ts";
-import type {NetworkCategoryResult} from "@/modules/network/types/NetworkCategoryResult.ts";
-import {getAction} from "@/lib/http.ts";
-import type {NetworkSearchResult} from "@/modules/network/types/NetworkSearchResult.ts";
-import {cmsTreeTransfer} from "@/modules/network/CmsUtil.ts";
-import type {NetworkHome} from "@/modules/network/types/NetworkHome.ts";
-import type {NetworkListItem} from "@/modules/network/types/NetworkListItem.ts";
-import type {NetworkDetail} from "@/modules/network/types/NetworkDetail.ts";
-import type {NetworkListItemChapter} from "@/modules/network/types/NetworkListItemChapter.ts";
-import type {INetworkServer} from "@/modules/network/INetworkServer.ts";
+import { XMLParser } from 'fast-xml-parser';
+import type { NetworkServer } from "@/entity/NetworkServer.ts";
+import type { NetworkCategoryResult } from "@/modules/network/types/NetworkCategoryResult.ts";
+import { getAction } from "@/lib/http.ts";
+import type { NetworkSearchResult } from "@/modules/network/types/NetworkSearchResult.ts";
+import { cmsTreeTransfer } from "@/modules/network/CmsUtil.ts";
+import type { NetworkHome } from "@/modules/network/types/NetworkHome.ts";
+import type { NetworkListItem } from "@/modules/network/types/NetworkListItem.ts";
+import type { NetworkDetail } from "@/modules/network/types/NetworkDetail.ts";
+import type { NetworkListItemChapter } from "@/modules/network/types/NetworkListItemChapter.ts";
+import type { INetworkServer } from "@/modules/network/INetworkServer.ts";
 
 
 export class NetworkServerCmsXml implements INetworkServer {
@@ -27,7 +27,7 @@ export class NetworkServerCmsXml implements INetworkServer {
   }
 
   private async cToL(params: Record<string, any>): Promise<NetworkCategoryResult> {
-    const {data} = await getAction<string>(this.url, params, {
+    const { data } = await getAction<string>(this.url, params, {
       responseType: 'text'
     });
     const xml = this.parser.parse(data);
@@ -36,36 +36,36 @@ export class NetworkServerCmsXml implements INetworkServer {
       limit: Number(list['@_pagesize']),
       page: Number(list['@_page']),
       total: Number(list['@_recordcount']),
-      data: (list.video as Array<any>)?.map(e => {
+      data: list.video ? ((Array.isArray(list.video) ? list.video : [list.video]) as Array<any>)?.map(e => {
         const chapters = new Array<NetworkListItemChapter>();
-          const dds: Array<any> = Array.isArray(e.dl.dd) ? e.dl.dd : [e.dl.dd];
-          dds.forEach((dd) => {
-            if (typeof dd === 'string') {
-              chapters.push({
-                id: this.props.id,
-                name: this.props.name,
-                items: dd.split('#').map(e => {
-                  const temp = e.split('$');
-                  return {
-                    name: temp[0]!,
-                    url: temp[1]!
-                  }
-                })
+        const dds: Array<any> = Array.isArray(e.dl.dd) ? e.dl.dd : [e.dl.dd];
+        dds.forEach((dd) => {
+          if (typeof dd === 'string') {
+            chapters.push({
+              id: this.props.id,
+              name: this.props.name,
+              items: dd.split('#').map(e => {
+                const temp = e.split('$');
+                return {
+                  name: temp[0]!,
+                  url: temp[1]!
+                }
               })
-            }else {
-              chapters.push({
-                id: encodeURIComponent(dd['@_flag']),
-                name: dd['@_flag'],
-                items: (dd['#text'] as string).split('#').map(ddString => {
-                  const temp = ddString.split('$');
-                  return {
-                    name: temp[0]!,
-                    url: temp[1]!
-                  }
-                })
+            })
+          } else {
+            chapters.push({
+              id: encodeURIComponent(dd['@_flag']),
+              name: dd['@_flag'],
+              items: (dd['#text'] as string).split('#').map(ddString => {
+                const temp = ddString.split('$');
+                return {
+                  name: temp[0]!,
+                  url: temp[1]!
+                }
               })
-            }
-          })
+            })
+          }
+        })
         return {
           id: e.id + '',
           type: 'Series',
@@ -86,7 +86,7 @@ export class NetworkServerCmsXml implements INetworkServer {
           content: e.des,
           chapters
         }
-      }) || []
+      }) || [] : []
     }
   }
 
@@ -97,16 +97,17 @@ export class NetworkServerCmsXml implements INetworkServer {
       ids: video.id
     })
     return {
+      ...video,
       ...results.data[0]!,
       recommends: results.data.slice(1)
     };
   }
 
   async home(page: number): Promise<NetworkHome> {
-    const {data} = await getAction<string>(this.url, {
+    const { data } = await getAction<string>(this.url, {
       ac: 'class',
       pg: page
-    }, {responseType: 'text'});
+    }, { responseType: 'text' });
     const xml = this.parser.parse(data);
     const list = xml.rss.list;
     return {
