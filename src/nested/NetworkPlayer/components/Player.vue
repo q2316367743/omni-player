@@ -105,6 +105,7 @@ import {useCacheRecordStorage} from "@/hooks";
 import {LocalName} from "@/global/LocalName.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {isEmptyArray} from "@/util";
+import VideoContainer from "@/nested/NetworkPlayer/components/VideoContainer.vue";
 
 const props = defineProps({
   plugin: {

@@ -5,5 +5,8 @@ export const LocalName = {
   LIST_NETWORK_SERVER: "/list/network-server",
 
   // 服务器资源播放进度缓存
-  KEY_PLAYER_VIDEO_INDEX: "/key/player/video/index"
+  KEY_PLAYER_VIDEO_INDEX: "/key/player/video/index",
+
+  // 全局设置
+  KEY_SETTING_GLOBAL: "/key/setting/global"
 }

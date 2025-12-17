@@ -7,12 +7,33 @@
     "linux"
   ],
   "windows": [
-    "player-media"
+    "player-media",
+    "player-network"
   ],
   "permissions": [
+    "core:default",
+    "core:event:allow-listen",
+    "store:allow-delete",
+    "store:allow-get",
+    "store:allow-set",
+    "store:allow-save",
+    "store:allow-load",
     "libmpv:default",
     "fs:allow-read-text-file",
-    "fs:allow-resource-read-recursive"
-  ],
-  "capabilities": []
+    "fs:allow-resource-read-recursive",
+    {
+      "identifier": "http:default",
+      "allow": [
+        {
+          "url": "https://*"
+        },
+        {
+          "url": "http://*"
+        },
+        {
+          "url": "http://*:*/*"
+        }
+      ]
+    }
+  ]
 }

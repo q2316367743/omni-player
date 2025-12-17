@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <player v-if="detail && plugin" :default-video="detail" :plugin="plugin"/>
+    <player v-if="detail && plugin" :default-network="detail" :plugin="plugin"/>
     <loading-result v-else title="正在加载中"/>
   </div>
 </template>

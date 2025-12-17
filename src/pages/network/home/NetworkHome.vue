@@ -6,11 +6,11 @@
         <div class="page-title">{{ client?.props.name }}</div>
         <div class="page-stats">
           <span class="stat-item">
-            <t-icon name="video" />
-            已加载 {{ currentItems.length }} 部作品
+            <t-icon name="video"/>
+            已加载 {{ items.length }} 部作品
           </span>
           <span v-if="total > 0" class="stat-item">
-            <t-icon name="list" />
+            <t-icon name="list"/>
             总计 {{ total }} 部
           </span>
         </div>
@@ -35,11 +35,11 @@
       </div>
 
       <!-- 初始加载状态 -->
-      <t-loading v-if="loading && currentItems.length === 0" text="正在加载视频数据..." class="w-full !pr-232px" />
+      <t-loading v-if="loading && items.length === 0" text="正在加载视频数据..." class="w-full !pr-232px"/>
 
       <!-- 错误状态 -->
-      <div v-else-if="error && currentItems.length === 0" class="error-container">
-        <t-icon name="error-circle" class="error-icon" />
+      <div v-else-if="error && items.length === 0" class="error-container">
+        <t-icon name="error-circle" class="error-icon"/>
         <p class="error-message">{{ error }}</p>
         <t-button theme="primary" @click="loadData">重新加载</t-button>
       </div>
@@ -47,20 +47,15 @@
       <!-- 视频网格 -->
       <div v-else class="video-content">
         <div class="video-grid" ref="gridRef">
-          <!-- 推荐视频 -->
-          <HomeRecommendCard v-for="item in recommends" :item="item" :key="`recommend-${item.id}`" @click="goToDetail"
-            @mouseenter="hoveredItem = $event" @mouseleave="hoveredItem = null" />
-          <!-- 常规视频 -->
-          <HomeVideoCard v-for="item in items" :item="item" :key="`video-${item.id}`" @click="goToDetail"
-            @mouseenter="hoveredItem = $event" @mouseleave="hoveredItem = null" />
+          <HomeVideoCard v-for="item in items" :item="item" :key="`video-${item.id}`" @click="goToDetail"/>
         </div>
 
         <!-- 加载更多提示 -->
         <t-loading v-if="loadingMore" text="正在加载更多..." size="small" class="w-full"/>
 
         <!-- 加载完成提示 -->
-        <div v-if="!hasMore && currentItems.length > 0" class="load-complete">
-          <t-icon name="check-circle" class="complete-icon" />
+        <div v-if="!hasMore && items.length > 0" class="load-complete">
+          <t-icon name="check-circle" class="complete-icon"/>
           <span>已加载全部 {{ total }} 部作品</span>
         </div>
 
@@ -71,18 +66,18 @@
         </div>
       </div>
     </div>
-    <t-back-top container=".network-home-container" />
+    <t-back-top container=".network-home-container"/>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useNetworkServerStore } from '@/store';
-import type { NetworkRecommend } from '@/modules/network/types/NetworkRecommend';
-import type { NetworkCategory } from '@/modules/network/types/NetworkCategory';
-import type { INetworkServer } from '@/modules/network/INetworkServer';
-import type { NetworkListItem } from '@/modules/network/types/NetworkListItem';
+import {useNetworkServerStore} from '@/store';
+import type {NetworkRecommend} from '@/modules/network/types/NetworkRecommend';
+import type {NetworkCategory} from '@/modules/network/types/NetworkCategory';
+import type {INetworkServer} from '@/modules/network/INetworkServer';
+import type {NetworkListItem} from '@/modules/network/types/NetworkListItem';
+import MessageUtil from "@/util/model/MessageUtil.ts";
 import HomeVideoCard from '@/pages/network/home/components/HomeVideoCard.vue';
-import HomeRecommendCard from '@/pages/network/home/components/HomeRecommendCard.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -97,14 +92,12 @@ const total = ref(0);
 const hasMore = ref(true);
 
 // 数据状态
-const recommends = ref<NetworkRecommend[]>([]);
 const items = ref<NetworkListItem[]>([]);
 const categories = ref<NetworkCategory[]>([]);
 const loading = ref(false);
 const loadingMore = ref(false);
 const error = ref<string>('');
 const loadMoreError = ref<string>('');
-const hoveredItem = ref<NetworkRecommend | NetworkListItem | null>(null);
 
 // 分类状态
 const categoryId = ref('');
@@ -112,11 +105,6 @@ const categoryId = ref('');
 // DOM引用
 const containerRef = ref<HTMLElement>();
 const gridRef = ref<HTMLElement>();
-
-// 计算当前显示的项目（推荐+常规）
-const currentItems = computed(() => {
-  return categoryId.value ? items.value : recommends.value;
-});
 
 // 网络服务客户端
 let client: INetworkServer | null = null;
@@ -135,34 +123,28 @@ const loadData = async () => {
   try {
     client = await useNetworkServerStore().getServerClient(networkId);
 
-    if (categoryId.value) {
-      // 加载分类视频
-      const res = await client.getVideos(categoryId.value, 1);
-      console.log(`分类视频「${categoryId.value}」响应:`, res);
+    // 加载首页推荐
+    client.home(1).then(res1 => {
+      console.log('首页推荐响应:', res1);
+      categories.value = res1.categories;
+    });
 
-      items.value = res.data;
-      total.value = res.total;
-      hasMore.value = res.data.length >= pageSize.value;
-      page.value = 1;
-    } else {
-      // 加载首页推荐
-      const res = await client.home(1);
-      console.log('首页推荐响应:', res);
+    // 加载分类视频
+    const res = await client.getVideos(categoryId.value, 1);
 
-      recommends.value = res.recommends;
-      categories.value = res.categories;
-      total.value = res.total;
-      hasMore.value = res.recommends.length >= pageSize.value;
-      page.value = 1;
-    }
+    items.value = res.data;
+    total.value = res.total;
+    hasMore.value = res.data.length >= pageSize.value;
+    page.value = 1;
+
 
     // 滚动到顶部
     if (containerRef.value) {
-      containerRef.value.scrollTo({ top: 0, behavior: 'smooth' });
+      containerRef.value.scrollTo({top: 0, behavior: 'smooth'});
     }
   } catch (err) {
     error.value = err instanceof Error ? err.message : '加载数据失败';
-    MessagePlugin.error('加载视频数据失败');
+    MessageUtil.error('加载视频数据失败');
   } finally {
     loading.value = false;
     isLoading = false;
@@ -172,7 +154,7 @@ const loadData = async () => {
 // 加载更多数据
 const loadMoreData = async () => {
   if (isLoading || !hasMore.value || loadingMore.value) {
-    console.log('加载更多被阻止:', { isLoading, hasMore: hasMore.value, loadingMore: loadingMore.value });
+    console.log('加载更多被阻止:', {isLoading, hasMore: hasMore.value, loadingMore: loadingMore.value});
     return;
   }
 
@@ -189,33 +171,22 @@ const loadMoreData = async () => {
       client = await useNetworkServerStore().getServerClient(networkId);
     }
 
-    if (categoryId.value) {
-      // 加载更多分类视频
-      const res = await client.getVideos(categoryId.value, nextPage);
-      console.log('更多分类视频响应:', res);
+    // 加载更多分类视频
+    const res = await client.getVideos(categoryId.value, nextPage);
+    console.log('更多分类视频响应:', res);
 
-      // 追加新数据到现有数组
-      items.value.push(...res.data);
-      total.value = res.total;
-      hasMore.value = res.data.length >= pageSize.value;
-      page.value = nextPage;
-    } else {
-      // 加载更多推荐（通常推荐不会分页，这里作为兼容处理）
-      const res = await client.home(nextPage);
-      console.log('更多推荐响应:', res);
-
-      recommends.value.push(...res.recommends);
-      total.value = res.total;
-      hasMore.value = res.recommends.length >= pageSize.value;
-      page.value = nextPage;
-    }
+    // 追加新数据到现有数组
+    items.value.push(...res.data);
+    total.value = res.total;
+    hasMore.value = res.data.length >= pageSize.value;
+    page.value = nextPage;
 
     console.log('加载更多完成, hasMore:', hasMore.value);
 
   } catch (err) {
     console.error('加载更多错误:', err);
     loadMoreError.value = err instanceof Error ? err.message : '加载更多数据失败';
-    MessagePlugin.error('加载更多数据失败');
+    MessageUtil.error('加载更多数据失败');
   } finally {
     loadingMore.value = false;
     isLoading = false;
@@ -233,7 +204,6 @@ watch(categoryId, () => {
   page.value = 1;
   total.value = 0;
   hasMore.value = true;
-  recommends.value = [];
   items.value = [];
 
   // 重新加载数据
@@ -252,7 +222,6 @@ onMounted(() => {
   page.value = 1;
   total.value = 0;
   hasMore.value = true;
-  recommends.value = [];
   items.value = [];
   categories.value = [];
 

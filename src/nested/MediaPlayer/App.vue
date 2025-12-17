@@ -12,6 +12,8 @@ import {
   observeProperties,
 } from 'tauri-plugin-libmpv-api';
 import {getAllWindows, getCurrentWindow} from "@tauri-apps/api/window";
+import type {WindowPayload} from "@/lib/windows.ts";
+import {fetchMediaClient} from "@/store";
 
 // Properties to observe
 // Tip: The optional third element, 'none', signals to TypeScript that the property's value may be null
@@ -68,15 +70,19 @@ onMounted(async () => {
     })
   // 设置监听初始化事件
   const current = getCurrentWindow();
-  await current.listen<{ url: string }>("init", ({payload}) => {
-    const {url} = payload;
+  await current.listen<WindowPayload>("init", async ({payload}) => {
+    const {mediaId, serverId} = payload;
+    // 获取实例
+    const client = await fetchMediaClient(serverId);
+    // 获取播放信息
+    const playbackInfo = await client.getPlaybackInfo(mediaId);
     // Load and play a file
-    command('loadfile', [url])
+    await command('loadfile', [playbackInfo.streamUrl])
   });
   // 发送初始化完成事件
   const windows = await getAllWindows()
   for (let win of windows) {
-    if (win.label === 'media-player') {
+    if (win.label === 'main') {
       // 推送初始化完成事件
       await win.emit("complete");
       return;

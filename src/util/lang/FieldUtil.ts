@@ -65,38 +65,3 @@ export function ifObjectIsNull<T extends Record<string, any>, A extends T[K], K 
     return defaultValue;
   }
 }
-
-/**
- * 深拷贝对象
- * @param obj
- */
-export function deepClone<T>(obj: T): T {
-  if (obj === null || typeof obj !== "object") {
-    return obj;
-  }
-
-  if (Array.isArray(obj)) {
-    const arrClone = [] as any[];
-    for (const item of obj) {
-      arrClone.push(deepClone(item));
-    }
-    return arrClone as T;
-  }
-
-  const objClone = {} as { [key: string]: any };
-  for (const key in obj) {
-    if (Object.hasOwn(obj, key)) {
-      objClone[key] = deepClone((obj as { [key: string]: any })[key]);
-    }
-  }
-  return objClone as T;
-}
-
-export function assignBase<T extends Record<string, any>>(initial: T, override: any) {
-  for (const key in initial) {
-    if (Object.hasOwn(override, key)) {
-      initial[key] = override[key];
-    }
-  }
-  return initial;
-}

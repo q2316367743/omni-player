@@ -64,7 +64,6 @@
                   block
                   @click="toggleFavorite"
                 >
-                  <t-icon :name="detail.userState?.isFavorite ? 'heart-filled' : 'heart'"/>
                   <template #icon>
                     <heart-filled-icon v-if="detail.userState?.isFavorite"/>
                     <heart-icon v-else/>
@@ -185,8 +184,8 @@
                   @click="goToPerson(person.id)"
                 >
                   <img
-                    v-if="person.thumbUrl"
-                    :src="person.thumbUrl"
+                    v-if="person.imageUrl"
+                    :src="person.imageUrl"
                     :alt="person.name"
                     class="w-12 h-12 sm:w-16 sm:h-16 rounded-full mx-auto mb-2 sm:mb-3 object-cover"
                   />
@@ -371,6 +370,7 @@ import type {MediaDetail} from "@/modules/media/types/detail/MediaDetail.ts";
 import {useMediaServerStore} from "@/store";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {HeartFilledIcon, HeartIcon, MoreIcon} from "tdesign-icons-vue-next";
+import {createWindows} from "@/lib/windows.ts";
 
 const route = useRoute();
 const router = useRouter();
@@ -470,34 +470,36 @@ const handlePlay = () => {
   if (!detail.value) return;
 
   // 这里可以添加播放逻辑
-  MessagePlugin.success('开始播放');
-  console.log('播放视频:', detail.value.id);
+  createWindows("media", {
+    serverId: clientId,
+    mediaId: detail.value.id,
+  })
 };
 
 // 切换收藏状态
 const toggleFavorite = async () => {
   if (!detail.value) return;
 
-  try {
-    const client = await useMediaServerStore().getServerClient(clientId);
-    await client.toggleFavorite(detail.value.id);
-
-    // 更新本地状态
-    if (detail.value.userState) {
-      detail.value.userState.isFavorite = !detail.value.userState.isFavorite;
-    }
-
-    MessagePlugin.success(detail.value.userState?.isFavorite ? '已添加到收藏' : '已取消收藏');
-  } catch (error) {
-    console.error('切换收藏状态失败:', error);
-    MessagePlugin.error('操作失败');
-  }
+  // try {
+  //   const client = await useMediaServerStore().getServerClient(clientId);
+  //   await client.toggleFavorite(detail.value.id);
+  //
+  //   // 更新本地状态
+  //   if (detail.value.userState) {
+  //     detail.value.userState.isFavorite = !detail.value.userState.isFavorite;
+  //   }
+  //
+  //   MessagePlugin.success(detail.value.userState?.isFavorite ? '已添加到收藏' : '已取消收藏');
+  // } catch (error) {
+  //   console.error('切换收藏状态失败:', error);
+  //   MessagePlugin.error('操作失败');
+  // }
 };
 
 // 显示更多操作
 const showMoreActions = () => {
   // 这里可以显示更多操作菜单
-  MessagePlugin.info('更多功能开发中...');
+  MessageUtil.info('更多功能开发中...');
 };
 
 // 显示所有演职员

@@ -8,6 +8,19 @@ import {useStronghold} from "@/lib/Stronghold.ts";
 import type {IMediaServer} from "@/modules/media/IMediaServer.ts";
 import {createMediaClient} from "@/modules/media/factory.ts";
 
+export const fetchMediaClient =async (id: string) => {
+  const servers = await useStore().list(LocalName.LIST_MEDIA_SERVER);
+  const index = servers.findIndex(s => s.id === id);
+  if (index >= 0) {
+    const server = servers[index]!;
+    const client = createMediaClient(server);
+    await client.authenticate();
+    return client;
+  } else {
+    throw new Error("媒体服务器不存在");
+  }
+}
+
 export const useMediaServerStore = defineStore('media-server', () => {
 
   const servers = ref(new Array<MediaServer>());

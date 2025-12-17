@@ -128,18 +128,6 @@ class CryptoUtil {
 
 class StrongholdWrapper {
   private store: Store | null = null;
-  private customEncryptionKey: string = '';
-
-  // 设置自定义加密密钥
-  setEncryptionKey(key: string) {
-    this.customEncryptionKey = key;
-  }
-
-  // 获取当前使用的加密密钥
-  private getEncryptionKey(): string {
-    // 优先使用自定义密钥，否则使用应用默认密码
-    return this.customEncryptionKey || APP_PASSWORD;
-  }
 
 
   private async getStore() {
@@ -161,7 +149,7 @@ class StrongholdWrapper {
     
     try {
       // 加密值
-      const encryptedValue = await CryptoUtil.encrypt(value, this.getEncryptionKey());
+      const encryptedValue = await CryptoUtil.encrypt(value, APP_PASSWORD);
       
       // 存储加密后的数据
       await store.set(key, JSON.stringify({
@@ -193,7 +181,7 @@ class StrongholdWrapper {
       // 如果数据已加密，进行解密
       if (obj.encrypted) {
         try {
-          return await CryptoUtil.decrypt(obj.value, this.getEncryptionKey());
+          return await CryptoUtil.decrypt(obj.value, APP_PASSWORD);
         } catch (decryptError) {
           console.error(`解密失败 [${key}]:`, decryptError);
           // 如果解密失败，可能是密钥不匹配，返回 null

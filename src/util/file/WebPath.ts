@@ -3,7 +3,7 @@ export function extname(path: string): string {
   if (items.length === 1) {
     return "";
   }
-  return items[items.length - 1];
+  return items[items.length - 1] || '';
 }
 
 export function basename(path: string): string {

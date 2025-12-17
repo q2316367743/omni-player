@@ -24,6 +24,7 @@ declare module 'vue' {
     TAside: typeof import('tdesign-vue-next')['Aside']
     TBackTop: typeof import('tdesign-vue-next')['BackTop']
     TButton: typeof import('tdesign-vue-next')['Button']
+    TCard: typeof import('tdesign-vue-next')['Card']
     TContent: typeof import('tdesign-vue-next')['Content']
     THeader: typeof import('tdesign-vue-next')['Header']
     THeadMenu: typeof import('tdesign-vue-next')['HeadMenu']
@@ -37,11 +38,13 @@ declare module 'vue' {
     TMenu: typeof import('tdesign-vue-next')['Menu']
     TMenuItem: typeof import('tdesign-vue-next')['MenuItem']
     TPagination: typeof import('tdesign-vue-next')['Pagination']
+    TParagraph: typeof import('tdesign-vue-next')['Paragraph']
     TSpace: typeof import('tdesign-vue-next')['Space']
     TSubmenu: typeof import('tdesign-vue-next')['Submenu']
     TTabPanel: typeof import('tdesign-vue-next')['TabPanel']
     TTabs: typeof import('tdesign-vue-next')['Tabs']
     TTag: typeof import('tdesign-vue-next')['Tag']
+    TTooltip: typeof import('tdesign-vue-next')['Tooltip']
   }
 }
 
@@ -59,6 +62,7 @@ declare global {
   const TAside: typeof import('tdesign-vue-next')['Aside']
   const TBackTop: typeof import('tdesign-vue-next')['BackTop']
   const TButton: typeof import('tdesign-vue-next')['Button']
+  const TCard: typeof import('tdesign-vue-next')['Card']
   const TContent: typeof import('tdesign-vue-next')['Content']
   const THeader: typeof import('tdesign-vue-next')['Header']
   const THeadMenu: typeof import('tdesign-vue-next')['HeadMenu']
@@ -72,9 +76,11 @@ declare global {
   const TMenu: typeof import('tdesign-vue-next')['Menu']
   const TMenuItem: typeof import('tdesign-vue-next')['MenuItem']
   const TPagination: typeof import('tdesign-vue-next')['Pagination']
+  const TParagraph: typeof import('tdesign-vue-next')['Paragraph']
   const TSpace: typeof import('tdesign-vue-next')['Space']
   const TSubmenu: typeof import('tdesign-vue-next')['Submenu']
   const TTabPanel: typeof import('tdesign-vue-next')['TabPanel']
   const TTabs: typeof import('tdesign-vue-next')['Tabs']
   const TTag: typeof import('tdesign-vue-next')['Tag']
+  const TTooltip: typeof import('tdesign-vue-next')['Tooltip']
 }

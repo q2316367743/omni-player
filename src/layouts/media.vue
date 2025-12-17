@@ -2,6 +2,13 @@
   <t-layout class="w-full h-full">
     <t-header>
       <t-head-menu v-model="value">
+        <template #logo>
+          <t-button theme="primary" shape="circle" @click="goHome">
+            <template #icon>
+              <home-icon />
+            </template>
+          </t-button>
+        </template>
         <t-menu-item :value="home">全部视频</t-menu-item>
         <t-menu-item :value="category">分类查询</t-menu-item>
         <t-menu-item :value="person">演员列表</t-menu-item>
@@ -13,6 +20,8 @@
   </t-layout>
 </template>
 <script lang="ts" setup>
+import {HomeIcon} from "tdesign-icons-vue-next";
+
 const route = useRoute();
 const router = useRouter();
 
@@ -30,6 +39,10 @@ watch(() => route.path, val => {
     value.value = val;
   }
 })
+
+const goHome = () => {
+  router.replace("/home")
+}
 
 </script>
 <style scoped lang="less">

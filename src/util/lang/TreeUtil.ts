@@ -1,4 +1,4 @@
-import { TreeOptionData } from "tdesign-vue-next";
+import {type TreeOptionData } from "tdesign-vue-next";
 
 interface TreeNode extends TreeOptionData {
   value: string | number;

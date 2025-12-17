@@ -4,7 +4,7 @@
       class="min-h-full w-full bg-gradient-to-br from-slate-50 via-fuchsia-50 to-cyan-50 text-slate-900 dark:from-slate-950 dark:via-fuchsia-950 dark:to-cyan-950 dark:text-slate-50"
     >
       <div v-if="loading" class="min-h-[60vh] w-full flex items-center justify-center">
-        <t-loading size="large" text="加载中..." />
+        <t-loading size="large" text="加载中..."/>
       </div>
 
       <div v-else-if="error" class="min-h-[60vh] w-full flex items-center justify-center px-4">
@@ -28,9 +28,11 @@
             :alt="detail.title"
             class="h-full w-full object-cover opacity-20 blur-sm scale-110"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-          <div class="abs-24 rounded-full bg-gradient-to-r from-indigo-500/25 via-fuchsia-500/25 to-cyan-500/25 blur-3xl" />
-          <div class="absolute right-10 top-20 h-72 w-72 rounded-full bg-gradient-to-br from-amber-400/20 to-rose-500/20 blur-3xl" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"/>
+          <div
+            class="abs-24 rounded-full bg-gradient-to-r from-indigo-500/25 via-fuchsia-500/25 to-cyan-500/25 blur-3xl"/>
+          <div
+            class="absolute right-10 top-20 h-72 w-72 rounded-full bg-gradient-to-br from-amber-400/20 to-rose-500/20 blur-3xl"/>
         </div>
 
         <div
@@ -39,7 +41,7 @@
           <div class="mx-auto max-w-7xl px-4 lg:px-8 py-3 flex items-center gap-3">
             <t-button theme="default" variant="outline" shape="circle" @click="router.back()">
               <template #icon>
-                <chevron-left-icon />
+                <chevron-left-icon/>
               </template>
             </t-button>
             <div class="min-w-0 flex-1">
@@ -50,13 +52,13 @@
             </div>
             <t-button theme="primary" class="shadow-lg" @click="openPlayer">
               <template #icon>
-                <play-icon />
+                <play-icon/>
               </template>
               播放
             </t-button>
             <t-button theme="default" variant="outline" @click="loadDetail">
               <template #icon>
-                <refresh-icon />
+                <refresh-icon/>
               </template>
               刷新
             </t-button>
@@ -82,13 +84,13 @@
                       v-else
                       class="h-full w-full bg-gradient-to-br from-indigo-500/40 via-fuchsia-500/30 to-cyan-500/40 flex items-center justify-center"
                     >
-                      <image-icon class="text-5xl text-white/60" />
+                      <image-icon class="text-5xl text-white/60"/>
                     </div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent"/>
                     <div class="absolute inset-0 flex items-center justify-center">
                       <t-button theme="primary" shape="circle" size="large" class="shadow-xl" @click="openPlayer">
                         <template #icon>
-                          <play-icon />
+                          <play-icon/>
                         </template>
                       </t-button>
                     </div>
@@ -117,7 +119,7 @@
                         class="border-0 bg-black/35 text-white"
                       >
                         <template #icon>
-                          <calendar-icon />
+                          <calendar-icon/>
                         </template>
                         {{ detail.releaseYear }}
                       </t-tag>
@@ -129,7 +131,7 @@
                         class="border-0 bg-black/35 text-white"
                       >
                         <template #icon>
-                          <location-icon />
+                          <location-icon/>
                         </template>
                         {{ detail.region }}
                       </t-tag>
@@ -141,7 +143,7 @@
                         class="border-0 bg-black/35 text-white"
                       >
                         <template #icon>
-                          <translate-icon />
+                          <translate-icon/>
                         </template>
                         {{ detail.language }}
                       </t-tag>
@@ -154,13 +156,13 @@
                     <div class="mt-4 grid grid-cols-2 gap-3">
                       <t-button theme="primary" block class="shadow-lg" @click="openPlayer">
                         <template #icon>
-                          <play-icon />
+                          <play-icon/>
                         </template>
                         播放
                       </t-button>
                       <t-button theme="default" variant="outline" block @click="loadDetail">
                         <template #icon>
-                          <refresh-icon />
+                          <refresh-icon/>
                         </template>
                         刷新
                       </t-button>
@@ -177,20 +179,20 @@
                   </div>
                   <div class="mt-3 grid grid-cols-2 gap-3 text-sm text-white/80">
                     <div class="flex items-center gap-2">
-                      <time-icon class="text-white/70" />
+                      <time-icon class="text-white/70"/>
 
                       <span>{{ detail.duration || '未知时长' }}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                      <video-icon class="text-white/70" />
+                      <video-icon class="text-white/70"/>
                       <span>{{ detail.total ? `${detail.total}集` : '未知集数' }}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                      <calendar-icon class="text-white/70" />
+                      <calendar-icon class="text-white/70"/>
                       <span>{{ detail.releaseDate || '未知上映' }}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                      <layers-icon class="text-white/70" />
+                      <layers-icon class="text-white/70"/>
                       <span>{{ detail.chapters?.length ? `${detail.chapters.length}个播放源` : '无播放源' }}</span>
                     </div>
                   </div>
@@ -199,7 +201,8 @@
             </div>
 
             <div class="lg:col-span-2">
-              <div class="rounded-2xl border border-white/25 bg-white/10 p-6 shadow-xl backdrop-blur dark:border-white/10">
+              <div
+                class="rounded-2xl border border-white/25 bg-white/10 p-6 shadow-xl backdrop-blur dark:border-white/10">
                 <div class="flex flex-wrap items-end gap-3">
                   <div class="text-3xl lg:text-4xl font-bold">{{ detail.title || '未命名' }}</div>
                   <div v-if="detail.subtitle" class="text-base text-white/75">{{ detail.subtitle }}</div>
@@ -361,21 +364,24 @@
   </div>
 </template>
 <script lang="ts" setup>
-import type { INetworkServer } from "@/modules/network/INetworkServer";
-import type { NetworkDetail } from "@/modules/network/types/NetworkDetail";
-import type { NetworkListItem } from "@/modules/network/types/NetworkListItem";
-import { useNetworkServerStore } from "@/store";
-import { getNetworkListItem, setNetworkListItem } from "../components/detail";
+import type {INetworkServer} from "@/modules/network/INetworkServer";
+import type {NetworkDetail} from "@/modules/network/types/NetworkDetail";
+import type {NetworkListItem} from "@/modules/network/types/NetworkListItem";
+import {useNetworkServerStore} from "@/store";
+import {getNetworkListItem, setNetworkListItem} from "../components/detail";
 import MessageUtil from "@/util/model/MessageUtil";
-import { createWindows } from "@/lib/windows";
+import {createWindows} from "@/lib/windows";
 import {
   CalendarIcon,
   ChevronLeftIcon,
-  ImageIcon, LayersIcon,
+  ImageIcon,
+  LayersIcon,
   LocationIcon,
   PlayIcon,
-  RefreshIcon, TimeIcon,
-  TranslateIcon, VideoIcon
+  RefreshIcon,
+  TimeIcon,
+  TranslateIcon,
+  VideoIcon
 } from "tdesign-icons-vue-next";
 
 const route = useRoute();
@@ -430,8 +436,8 @@ const openPlayer = async () => {
   if (!detail.value || !client.value) return;
 
   createWindows("network", {
-    id: detail.value.id,
-    url: ""
+    serverId: clientId.value,
+    mediaId: detail.value.id,
   })
 
 };
@@ -443,6 +449,6 @@ const goToDetail = (item: NetworkListItem) => {
 
 watch([clientId, mediaId], () => {
   loadDetail();
-}, { immediate: true });
+}, {immediate: true});
 
 </script>
