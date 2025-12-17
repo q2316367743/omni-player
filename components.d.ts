@@ -21,6 +21,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SubPageLayout: typeof import('./src/components/PageLayout/SubPageLayout.vue')['default']
     SuccessResult: typeof import('./src/components/Result/SuccessResult.vue')['default']
+    TAside: typeof import('tdesign-vue-next')['Aside']
     TButton: typeof import('tdesign-vue-next')['Button']
     TContent: typeof import('tdesign-vue-next')['Content']
     THeader: typeof import('tdesign-vue-next')['Header']
@@ -32,9 +33,11 @@ declare module 'vue' {
     TListItem: typeof import('tdesign-vue-next')['ListItem']
     TListItemMeta: typeof import('tdesign-vue-next')['ListItemMeta']
     TLoading: typeof import('tdesign-vue-next')['Loading']
+    TMenu: typeof import('tdesign-vue-next')['Menu']
     TMenuItem: typeof import('tdesign-vue-next')['MenuItem']
     TPagination: typeof import('tdesign-vue-next')['Pagination']
     TSpace: typeof import('tdesign-vue-next')['Space']
+    TSubmenu: typeof import('tdesign-vue-next')['Submenu']
     TTag: typeof import('tdesign-vue-next')['Tag']
   }
 }
@@ -50,6 +53,7 @@ declare global {
   const RouterView: typeof import('vue-router')['RouterView']
   const SubPageLayout: typeof import('./src/components/PageLayout/SubPageLayout.vue')['default']
   const SuccessResult: typeof import('./src/components/Result/SuccessResult.vue')['default']
+  const TAside: typeof import('tdesign-vue-next')['Aside']
   const TButton: typeof import('tdesign-vue-next')['Button']
   const TContent: typeof import('tdesign-vue-next')['Content']
   const THeader: typeof import('tdesign-vue-next')['Header']
@@ -61,8 +65,10 @@ declare global {
   const TListItem: typeof import('tdesign-vue-next')['ListItem']
   const TListItemMeta: typeof import('tdesign-vue-next')['ListItemMeta']
   const TLoading: typeof import('tdesign-vue-next')['Loading']
+  const TMenu: typeof import('tdesign-vue-next')['Menu']
   const TMenuItem: typeof import('tdesign-vue-next')['MenuItem']
   const TPagination: typeof import('tdesign-vue-next')['Pagination']
   const TSpace: typeof import('tdesign-vue-next')['Space']
+  const TSubmenu: typeof import('tdesign-vue-next')['Submenu']
   const TTag: typeof import('tdesign-vue-next')['Tag']
 }

@@ -15,8 +15,9 @@ export type Method =
 
 const instance = axios.create({
   timeout: 150000,
+  adapter: 'fetch',
   env: {
-    fetch
+    fetch: fetch
   }
   // 配置代理等信息
 });
@@ -26,7 +27,7 @@ instance.interceptors.response.use(e => {
 }, e => {
   console.log(e);
   return Promise.reject(e);
-} )
+})
 
 export interface RequestConfig extends AxiosRequestConfig {
 
