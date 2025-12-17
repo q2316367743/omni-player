@@ -30,7 +30,7 @@ export const router = createRouter({
     path: "/media",
     component: () => import('@/layouts/media.vue'),
     children: [{
-      name: '媒体中心 - 首页',
+      name: 'MediaHome',
       path: ':id/home',
       component: () => import('@/pages/media/home/index.vue')
     },{

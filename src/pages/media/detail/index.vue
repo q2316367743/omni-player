@@ -18,6 +18,27 @@
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"/>
       </div>
 
+      <div
+        class="sticky top-0 z-20 border-b border-white/20 bg-white/55 backdrop-blur dark:border-white/10 dark:bg-black/25"
+      >
+        <div class="mx-auto max-w-7xl px-4 lg:px-8 py-3 flex items-center gap-3">
+          <t-button theme="default" variant="outline" shape="circle" @click="router.back()">
+            <template #icon>
+              <chevron-left-icon/>
+            </template>
+          </t-button>
+          <div class="min-w-0 flex-1">
+            <div class="truncate text-lg font-semibold">{{ detail?.name || '未命名' }}</div>
+          </div>
+          <t-button theme="primary" class="shadow-lg" @click="handlePlay">
+            <template #icon>
+              <play-icon/>
+            </template>
+            播放
+          </t-button>
+        </div>
+      </div>
+
       <!-- 主要内容 -->
       <div class="relative z-10 w-full max-w-7xl mx-auto px-4 lg:px-8 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -369,7 +390,7 @@
 import type {MediaDetail} from "@/modules/media/types/detail/MediaDetail.ts";
 import {useMediaServerStore} from "@/store";
 import MessageUtil from "@/util/model/MessageUtil.ts";
-import {HeartFilledIcon, HeartIcon, MoreIcon} from "tdesign-icons-vue-next";
+import {ChevronLeftIcon, HeartFilledIcon, HeartIcon, MoreIcon, PlayIcon, RefreshIcon} from "tdesign-icons-vue-next";
 import {createWindows} from "@/lib/windows.ts";
 
 const route = useRoute();
@@ -385,7 +406,6 @@ onMounted(async () => {
   try {
     const client = await useMediaServerStore().getServerClient(clientId);
     detail.value = await client.getItem(mediaId);
-    console.log(detail.value)
   } catch (error) {
     MessageUtil.error('加载媒体详情失败', error);
   }

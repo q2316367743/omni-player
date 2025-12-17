@@ -21,6 +21,7 @@
     "libmpv:default",
     "fs:allow-read-text-file",
     "fs:allow-resource-read-recursive",
+    "core:window:allow-set-fullscreen",
     {
       "identifier": "http:default",
       "allow": [

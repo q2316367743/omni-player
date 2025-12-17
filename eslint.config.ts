@@ -3,12 +3,22 @@ import * as globals from "globals";
 import * as tseslint from "typescript-eslint";
 import * as pluginVue from "eslint-plugin-vue";
 import css from "@eslint/css";
-import { defineConfig } from "eslint/config";
+import {defineConfig} from "eslint/config";
+// @ts-ignore
+import autoImportGlobals from "./.eslintrc-auto-import.json";
 
 export default defineConfig([
-  { files: ["**/*.{js,mjs,cjs,ts,mts,cts,vue}"], plugins: { js }, extends: ["js/recommended"], languageOptions: { globals: globals.browser } },
+  {ignores: ["dist/**", "src-tauri/**", "node_modules/**"]},
+  {
+    files: ["**/*.{js,mjs,cjs,ts,mts,cts,vue}"], plugins: {js}, extends: ["js/recommended"], languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...autoImportGlobals.globals, // 👈 合并自动导入的全局变量
+      }
+    }
+  },
   tseslint.configs.recommended,
   pluginVue.configs["flat/essential"],
-  { files: ["**/*.vue"], languageOptions: { parserOptions: { parser: tseslint.parser } } },
-  { files: ["**/*.css"], plugins: { css }, language: "css/css", extends: ["css/recommended"] },
+  {files: ["**/*.vue"], languageOptions: {parserOptions: {parser: tseslint.parser}}},
+  {files: ["**/*.css"], plugins: {css}, language: "css/css", extends: ["css/recommended"]},
 ]);

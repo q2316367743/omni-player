@@ -189,6 +189,12 @@ watch(() => route.params.id, () => {
 
 </script>
 
+<script lang="ts">
+export default {
+  name: "MediaHome"
+}
+</script>
+
 <style scoped lang="less">
 .media-wall-container {
   background: linear-gradient(135deg, var(--td-bg-color-container) 0%, var(--td-bg-color-secondarycontainer) 100%);

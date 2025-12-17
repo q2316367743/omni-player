@@ -469,6 +469,8 @@ export class JellyfinClient implements IMediaServer {
         isDefault: s.IsDefault,
       }));
 
+    console.log(playbackData)
+
     return {
       streamUrl,
       subtitleUrls,
