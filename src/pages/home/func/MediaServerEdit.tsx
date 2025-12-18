@@ -1,5 +1,5 @@
 import {buildMediaServerInsert, type MediaServer, type MediaServerEdit} from "@/entity/MediaServer.ts";
-import {DialogPlugin, Form, FormItem, Input, InputNumber, Radio, RadioGroup} from "tdesign-vue-next";
+import {DrawerPlugin, Form, FormItem, Input, InputNumber, Radio, RadioGroup} from "tdesign-vue-next";
 import {useStronghold} from "@/lib/Stronghold.ts";
 import {useMediaServerStore} from "@/store";
 import MessageUtil from "@/util/model/MessageUtil.ts";
@@ -21,10 +21,11 @@ export function openMediaServerEdit(old?: MediaServer) {
     })().catch(e => MessageUtil.error("初始化密码信息失败", e))
   }
 
-  const plugin = DialogPlugin({
+  const plugin = DrawerPlugin({
     header: (update ? "修改" : "新增") + "媒体服务器",
     confirmBtn: update ? "修改" : "新增",
-    placement: "center",
+    size: "600px",
+    attach: ".app-layout-content",
     default: () => <Form data={server.value}>
       <FormItem label={'名称'} labelAlign={"top"}>
         <Input v-model={server.value.name} clearable/>
@@ -53,7 +54,7 @@ export function openMediaServerEdit(old?: MediaServer) {
       (old ? useMediaServerStore().updateServer(server.value, old.id) : useMediaServerStore().addServer(server.value))
         .then(() => {
           MessageUtil.success(update ? "修改媒体服务器成功" : "新增媒体服务器成功");
-          plugin.destroy();
+          plugin.destroy?.();
         }).catch(e => MessageUtil.error("操作失败", e));
     }
   })

@@ -1,4 +1,13 @@
-export type NetworkServerType = "CMS:JSON" | "CMS:XML"
+export type NetworkServerType = "mc10"
+
+export const NetworkServerTypeOptions = [{
+  label: "苹果CMS10",
+  value: "mc10"
+}]
+
+export const NetworkServerTypeLabel = {
+  mc10: "苹果CMS10"
+}
 
 export interface NetworkServerEdit {
 
@@ -9,6 +18,7 @@ export interface NetworkServerEdit {
 
   name: string;
   type: NetworkServerType;
+  format: "json" | "xml"
   url: string;
   /**
    * m3u8解析地址
@@ -28,7 +38,8 @@ export function buildNetworkServerEdit(): NetworkServerEdit {
     group: "默认",
     sequence: 0,
     name: "",
-    type: "CMS:JSON",
+    type: "mc10",
+    format: "json",
     url: "",
     m3u8Parse: ""
   }

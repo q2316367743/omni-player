@@ -1,6 +1,6 @@
 import type {INetworkServer} from "@/modules/network/INetworkServer.ts";
 import type {NetworkServer} from "@/entity/NetworkServer.ts";
-import type {CmsHomeResult, CmsVideoList} from "@/modules/network/services/CmsJson/types.ts";
+import type {CmsHomeResult, CmsVideoList} from "@/modules/network/types/NetworkCommon.ts";
 import {getAction} from "@/lib/http.ts";
 import type {NetworkListItemChapter} from "@/modules/network/types/NetworkListItemChapter.ts";
 import type {NetworkCategoryResult} from "@/modules/network/types/NetworkCategoryResult.ts";
@@ -11,7 +11,7 @@ import type {NetworkSearchResult} from "@/modules/network/types/NetworkSearchRes
 import {cmsTreeTransfer} from "@/modules/network/CmsUtil.ts";
 
 
-export class NetworkServerCmsJson implements INetworkServer {
+export class NetworkServerMc10Json implements INetworkServer {
 
   public props: NetworkServer;
   private readonly url: string;

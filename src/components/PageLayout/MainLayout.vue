@@ -69,6 +69,7 @@ const goHome = () => router.replace('/home');
     left: 0;
     width: 100vw;
     height: calc(100vh - 33px);
+    transform: scale(1);
   }
 }
 </style>

@@ -38,7 +38,6 @@
               </div>
               <div class="shrink-0 flex items-center gap-2">
                 <t-tag v-if="!media.isEnabled" theme="warning" size="small" variant="light">已停用</t-tag>
-                <t-tag theme="default" size="small" variant="light">{{ formatMediaType(media.type) }}</t-tag>
               </div>
             </div>
 
@@ -82,12 +81,12 @@
                 <div
                   class="h-10 w-10 rounded-xl flex flex-col items-center justify-center shrink-0"
                   :style="
-                    network.type === 'CMS:JSON'
+                    network.format === 'json'
                       ? 'background: linear-gradient(135deg, var(--td-brand-color-light) 0%, var(--td-brand-color-light-hover) 100%); color: var(--td-brand-color)'
                       : 'background: linear-gradient(135deg, var(--td-success-color-light) 0%, var(--td-success-color-light-hover) 100%); color: var(--td-success-color)'
                   "
                 >
-                  <template v-if="network.type === 'CMS:JSON'">
+                  <template v-if="network.format === 'json'">
                     <div class="text-[13px] leading-3 font-mono font-semibold">{}</div>
                     <div class="mt-1 text-[9px] leading-3 font-semibold tracking-wide">JSON</div>
                   </template>
@@ -98,11 +97,14 @@
                 </div>
                 <div class="min-w-0">
                   <div class="font-semibold truncate">{{ network.name }}</div>
-                  <div class="mt-1 text-xs truncate" style="color: var(--td-text-color-secondary)">{{ network.url }}</div>
+                  <div class="mt-1 text-xs truncate" style="color: var(--td-text-color-secondary)">{{
+                      network.url
+                    }}
+                  </div>
                 </div>
               </div>
               <div class="shrink-0 flex flex-col items-end gap-2">
-                <t-tag theme="default" size="small" variant="light">{{ network.type }}</t-tag>
+                <t-tag theme="primary" size="small" variant="outline">{{ NetworkServerTypeLabel[network.type] }}</t-tag>
                 <t-tag v-if="network.group" theme="primary" size="small" variant="light">{{ network.group }}</t-tag>
               </div>
             </div>
@@ -127,13 +129,13 @@
   </page-layout>
 </template>
 <script lang="ts" setup>
-import { useMediaServerStore, useNetworkServerStore } from "@/store";
-import { openMediaServerEdit } from "@/pages/home/func/MediaServerEdit.tsx";
-import type { MediaServer, MediaServerType } from "@/entity/MediaServer.ts";
+import {useMediaServerStore, useNetworkServerStore} from "@/store";
+import {openMediaServerEdit} from "@/pages/home/func/MediaServerEdit.tsx";
+import type {MediaServer, MediaServerType} from "@/entity/MediaServer.ts";
 import MessageBoxUtil from "@/util/model/MessageBoxUtil.tsx";
 import MessageUtil from "@/util/model/MessageUtil.ts";
-import { openNetworkServerEdit } from "@/pages/home/func/NetworkServerEdit.tsx";
-import type { NetworkServer } from "@/entity/NetworkServer.ts";
+import {openNetworkServerEdit} from "@/pages/home/func/NetworkServerEdit.tsx";
+import {type NetworkServer, NetworkServerTypeLabel} from "@/entity/NetworkServer.ts";
 import JellyfinIcon from "@/modules/icon/JellyfinIcon.vue";
 import EmbyIcon from "@/modules/icon/EmbyIcon.vue";
 import PlexIcon from "@/modules/icon/PlexIcon.vue";

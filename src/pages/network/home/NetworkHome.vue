@@ -126,6 +126,7 @@ const loadData = async () => {
     // 加载首页推荐
     client.home(1).then(res1 => {
       categories.value = res1.categories;
+      console.log('首页推荐:', res1);
     });
 
     // 加载分类视频
@@ -284,8 +285,8 @@ export default {
 /* 内容区域布局 */
 .content-area {
   display: flex;
-  padding: 0 24px 24px;
-  min-height: calc(100vh - 120px);
+  padding: 0 24px;
+  min-height: calc(100vh - 129px);
   gap: 24px;
 }
 
@@ -307,7 +308,6 @@ export default {
 /* 视频内容区域 */
 .video-content {
   flex: 1;
-  min-height: 100vh;
 }
 
 .video-grid {

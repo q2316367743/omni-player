@@ -11,7 +11,7 @@ import type { NetworkListItemChapter } from "@/modules/network/types/NetworkList
 import type { INetworkServer } from "@/modules/network/INetworkServer.ts";
 
 
-export class NetworkServerCmsXml implements INetworkServer {
+export class NetworkServerMc10Xml implements INetworkServer {
 
   public props: NetworkServer;
   private readonly url: string;

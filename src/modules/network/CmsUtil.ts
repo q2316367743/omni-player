@@ -1,4 +1,4 @@
-import type {CmsHomeClass} from "@/modules/network/services/CmsJson/types.ts";
+import type {CmsHomeClass} from "@/modules/network/types/NetworkCommon.ts";
 import type {NetworkCategory} from "@/modules/network/types/NetworkCategory.ts";
 import {group, MapWrapper} from "@/util";
 
