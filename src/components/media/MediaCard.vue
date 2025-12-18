@@ -79,9 +79,9 @@
         theme="primary"
         shape="circle"
         size="small"
-        class="shadow-lg"
+        @click.stop="handlePlay()"
       >
-        <t-icon name="play" />
+        <play-icon />
       </t-button>
     </div>
   </div>
@@ -89,6 +89,12 @@
 
 <script setup lang="ts">
 import type { MediaItem } from '@/modules/media/types/media/MediaItem';
+import {PlayIcon} from "tdesign-icons-vue-next";
+import {createWindows} from "@/lib/windows.ts";
+
+const route = useRoute();
+
+const clientId = route.params.id as string;
 
 interface Props {
   item: MediaItem;
@@ -100,7 +106,7 @@ interface Emits {
   mouseleave: [item: MediaItem];
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 defineEmits<Emits>();
 
 // 格式化时长
@@ -133,6 +139,15 @@ const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement;
   img.style.display = 'none';
   img.nextElementSibling?.classList.remove('hidden');
+};
+
+const handlePlay = () => {
+  // 这里可以添加播放逻辑
+  createWindows("media", {
+    title: props.item.name,
+    serverId: clientId,
+    mediaId: props.item.id,
+  })
 };
 </script>
 

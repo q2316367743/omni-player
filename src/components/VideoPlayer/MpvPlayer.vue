@@ -87,7 +87,7 @@
               </div>
 
 
-              <t-tooltip :content="isFullscreen ? '退出全屏' : '全屏'" placement="top">
+              <t-tooltip :content="isFullscreen ? '退出全屏' : '全屏'" placement="top" class="ml-12px">
                 <t-button theme="primary" variant="text" shape="circle" @click="toggleFullscreen">
                   <t-icon :name="isFullscreen ? 'fullscreen-exit' : 'fullscreen'"/>
                 </t-button>
@@ -149,9 +149,11 @@ import {
 import {getCurrentWindow} from '@tauri-apps/api/window';
 import MessageUtil from '@/util/model/MessageUtil.ts';
 
-const url = defineModel({
-  type: String,
-  default: ''
+const props = defineProps({
+  url: {
+    type: String,
+    default: ''
+  }
 })
 const emit = defineEmits(['next']);
 
@@ -379,11 +381,12 @@ onMounted(async () => {
   }
 
   // 监听url变化
-  watch(url, val => {
+  watch(() => props.url, val => {
     if (!val) {
       command("stop")
       return;
     }
+    console.log('url:', val)
     command('loadfile', [val, 'replace']);
   }, {immediate: true})
 

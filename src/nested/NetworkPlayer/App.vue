@@ -47,7 +47,5 @@ onMounted(async () => {
   left: 0;
   right: 0;
   bottom: 0;
-  color: var(--td-text-color-primary);
-  background-color: var(--td-bg-color-container);
 }
 </style>

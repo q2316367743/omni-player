@@ -1,6 +1,7 @@
 <template>
   <div class="video-container">
     <art-player :url="url" :type="type" v-if="status === 'artplayer'" @next="$emit('next')"/>
+    <mpv-player :url="url" v-else-if="status === 'mpv'" @next="$emit('next')"/>
     <iframe v-else-if="status === 'iframe'" :src="url" class="video-iframe" frameborder="0"/>
     <loading-result v-else-if="status === 'loading'" title="正在加载中"/>
     <empty-result v-else-if="status === 'unknow'" title="未知视频类型"/>
@@ -8,6 +9,7 @@
 </template>
 <script lang="ts" setup>
 import ArtPlayer from "@/nested/NetworkPlayer/components/ArtPlayer.vue";
+import {useGlobalSettingStore} from "@/store/GlobalSettingStore.ts";
 
 const props = defineProps({
   url: {
@@ -16,8 +18,10 @@ const props = defineProps({
   }
 });
 defineEmits(['next']);
-const status = ref<'loading' | 'unknow' | 'artplayer' | 'iframe'>('loading');
+const status = ref<'loading' | 'unknow'  | 'iframe'| 'artplayer' | "mpv">('loading');
 const type = ref('mp4');
+
+const {playerModeType} = useGlobalSettingStore()
 
 function onPlay(url: string) {
   if (!url) return;
@@ -34,7 +38,8 @@ function onPlay(url: string) {
     status.value = 'iframe';
     return;
   }
-  status.value = 'artplayer';
+  if (playerModeType === 'h5') status.value = 'artplayer';
+  else status.value = 'mpv';
 }
 
 
