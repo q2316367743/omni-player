@@ -4,10 +4,10 @@ import DetailDrawerContent from './DetailDrawerContent';
 
 export function openDetailDrawer(options: {
   detail: MediaDetail;
-  timeText: string;
-  durationText: string;
+  timeText?: string;
+  durationText?: string;
 }) {
-  const { detail, timeText, durationText } = options;
+  const { detail, timeText = '', durationText = '' } = options;
 
   const plugin = DrawerPlugin({
     size: '420px',

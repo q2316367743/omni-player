@@ -12,10 +12,12 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ArtPlayer: typeof import('./src/components/VideoPlayer/ArtPlayer.vue')['default']
     EmptyResult: typeof import('./src/components/Result/EmptyResult.vue')['default']
     InfoResult: typeof import('./src/components/Result/InfoResult.vue')['default']
     LoadingResult: typeof import('./src/components/Result/LoadingResult.vue')['default']
     MediaCard: typeof import('./src/components/media/MediaCard.vue')['default']
+    MpvPlayer: typeof import('./src/components/VideoPlayer/MpvPlayer.vue')['default']
     PageLayout: typeof import('./src/components/PageLayout/PageLayout.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
@@ -57,10 +59,12 @@ declare module 'vue' {
 
 // For TSX support
 declare global {
+  const ArtPlayer: typeof import('./src/components/VideoPlayer/ArtPlayer.vue')['default']
   const EmptyResult: typeof import('./src/components/Result/EmptyResult.vue')['default']
   const InfoResult: typeof import('./src/components/Result/InfoResult.vue')['default']
   const LoadingResult: typeof import('./src/components/Result/LoadingResult.vue')['default']
   const MediaCard: typeof import('./src/components/media/MediaCard.vue')['default']
+  const MpvPlayer: typeof import('./src/components/VideoPlayer/MpvPlayer.vue')['default']
   const PageLayout: typeof import('./src/components/PageLayout/PageLayout.vue')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
