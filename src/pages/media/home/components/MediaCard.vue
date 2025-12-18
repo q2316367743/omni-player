@@ -1,12 +1,12 @@
 <template>
   <div
-    class="media-card group relative overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
+    class="media-card group relative overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
     @click="$emit('click', item)"
     @mouseenter="$emit('mouseenter', item)"
     @mouseleave="$emit('mouseleave', item)"
   >
     <!-- 海报图片 -->
-    <div class="aspect-2/3 relative overflow-hidden bg-gray-100">
+    <div class="aspect-2/3 relative overflow-hidden bg-td-secondary">
       <img
         v-if="item.posterUrl"
         :src="item.posterUrl"
@@ -17,13 +17,13 @@
       />
       <div
         v-else
-        class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50"
+        class="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500/12 via-fuchsia-500/10 to-cyan-500/12 dark:from-indigo-400/20 dark:via-fuchsia-400/16 dark:to-cyan-400/20"
       >
-        <t-icon name="image" class="text-4xl text-gray-300" />
+        <t-icon name="image" class="text-4xl text-td-placeholder" />
       </div>
       
       <!-- 悬停遮罩层 -->
-      <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
+      <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
       
       <!-- 评分标签 -->
       <div
@@ -43,20 +43,22 @@
     </div>
     
     <!-- 卡片信息 -->
-    <div class="p-4 bg-white">
+    <div class="p-4">
       <!-- 标题 -->
-      <h3 class="font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+      <h3
+        class="font-bold text-td-primary mb-2 line-clamp-2 group-hover:text-td-brand transition-colors"
+      >
         {{ item.name }}
       </h3>
       
       <!-- 元信息 -->
-      <div class="flex items-center gap-3 text-sm text-gray-600 mb-3">
+      <div class="flex items-center gap-3 text-sm text-td-secondary mb-3">
         <span v-if="item.year" class="flex items-center gap-1">
-          <t-icon name="calendar" class="text-gray-400" />
+          <t-icon name="calendar" class="text-td-placeholder" />
           {{ item.year }}
         </span>
         <span v-if="item.runtimeSeconds" class="flex items-center gap-1">
-          <t-icon name="time" class="text-gray-400" />
+          <t-icon name="time" class="text-td-placeholder" />
           {{ formatDuration(item.runtimeSeconds) }}
         </span>
       </div>
@@ -66,7 +68,7 @@
         <span
           v-for="genre in item.genres.slice(0, 2)"
           :key="genre"
-          class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium"
+          class="bg-blue-100 text-blue-800 dark:bg-blue-500/20 dark:text-blue-200 px-2 py-1 rounded-full text-xs font-medium"
         >
           {{ genre }}
         </span>
@@ -88,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import type { MediaItem } from '@/modules/media/types/media/MediaItem';
+import type { MediaItem } from '@/modules/media/types/media/MediaItem.ts';
 import {PlayIcon} from "tdesign-icons-vue-next";
 import {createWindows} from "@/lib/windows.ts";
 
@@ -163,5 +165,14 @@ const handlePlay = () => {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.media-card {
+  background: var(--td-bg-color-container);
+  border: 1px solid var(--td-border-level-1-color);
+}
+
+.media-card:hover {
+  border-color: var(--td-brand-color);
 }
 </style>

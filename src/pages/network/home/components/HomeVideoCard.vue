@@ -1,18 +1,21 @@
 <template>
   <div
-    class="video-card group relative overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
+    class="video-card group relative overflow-hidden rounded-lg  shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
     @click="handleClick">
     <!-- 封面图片 -->
-    <div class="aspect-2/3 relative overflow-hidden bg-gray-100">
+    <div class="aspect-2/3 relative overflow-hidden bg-td-secondary">
       <img v-if="item.cover" :src="item.cover" :alt="item.title"
            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy"
            @error="handleImageError"/>
-      <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+      <div
+        v-else
+        class="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500/12 via-fuchsia-500/10 to-cyan-500/12 dark:from-indigo-400/20 dark:via-fuchsia-400/16 dark:to-cyan-400/20 text-td-placeholder"
+      >
         <image-icon/>
       </div>
 
       <!-- 悬停遮罩层 -->
-      <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"/>
+      <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300"/>
 
       <!-- 类型标签 -->
       <div class="absolute top-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs font-medium">
@@ -21,7 +24,7 @@
 
       <!-- 备注标签（更新状态） -->
       <div v-if="item.remark"
-           class="absolute top-2 right-2 bg-brand-color bg-opacity-90 text-white px-2 py-1 rounded text-xs font-medium">
+           class="absolute top-2 right-2 bg-td-brand/90 text-white px-2 py-1 rounded text-xs font-medium">
         {{ item.remark }}
       </div>
 
@@ -39,17 +42,19 @@
     </div>
 
     <!-- 卡片信息 -->
-    <div class="p-4 bg-white">
+    <div class="p-4">
       <!-- 标题和副标题 -->
-      <h3 class="font-bold text-gray-900 mb-1 line-clamp-2 group-hover:text-brand-color transition-colors">
+      <h3
+        class="font-bold text-td-primary mb-1 line-clamp-2 group-hover:text-td-brand transition-colors"
+      >
         {{ item.title }}
       </h3>
-      <p v-if="item.subtitle" class="text-sm text-gray-600 mb-2 line-clamp-1">
+      <p v-if="item.subtitle" class="text-sm text-td-secondary mb-2 line-clamp-1">
         {{ item.subtitle }}
       </p>
 
       <!-- 元信息 -->
-      <div class="flex items-center gap-3 text-sm text-gray-600 mb-3">
+      <div class="flex items-center gap-3 text-sm text-td-secondary mb-3">
         <span v-if="item.releaseYear" class="flex items-center gap-1">
           <calendar-icon/>
           {{ item.releaseYear }}
@@ -67,14 +72,14 @@
       <!-- 标签类型 -->
       <div v-if="item.types?.length" class="flex flex-wrap gap-1 mb-3">
         <span v-for="type in item.types.slice(0, 3)" :key="type"
-              class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+              class="bg-blue-100 text-blue-800 dark:bg-blue-500/20 dark:text-blue-200 px-2 py-1 rounded-full text-xs font-medium">
           {{ type }}
         </span>
       </div>
 
       <!-- 演员信息 -->
       <div v-if="item.actors?.length" class="mb-3">
-        <div class="flex items-center gap-2 text-sm text-gray-600">
+        <div class="flex items-center gap-2 text-sm text-td-secondary">
           <usergroup-icon/>
           <span class="line-clamp-1">
             <span class="font-medium">主演：</span>{{ item.actors.slice(0, 3).join(', ') }}
@@ -84,7 +89,7 @@
 
       <!-- 导演信息 -->
       <div v-if="item.directors?.length" class="mb-3">
-        <div class="flex items-center gap-2 text-sm text-gray-600">
+        <div class="flex items-center gap-2 text-sm text-td-secondary">
           <user-icon/>
           <span class="line-clamp-1">
             <span class="font-medium">导演：</span>{{ item.directors.slice(0, 2).join(', ') }}
@@ -93,8 +98,8 @@
       </div>
 
       <!-- 底部操作区 -->
-      <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-        <div class="flex items-center gap-2 text-xs text-gray-500">
+      <div class="flex items-center justify-between pt-3 border-t border-td-1">
+        <div class="flex items-center gap-2 text-xs text-td-secondary">
           <video-icon/>
           <span>{{ item.chapters?.length || 0 }}个播放源</span>
         </div>

@@ -1,5 +1,11 @@
 <template>
   <div class="flex">
+    <t-button theme="primary" variant="text" shape="square" @click="toggleColorMode()">
+      <template #icon>
+        <moon-icon v-if="colorMode === 'dark'"/>
+        <sunny-icon v-else-if="colorMode === 'light'"/>
+      </template>
+    </t-button>
     <t-button theme="primary" variant="text" shape="square" @click="minimize()">
       <template #icon>
         <minus-icon/>
@@ -19,9 +25,10 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {CloseIcon, FullscreenExitIcon, FullscreenIcon, MinusIcon} from "tdesign-icons-vue-next";
+import {CloseIcon, FullscreenExitIcon, FullscreenIcon, MinusIcon, MoonIcon, SunnyIcon} from "tdesign-icons-vue-next";
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import {debounce} from "es-toolkit";
+import {colorMode, toggleColorMode} from "@/global/Constants.ts";
 
 const win = getCurrentWindow();
 
@@ -45,6 +52,7 @@ const toggleMaximize = () => {
 const hide = () => {
   win.hide();
 }
+
 </script>
 <style scoped lang="less">
 

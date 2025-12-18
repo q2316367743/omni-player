@@ -215,7 +215,6 @@
                     theme="primary"
                     variant="light"
                     shape="round"
-                    class="border-0 bg-gradient-to-r from-indigo-500/70 via-fuchsia-500/70 to-cyan-500/70 text-white"
                   >
                     {{ t }}
                   </t-tag>
@@ -453,3 +452,9 @@ watch([clientId, mediaId], () => {
 }, {immediate: true});
 
 </script>
+
+<style scoped lang="less">
+:deep(.t-tabs) {
+  background-color: transparent !important;
+}
+</style>

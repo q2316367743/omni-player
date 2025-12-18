@@ -1,4 +1,5 @@
 import {appDataDir, join} from "@tauri-apps/api/path";
+import {useColorMode} from "@/hooks/ColorMode.ts";
 
 export const APP_NAME = "omni-player";
 export const APP_VERSION = "0.0.1";
@@ -8,3 +9,9 @@ export const APP_DATA_DIR = () => appDataDir();
 export const APP_DATA_DB_PATH = async () => join(await APP_DATA_DIR(), "db.sqlite");
 export const APP_DATA_VAULT_PATH = async () => join(await APP_DATA_DIR(), "vault.hold");
 export const APP_DATA_STORE_PATH = async () => join(await APP_DATA_DIR(), "store.json");
+
+export const {colorMode, isDark} = useColorMode();
+
+export const toggleColorMode = () => {
+  colorMode.value = colorMode.value === 'light' ? 'dark' : 'light';
+}

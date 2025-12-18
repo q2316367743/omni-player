@@ -142,8 +142,9 @@ import {
   init,
   listenEvents,
   type MpvConfig,
+  type MpvEndFileEvent,
+  type MpvEvent,
   type MpvObservableProperty,
-  observeProperties,
   setProperty,
 } from 'tauri-plugin-libmpv-api';
 import {getCurrentWindow} from '@tauri-apps/api/window';
@@ -356,9 +357,48 @@ function setVolume(v: number | number[]) {
   volumeDraft.value = toNumber(v);
 }
 
-let unobserve: (() => void) | undefined;
 let unlisten: (() => void) | undefined;
 
+function resetPlaybackState() {
+  fileLoaded.value = false;
+  timePos.value = null;
+  duration.value = null;
+  filename.value = null;
+  seeking.value = false;
+  progressDraft.value = 0;
+  paused.value = true;
+  controlsVisible.value = true;
+  clearHideTimer();
+}
+
+async function syncSnapshot() {
+  if (!mpvReady.value) return;
+
+  const [p, t, d, v, m, f] = await Promise.all([
+    getProperty('pause', 'flag').catch(() => null),
+    getProperty('time-pos', 'double').catch(() => null),
+    getProperty('duration', 'double').catch(() => null),
+    getProperty('volume', 'double').catch(() => null),
+    getProperty('mute', 'flag').catch(() => null),
+    getProperty('filename', 'string').catch(() => null),
+  ] as const);
+
+  if (typeof v === 'number') volume.value = v;
+  if (typeof m === 'boolean') muted.value = m;
+  if (typeof f === 'string' || f === null) filename.value = f;
+  if (typeof d === 'number' || d === null) duration.value = d;
+  if (!seeking.value && (typeof t === 'number' || t === null)) timePos.value = t;
+
+  if (typeof p === 'boolean') {
+    paused.value = p;
+    if (paused.value) {
+      controlsVisible.value = true;
+      clearHideTimer();
+    } else {
+      scheduleHide();
+    }
+  }
+}
 
 onMounted(async () => {
   const mpvConfig: MpvConfig = {
@@ -381,13 +421,19 @@ onMounted(async () => {
   }
 
   // 监听url变化
-  watch(() => props.url, val => {
+  watch(() => props.url, async (val) => {
+    if (!mpvReady.value) return;
+
     if (!val) {
-      command("stop")
+      resetPlaybackState();
+      await command('stop').catch(() => undefined);
       return;
     }
-    console.log('url:', val)
-    command('loadfile', [val, 'replace']);
+
+    resetPlaybackState();
+    await command('loadfile', [val, 'replace']).catch((error) => {
+      MessageUtil.error('加载播放地址失败', error);
+    });
   }, {immediate: true})
 
   // 是否全屏
@@ -401,97 +447,69 @@ onMounted(async () => {
     void seekCommit(progressDraft.value);
   });
 
-  // 每300ms获取一次mpv播放器状态
-  useIntervalFn(async () => {
-    if (!mpvReady.value) return;
-    if (!fileLoaded.value) return;
+  void syncSnapshot();
 
-    const [p, t, d, v, m, f] = await Promise.all([
-      getProperty('pause', 'flag').catch(() => null),
-      getProperty('time-pos', 'double').catch(() => null),
-      getProperty('duration', 'double').catch(() => null),
-      getProperty('volume', 'double').catch(() => null),
-      getProperty('mute', 'flag').catch(() => null),
-      getProperty('filename', 'string').catch(() => null),
-    ] as const);
-
-    if (typeof d === 'number' || d === null) duration.value = d;
-    if (typeof v === 'number') volume.value = v;
-    if (typeof m === 'boolean') muted.value = m;
-    if (typeof f === 'string' || f === null) filename.value = f;
-    if (!seeking.value && (typeof t === 'number' || t === null)) timePos.value = t;
-
-    if (typeof p === 'boolean') {
-      const prev = paused.value;
-      paused.value = p;
-      if (prev !== paused.value) {
-        if (paused.value) {
-          controlsVisible.value = true;
-          clearHideTimer();
-        } else {
-          scheduleHide();
-        }
-      }
-    }
-  }, 300, {immediate: true});
-
-  // 状态监听
-  try {
-    unobserve = await observeProperties(OBSERVED_PROPERTIES, ({name, data}) => {
-      switch (name) {
-        case 'pause':
-          if (typeof data !== 'boolean') break;
-          paused.value = data;
-          if (paused.value) {
-            controlsVisible.value = true;
-            clearHideTimer();
-          } else {
-            scheduleHide();
-          }
-          break;
-        case 'time-pos':
-          if (!seeking.value) timePos.value = data;
-          break;
-        case 'duration':
-          duration.value = data;
-          break;
-        case 'volume':
-          volume.value = data;
-          break;
-        case 'mute':
-          muted.value = data;
-          break;
-        case 'filename':
-          filename.value = data;
-          break;
-      }
-    });
-  } catch (error) {
-    MessageUtil.error('播放器状态监听失败', error);
-  }
   // 事件监听
   try {
-    unlisten = await listenEvents((event) => {
+    unlisten = await listenEvents((event: MpvEvent) => {
+      if (event.event === 'start-file') {
+        resetPlaybackState();
+        return;
+      }
+
+      if (event.event === 'file-loaded') {
+        fileLoaded.value = true;
+        controlsVisible.value = true;
+        void syncSnapshot();
+        return;
+      }
+
+      if (event.event === 'property-change') {
+        switch (event.name) {
+          case 'pause':
+            if (typeof event.data !== 'boolean') break;
+            paused.value = event.data;
+            if (paused.value) {
+              controlsVisible.value = true;
+              clearHideTimer();
+            } else {
+              scheduleHide();
+            }
+            break;
+          case 'time-pos':
+            if (seeking.value) break;
+            if (typeof event.data === 'number' || event.data === null) timePos.value = event.data;
+            break;
+          case 'duration':
+            if (typeof event.data === 'number' || event.data === null) duration.value = event.data;
+            break;
+          case 'volume':
+            if (typeof event.data === 'number') volume.value = event.data;
+            break;
+          case 'mute':
+            if (typeof event.data === 'boolean') muted.value = event.data;
+            break;
+          case 'filename':
+            if (typeof event.data === 'string' || event.data === null) filename.value = event.data;
+            break;
+        }
+        return;
+      }
+
       if (event.event === 'end-file') {
-        const endEvent = event as import('tauri-plugin-libmpv-api').MpvEndFileEvent
-        console.log('播放结束原因:', endEvent.reason)
+        const endEvent = event as MpvEndFileEvent;
+        resetPlaybackState();
 
         switch (endEvent.reason) {
           case 'eof':
-            console.log('✅ 正常播放完毕')
             emit('next');
-            break
+            break;
           case 'error':
-            MessageUtil.error('❌ 播放出错 (error code:' + endEvent.error + ')')
-            break
-          case 'stop':
-            console.log('⏹ 用户手动停止')
-            break
-          default:
-            MessageUtil.error('ℹ️ 其他结束原因:', endEvent.reason);
+            MessageUtil.error('播放出错 (error code:' + endEvent.error + ')');
+            break;
         }
       }
-    })
+    });
   } catch (error) {
     MessageUtil.error('播放器事件监听失败', error);
   }
@@ -540,24 +558,8 @@ onMounted(async () => {
     }
   });
 
-  fileLoaded.value = true;
-  controlsVisible.value = true;
-
-  const v = await getProperty('volume', 'double').catch(() => null);
-  if (typeof v === 'number') volume.value = v;
-  volumeDraft.value = volume.value;
-
-  const m = await getProperty('mute', 'flag').catch(() => null);
-  if (typeof m === 'boolean') muted.value = m;
-
-  const p = await getProperty('pause', 'flag').catch(() => null);
-  if (typeof p === 'boolean') paused.value = p;
-
-  if (paused.value === false) scheduleHide();
-
   // 窗口关闭后释放资源
   await current.listen('tauri://destroyed', async () => {
-    unobserve?.();
     unlisten?.();
     await destroy();
   });

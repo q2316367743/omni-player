@@ -7,6 +7,11 @@ export const LocalName = {
   // 服务器资源播放进度缓存
   KEY_PLAYER_VIDEO_INDEX: "/key/player/video/index",
 
+  /**
+   * 主题
+   */
+  KEY_THEME: '/key/theme',
+
   // 全局设置
   KEY_SETTING_GLOBAL: "/key/setting/global",
 
