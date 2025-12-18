@@ -13,7 +13,7 @@ export interface IMediaServer {
   getLibraries(): Promise<MediaItem[]>; // 获取根媒体库（电影、剧集等）
 
   // 内容浏览
-  getItems(options: PaginationOptions,parentId?: string, type?: 'Movie' | 'Series'): Promise<PaginatedResult<MediaItem>>;
+  getItems(options: PaginationOptions,parentId?: string): Promise<PaginatedResult<MediaItem>>;
   getItem(id: string): Promise<MediaDetail>; // 获取详情（含元数据）
 
   // 搜索
@@ -31,7 +31,4 @@ export interface IMediaServer {
     subtitleId?: string;
   }): Promise<MediaPlaybackInfo>;
 
-  // 可选：用户信息、播放历史、收藏等
-  getUserInfo?(): Promise<any>;
-  getWatchedStatus?(itemId: string): Promise<boolean>;
 }

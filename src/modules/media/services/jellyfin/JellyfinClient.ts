@@ -16,7 +16,6 @@ import {
 import type {MediaServer} from "@/entity/MediaServer.ts";
 import {useStronghold} from "@/lib/Stronghold.ts";
 import type {MediaItem} from "@/modules/media/types/media/MediaItem";
-import type {MediaPerson} from "@/modules/media/types/person/MediaPerson";
 import {type Method, postAction, requestAction, type RequestConfig} from "@/lib/http.ts";
 import MessageBoxUtil from "@/util/model/MessageBoxUtil.tsx";
 import type {PaginatedResult, PaginationOptions} from "@/modules/media/types/common/MediaPage.ts";
@@ -28,6 +27,7 @@ export class JellyfinClient implements IMediaServer {
   private readonly baseUrl: string;
   private accessToken: string | null = null;
   private userId: string | null = null;
+  private authenticating: Promise<void> | null = null;
 
   constructor(server: MediaServer) {
     this.server = server;
@@ -79,7 +79,7 @@ export class JellyfinClient implements IMediaServer {
       if (status !== 200 || !data) {
         const message = (data && (data as any).ErrorMessage) || "登录失败";
         await MessageBoxUtil.alert(message, "登录失败");
-        throw new Error(message);
+        return Promise.reject(new Error(message))
       }
       this.accessToken = data.AccessToken;
       await stronghold.setMediaRecord(this.server.id, "accessToken", this.accessToken!, 30 * 24 * 60 * 60 * 1000);
@@ -97,7 +97,7 @@ export class JellyfinClient implements IMediaServer {
         message = e.message;
       }
       await MessageBoxUtil.alert(message, "登录失败");
-      throw e;
+      return Promise.reject(e);
     }
   }
 
@@ -111,21 +111,65 @@ export class JellyfinClient implements IMediaServer {
     };
   }
 
+  private async ensureAuthenticated(options?: { force?: boolean }) {
+    if (!options?.force && this.accessToken && this.userId) return;
+    if (this.authenticating) return this.authenticating;
+    this.authenticating = this.authenticate().finally(() => {
+      this.authenticating = null;
+    });
+    return this.authenticating;
+  }
+
+  private async invalidateAuthentication() {
+    this.accessToken = null;
+    this.userId = null;
+    try {
+      await useStronghold().removeMediaRecord(this.server.id, "accessToken");
+    } catch {
+    }
+  }
+
+  private parseStatus(error: unknown): number | undefined {
+    if (!error || typeof error !== "object") return undefined;
+    const maybeError = error as { response?: unknown; status?: unknown };
+    if (typeof maybeError.status === "number") return maybeError.status;
+    const response = maybeError.response;
+    if (!response || typeof response !== "object") return undefined;
+    const maybeResponse = response as { status?: unknown };
+    return typeof maybeResponse.status === "number" ? maybeResponse.status : undefined;
+  }
+
   private async request<T extends Record<string, any>>(url: string, method: Method, config?: RequestConfig) {
-    const {data} = await requestAction<T>(
-      {
-        ...config,
-        method,
-        url,
-        baseURL: this.baseUrl,
-        headers: {
-          ...config?.headers,
-          ...this.getAuthHeaders(),
-        },
-        responseType: "json"
-      },
-    )
-    return data;
+    const maxAttempts = 2;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        await this.ensureAuthenticated();
+
+        const requestConfig: RequestConfig = {
+          ...config,
+          method,
+          url,
+          baseURL: this.baseUrl,
+          headers: {
+            ...config?.headers,
+            ...this.getAuthHeaders(),
+          },
+          responseType: "json"
+        };
+
+        const {data} = await requestAction<T>(requestConfig);
+        return data;
+      } catch (e) {
+        const status = this.parseStatus(e);
+        const shouldRetry = attempt < maxAttempts && (status === 401 || status === 403 || (e instanceof Error && e.message === "Not authenticated"));
+        if (!shouldRetry) throw e;
+
+        await this.invalidateAuthentication();
+        await this.ensureAuthenticated({force: true});
+      }
+    }
+
+    throw new Error("Request failed after retries");
   }
 
   private async getAction<T extends Record<string, any>>(url: string, params?: Record<string, any>, config?: RequestConfig) {
@@ -138,7 +182,6 @@ export class JellyfinClient implements IMediaServer {
     )
   }
 
-
   private async postAction<T extends Record<string, any>>(url: string, data?: Record<string, any>, config?: RequestConfig) {
     return this.request<T>(
       url, "POST",
@@ -149,13 +192,17 @@ export class JellyfinClient implements IMediaServer {
     )
   }
 
-
   /**
    * 获取根媒体库（电影、剧集等）
    */
   async getLibraries(): Promise<MediaItemJellyfin[]> {
+    await this.ensureAuthenticated();
+    const userId = this.userId;
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
     const data = await this.getAction(
-      `/Users/${this.userId}/Views`,
+      `/Users/${userId}/Views`,
     );
     return data.Items.map((item: any) =>
       normalizeMediaItem({...item, ServerUrl: this.baseUrl})
@@ -165,7 +212,12 @@ export class JellyfinClient implements IMediaServer {
   /**
    * 获取子项（支持 parentId 和 type 过滤）
    */
-  async getItems(options: PaginationOptions, parentId?: string, type?: 'Movie' | 'Series'): Promise<PaginatedResult<MediaItem>> {
+  async getItems(options: PaginationOptions, parentId?: string): Promise<PaginatedResult<MediaItem>> {
+    await this.ensureAuthenticated();
+    const userId = this.userId;
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
     const {
       page = 1,
       pageSize = 50,
@@ -184,6 +236,7 @@ export class JellyfinClient implements IMediaServer {
       // 👇 关键：排序
       SortBy: sortBy,
       SortOrder: sortOrder,
+      IncludeItemTypes: "Movie,Series"
     };
 
     // 高级过滤（可选）
@@ -199,16 +252,13 @@ export class JellyfinClient implements IMediaServer {
 
 
     if (parentId) params['ParentId'] = parentId;
-    if (type) {
-      params['IncludeItemTypes'] = type === 'Movie' ? 'Movie' : 'Series';
-    }
 
     const startIndex = (page - 1) * pageSize;
     // 👇 关键：分页参数
     params['StartIndex'] = startIndex.toString();
     params['Limit'] = pageSize.toString();
 
-    const data = await this.getAction(`/Users/${this.userId}/Items`, params);
+    const data = await this.getAction(`/Users/${userId}/Items`, params);
     const items = data.Items.map((item: any) =>
       normalizeMediaItem({...item, ServerUrl: this.baseUrl})
     );
@@ -224,7 +274,9 @@ export class JellyfinClient implements IMediaServer {
    * 获取单个媒体详情
    */
   async getItem(id: string): Promise<MediaDetailJellyfin> {
-    if (!this.userId || !this.accessToken) {
+    await this.ensureAuthenticated();
+    const userId = this.userId;
+    if (!userId) {
       throw new Error('Not authenticated');
     }
 
@@ -249,18 +301,14 @@ export class JellyfinClient implements IMediaServer {
 
     const enableImageTypes = 'Primary,Backdrop,Logo,Art,Banner,Thumb,Disc,Menu,Screenshot,Chapter,Box,BoxRear,Profile';
 
-    const url = `${this.baseUrl}/Users/${this.userId}/Items/${id}?` +
-      `Fields=${fields}&EnableImageTypes=${enableImageTypes}&ImageTypeLimit=0`;
-
-    const res = await fetch(url, {
-      headers: this.getAuthHeaders(),
-    });
-
-    if (!res.ok) {
-      throw new Error(`Failed to fetch item: ${res.status} ${res.statusText}`);
-    }
-
-    const rawItem = await res.json();
+    const rawItem = await this.getAction<any>(
+      `/Users/${userId}/Items/${id}`,
+      {
+        Fields: fields,
+        EnableImageTypes: enableImageTypes,
+        ImageTypeLimit: 0,
+      }
+    );
 
     // === 开始映射到通用 MediaDetail ===
 
@@ -419,16 +467,6 @@ export class JellyfinClient implements IMediaServer {
   }
 
   /**
-   * 获取演职员列表（从媒体详情中提取）
-   */
-  async getPeople(itemId: string): Promise<MediaPersonJellyfin[]> {
-    const item = await this.getItem(itemId);
-    // Jellyfin 在 getItem 时已包含 People 字段（若请求了 Fields=People）
-    const people = (item.extra?.People as any[]) || [];
-    return people.map(p => normalizePerson(p, this.baseUrl));
-  }
-
-  /**
    * 搜索（简单实现：使用通用搜索 API）
    */
   async search(query: string): Promise<MediaItemJellyfin[]> {
@@ -453,14 +491,19 @@ export class JellyfinClient implements IMediaServer {
     itemId: string,
     options: { maxBitrate?: number; audioTrackId?: string; subtitleId?: string } = {}
   ): Promise<MediaPlaybackInfoJellyfin> {
+    await this.ensureAuthenticated();
+    const userId = this.userId;
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
     // 简化：直接使用 Direct Stream（假设客户端支持硬解）
     const streamUrl = `${this.baseUrl}/Videos/${itemId}/stream?static=true&mediaSourceId=${itemId}`;
 
     // 获取媒体源以提取容器和音轨
     const playbackData = await this.postAction(
-      `${this.baseUrl}/Items/${itemId}/PlaybackInfo`,
+      `/Items/${itemId}/PlaybackInfo`,
       {
-        UserId: this.userId,
+        UserId: userId,
         MaxStreamingBitrate: options.maxBitrate || 100_000_000, // 100 Mbps
         AutoOpenLiveStream: true,
       },
@@ -509,20 +552,88 @@ export class JellyfinClient implements IMediaServer {
     };
   }
 
-  getPersonDetails(personId: string): Promise<MediaPerson> {
-    throw new Error("Method not implemented.");
+  /**
+   * 获取演职员列表（从媒体详情中提取）
+   */
+  async getPeople(itemId: string): Promise<MediaPersonJellyfin[]> {
+    const res = await this.getAction<any>(`/Items/${itemId}/People`);
+    const peopleRaw = Array.isArray(res) ? res : (res?.People || res?.Items || []);
+    return (peopleRaw as any[]).map((p) => normalizePerson(p, this.baseUrl));
   }
 
-  getPersonMedia(personId: string): Promise<MediaItem[]> {
-    throw new Error("Method not implemented.");
+  async getPersonDetails(personId: string): Promise<MediaPersonJellyfin> {
+    await this.ensureAuthenticated();
+    const userId = this.userId;
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
+
+    const person = await this.getAction<any>(
+      `/Users/${userId}/Items/${personId}`,
+      {
+        Fields: "Overview",
+      }
+    );
+
+    const birthYear = typeof person?.BirthYear === "number"
+      ? person.BirthYear
+      : (typeof person?.BirthDate === "string" ? new Date(person.BirthDate).getFullYear() : undefined);
+
+    const deathYear = typeof person?.EndYear === "number"
+      ? person.EndYear
+      : (typeof person?.DeathDate === "string" ? new Date(person.DeathDate).getFullYear() : undefined);
+
+    const primaryImageTag = person?.PrimaryImageTag ?? person?.ImageTags?.Primary;
+
+    return {
+      id: person.Id,
+      name: person.Name,
+      type: 'Actor',
+      imageUrl: primaryImageTag ? `${this.baseUrl}/Items/${person.Id}/Images/Primary?tag=${primaryImageTag}` : undefined,
+      birthYear,
+      deathYear,
+      biography: person.Overview,
+      extra: person,
+    };
   }
 
-  getUserInfo?(): Promise<any> {
-    throw new Error("Method not implemented.");
-  }
+  async getPersonMedia(personId: string): Promise<MediaItem[]> {
+    await this.ensureAuthenticated();
+    const userId = this.userId;
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
 
-  getWatchedStatus?(itemId: string): Promise<boolean> {
-    throw new Error("Method not implemented.");
+    const pageSize = 200;
+    let startIndex = 0;
+    const items: MediaItem[] = [];
+
+    while (true) {
+      const data = await this.getAction<any>(
+        `/Users/${userId}/Items`,
+        {
+          Recursive: "true",
+          PersonIds: personId,
+          IncludeItemTypes: "Movie,Series",
+          Fields: "ProviderIds,UserData,Genres,Overview,DateCreated,DateLastSaved",
+          SortBy: "SortName",
+          SortOrder: "Ascending",
+          StartIndex: startIndex.toString(),
+          Limit: pageSize.toString(),
+        }
+      );
+
+      const batch = (data?.Items || []) as any[];
+      for (const raw of batch) {
+        items.push(normalizeMediaItem({...raw, ServerUrl: this.baseUrl}));
+      }
+
+      const total = typeof data?.TotalRecordCount === "number" ? data.TotalRecordCount : items.length;
+      startIndex += batch.length;
+      if (batch.length === 0 || startIndex >= total) break;
+    }
+
+    return items;
   }
 
 }

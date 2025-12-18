@@ -180,9 +180,8 @@
                   v-for="genre in detail.genres" 
                   :key="genre"
                   theme="primary" 
-                  variant="light" 
+                  variant="outline"
                   shape="round"
-                  class="bg-gradient-to-r from-blue-500 to-purple-600 border-0 text-white"
                 >
                   {{ genre }}
                 </t-tag>
@@ -563,6 +562,8 @@ const seekToChapter = (seconds: number) => {
 /* 防止内容溢出 */
 .media-detail-page {
   width: 100vw;
+  height: calc(100vh - 33px);
+  overflow: auto;
   max-width: 100%;
   box-sizing: border-box;
 }

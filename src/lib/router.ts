@@ -33,17 +33,17 @@ export const router = createRouter({
       name: 'MediaHome',
       path: ':id/home',
       component: () => import('@/pages/media/home/index.vue')
-    },{
+    }, {
       name: '媒体中心 - 影视详情',
       path: ':id/detail/:mediaId',
       component: () => import('@/pages/media/detail/index.vue')
-    },{
-      name: '媒体中心 - 分类',
-      path: ':id/category',
-      component: () => import('@/pages/media/category/index.vue')
-    },{
+    }, {
+      name: '媒体中心 - 收藏',
+      path: ':id/collection',
+      component: () => import('@/pages/media/collection/index.vue')
+    }, {
       name: '媒体中心 - 演员',
-      path: ':id/person',
+      path: ':id/person/:personId',
       component: () => import('@/pages/media/person/index.vue')
     }]
   }, {
@@ -54,15 +54,15 @@ export const router = createRouter({
       name: 'NetworkHome',
       path: ':id/home',
       component: () => import('@/pages/network/home/NetworkHome.vue')
-    },{
+    }, {
       name: '网络服务 - 影视详情',
       path: ':id/detail/:mediaId',
       component: () => import('@/pages/network/detail/index.vue')
-    },{
+    }, {
       name: '网络服务 - 分类',
       path: ':id/video',
       component: () => import('@/pages/network/video/index.vue')
-    },{
+    }, {
       name: '网络服务 - 搜索',
       path: ':id/search',
       component: () => import('@/pages/network/search/index.vue')

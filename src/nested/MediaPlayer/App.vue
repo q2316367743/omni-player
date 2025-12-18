@@ -1,6 +1,6 @@
 <template>
-  <art-player :url="url" v-if="status === 'artplayer'" @next="$emit('next')"/>
-  <MpvPlayer :url="url">
+  <art-player :url="url" :type="type" v-if="status === 'artplayer'" @next="$emit('next')"/>
+  <MpvPlayer :url="url" v-else>
     <t-button theme="primary" variant="text" shape="circle" @click="openDetail">
       <template #icon>
         <InfoCircleIcon/>
@@ -37,6 +37,7 @@ onMounted(async () => {
 
   const current = getCurrentWindow();
   const {playerModeType} = useGlobalSettingStore()
+  console.log(playerModeType)
   if (playerModeType === 'h5') status.value = 'artplayer';
   else status.value = 'mpv';
 
@@ -45,6 +46,7 @@ onMounted(async () => {
     const client = await fetchMediaClient(serverId);
     const playbackInfo = await client.getPlaybackInfo(mediaId);
 
+    console.log('playbackInfo', playbackInfo)
 
     url.value = playbackInfo.streamUrl;
 
@@ -52,9 +54,9 @@ onMounted(async () => {
       type.value = 'm3u8';
     } else if (url.value.endsWith('.flv')) {
       type.value = 'flv';
-    } else if (url.value.endsWith('.mp4') || url.value.endsWith('.mkv')) {
+    } else {
       type.value = 'mp4';
-    } else
+    }
 
 
     detail.value = await client.getItem(mediaId);

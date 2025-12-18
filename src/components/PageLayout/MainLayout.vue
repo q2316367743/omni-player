@@ -16,7 +16,7 @@
             </template>
           </t-button>
         </div>
-        <div class="w-24px">
+        <div class="w-24px mr-8px">
           <t-button theme="primary" size="small" variant="text" shape="square" :disabled="disableHome" @click="goHome">
             <template #icon>
               <home-icon/>

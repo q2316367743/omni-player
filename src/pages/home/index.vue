@@ -171,17 +171,6 @@ const getMediaIcon = (type: MediaServerType) => {
   }
 };
 
-const formatMediaType = (type: MediaServerType): string => {
-  switch (type) {
-    case 'jellyfin':
-      return 'Jellyfin';
-    case 'emby':
-      return 'Emby';
-    case 'plex':
-      return 'Plex';
-  }
-};
-
 const openMediaServerRemove = (server: MediaServer) => {
   MessageBoxUtil.confirm("确定要删除吗？", "提示", {
     confirmButtonText: "确定",
