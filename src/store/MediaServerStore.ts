@@ -55,6 +55,8 @@ export const useMediaServerStore = defineStore('media-server', () => {
     serverClientMap.delete(server.id);
     localStorage.removeItem(`${LocalName.PAGE_MEDIA_HOME_SORT_BY}/${server.id}`)
     localStorage.removeItem(`${LocalName.PAGE_MEDIA_HOME_SORT_ORDER}/${server.id}`)
+    localStorage.removeItem(`${LocalName.PAGE_MEDIA_COLLECTION_SORT_BY}/${server.id}`)
+    localStorage.removeItem(`${LocalName.PAGE_MEDIA_COLLECTION_SORT_ORDER}/${server.id}`)
   }
 
   const updateServer = async (server: MediaServerEdit, id: string) => {

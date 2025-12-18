@@ -2,8 +2,8 @@
   <MediaWall
     :key="clientId"
     :client-id="clientId"
-    :sort-by-storage-key="`${LocalName.PAGE_MEDIA_COLLECTION_SORT_BY}/${clientId}`"
-    :sort-order-storage-key="`${LocalName.PAGE_MEDIA_COLLECTION_SORT_ORDER}/${clientId}`"
+    :sort-by-storage-key="`${LocalName.PAGE_MEDIA_MOVIE_SORT_BY}/${clientId}`"
+    :sort-order-storage-key="`${LocalName.PAGE_MEDIA_MOVIE_SORT_ORDER}/${clientId}`"
     :fetch-page="fetchPage"
   />
 </template>
@@ -15,12 +15,15 @@ import type { PaginatedResult, PaginationOptions } from '@/modules/media/types/c
 import { LocalName } from '@/global/LocalName.ts';
 import MediaWall from '@/pages/media/components/MediaWall.vue';
 
-defineOptions({ name: 'MediaCollection' });
+defineOptions({ name: 'MediaHome' });
 
 const route = useRoute();
 const clientId = computed(() => route.params.id as string);
 
 const fetchPage = (client: IMediaServer, options: PaginationOptions): Promise<PaginatedResult<MediaItem>> => {
-  return client.collections(options);
+  return client.getItems({
+    ...options,
+    type: 'Movie'
+  });
 };
 </script>

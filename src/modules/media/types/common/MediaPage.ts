@@ -35,6 +35,8 @@ export interface PaginationOptions {
   years?: number[];      // 年份范围
   isFavorite?: boolean;  // 仅收藏
   isUnplayed?: boolean;  // 未观看
+
+  type?: "Movie" | "Series"
 }
 
 export interface PaginatedResult<T> {

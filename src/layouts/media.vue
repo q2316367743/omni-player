@@ -7,7 +7,7 @@
     </template>
     <template #content>
       <router-view v-slot="{ Component, route }">
-        <keep-alive :include="['MediaHome']">
+        <keep-alive :include="['MediaHome', 'MediaMovie', 'MediaSeries', 'MediaCollection']">
           <component :is="Component" :key="route.fullPath"/>
         </keep-alive>
       </router-view>
@@ -28,13 +28,25 @@ const router = useRouter();
 const value = ref(`/media/${route.params.id}/home`)
 
 const home = computed(() => `/media/${route.params.id}/home`);
+const movie = computed(() => `/media/${route.params.id}/movie`);
+const series = computed(() => `/media/${route.params.id}/series`);
 const collection = computed(() => `/media/${route.params.id}/collection`);
 
 const menus = computed<Array<MenuItem>>(() => ([
   {
-    label: '全部视频',
+    label: '全部',
     path: home.value,
     value: home.value === value.value ? 'primary' : 'default'
+  },
+  {
+    label: '电影',
+    path: movie.value,
+    value: movie.value === value.value ? 'primary' : 'default'
+  },
+  {
+    label: '剧集',
+    path: series.value,
+    value: series.value === value.value ? 'primary' : 'default'
   },
   {
     label: '已收藏',

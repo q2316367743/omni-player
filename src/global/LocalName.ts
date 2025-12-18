@@ -17,5 +17,17 @@ export const LocalName = {
 
   PAGE_MEDIA_HOME_SORT_BY: "/page/media/home/sortBy",
 
-  PAGE_MEDIA_HOME_SORT_ORDER: "/page/media/home/sortOrder"
+  PAGE_MEDIA_HOME_SORT_ORDER: "/page/media/home/sortOrder",
+
+  PAGE_MEDIA_MOVIE_SORT_BY: "/page/media/movie/sortBy",
+
+  PAGE_MEDIA_MOVIE_SORT_ORDER: "/page/media/movie/sortOrder",
+
+  PAGE_MEDIA_SERIES_SORT_BY: "/page/media/series/sortBy",
+
+  PAGE_MEDIA_SERIES_SORT_ORDER: "/page/media/series/sortOrder",
+
+  PAGE_MEDIA_COLLECTION_SORT_BY: "/page/media/collection/sortBy",
+
+  PAGE_MEDIA_COLLECTION_SORT_ORDER: "/page/media/collection/sortOrder"
 }

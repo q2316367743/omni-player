@@ -233,7 +233,8 @@ export class JellyfinClient implements IMediaServer {
       isUnplayed,
       isFavorite,
       genres,
-      years
+      years,
+      type
     } = options || {};
     const params: Record<string, string> = {
       Recursive: 'true',
@@ -245,6 +246,10 @@ export class JellyfinClient implements IMediaServer {
       SortOrder: sortOrder,
       IncludeItemTypes: "Movie,Series"
     };
+
+    if (type) {
+      params['IncludeItemTypes'] = type;
+    }
 
     // 高级过滤（可选）
     if (isUnplayed) params['IsUnplayed'] = 'true';
