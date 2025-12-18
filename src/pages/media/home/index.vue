@@ -78,7 +78,7 @@
 import {useMediaServerStore} from '@/store';
 import type {MediaItem} from '@/modules/media/types/media/MediaItem.ts';
 import MessageUtil from "@/util/model/MessageUtil.ts"
-import MediaCard from '@/pages/media/home/components/MediaCard.vue';
+import MediaCard from '@/pages/media/components/MediaCard.vue';
 import {MediaPageSortOptions, type MediaPageSortBy} from '@/modules/media/types/common/MediaPage.ts';
 import {LocalName} from "@/global/LocalName.ts";
 

@@ -34,8 +34,11 @@ export class JellyfinClient implements IMediaServer {
     this.baseUrl = server.url;
   }
 
-  collections(options: PaginationOptions): Promise<PaginatedResult<MediaItem>> {
-    throw new Error("Method not implemented.");
+  async collections(options: PaginationOptions): Promise<PaginatedResult<MediaItem>> {
+    return this.getItems({
+      ...options,
+      isFavorite: true,
+    });
   }
 
   /**

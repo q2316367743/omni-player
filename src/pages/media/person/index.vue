@@ -156,7 +156,7 @@ import type {MediaItem} from "@/modules/media/types/media/MediaItem.ts";
 import type {MediaPerson} from "@/modules/media/types/person/MediaPerson.ts";
 import {useMediaServerStore} from "@/store";
 import MessageUtil from "@/util/model/MessageUtil.ts";
-import MediaCard from "@/pages/media/home/components/MediaCard.vue";
+import MediaCard from "@/pages/media/components/MediaCard.vue";
 import {ChevronLeftIcon, RefreshIcon} from "tdesign-icons-vue-next";
 
 type MediaTab = 'all' | MediaItem['type'];
