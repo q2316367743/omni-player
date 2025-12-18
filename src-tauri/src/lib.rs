@@ -1,4 +1,10 @@
 use tauri_plugin_log::{Target, TargetKind};
+use tauri::{
+    Manager,
+    menu::{Menu, MenuItem},
+    tray::TrayIconBuilder,
+};
+
 
 mod commands;
 
@@ -58,6 +64,35 @@ pub fn run() {
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
+        .setup(|app| {
+
+
+            let show_i = MenuItem::with_id(app, "show", "显示", true, None::<&str>)?;
+            let quit_i = MenuItem::with_id(app, "quit", "关闭", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&show_i, &quit_i])?;
+
+            TrayIconBuilder::new()
+            .icon(app.default_window_icon().unwrap().clone())
+                .menu(&menu)
+                .show_menu_on_left_click(true)
+                .on_menu_event(|app: &tauri::AppHandle, event| match event.id.as_ref() {
+                    "show" => {
+                        app.get_webview_window("main")
+                            .unwrap()
+                            .show()
+                            .unwrap();
+                    }
+                    "quit" => {
+                        app.exit(0);
+                    }
+                    _ => {
+                        println!("menu item {:?} not handled", event.id);
+                    }
+                })
+                .build(app)?;
+
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

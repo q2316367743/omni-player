@@ -419,7 +419,6 @@ const loadDetail = async () => {
     client.value = c;
 
     detail.value = await c.getDetail(getNetworkListItem());
-    console.log("获取到明细：", detail.value)
 
     if (detail.value?.chapters?.length) {
       chapterTabId.value = detail.value.chapters[0]?.id || "";
@@ -436,8 +435,10 @@ const openPlayer = async () => {
   if (!detail.value || !client.value) return;
 
   createWindows("network", {
+    title: detail.value.title,
     serverId: clientId.value,
     mediaId: detail.value.id,
+    item: detail.value
   })
 
 };

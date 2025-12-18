@@ -1,31 +1,22 @@
 <template>
-  <t-layout class="w-full h-full">
-    <t-header>
+  <MainLayout>
+    <template #header>
       <t-head-menu v-model="value">
-        <template #logo>
-          <t-button theme="primary" shape="circle" @click="goHome">
-            <template #icon>
-              <home-icon />
-            </template>
-          </t-button>
-        </template>
         <t-menu-item :value="home">首页</t-menu-item>
         <t-menu-item :value="video">分类</t-menu-item>
         <t-menu-item :value="search">搜索</t-menu-item>
       </t-head-menu>
-    </t-header>
-    <t-content class="h-full relative overflow-auto">
+    </template>
+    <template #content>
       <router-view v-slot="{ Component, route }">
         <keep-alive :include="['NetworkHome']">
           <component :is="Component" :key="route.fullPath"/>
         </keep-alive>
       </router-view>
-    </t-content>
-  </t-layout>
+    </template>
+  </MainLayout>
 </template>
 <script lang="ts" setup>
-import {HomeIcon} from "tdesign-icons-vue-next";
-
 const route = useRoute();
 const router = useRouter();
 
@@ -43,10 +34,6 @@ watch(() => route.path, val => {
     value.value = val;
   }
 })
-
-const goHome = () => {
-  router.replace("/home")
-}
 
 </script>
 <style scoped lang="less">

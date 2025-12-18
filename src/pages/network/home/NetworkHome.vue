@@ -125,7 +125,6 @@ const loadData = async () => {
 
     // 加载首页推荐
     client.home(1).then(res1 => {
-      console.log('首页推荐响应:', res1);
       categories.value = res1.categories;
     });
 
@@ -173,7 +172,6 @@ const loadMoreData = async () => {
 
     // 加载更多分类视频
     const res = await client.getVideos(categoryId.value, nextPage);
-    console.log('更多分类视频响应:', res);
 
     // 追加新数据到现有数组
     items.value.push(...res.data);
@@ -295,7 +293,7 @@ export default {
 .category-section {
   flex-shrink: 0;
   width: 240px;
-  height: calc(100vh - 148px);
+  height: calc(100vh - 116px);
   position: sticky;
   top: 72px;
 }

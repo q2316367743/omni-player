@@ -2,13 +2,16 @@ import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import {invoke} from '@tauri-apps/api/core'
 import MessageUtil from "@/util/model/MessageUtil.ts";
+import type {NetworkListItem} from "@/modules/network/types/NetworkListItem.ts";
 
 
 export type WindowLabel = "media" | "network" | "file";
 
 export interface WindowPayload {
+  title: string;
   serverId: string;
   mediaId: string;
+  item?: NetworkListItem
 }
 
 export interface CreateTauriWindowOptions {
@@ -41,7 +44,7 @@ export async function createWindows(label: WindowLabel, payload: WindowPayload) 
     const options: CreateTauriWindowOptions = {
       label: windowLabel,
       url: import.meta.env.DEV ? `http://localhost:5123/player-${label}.html` : `./player-${label}.html`,
-      title: "媒体播放器",
+      title: payload.title,
       width: 1200,
       height: 800,
       resizable: true,

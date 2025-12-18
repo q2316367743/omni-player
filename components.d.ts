@@ -16,6 +16,7 @@ declare module 'vue' {
     EmptyResult: typeof import('./src/components/Result/EmptyResult.vue')['default']
     InfoResult: typeof import('./src/components/Result/InfoResult.vue')['default']
     LoadingResult: typeof import('./src/components/Result/LoadingResult.vue')['default']
+    MainLayout: typeof import('./src/components/PageLayout/MainLayout.vue')['default']
     MediaCard: typeof import('./src/components/media/MediaCard.vue')['default']
     MpvPlayer: typeof import('./src/components/VideoPlayer/MpvPlayer.vue')['default']
     PageLayout: typeof import('./src/components/PageLayout/PageLayout.vue')['default']
@@ -54,6 +55,7 @@ declare module 'vue' {
     TTabs: typeof import('tdesign-vue-next')['Tabs']
     TTag: typeof import('tdesign-vue-next')['Tag']
     TTooltip: typeof import('tdesign-vue-next')['Tooltip']
+    WindowControl: typeof import('./src/components/WindowControl/WindowControl.vue')['default']
   }
 }
 
@@ -63,6 +65,7 @@ declare global {
   const EmptyResult: typeof import('./src/components/Result/EmptyResult.vue')['default']
   const InfoResult: typeof import('./src/components/Result/InfoResult.vue')['default']
   const LoadingResult: typeof import('./src/components/Result/LoadingResult.vue')['default']
+  const MainLayout: typeof import('./src/components/PageLayout/MainLayout.vue')['default']
   const MediaCard: typeof import('./src/components/media/MediaCard.vue')['default']
   const MpvPlayer: typeof import('./src/components/VideoPlayer/MpvPlayer.vue')['default']
   const PageLayout: typeof import('./src/components/PageLayout/PageLayout.vue')['default']
@@ -101,4 +104,5 @@ declare global {
   const TTabs: typeof import('tdesign-vue-next')['Tabs']
   const TTag: typeof import('tdesign-vue-next')['Tag']
   const TTooltip: typeof import('tdesign-vue-next')['Tooltip']
+  const WindowControl: typeof import('./src/components/WindowControl/WindowControl.vue')['default']
 }

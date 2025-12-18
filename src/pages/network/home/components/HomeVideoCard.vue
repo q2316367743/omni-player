@@ -5,14 +5,14 @@
     <!-- 封面图片 -->
     <div class="aspect-2/3 relative overflow-hidden bg-gray-100">
       <img v-if="item.cover" :src="item.cover" :alt="item.title"
-        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy"
-        @error="handleImageError" />
+           class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy"
+           @error="handleImageError"/>
       <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
-        <t-icon name="image" class="text-4xl text-gray-300" />
+        <image-icon/>
       </div>
 
       <!-- 悬停遮罩层 -->
-      <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
+      <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"/>
 
       <!-- 类型标签 -->
       <div class="absolute top-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs font-medium">
@@ -21,19 +21,19 @@
 
       <!-- 备注标签（更新状态） -->
       <div v-if="item.remark"
-        class="absolute top-2 right-2 bg-brand-color bg-opacity-90 text-white px-2 py-1 rounded text-xs font-medium">
+           class="absolute top-2 right-2 bg-brand-color bg-opacity-90 text-white px-2 py-1 rounded text-xs font-medium">
         {{ item.remark }}
       </div>
 
       <!-- 集数信息 -->
       <div v-if="item.type === 'Series' && item.total"
-        class="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
+           class="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
         {{ item.total }}集
       </div>
 
       <!-- 时长信息 -->
       <div v-if="item.duration && item.type === 'Movie'"
-        class="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
+           class="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
         {{ item.duration }}
       </div>
     </div>
@@ -51,15 +51,15 @@
       <!-- 元信息 -->
       <div class="flex items-center gap-3 text-sm text-gray-600 mb-3">
         <span v-if="item.releaseYear" class="flex items-center gap-1">
-          <t-icon name="calendar" class="text-gray-400" />
+          <calendar-icon/>
           {{ item.releaseYear }}
         </span>
         <span v-if="item.region" class="flex items-center gap-1">
-          <t-icon name="location" class="text-gray-400" />
+          <location-icon/>
           {{ item.region }}
         </span>
         <span v-if="item.language" class="flex items-center gap-1">
-          <t-icon name="translate" class="text-gray-400" />
+          <translate-icon/>
           {{ item.language }}
         </span>
       </div>
@@ -67,7 +67,7 @@
       <!-- 标签类型 -->
       <div v-if="item.types?.length" class="flex flex-wrap gap-1 mb-3">
         <span v-for="type in item.types.slice(0, 3)" :key="type"
-          class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+              class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
           {{ type }}
         </span>
       </div>
@@ -75,7 +75,7 @@
       <!-- 演员信息 -->
       <div v-if="item.actors?.length" class="mb-3">
         <div class="flex items-center gap-2 text-sm text-gray-600">
-          <t-icon name="user-group" class="text-gray-400" />
+          <usergroup-icon/>
           <span class="line-clamp-1">
             <span class="font-medium">主演：</span>{{ item.actors.slice(0, 3).join(', ') }}
           </span>
@@ -85,7 +85,7 @@
       <!-- 导演信息 -->
       <div v-if="item.directors?.length" class="mb-3">
         <div class="flex items-center gap-2 text-sm text-gray-600">
-          <t-icon name="user" class="text-gray-400" />
+          <user-icon/>
           <span class="line-clamp-1">
             <span class="font-medium">导演：</span>{{ item.directors.slice(0, 2).join(', ') }}
           </span>
@@ -95,13 +95,13 @@
       <!-- 底部操作区 -->
       <div class="flex items-center justify-between pt-3 border-t border-gray-100">
         <div class="flex items-center gap-2 text-xs text-gray-500">
-          <t-icon name="video" class="text-gray-400" />
+          <video-icon/>
           <span>{{ item.chapters?.length || 0 }}个播放源</span>
         </div>
 
-        <t-button theme="primary" size="small" shape="round" class="shadow-md group-hover:shadow-lg transition-shadow">
+        <t-button theme="primary" size="small" shape="round" @click.stop="handlePlayer()">
           <template #icon>
-            <play-icon />
+            <play-icon/>
           </template>
           播放
         </t-button>
@@ -111,9 +111,19 @@
 </template>
 
 <script setup lang="ts">
-import { PlayIcon } from "tdesign-icons-vue-next"
-import type { NetworkListItem } from '@/modules/network/types/NetworkListItem';
-import { setNetworkListItem } from '../../components/detail';
+import {
+  CalendarIcon,
+  ImageIcon,
+  LocationIcon,
+  PlayIcon,
+  TranslateIcon,
+  UsergroupIcon,
+  UserIcon,
+  VideoIcon
+} from "tdesign-icons-vue-next"
+import type {NetworkListItem} from '@/modules/network/types/NetworkListItem';
+import {setNetworkListItem} from '../../components/detail';
+import {createWindows} from "@/lib/windows.ts";
 
 interface Props {
   item: NetworkListItem;
@@ -122,6 +132,8 @@ interface Props {
 const props = defineProps<Props>();
 const route = useRoute();
 const router = useRouter();
+
+const networkId = route.params.id as string;
 
 // 处理图片加载错误
 const handleImageError = (event: Event) => {
@@ -134,8 +146,17 @@ const handleImageError = (event: Event) => {
 const handleClick = () => {
   // 这里可以添加跳转逻辑
   setNetworkListItem(props.item);
-  router.push(`/network/${route.params.id}/detail/${props.item.id}`);
+  router.push(`/network/${networkId}/detail/${props.item.id}`);
 };
+
+const handlePlayer = () => {
+  createWindows("network", {
+    title: props.item.title,
+    serverId: networkId,
+    mediaId: props.item.id,
+    item: props.item
+  })
+}
 </script>
 
 <style scoped>

@@ -491,6 +491,7 @@ const handlePlay = () => {
 
   // 这里可以添加播放逻辑
   createWindows("media", {
+    title: detail.value.name,
     serverId: clientId,
     mediaId: detail.value.id,
   })
@@ -559,13 +560,6 @@ const seekToChapter = (seconds: number) => {
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* 响应式容器 */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
 /* 防止内容溢出 */
 .media-detail-page {
   width: 100vw;
@@ -578,21 +572,4 @@ const seekToChapter = (seconds: number) => {
   box-sizing: border-box;
 }
 
-/* 渐变文字效果 */
-.text-gradient {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* 悬停效果 */
-.hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
 </style>

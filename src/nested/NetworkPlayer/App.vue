@@ -8,17 +8,19 @@
 import Player from "@/nested/NetworkPlayer/components/Player.vue";
 import type {NetworkDetail} from "@/modules/network/types/NetworkDetail.ts";
 import type {INetworkServer} from "@/modules/network/INetworkServer.ts";
-import {createNetworkServer} from "@/modules/network/factory.ts";
 import {getAllWindows, getCurrentWindow} from "@tauri-apps/api/window";
+import {fetchNetworkClient} from "@/store";
+import type {WindowPayload} from "@/lib/windows.ts";
 
 const detail = shallowRef<NetworkDetail>();
 const plugin = shallowRef<INetworkServer>();
 
 onMounted(async () => {
-  await getCurrentWindow().listen<any>("init", ({payload}) => {
-    const {source, video} = payload;
-    plugin.value = createNetworkServer(source);
-    detail.value = video;
+  await getCurrentWindow().listen<WindowPayload>("init", async ({payload}) => {
+    const {serverId, item} = payload;
+    console.log("init", payload)
+    plugin.value = await fetchNetworkClient(serverId);
+    detail.value = await plugin.value.getDetail(item!);
   });
   const wins = await getAllWindows()
   for (let win of wins) {
