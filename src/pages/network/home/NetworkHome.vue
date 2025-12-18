@@ -46,7 +46,7 @@
 
       <!-- 视频网格 -->
       <div v-else class="video-content">
-        <div class="video-grid" ref="gridRef">
+        <div class="video-grid">
           <HomeVideoCard v-for="item in items" :item="item" :key="`video-${item.id}`" @click="goToDetail"/>
         </div>
 
@@ -104,10 +104,8 @@ const categoryId = ref('');
 
 // DOM引用
 const containerRef = ref<HTMLElement>();
-const gridRef = ref<HTMLElement>();
-
 // 网络服务客户端
-let client: INetworkServer | null = null;
+const client = ref<INetworkServer>();
 
 // 滚动节流控制
 let isLoading = false;
@@ -121,16 +119,16 @@ const loadData = async () => {
   isLoading = true;
 
   try {
-    client = await useNetworkServerStore().getServerClient(networkId);
+    client.value = await useNetworkServerStore().getServerClient(networkId);
 
     // 加载首页推荐
-    client.home(1).then(res1 => {
+    client.value.home(1).then(res1 => {
       categories.value = res1.categories;
       console.log('首页推荐:', res1);
     });
 
     // 加载分类视频
-    const res = await client.getVideos(categoryId.value, 1);
+    const res = await client.value.getVideos(categoryId.value, 1);
 
     items.value = res.data;
     total.value = res.total;
@@ -167,12 +165,12 @@ const loadMoreData = async () => {
     const nextPage = page.value + 1;
     console.log('加载第几页:', nextPage);
 
-    if (!client) {
-      client = await useNetworkServerStore().getServerClient(networkId);
+    if (!client.value) {
+      client.value = await useNetworkServerStore().getServerClient(networkId);
     }
 
     // 加载更多分类视频
-    const res = await client.getVideos(categoryId.value, nextPage);
+    const res = await client.value.getVideos(categoryId.value, nextPage);
 
     // 追加新数据到现有数组
     items.value.push(...res.data);

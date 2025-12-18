@@ -126,8 +126,6 @@ const loadData = async () => {
       sortOrder: sortOrder.value,
     });
 
-    console.log('Initial load response:', res);
-
     items.value = res.items;
     total.value = res.total;
     hasMore.value = res.hasNext;

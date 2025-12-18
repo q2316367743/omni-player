@@ -3,7 +3,7 @@ import type {WindowLabel, WindowPayload} from "@/lib/windows.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {useGlobalSettingStore} from "@/store/GlobalSettingStore.ts";
 
-function openPotPlayerForMedia(payload: WindowPayload) {
+function openPotPlayerForMedia(_payload: WindowPayload) {
   const {playerModeValue} = useGlobalSettingStore().globalSetting;
   if (!playerModeValue) {
     MessageUtil.error("请先设置PotPlayer地址");

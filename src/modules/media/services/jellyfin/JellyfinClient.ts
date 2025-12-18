@@ -34,6 +34,10 @@ export class JellyfinClient implements IMediaServer {
     this.baseUrl = server.url;
   }
 
+  collections(options: PaginationOptions): Promise<PaginatedResult<MediaItem>> {
+    throw new Error("Method not implemented.");
+  }
+
   /**
    * 认证用户
    */

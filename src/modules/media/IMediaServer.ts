@@ -14,6 +14,7 @@ export interface IMediaServer {
 
   // 内容浏览
   getItems(options: PaginationOptions,parentId?: string): Promise<PaginatedResult<MediaItem>>;
+  collections(options: PaginationOptions): Promise<PaginatedResult<MediaItem>>; // 获取收藏
   getItem(id: string): Promise<MediaDetail>; // 获取详情（含元数据）
 
   // 搜索
