@@ -25,13 +25,20 @@
       <!-- 悬停遮罩层 -->
       <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
       
-      <!-- 评分标签 -->
-      <div
-        v-if="item.rating"
-        class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1"
-      >
-        <t-icon name="star-filled" class="text-yellow-600" />
-        {{ item.rating.toFixed(1) }}
+      <div class="absolute top-2 right-2 flex flex-col items-end gap-2">
+        <div
+          v-if="seriesCountText"
+          class="bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs font-medium tabular-nums"
+        >
+          {{ seriesCountText }}
+        </div>
+        <div
+          v-else-if="item.rating"
+          class="bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1"
+        >
+          <t-icon name="star-filled" class="text-yellow-600" />
+          {{ item.rating.toFixed(1) }}
+        </div>
       </div>
       
       <!-- 媒体类型标签 -->
@@ -110,6 +117,48 @@ interface Emits {
 
 const props = defineProps<Props>();
 defineEmits<Emits>();
+
+const getFiniteNumber = (value: unknown): number | undefined => {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string') {
+    const num = Number(value);
+    if (Number.isFinite(num)) return num;
+  }
+  return undefined;
+};
+
+const getNumberProp = <T extends object>(obj: T, key: string): number | undefined => {
+  return getFiniteNumber((obj as Record<string, unknown>)[key]);
+};
+
+const seriesCountText = computed(() => {
+  if (props.item.type !== 'Series') return undefined;
+
+  const totalEpisodes =
+    getNumberProp(props.item, 'recursiveItemCount') ??
+    getNumberProp(props.item, 'leafCount');
+
+  if (totalEpisodes) return `${totalEpisodes}集`;
+
+  const extra = props.item.extra;
+  if (extra) {
+    const extraEpisodes =
+      getNumberProp(extra, 'RecursiveItemCount') ??
+      getNumberProp(extra, 'leafCount') ??
+      getNumberProp(extra, 'LeafCount');
+    if (extraEpisodes) return `${extraEpisodes}集`;
+
+    const seasons =
+      getNumberProp(props.item, 'childCount') ??
+      getNumberProp(extra, 'ChildCount');
+    if (seasons) return `${seasons}季`;
+  }
+
+  const seasons = getNumberProp(props.item, 'childCount');
+  if (seasons) return `${seasons}季`;
+
+  return undefined;
+});
 
 // 格式化时长
 const formatDuration = (seconds: number): string => {

@@ -238,7 +238,7 @@ export class JellyfinClient implements IMediaServer {
     } = options || {};
     const params: Record<string, string> = {
       Recursive: 'true',
-      Fields: 'ProviderIds,UserData,Genres,Overview,DateCreated,DateLastSaved',
+      Fields: 'ProviderIds,UserData,Genres,Overview,DateCreated,DateLastSaved,ChildCount,RecursiveItemCount',
       ImageTypeLimit: '1',
       EnableImageTypes: 'Primary,Backdrop',
       // 👇 关键：排序

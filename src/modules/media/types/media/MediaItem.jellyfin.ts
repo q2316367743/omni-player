@@ -50,14 +50,6 @@ export interface MediaItemJellyfin extends MediaItem{
     imageUrl?: string;              // 章节缩略图
   }>;
   mediaSources?: MediaSourceJellyfin[]; // 所有可用播放源（本地文件、转码等）
-  userData?: {
-    playbackPositionTicks: number;  // 当前播放进度（100ns）
-    playCount: number;
-    lastPlayedDate?: string;
-    played: boolean;
-    isFavorite: boolean;
-    rating?: number;                // 用户个人评分
-  };
 
   // --- 关联内容 ---
   parentId?: string;

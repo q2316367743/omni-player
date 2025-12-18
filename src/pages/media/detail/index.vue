@@ -176,10 +176,10 @@
             <div v-if="detail.genres?.length" class="mb-8 w-full">
               <h3 class="text-white font-semibold mb-4">类型</h3>
               <div class="flex flex-wrap gap-2">
-                <t-tag 
-                  v-for="genre in detail.genres" 
+                <t-tag
+                  v-for="genre in detail.genres"
                   :key="genre"
-                  theme="primary" 
+                  theme="primary"
                   variant="outline"
                   shape="round"
                 >
@@ -209,7 +209,8 @@
                     :alt="person.name"
                     class="w-12 h-12 sm:w-16 sm:h-16 rounded-full mx-auto mb-2 sm:mb-3 object-cover"
                   />
-                  <div v-else class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-gray-500 to-gray-700 rounded-full mx-auto mb-2 sm:mb-3 flex items-center justify-center">
+                  <div v-else
+                       class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-gray-500 to-gray-700 rounded-full mx-auto mb-2 sm:mb-3 flex items-center justify-center">
                     <t-icon name="user" class="text-gray-300 text-lg sm:text-xl"/>
                   </div>
                   <h4 class="text-white font-medium text-xs sm:text-sm mb-1">{{ person.name }}</h4>
@@ -265,7 +266,7 @@
                   <div class="text-gray-300 text-sm">观看进度</div>
                 </div>
               </div>
-              
+
               <!-- 观看进度条 -->
               <div v-if="detail.runtimeSeconds && detail.userState.playbackPositionSeconds" class="mt-4">
                 <div class="bg-white/20 rounded-full h-2 overflow-hidden">
@@ -299,11 +300,11 @@
                       </t-tag>
                     </div>
                   </div>
-                  
+
                   <!-- 视频流 -->
                   <div v-if="source.videoStreams?.length" class="mb-4">
                     <h5 class="text-blue-300 font-medium mb-2 flex items-center gap-2">
-                      <t-icon name="desktop" />
+                      <t-icon name="desktop"/>
                       视频流
                     </h5>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -323,11 +324,11 @@
                       </div>
                     </div>
                   </div>
-                  
+
                   <!-- 音频流 -->
                   <div v-if="source.audioStreams?.length" class="mb-4">
                     <h5 class="text-green-300 font-medium mb-2 flex items-center gap-2">
-                      <t-icon name="volume" />
+                      <t-icon name="volume"/>
                       音频流
                     </h5>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -347,11 +348,11 @@
                       </div>
                     </div>
                   </div>
-                  
+
                   <!-- 字幕流 -->
                   <div v-if="source.subtitleStreams?.length">
                     <h5 class="text-yellow-300 font-medium mb-2 flex items-center gap-2">
-                      <t-icon name="subtitle" />
+                      <t-icon name="subtitle"/>
                       字幕流
                     </h5>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -405,6 +406,7 @@ onMounted(async () => {
   try {
     const client = await useMediaServerStore().getServerClient(clientId);
     detail.value = await client.getItem(mediaId);
+    console.log("detail: ", detail.value);
   } catch (error) {
     MessageUtil.error('加载媒体详情失败', error);
   }

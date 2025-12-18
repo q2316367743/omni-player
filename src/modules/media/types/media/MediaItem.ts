@@ -74,4 +74,13 @@ export interface MediaItem {
    * 额外平台特有数据（兜底）
    */
   extra?: Record<string, unknown>;
+
+  userData?: {
+    playbackPositionTicks: number;  // 当前播放进度（100ns）
+    playCount: number;
+    lastPlayedDate?: string;
+    played: boolean;
+    isFavorite: boolean;
+    rating?: number;                // 用户个人评分
+  };
 }
