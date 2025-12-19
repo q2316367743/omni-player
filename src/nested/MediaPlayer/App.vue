@@ -13,7 +13,6 @@
 import {getAllWindows, getCurrentWindow} from '@tauri-apps/api/window';
 import type {WindowPayload} from '@/lib/windows.ts';
 import {fetchMediaClient} from '@/store';
-import type {MediaDetail} from '@/modules/media/types/detail/MediaDetail.ts';
 import type {IMediaServer} from "@/modules/media/IMediaServer.ts";
 import type {MediaPlaybackReport, MediaPlaybackState} from "@/modules/media/types/playback/MediaPlaybackReport.ts";
 import {openDetailDrawer} from './detailDrawer.tsx';
@@ -23,17 +22,16 @@ import {useGlobalSettingStore} from "@/store/GlobalSettingStore.ts";
 
 const url = ref('')
 
-const detail = ref<MediaDetail>();
 const clientRef = shallowRef<IMediaServer>();
 const itemIdRef = ref<string>('');
 const playbackStartTimeRef = ref<number>();
 const lastPlaybackRef = shallowRef<{ state: MediaPlaybackState; positionMs: number; durationMs?: number }>();
+let windowPayload: WindowPayload | null = null;
 
 function openDetail() {
-  if (!detail.value) return;
-  openDetailDrawer({
-    detail: detail.value,
-  });
+  if (!clientRef.value) return;
+  if (!windowPayload) return;
+  openDetailDrawer(clientRef.value, windowPayload);
 }
 
 const status = ref<'artplayer' | "mpv" | "loading">('loading');
@@ -93,7 +91,9 @@ onMounted(async () => {
   else status.value = 'mpv';
 
   const unlistenInit = await current.listen<WindowPayload>('init', async ({payload}) => {
-    const {mediaId, serverId, itemId} = payload;
+    const {serverId, itemId} = payload;
+    windowPayload = payload;
+
     if (itemIdRef.value && itemIdRef.value !== itemId) {
       await reportStopped();
     }
@@ -116,7 +116,6 @@ onMounted(async () => {
     }
 
 
-    detail.value = await client.getItem(mediaId);
   });
 
   const windows = await getAllWindows();
@@ -145,5 +144,8 @@ onMounted(async () => {
 html,
 body {
   background: transparent;
+}
+.t-drawer__body {
+  padding: 0 !important;
 }
 </style>
