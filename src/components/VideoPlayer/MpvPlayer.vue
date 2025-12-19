@@ -54,41 +54,38 @@
               <div class="shrink-0 text-xs text-white/90 font-mono tabular-nums">
                 {{ timeText }} / {{ durationText }}
               </div>
-              <t-slider
-                :value="progressDraft"
+              <PlayerSlider
+                v-model="progressDraft"
                 :min="0"
                 :max="100"
                 :step="0.1"
                 :disabled="!canSeek"
-                :tooltip-props="{ placement: 'top' }"
-                @update:model-value="setProgress"
+                :tooltip-formatter="formatProgressTooltip"
                 @pointerdown="startSeeking"
                 @change-end="seekCommit($event)"
               />
             </div>
 
-            <div class="flex items-center gap-1 pl-2">
+            <div class="flex items-center gap-1 pl-2 shrink-0">
               <t-tooltip :content="muted ? '取消静音' : '静音'" placement="top">
                 <t-button theme="primary" variant="text" shape="circle" @click="toggleMute">
                   <t-icon :name="muted ? 'sound-mute' : 'sound'"/>
                 </t-button>
               </t-tooltip>
 
-              <div class="w-28">
-                <t-slider
-                  :value="volumeDraft"
-                  :min="0"
-                  :max="100"
-                  :step="1"
-                  :tooltip-props="{ placement: 'top' }"
-                  @update:model-value="setVolume"
-                  @change-end="volumeCommit($event)"
-                />
-              </div>
+              <PlayerSlider
+                v-model="volumeDraft"
+                class="w-28"
+                :min="0"
+                :max="100"
+                :step="1"
+                :tooltip-formatter="formatVolumeTooltip"
+                @change-end="volumeCommit($event)"
+              />
 
 
               <t-tooltip :content="isFullscreen ? '退出全屏' : '全屏'" placement="top" class="ml-12px">
-                <t-button theme="primary" variant="text" shape="circle" @click="toggleFullscreen">
+                <t-button theme="primary" variant="text" shape="circle" @click="toggleFullscreen" class="shrink-0">
                   <t-icon :name="isFullscreen ? 'fullscreen-exit' : 'fullscreen'"/>
                 </t-button>
               </t-tooltip>
@@ -97,7 +94,7 @@
               <slot/>
 
               <t-tooltip content="关闭" placement="top">
-                <t-button theme="primary" variant="text" shape="circle" @click="closeWindow">
+                <t-button theme="primary" variant="text" shape="circle" @click="closeWindow" class="shrink-0">
                   <t-icon name="close"/>
                 </t-button>
               </t-tooltip>
@@ -149,6 +146,7 @@ import {
 } from 'tauri-plugin-libmpv-api';
 import {getCurrentWindow} from '@tauri-apps/api/window';
 import MessageUtil from '@/util/model/MessageUtil.ts';
+import PlayerSlider from '@/components/common/PlayerSlider.vue';
 
 const props = defineProps({
   url: {
@@ -263,6 +261,16 @@ function formatTime(totalSeconds: number) {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
+function formatProgressTooltip(percent: number) {
+  const target = (clamp(percent ?? 0, 0, 100) / 100) * (duration.value || 0);
+  return formatTime(target);
+}
+
+function formatVolumeTooltip(v: number) {
+  const value = Math.round(clamp(v ?? 0, 0, 100));
+  return `${value}%`;
+}
+
 function clearHideTimer() {
   if (hideTimer) window.clearTimeout(hideTimer);
   hideTimer = undefined;
@@ -375,21 +383,9 @@ async function closeWindow() {
   await getCurrentWindow().close();
 }
 
-function toNumber(v: number | number[]) {
-  return Array.isArray(v) ? (v[0] ?? 0) : v;
-}
-
 function setHovering(v: boolean) {
   if (hoveringControls.value === v) return;
   hoveringControls.value = v;
-}
-
-function setProgress(v: number | number[]) {
-  progressDraft.value = toNumber(v);
-}
-
-function setVolume(v: number | number[]) {
-  volumeDraft.value = toNumber(v);
 }
 
 let unlisten: (() => void) | undefined;
@@ -477,13 +473,6 @@ onMounted(async () => {
   // 是否全屏
   const current = getCurrentWindow();
   isFullscreen.value = await current.isFullscreen();
-
-  // 监听进度条拖动
-  useEventListener(window, 'pointerup', () => {
-    if (!seeking.value) return;
-    seeking.value = false;
-    void seekCommit(progressDraft.value);
-  });
 
   void syncSnapshot();
 

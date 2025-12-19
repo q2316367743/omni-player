@@ -1,7 +1,7 @@
 <template>
   <art-player :url="url" :type="type" v-if="status === 'artplayer'" @next="$emit('next')" @playback="handlePlayback"/>
   <MpvPlayer :url="url" v-else @playback="handlePlayback">
-    <t-button theme="primary" variant="text" shape="circle" @click="openDetail">
+    <t-button theme="primary" variant="text" shape="circle" @click="openDetail" class="shrink-0">
       <template #icon>
         <InfoCircleIcon/>
       </template>
