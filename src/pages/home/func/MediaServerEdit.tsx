@@ -1,6 +1,6 @@
 import {buildMediaServerInsert, type MediaServer, type MediaServerEdit} from "@/entity/MediaServer.ts";
 import {DrawerPlugin, Form, FormItem, Input, InputNumber, Radio, RadioGroup} from "tdesign-vue-next";
-import {useStronghold} from "@/lib/Stronghold.ts";
+import {useMediaStronghold} from "@/lib/Stronghold.ts";
 import {useMediaServerStore} from "@/store";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 
@@ -16,8 +16,8 @@ export function openMediaServerEdit(old?: MediaServer) {
 
   if (old) {
     (async () => {
-      server.value.username = await useStronghold().getMediaRecord(old.id, "username") || '';
-      server.value.password = await useStronghold().getMediaRecord(old.id, "password") || '';
+      server.value.username = await useMediaStronghold().getMediaRecord(old.id, "username") || '';
+      server.value.password = await useMediaStronghold().getMediaRecord(old.id, "password") || '';
     })().catch(e => MessageUtil.error("初始化密码信息失败", e))
   }
 

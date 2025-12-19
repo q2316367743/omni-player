@@ -4,7 +4,7 @@ import {useStore} from "@/lib/store.ts";
 import {LocalName} from "@/global/LocalName.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {useSnowflake} from "@/util";
-import {useStronghold} from "@/lib/Stronghold.ts";
+import {useMediaStronghold} from "@/lib/Stronghold.ts";
 import type {IMediaServer} from "@/modules/media/IMediaServer.ts";
 import {createMediaClient} from "@/modules/media/factory.ts";
 
@@ -42,16 +42,16 @@ export const useMediaServerStore = defineStore('media-server', () => {
     servers.value.push(server);
     await useStore().save(LocalName.LIST_MEDIA_SERVER, servers.value);
     // 保存用户名密码
-    await useStronghold().setMediaRecord(server.id, "username", username);
-    await useStronghold().setMediaRecord(server.id, "password", password);
+    await useMediaStronghold().setMediaRecord(server.id, "username", username);
+    await useMediaStronghold().setMediaRecord(server.id, "password", password);
   }
 
   const removeServer = async (server: MediaServer) => {
     servers.value = servers.value.filter(s => s.id !== server.id);
     await useStore().save(LocalName.LIST_MEDIA_SERVER, servers.value);
     // 删除用户名密码
-    await useStronghold().removeMediaRecord(server.id, "username");
-    await useStronghold().removeMediaRecord(server.id, "password");
+    await useMediaStronghold().removeMediaRecord(server.id, "username");
+    await useMediaStronghold().removeMediaRecord(server.id, "password");
     serverClientMap.delete(server.id);
     localStorage.removeItem(`${LocalName.PAGE_MEDIA_HOME_SORT_BY}/${server.id}`)
     localStorage.removeItem(`${LocalName.PAGE_MEDIA_HOME_SORT_ORDER}/${server.id}`)
@@ -69,8 +69,8 @@ export const useMediaServerStore = defineStore('media-server', () => {
     };
     await useStore().save(LocalName.LIST_MEDIA_SERVER, servers.value);
     // 更新用户名密码
-    await useStronghold().setMediaRecord(id, "username", username);
-    await useStronghold().setMediaRecord(id, "password", password);
+    await useMediaStronghold().setMediaRecord(id, "username", username);
+    await useMediaStronghold().setMediaRecord(id, "password", password);
     serverClientMap.delete(id);
   }
 

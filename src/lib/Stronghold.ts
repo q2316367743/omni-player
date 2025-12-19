@@ -207,21 +207,25 @@ class StrongholdWrapper {
     await store.delete(key);
   }
 
+  async onChange<T = string>(cb: (key: string, value: T | undefined) => void) {
+    const store = await this.getStore();
+    return store.onChange(cb);
+  }
+
+}
+
+class StrongholdMediaWrapper extends StrongholdWrapper {
+
   async getMediaRecord(serviceId: string, key: string) {
     return await this.getRecord(`/media/${serviceId}/${key}`);
   }
 
   async setMediaRecord(serviceId: string, key: string, value: string, timeout?: number) {
-    return await this.insertRecord(`/media/${serviceId}/${key}`, value, timeout);
+    await this.insertRecord(`/media/${serviceId}/${key}`, value, timeout);
   }
 
   async removeMediaRecord(serviceId: string, key: string) {
     await this.removeRecord(`/media/${serviceId}/${key}`);
-  }
-
-  async onChange<T = string>(cb: (key: string, value: T | undefined) => void) {
-    const store = await this.getStore();
-    return store.onChange(cb);
   }
 
 }
@@ -232,7 +236,7 @@ export const useStronghold = () => {
   return strongholdWrapper;
 }
 
-const mediaStrongholdWrap = new StrongholdWrapper("media");
+const mediaStrongholdWrap = new StrongholdMediaWrapper("media");
 
 mediaStrongholdWrap.onChange((key) => {
   const serviceId = key.split("/")[2];
