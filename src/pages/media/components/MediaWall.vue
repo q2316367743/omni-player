@@ -16,11 +16,11 @@
         </div>
         <div class="page-stats">
           <span class="stat-item">
-            <t-icon name="video" />
+            <t-icon name="video"/>
             已加载 {{ items.length }} 部作品
           </span>
           <span v-if="total > 0" class="stat-item">
-            <t-icon name="list" />
+            <t-icon name="list"/>
             总计 {{ total }} 部
           </span>
         </div>
@@ -29,26 +29,26 @@
 
     <div class="content-area">
       <div v-if="loading && items.length === 0" class="loading-container">
-        <t-loading text="正在加载影视数据..." />
+        <t-loading text="正在加载影视数据..."/>
       </div>
 
       <div v-else-if="error && items.length === 0" class="error-container">
-        <t-icon name="error-circle" class="error-icon" />
+        <t-icon name="error-circle" class="error-icon"/>
         <p class="error-message">{{ error }}</p>
         <t-button theme="primary" @click="loadData">重新加载</t-button>
       </div>
 
       <div v-else class="media-content">
         <div class="media-grid">
-          <MediaCard v-for="item in items" :key="item.id" :item="item" @click="goToDetail" />
+          <MediaCard v-for="item in items" :key="item.id" :item="item" @click="goToDetail"/>
         </div>
 
         <div v-if="loadingMore" class="loading-more">
-          <t-loading text="正在加载更多..." size="small" />
+          <t-loading text="正在加载更多..." size="small"/>
         </div>
 
         <div v-if="!hasMore && items.length > 0" class="load-complete">
-          <t-icon name="check-circle" class="complete-icon" />
+          <t-icon name="check-circle" class="complete-icon"/>
           <span>已加载全部 {{ total }} 部作品</span>
         </div>
 
@@ -62,11 +62,10 @@
 </template>
 
 <script lang="ts" setup>
-import { useMediaServerStore } from '@/store';
-import type { IMediaServer } from '@/modules/media/IMediaServer.ts';
-import type { MediaItem } from '@/modules/media/types/media/MediaItem.ts';
-import type { PaginatedResult, PaginationOptions } from '@/modules/media/types/common/MediaPage.ts';
-import { MediaPageSortOptions, type MediaPageSortBy } from '@/modules/media/types/common/MediaPage.ts';
+import {useMediaServerStore} from '@/store';
+import type {MediaItem} from '@/modules/media/types/media/MediaItem.ts';
+import type {PaginationOptions} from '@/modules/media/types/common/MediaPage.ts';
+import {type MediaPageSortBy, MediaPageSortOptions} from '@/modules/media/types/common/MediaPage.ts';
 import MessageUtil from '@/util/model/MessageUtil.ts';
 import MediaCard from '@/pages/media/components/MediaCard.vue';
 
@@ -74,7 +73,7 @@ const props = defineProps<{
   clientId: string;
   sortByStorageKey: string;
   sortOrderStorageKey: string;
-  fetchPage: (client: IMediaServer, options: PaginationOptions) => Promise<PaginatedResult<MediaItem>>;
+  options: Partial<PaginationOptions>
 }>();
 
 const router = useRouter();
@@ -102,10 +101,10 @@ let pendingReload = false;
 
 const scrollToTop = () => {
   if (mediaWallContainerRef.value) {
-    mediaWallContainerRef.value.scrollTo({ top: 0, behavior: 'smooth' });
+    mediaWallContainerRef.value.scrollTo({top: 0, behavior: 'smooth'});
     return;
   }
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({top: 0, behavior: 'smooth'});
 };
 
 const loadData = async () => {
@@ -117,11 +116,12 @@ const loadData = async () => {
 
   try {
     const client = await useMediaServerStore().getServerClient(props.clientId);
-    const res = await props.fetchPage(client, {
+    const res = await client.getItems({
       page: 1,
       pageSize: pageSize.value,
       sortBy: sortBy.value,
       sortOrder: sortOrder.value,
+      ...props.options,
     });
 
     items.value = res.items;
@@ -154,11 +154,12 @@ const loadMoreData = async () => {
   try {
     const nextPage = page.value + 1;
     const client = await useMediaServerStore().getServerClient(props.clientId);
-    const res = await props.fetchPage(client, {
+    const res = await client.getItems({
       page: nextPage,
       pageSize: pageSize.value,
       sortBy: sortBy.value,
       sortOrder: sortOrder.value,
+      ...props.options
     });
 
     items.value.push(...res.items);
@@ -203,17 +204,15 @@ watch(
     page.value = 1;
     loadData();
   },
-  { immediate: true },
+  {immediate: true},
 );
 </script>
 
 <style scoped lang="less">
 .media-wall-container {
-  background: linear-gradient(
-    135deg,
-    var(--td-bg-color-container) 0%,
-    var(--td-bg-color-secondarycontainer) 100%
-  );
+  background: linear-gradient(135deg,
+  var(--td-bg-color-container) 0%,
+  var(--td-bg-color-secondarycontainer) 100%);
   padding: 0;
 }
 
@@ -221,11 +220,9 @@ watch(
   position: sticky;
   top: 0;
   z-index: 100;
-  background: linear-gradient(
-    135deg,
-    var(--td-bg-color-container) 0%,
-    var(--td-bg-color-secondarycontainer) 100%
-  );
+  background: linear-gradient(135deg,
+  var(--td-bg-color-container) 0%,
+  var(--td-bg-color-secondarycontainer) 100%);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--td-border-level-1-color);
   padding: 12px;

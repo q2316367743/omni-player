@@ -16,11 +16,5 @@ export interface MediaItemEmby extends MediaItem{
     Imdb?: string;
     Tvdb?: string;
   };
-  userData?: {
-    played: boolean;
-    playCount: number;
-    lastPlayedDate?: string;
-    playbackPositionTicks: number;
-  };
 
 }

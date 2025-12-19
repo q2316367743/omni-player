@@ -6,6 +6,7 @@ import type {PaginatedResult, PaginationOptions} from "@/modules/media/types/com
 import type {MediaDetail} from "@/modules/media/types/detail/MediaDetail.ts";
 import type {MediaSeason} from "@/modules/media/types/detail/MediaSeason.ts";
 import type {MediaEpisode} from "@/modules/media/types/detail/MediaEpisode.ts";
+import type {MediaPlaybackReport} from "@/modules/media/types/playback/MediaPlaybackReport.ts";
 
 export interface IMediaServer {
   // 认证
@@ -16,9 +17,6 @@ export interface IMediaServer {
 
   // 内容浏览
   getItems(options: PaginationOptions,parentId?: string): Promise<PaginatedResult<MediaItem>>;
-  collections(options: PaginationOptions): Promise<PaginatedResult<MediaItem>>; // 获取收藏
-
-  //
   getItem(id: string): Promise<MediaDetail>; // 获取详情（含元数据）
   // /Shows/NextUp?SeriesId={id}&UserId={userId}&Fields=MediaSourceCount 获取下一个播放内容
   // /Shows/{id}/Seasons 获取剧集
@@ -40,5 +38,9 @@ export interface IMediaServer {
     audioTrackId?: string;
     subtitleId?: string;
   }): Promise<MediaPlaybackInfo>;
+  /**
+   * 上报播放状态
+   */
+  report(report: MediaPlaybackReport): Promise<void>;
 
 }

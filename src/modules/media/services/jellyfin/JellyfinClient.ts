@@ -1,5 +1,3 @@
-// src/services/jellyfin/JellyfinClient.ts
-
 import type {IMediaServer} from '@/modules/media/IMediaServer.ts';
 import type {MediaItemJellyfin} from '@/modules/media/types/media/MediaItem.jellyfin';
 import type {MediaPersonJellyfin} from '@/modules/media/types/person/MediaPerson.jellyfin';
@@ -20,6 +18,12 @@ import {type Method, postAction, requestAction, type RequestConfig} from "@/lib/
 import MessageBoxUtil from "@/util/model/MessageBoxUtil.tsx";
 import type {PaginatedResult, PaginationOptions} from "@/modules/media/types/common/MediaPage.ts";
 import type {MediaDetailJellyfin} from "@/modules/media/types/detail/MediaDetail.jellyfin.ts";
+import type { MediaPlaybackReport } from "@/modules/media/types/playback/MediaPlaybackReport";
+import type {
+  MediaEpisodeItemJellyfin,
+  MediaEpisodeJellyfin
+} from "@/modules/media/types/detail/MediaEpisode.jellyfin.ts";
+import type {MediaSeasonItemJellyfin, MediaSeasonJellyfin} from "@/modules/media/types/detail/MediaSeason.jellyfin.ts";
 
 
 export class JellyfinClient implements IMediaServer {
@@ -34,12 +38,6 @@ export class JellyfinClient implements IMediaServer {
     this.baseUrl = server.url;
   }
 
-  async collections(options: PaginationOptions): Promise<PaginatedResult<MediaItem>> {
-    return this.getItems({
-      ...options,
-      isFavorite: true,
-    });
-  }
 
   /**
    * 认证用户
@@ -282,6 +280,25 @@ export class JellyfinClient implements IMediaServer {
     };
   }
 
+
+  /**
+   * 搜索（简单实现：使用通用搜索 API）
+   */
+  async search(query: string): Promise<MediaItemJellyfin[]> {
+    const data = await this.getAction(
+      `/Search/Hints?SearchTerm=${encodeURIComponent(query)}&IncludeItemTypes=Movie,Series,Person`
+    );
+    return data.SearchHints.map((hint: any) =>
+      normalizeMediaItem({
+        ...hint,
+        Id: hint.ItemId,
+        Name: hint.Name,
+        Type: hint.Type,
+        ServerUrl: this.baseUrl,
+      })
+    );
+  }
+
   /**
    * 获取单个媒体详情
    */
@@ -478,89 +495,134 @@ export class JellyfinClient implements IMediaServer {
     };
   }
 
-  /**
-   * 搜索（简单实现：使用通用搜索 API）
-   */
-  async search(query: string): Promise<MediaItemJellyfin[]> {
-    const data = await this.getAction(
-      `/Search/Hints?SearchTerm=${encodeURIComponent(query)}&IncludeItemTypes=Movie,Series,Person`
-    );
-    return data.SearchHints.map((hint: any) =>
-      normalizeMediaItem({
-        ...hint,
-        Id: hint.ItemId,
-        Name: hint.Name,
-        Type: hint.Type,
-        ServerUrl: this.baseUrl,
-      })
-    );
-  }
-
-  /**
-   * 获取播放流信息（直连或转码）
-   */
-  async getPlaybackInfo(
-    itemId: string,
-    options: { maxBitrate?: number; audioTrackId?: string; subtitleId?: string } = {}
-  ): Promise<MediaPlaybackInfoJellyfin> {
+  async getItemSeason(id: string): Promise<MediaSeasonJellyfin> {
     await this.ensureAuthenticated();
     const userId = this.userId;
     if (!userId) {
       throw new Error('Not authenticated');
     }
-    // 简化：直接使用 Direct Stream（假设客户端支持硬解）
-    const streamUrl = `${this.baseUrl}/Videos/${itemId}/stream?static=true&mediaSourceId=${itemId}`;
 
-    // 获取媒体源以提取容器和音轨
-    const playbackData = await this.postAction(
-      `/Items/${itemId}/PlaybackInfo`,
+    const data = await this.getAction<any>(
+      `/Shows/${id}/Seasons`,
       {
         UserId: userId,
-        MaxStreamingBitrate: options.maxBitrate || 100_000_000, // 100 Mbps
-        AutoOpenLiveStream: true,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        EnableImageTypes: 'Primary,Backdrop',
+        Fields: 'UserData,ImageTags,ImageBlurHashes',
       }
     );
-    const mediaSource = playbackData.MediaSources?.[0];
 
-    const container = mediaSource?.Container || 'mp4';
+    const rawItems = Array.isArray(data) ? data : (data?.Items || []);
+    const items = (rawItems as any[]).map((raw) => {
+      const imageTags = (raw?.ImageTags ?? {}) as Record<string, string>;
+      const userDataRaw = raw?.UserData ?? {};
 
-    // 构建字幕 URL（仅外挂字幕）
-    const subtitleUrls: string[] = [];
-    if (mediaSource?.MediaStreams) {
-      for (const stream of mediaSource.MediaStreams) {
-        if (stream.Type === 'Subtitle' && stream.DeliveryUrl) {
-          subtitleUrls.push(this.baseUrl + stream.DeliveryUrl);
-        }
-      }
-    }
-
-    // 音轨
-    const audioTracks = (mediaSource?.MediaStreams || [])
-      .filter((s: any) => s.Type === 'Audio')
-      .map((s: any) => ({
-        id: s.Index.toString(),
-        title: s.DisplayTitle || s.Language || 'Audio Track',
-        language: s.Language,
-        isDefault: s.IsDefault,
-      }));
-
-    console.log(playbackData)
+      return {
+        id: raw?.Id,
+        name: raw?.Name ?? '',
+        indexNumber: raw?.IndexNumber,
+        seriesId: raw?.SeriesId ?? id,
+        seriesName: raw?.SeriesName ?? '',
+        isFolder: !!raw?.IsFolder,
+        type: 'Season',
+        primaryImageTag: imageTags.Primary,
+        backdropImageTag: imageTags.Backdrop,
+        userData: {
+          unplayedItemCount: userDataRaw?.UnplayedItemCount,
+          played: userDataRaw?.Played,
+          isFavorite: userDataRaw?.IsFavorite,
+          playCount: userDataRaw?.PlayCount,
+          playbackPositionTicks: userDataRaw?.PlaybackPositionTicks ?? 0,
+          key: userDataRaw?.Key ?? '',
+        },
+        serverId: raw?.ServerId ?? this.server.id,
+        canDelete: !!raw?.CanDelete,
+        channelId: raw?.ChannelId,
+        imageTags: imageTags,
+        imageBlurHashes: raw?.ImageBlurHashes ?? {},
+        locationType: raw?.LocationType ?? '',
+        mediaType: raw?.MediaType ?? '',
+      } as MediaSeasonItemJellyfin;
+    });
 
     return {
-      streamUrl,
-      subtitleUrls,
-      audioTracks,
-      container,
-      isDirectPlay: true, // 简化：假设直通
-      mediaSourceId: mediaSource?.Id || itemId,
-      deviceId: 'tauri-desktop',
-      accessToken: this.accessToken || '',
-      playSessionId: `session-${Date.now()}`,
+      items,
+      totalRecordCount: data?.TotalRecordCount,
+      startIndex: data?.StartIndex,
+    };
+  }
+  async getItemEpisode(id: string, seasonId: string): Promise<MediaEpisodeJellyfin> {
+    await this.ensureAuthenticated();
+    const userId = this.userId;
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
+
+    const data = await this.getAction<any>(
+      `/Shows/${id}/Episodes`,
+      {
+        UserId: userId,
+        SeasonId: seasonId,
+        EnableImageTypes: 'Primary,Backdrop',
+        Fields: 'UserData,ImageTags,ImageBlurHashes,PrimaryImageAspectRatio,MediaSources',
+        SortBy: 'IndexNumber',
+        SortOrder: 'Ascending',
+      }
+    );
+
+    const rawItems = Array.isArray(data) ? data : (data?.Items || []);
+    const items = (rawItems as any[]).map((raw) => {
+      const imageTagsRaw = (raw?.ImageTags ?? {}) as Record<string, string>;
+      const userDataRaw = raw?.UserData ?? {};
+      const positionTicks = userDataRaw?.PlaybackPositionTicks;
+
+      const runtimeMs = typeof raw?.RunTimeTicks === 'number'
+        ? Math.floor(raw.RunTimeTicks / 10_000)
+        : undefined;
+
+      return {
+        id: raw?.Id,
+        name: raw?.Name ?? '',
+        seasonId: raw?.SeasonId ?? raw?.ParentId ?? seasonId,
+        seasonName: raw?.SeasonName ?? '',
+        seriesId: raw?.SeriesId ?? id,
+        seriesName: raw?.SeriesName ?? '',
+        indexNumber: raw?.IndexNumber,
+        parentIndexNumber: raw?.ParentIndexNumber,
+        runtimeMs,
+        isFolder: !!raw?.IsFolder,
+        type: 'Episode',
+        primaryImageTag: imageTagsRaw.Primary,
+        backdropImageTag: imageTagsRaw.Backdrop,
+        userData: {
+          playbackPositionMs: typeof positionTicks === 'number' ? Math.floor(positionTicks / 10_000) : undefined,
+          playCount: userDataRaw?.PlayCount,
+          played: userDataRaw?.Played,
+          isFavorite: userDataRaw?.IsFavorite,
+          lastPlayedDate: userDataRaw?.LastPlayedDate,
+          key: userDataRaw?.Key ?? '',
+        },
+        container: raw?.Container,
+        hasSubtitles: raw?.HasSubtitles,
+        serverId: raw?.ServerId ?? this.server.id,
+        canDelete: !!raw?.CanDelete,
+        channelId: raw?.ChannelId,
+        videoType: raw?.VideoType ?? '',
+        imageTags: {
+          primary: imageTagsRaw.Primary,
+        },
+        imageBlurHashes: {
+          primary: raw?.ImageBlurHashes?.Primary ?? raw?.ImageBlurHashes?.primary,
+        },
+        locationType: raw?.LocationType ?? '',
+        mediaType: raw?.MediaType ?? '',
+        primaryImageAspectRatio: raw?.PrimaryImageAspectRatio,
+      } as MediaEpisodeItemJellyfin;
+    });
+
+    return {
+      items,
+      totalRecordCount: data?.TotalRecordCount,
+      startIndex: data?.StartIndex,
     };
   }
 
@@ -646,6 +708,133 @@ export class JellyfinClient implements IMediaServer {
     }
 
     return items;
+  }
+
+  /**
+   * 获取播放流信息（直连或转码）
+   */
+  async getPlaybackInfo(
+    itemId: string,
+    options: { maxBitrate?: number; audioTrackId?: string; subtitleId?: string } = {}
+  ): Promise<MediaPlaybackInfoJellyfin> {
+    await this.ensureAuthenticated();
+    const userId = this.userId;
+    if (!userId) {
+      throw new Error('Not authenticated');
+    }
+    // 简化：直接使用 Direct Stream（假设客户端支持硬解）
+    const streamUrl = `${this.baseUrl}/Videos/${itemId}/stream?static=true&mediaSourceId=${itemId}`;
+
+    // 获取媒体源以提取容器和音轨
+    const playbackData = await this.postAction(
+      `/Items/${itemId}/PlaybackInfo`,
+      {
+        UserId: userId,
+        MaxStreamingBitrate: options.maxBitrate || 100_000_000, // 100 Mbps
+        AutoOpenLiveStream: true,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    const mediaSource = playbackData.MediaSources?.[0];
+
+    const container = mediaSource?.Container || 'mp4';
+
+    // 构建字幕 URL（仅外挂字幕）
+    const subtitleUrls: string[] = [];
+    if (mediaSource?.MediaStreams) {
+      for (const stream of mediaSource.MediaStreams) {
+        if (stream.Type === 'Subtitle' && stream.DeliveryUrl) {
+          subtitleUrls.push(this.baseUrl + stream.DeliveryUrl);
+        }
+      }
+    }
+
+    // 音轨
+    const audioTracks = (mediaSource?.MediaStreams || [])
+      .filter((s: any) => s.Type === 'Audio')
+      .map((s: any) => ({
+        id: s.Index.toString(),
+        title: s.DisplayTitle || s.Language || 'Audio Track',
+        language: s.Language,
+        isDefault: s.IsDefault,
+      }));
+
+    console.log(playbackData)
+
+    return {
+      streamUrl,
+      subtitleUrls,
+      audioTracks,
+      container,
+      isDirectPlay: true, // 简化：假设直通
+      mediaSourceId: mediaSource?.Id || itemId,
+      deviceId: 'tauri-desktop',
+      accessToken: this.accessToken || '',
+      playSessionId: `session-${Date.now()}`,
+    };
+  }
+
+  async report(report: MediaPlaybackReport): Promise<void> {
+    await this.ensureAuthenticated();
+
+    const positionTicks = Math.max(0, Math.floor(report.positionMs * 10_000));
+    const playbackStartTimeTicks = typeof report.playbackStartTime === 'number'
+      ? Math.floor(report.playbackStartTime * 10_000)
+      : undefined;
+
+    const baseParams: Record<string, string> = {
+      ItemId: report.itemId,
+      MediaSourceId: report.itemId,
+      PositionTicks: positionTicks.toString(),
+      CanSeek: 'true',
+      IsMuted: 'false',
+      PlayMethod: 'DirectPlay',
+    };
+
+    if (typeof playbackStartTimeTicks === 'number') {
+      baseParams.PlaybackStartTimeTicks = playbackStartTimeTicks.toString();
+    }
+
+    if (report.state === 'stopped') {
+      await this.request(
+        '/Sessions/Playing/Stopped',
+        'POST',
+        {
+          params: {
+            ...baseParams,
+            EventName: 'Stop',
+          },
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      return;
+    }
+
+    const isPaused = report.state === 'paused';
+    const endpoint = report.state === 'playing' && report.positionMs <= 1000
+      ? '/Sessions/Playing'
+      : '/Sessions/Playing/Progress';
+
+    await this.request(
+      endpoint,
+      'POST',
+      {
+        params: {
+          ...baseParams,
+          IsPaused: isPaused ? 'true' : 'false',
+          EventName: isPaused ? 'Pause' : 'TimeUpdate',
+        },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
   }
 
 }
