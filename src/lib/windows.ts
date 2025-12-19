@@ -11,6 +11,7 @@ export interface WindowPayload {
   title: string;
   serverId: string;
   mediaId: string;
+  itemId: string;
   item?: NetworkListItem
 }
 

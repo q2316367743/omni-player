@@ -198,6 +198,7 @@ const handlePlay = () => {
     title: props.item.name,
     serverId: clientId,
     mediaId: props.item.id,
+    itemId: props.item.id
   })
 };
 </script>

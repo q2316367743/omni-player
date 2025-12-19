@@ -437,6 +437,7 @@ const openPlayer = async () => {
     title: detail.value.title,
     serverId: clientId.value,
     mediaId: detail.value.id,
+    itemId: detail.value.id,
     item: detail.value
   })
 

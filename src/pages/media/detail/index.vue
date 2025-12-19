@@ -379,6 +379,54 @@
                 </div>
               </div>
             </div>
+
+            <div v-if="detail.type === 'Series'" class="mb-8">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-white font-semibold">剧集</h3>
+                <div class="text-xs text-white/70">共 {{ season?.items?.length || 0 }} 季</div>
+              </div>
+
+              <div
+                class="rounded-2xl border border-white/25 bg-white/10 p-6 shadow-xl backdrop-blur dark:border-white/10"
+              >
+                <t-tabs v-model="selectedSeasonId" size="medium">
+                  <t-tab-panel
+                    v-for="s in season?.items || []"
+                    :key="s.id"
+                    :label="s.name"
+                    :value="s.id"
+                  >
+                    <div v-if="episodeLoadingMap[s.id]" class="flex items-center justify-center py-10">
+                      <t-loading text="加载剧集..." />
+                    </div>
+                    <div v-else-if="episodeErrorMap[s.id]" class="py-8 text-center text-sm text-red-200">
+                      {{ episodeErrorMap[s.id] }}
+                    </div>
+                    <div
+                      v-else-if="(episodeCacheMap[s.id] || []).length"
+                      class="mt-4 grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2"
+                    >
+                      <t-tooltip
+                        v-for="(ep, idx) in episodeCacheMap[s.id]"
+                        :key="ep.id"
+                        :content="ep.name"
+                      >
+                        <t-button
+                          :theme="ep.userData?.played ? 'default' : 'primary'"
+                          variant="outline"
+                          size="small"
+                          class="truncate"
+                          @click="playEpisode(ep)"
+                        >
+                          {{ ep.indexNumber ?? (idx + 1) }}
+                        </t-button>
+                      </t-tooltip>
+                    </div>
+                    <div v-else class="py-8 text-center text-sm text-white/70">暂无剧集</div>
+                  </t-tab-panel>
+                </t-tabs>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -392,6 +440,11 @@ import {useMediaServerStore} from "@/store";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {ChevronLeftIcon, HeartFilledIcon, HeartIcon, MoreIcon, PlayIcon} from "tdesign-icons-vue-next";
 import {createWindows} from "@/lib/windows.ts";
+import type {MediaSeason} from "@/modules/media/types/detail/MediaSeason.ts";
+import type {MediaEpisodeItem} from "@/modules/media/types/detail/MediaEpisode.ts";
+import type {IMediaServer} from "@/modules/media/IMediaServer.ts";
+
+defineOptions({ name: 'MediaDetail' });
 
 const route = useRoute();
 const router = useRouter();
@@ -400,13 +453,63 @@ const clientId = route.params.id as string;
 const mediaId = route.params.mediaId as string;
 
 const detail = ref<MediaDetail>();
+const season = ref<MediaSeason>();
+const selectedSeasonId = ref<string>("");
+
+const client = shallowRef<IMediaServer>();
+const episodeCacheMap = reactive<Record<string, MediaEpisodeItem[]>>({});
+const episodeLoadingMap = reactive<Record<string, boolean>>({});
+const episodeErrorMap = reactive<Record<string, string>>({});
+
+const loadEpisodesBySeasonId = async (seasonId: string) => {
+  if (!seasonId) return;
+  if (episodeCacheMap[seasonId]?.length) return;
+  if (episodeLoadingMap[seasonId]) return;
+
+  episodeLoadingMap[seasonId] = true;
+  episodeErrorMap[seasonId] = "";
+
+  try {
+    const c = client.value ?? await useMediaServerStore().getServerClient(clientId);
+    client.value = c;
+    const res = await c.getItemEpisode(mediaId, seasonId);
+    episodeCacheMap[seasonId] = res.items || [];
+  } catch (e) {
+    episodeErrorMap[seasonId] = e instanceof Error ? e.message : "加载剧集失败";
+    MessageUtil.error("加载剧集失败", e);
+  } finally {
+    episodeLoadingMap[seasonId] = false;
+  }
+};
+
+watch(selectedSeasonId, (id) => {
+  if (!id) return;
+  loadEpisodesBySeasonId(id);
+});
 
 // 加载详情数据
 onMounted(async () => {
   try {
-    const client = await useMediaServerStore().getServerClient(clientId);
-    detail.value = await client.getItem(mediaId);
-    console.log("detail: ", detail.value);
+    const c = await useMediaServerStore().getServerClient(clientId);
+    client.value = c;
+    detail.value = await c.getItem(mediaId);
+    if (detail.value.type === 'Series') {
+      // 获取剧集信息
+      season.value = await c.getItemSeason(mediaId);
+      const firstSeasonId = season.value.items?.[0]?.id || "";
+      selectedSeasonId.value = firstSeasonId;
+      if (firstSeasonId) {
+        await loadEpisodesBySeasonId(firstSeasonId);
+        void (async () => {
+          const ids = (season.value?.items || []).map(s => s.id).filter(Boolean);
+          for (const id of ids) {
+            if (!episodeCacheMap[id]?.length) {
+              await loadEpisodesBySeasonId(id);
+            }
+          }
+        })();
+      }
+    }
   } catch (error) {
     MessageUtil.error('加载媒体详情失败', error);
   }
@@ -486,16 +589,91 @@ const getLanguageName = (code: string): string => {
   return languages[code] || code.toUpperCase();
 };
 
+const loadAllEpisodes = async () => {
+  const ids = (season.value?.items || []).map(s => s.id).filter(Boolean);
+  if (!ids.length) return;
+  await Promise.allSettled(ids.map(id => loadEpisodesBySeasonId(id)));
+};
+
+const pickLastPlayedEpisode = (): MediaEpisodeItem | undefined => {
+  let bestByTime: { episode: MediaEpisodeItem; time: number } | undefined;
+  let bestByProgress: { episode: MediaEpisodeItem; progress: number } | undefined;
+
+  for (const eps of Object.values(episodeCacheMap)) {
+    for (const ep of eps) {
+      const t = ep.userData?.lastPlayedDate ? new Date(ep.userData.lastPlayedDate).getTime() : NaN;
+      if (Number.isFinite(t)) {
+        if (!bestByTime || t > bestByTime.time) bestByTime = { episode: ep, time: t };
+        continue;
+      }
+
+      const progress = ep.userData?.playbackPositionMs;
+      if (typeof progress === "number" && progress > 0) {
+        if (!bestByProgress || progress > bestByProgress.progress) {
+          bestByProgress = { episode: ep, progress };
+        }
+      }
+    }
+  }
+
+  return bestByTime?.episode || bestByProgress?.episode;
+};
+
+const playEpisode = (episode: MediaEpisodeItem) => {
+  if (!detail.value) return;
+  if (episode.seasonId && selectedSeasonId.value !== episode.seasonId) {
+    selectedSeasonId.value = episode.seasonId;
+  }
+  createWindows("media", {
+    title: `${detail.value.name} - ${episode.name}`,
+    serverId: clientId,
+    mediaId: detail.value.id,
+    itemId: episode.id,
+  });
+};
+
 // 播放视频
-const handlePlay = () => {
+const handlePlay = async () => {
   if (!detail.value) return;
 
   // 这里可以添加播放逻辑
-  createWindows("media", {
-    title: detail.value.name,
-    serverId: clientId,
-    mediaId: detail.value.id,
-  })
+  if (detail.value.type !== "Series") {
+    createWindows("media", {
+      title: detail.value.name,
+      serverId: clientId,
+      mediaId: detail.value.id,
+      itemId: detail.value.id,
+    });
+    return;
+  }
+
+  if (!season.value) {
+    const c = client.value ?? await useMediaServerStore().getServerClient(clientId);
+    client.value = c;
+    season.value = await c.getItemSeason(mediaId);
+  }
+
+  const seasonId = selectedSeasonId.value || season.value?.items?.[0]?.id || "";
+  if (!seasonId) {
+    MessageUtil.info("暂无剧集可播放");
+    return;
+  }
+
+  await loadAllEpisodes();
+  const lastPlayed = pickLastPlayedEpisode();
+  if (lastPlayed) {
+    playEpisode(lastPlayed);
+    return;
+  }
+
+  await loadEpisodesBySeasonId(seasonId);
+  const list = episodeCacheMap[seasonId] || [];
+  if (!list.length) {
+    MessageUtil.info("暂无剧集可播放");
+    return;
+  }
+  const fallback = list.find(ep => ep.userData?.played !== true) || list[0]!;
+  playEpisode(fallback);
 };
 
 // 切换收藏状态
@@ -574,5 +752,7 @@ const seekToChapter = (seconds: number) => {
 .media-detail-page * {
   box-sizing: border-box;
 }
-
+:deep(.t-tabs) {
+  background-color: transparent !important;
+}
 </style>

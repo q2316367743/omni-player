@@ -42,9 +42,9 @@ onMounted(async () => {
   else status.value = 'mpv';
 
   await current.listen<WindowPayload>('init', async ({payload}) => {
-    const {mediaId, serverId} = payload;
+    const {mediaId, serverId, itemId} = payload;
     const client = await fetchMediaClient(serverId);
-    const playbackInfo = await client.getPlaybackInfo(mediaId);
+    const playbackInfo = await client.getPlaybackInfo(itemId);
 
     console.log('playbackInfo', playbackInfo)
 

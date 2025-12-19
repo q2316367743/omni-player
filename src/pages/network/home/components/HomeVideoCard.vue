@@ -159,6 +159,7 @@ const handlePlayer = () => {
     title: props.item.title,
     serverId: networkId,
     mediaId: props.item.id,
+    itemId: props.item.id,
     item: props.item
   })
 }
