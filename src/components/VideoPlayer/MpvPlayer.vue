@@ -31,31 +31,77 @@
           @mouseenter="setHovering(true)"
           @mouseleave="setHovering(false)"
         >
-          <div class="flex items-center gap-2">
-            <t-tooltip :content="paused ? '播放' : '暂停'" placement="top">
-              <t-button theme="primary" variant="text" shape="circle" @click="togglePlay">
-                <t-icon :name="paused ? 'play' : 'pause'"/>
-              </t-button>
-            </t-tooltip>
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-2">
+            <div class="flex items-center gap-2 order-1 md:order-none">
+              <t-tooltip :content="paused ? '播放' : '暂停'" placement="top">
+                <t-button theme="primary" variant="text" shape="circle" @click="togglePlay">
+                  <t-icon :name="paused ? 'play' : 'pause'"/>
+                </t-button>
+              </t-tooltip>
 
-            <t-tooltip content="后退 10 秒" placement="top">
-              <t-button theme="primary" variant="text" shape="circle" @click="seekRelative(-10)">
-                <t-icon name="rollback"/>
-              </t-button>
-            </t-tooltip>
+              <t-tooltip content="后退 10 秒" placement="top">
+                <t-button theme="primary" variant="text" shape="circle" @click="seekRelative(-10)">
+                  <t-icon name="rollback"/>
+                </t-button>
+              </t-tooltip>
 
-            <t-tooltip content="前进 10 秒" placement="top">
-              <t-button theme="primary" variant="text" shape="circle" @click="seekRelative(10)">
-                <t-icon name="rollfront"/>
-              </t-button>
-            </t-tooltip>
+              <t-tooltip content="前进 10 秒" placement="top">
+                <t-button theme="primary" variant="text" shape="circle" @click="seekRelative(10)">
+                  <t-icon name="rollfront"/>
+                </t-button>
+              </t-tooltip>
+            </div>
 
-            <div class="min-w-0 flex-1 flex items-center gap-3 pl-1">
-              <div class="shrink-0 text-xs text-white/90 font-mono tabular-nums">
+            <div class="flex items-center gap-1 order-2 md:order-none ml-auto shrink-0">
+              <t-popup
+                :visible="volumePopupVisible"
+                trigger="hover"
+                placement="top"
+                :show-arrow="false"
+                @visible-change="handleVolumePopupVisibleChange"
+              >
+                <t-button theme="primary" variant="text" shape="circle" @click="toggleMute" class="shrink-0">
+                  <t-icon :name="volumeIcon"/>
+                </t-button>
+                <template #content>
+                  <div class="p-2 w-32 sm:w-40" @mouseenter="setHovering(true)" @mouseleave="setHovering(false)">
+                    <PlayerSlider
+                      v-model="volumeDraft"
+                      :min="0"
+                      :max="100"
+                      :step="1"
+                      :tooltip-formatter="formatVolumeTooltip"
+                      @pointerdown="showControls"
+                      @change-end="volumeCommit($event)"
+                    />
+                  </div>
+                </template>
+              </t-popup>
+
+              <t-tooltip :content="isFullscreen ? '退出全屏' : '全屏'" placement="top" class="ml-12px">
+                <t-button theme="primary" variant="text" shape="circle" @click="toggleFullscreen" class="shrink-0">
+                  <t-icon :name="isFullscreen ? 'fullscreen-exit' : 'fullscreen'"/>
+                </t-button>
+              </t-tooltip>
+
+              <div class="shrink-0">
+                <slot/>
+              </div>
+
+              <t-tooltip content="关闭" placement="top">
+                <t-button theme="primary" variant="text" shape="circle" @click="closeWindow" class="shrink-0">
+                  <t-icon name="close"/>
+                </t-button>
+              </t-tooltip>
+            </div>
+
+            <div class="min-w-0 w-full md:w-auto flex items-center gap-3 order-3 md:order-none md:flex-1 md:pl-1">
+              <div class="shrink-0 text-[10px] sm:text-xs text-white/90 font-mono tabular-nums">
                 {{ timeText }} / {{ durationText }}
               </div>
               <PlayerSlider
                 v-model="progressDraft"
+                class="flex-1 min-w-0"
                 :min="0"
                 :max="100"
                 :step="0.1"
@@ -64,40 +110,6 @@
                 @pointerdown="startSeeking"
                 @change-end="seekCommit($event)"
               />
-            </div>
-
-            <div class="flex items-center gap-1 pl-2 shrink-0">
-              <t-tooltip :content="muted ? '取消静音' : '静音'" placement="top">
-                <t-button theme="primary" variant="text" shape="circle" @click="toggleMute">
-                  <t-icon :name="muted ? 'sound-mute' : 'sound'"/>
-                </t-button>
-              </t-tooltip>
-
-              <PlayerSlider
-                v-model="volumeDraft"
-                class="w-28"
-                :min="0"
-                :max="100"
-                :step="1"
-                :tooltip-formatter="formatVolumeTooltip"
-                @change-end="volumeCommit($event)"
-              />
-
-
-              <t-tooltip :content="isFullscreen ? '退出全屏' : '全屏'" placement="top" class="ml-12px">
-                <t-button theme="primary" variant="text" shape="circle" @click="toggleFullscreen" class="shrink-0">
-                  <t-icon :name="isFullscreen ? 'fullscreen-exit' : 'fullscreen'"/>
-                </t-button>
-              </t-tooltip>
-
-              <!-- 此处做插槽 -->
-              <slot/>
-
-              <t-tooltip content="关闭" placement="top">
-                <t-button theme="primary" variant="text" shape="circle" @click="closeWindow" class="shrink-0">
-                  <t-icon name="close"/>
-                </t-button>
-              </t-tooltip>
             </div>
           </div>
         </div>
@@ -182,6 +194,7 @@ const filename = ref<string>();
 const volume = ref(100);
 const volumeDraft = ref(100);
 const muted = ref(false);
+const volumePopupVisible = ref(false);
 
 const controlsVisible = ref(true);
 const hoveringControls = ref(false);
@@ -196,6 +209,7 @@ const canTogglePlay = computed(() => mpvReady.value && fileLoaded.value);
 
 const timeText = computed(() => formatTime(timePos.value ?? 0));
 const durationText = computed(() => formatTime(duration.value ?? 0));
+const volumeIcon = computed(() => (muted.value || volumeDraft.value <= 0 ? 'sound-mute' : 'sound'));
 
 const reportIntervalMs = 5000;
 let lastReportAt = 0;
@@ -271,6 +285,12 @@ function formatVolumeTooltip(v: number) {
   return `${value}%`;
 }
 
+function handleVolumePopupVisibleChange(v: boolean) {
+  volumePopupVisible.value = v;
+  setHovering(v);
+  if (v) showControls();
+}
+
 function clearHideTimer() {
   if (hideTimer) window.clearTimeout(hideTimer);
   hideTimer = undefined;
@@ -279,9 +299,10 @@ function clearHideTimer() {
 function scheduleHide() {
   clearHideTimer();
   if (hoveringControls.value) return;
+  if (volumePopupVisible.value) return;
   if (paused.value) return;
   hideTimer = setTimeout(() => {
-    if (!hoveringControls.value && !paused.value) controlsVisible.value = false;
+    if (!hoveringControls.value && !volumePopupVisible.value && !paused.value) controlsVisible.value = false;
   }, 1500);
 }
 
@@ -298,6 +319,7 @@ function handleMouseMove() {
 function handleMouseLeave() {
   if (paused.value) return;
   if (hoveringControls.value) return;
+  if (volumePopupVisible.value) return;
   controlsVisible.value = false;
   clearHideTimer();
 }
@@ -384,6 +406,7 @@ async function closeWindow() {
 }
 
 function setHovering(v: boolean) {
+  if (!v && volumePopupVisible.value) return;
   if (hoveringControls.value === v) return;
   hoveringControls.value = v;
 }
