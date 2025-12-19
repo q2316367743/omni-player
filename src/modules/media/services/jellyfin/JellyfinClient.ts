@@ -12,7 +12,7 @@ import {
   normalizePerson
 } from './utils';
 import type {MediaServer} from "@/entity/MediaServer.ts";
-import {useStronghold} from "@/lib/Stronghold.ts";
+import {useMediaStronghold} from "@/lib/Stronghold.ts";
 import type {MediaItem} from "@/modules/media/types/media/MediaItem";
 import {type Method, postAction, requestAction, type RequestConfig} from "@/lib/http.ts";
 import MessageBoxUtil from "@/util/model/MessageBoxUtil.tsx";
@@ -43,7 +43,7 @@ export class JellyfinClient implements IMediaServer {
    * 认证用户
    */
   async authenticate(): Promise<void> {
-    const stronghold = useStronghold();
+    const stronghold = useMediaStronghold();
     const accessToken = await stronghold.getMediaRecord(this.server.id, "accessToken");
     if (accessToken) {
       this.accessToken = accessToken;
@@ -106,7 +106,6 @@ export class JellyfinClient implements IMediaServer {
     }
   }
 
-
   private getAuthHeaders() {
     if (!this.accessToken) {
       throw new Error('Not authenticated');
@@ -129,7 +128,7 @@ export class JellyfinClient implements IMediaServer {
     this.accessToken = null;
     this.userId = null;
     try {
-      await useStronghold().removeMediaRecord(this.server.id, "accessToken");
+      await useMediaStronghold().removeMediaRecord(this.server.id, "accessToken");
     } catch {
     }
   }

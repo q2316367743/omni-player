@@ -87,7 +87,10 @@ export const useMediaServerStore = defineStore('media-server', () => {
     } else {
       throw new Error("媒体服务器不存在");
     }
+  }
 
+  const removeServerClient = (id: string) => {
+    serverClientMap.delete(id);
   }
 
   return {
@@ -95,7 +98,8 @@ export const useMediaServerStore = defineStore('media-server', () => {
     addServer,
     updateServer,
     removeServer,
-    getServerClient
+    getServerClient,
+    removeServerClient
   }
 
 })

@@ -2,6 +2,7 @@ import {Store} from '@tauri-apps/plugin-store';
 // 当设置 `"withGlobalTauri": true` 时，你可以用
 // const { Client, Stronghold } = window.__TAURI__.stronghold;
 import {APP_DATA_VAULT_PATH, APP_PASSWORD} from "@/global/Constants.ts";
+import {useMediaServerStore} from "@/store";
 // 当设置 `"withGlobalTauri": true` 时，你可以用
 // const { appDataDir } = window.__TAURI__.path;
 
@@ -16,20 +17,20 @@ class CryptoUtil {
     try {
       const encoder = new TextEncoder();
       const dataBuffer = encoder.encode(data);
-      
+
       // 生成随机的 IV 和 salt
       const iv = crypto.getRandomValues(new Uint8Array(this.IV_LENGTH));
       const salt = crypto.getRandomValues(new Uint8Array(16));
-      
+
       // 使用固定的 salt 生成密钥
       const keyMaterial = await crypto.subtle.importKey(
         'raw',
         encoder.encode(password),
-        { name: 'PBKDF2' },
+        {name: 'PBKDF2'},
         false,
         ['deriveKey']
       );
-      
+
       const key = await crypto.subtle.deriveKey(
         {
           name: 'PBKDF2',
@@ -45,7 +46,7 @@ class CryptoUtil {
         false,
         ['encrypt', 'decrypt']
       );
-      
+
       // 加密数据
       const encryptedBuffer = await crypto.subtle.encrypt(
         {
@@ -61,7 +62,7 @@ class CryptoUtil {
       combined.set(salt, 0);
       combined.set(iv, salt.length);
       combined.set(new Uint8Array(encryptedBuffer), salt.length + iv.length);
-      
+
       return btoa(String.fromCharCode(...combined));
     } catch (error) {
       console.error('加密失败:', error);
@@ -74,22 +75,22 @@ class CryptoUtil {
     try {
       // Base64 解码
       const combined = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
-      
+
       // 分离 salt、IV 和加密数据
       const salt = combined.slice(0, 16);
       const iv = combined.slice(16, 16 + this.IV_LENGTH);
       const encrypted = combined.slice(16 + this.IV_LENGTH);
-      
+
       // 使用提取的 salt 生成密钥
       const encoder = new TextEncoder();
       const keyMaterial = await crypto.subtle.importKey(
         'raw',
         encoder.encode(password),
-        { name: 'PBKDF2' },
+        {name: 'PBKDF2'},
         false,
         ['deriveKey']
       );
-      
+
       const key = await crypto.subtle.deriveKey(
         {
           name: 'PBKDF2',
@@ -105,7 +106,7 @@ class CryptoUtil {
         false,
         ['encrypt', 'decrypt']
       );
-      
+
       // 解密数据
       const decryptedBuffer = await crypto.subtle.decrypt(
         {
@@ -128,11 +129,15 @@ class CryptoUtil {
 
 class StrongholdWrapper {
   private store: Store | null = null;
+  private readonly vaultName: string;
 
+  constructor(vaultName: string) {
+    this.vaultName = vaultName;
+  }
 
   private async getStore() {
     if (!this.store) {
-      this.store = await Store.load(await APP_DATA_VAULT_PATH());
+      this.store = await Store.load(await APP_DATA_VAULT_PATH(this.vaultName));
     }
     return this.store;
   }
@@ -146,11 +151,11 @@ class StrongholdWrapper {
    */
   async insertRecord(key: string, value: string, timeout = 0) {
     const store = await this.getStore();
-    
+
     try {
       // 加密值
       const encryptedValue = await CryptoUtil.encrypt(value, APP_PASSWORD);
-      
+
       // 存储加密后的数据
       await store.set(key, JSON.stringify({
         timeout,
@@ -168,10 +173,10 @@ class StrongholdWrapper {
     const store = await this.getStore();
     const data = await store.get<string>(key);
     if (!data) return null;
-    
+
     try {
       const obj = JSON.parse(data);
-      
+
       // 检查超时
       if (obj.timeout > 0 && Date.now() - obj.start > obj.timeout) {
         await store.delete(key);
@@ -188,7 +193,7 @@ class StrongholdWrapper {
           return null;
         }
       }
-      
+
       // 兼容旧版本未加密的数据
       return obj.value;
     } catch (error) {
@@ -214,10 +219,28 @@ class StrongholdWrapper {
     await this.removeRecord(`/media/${serviceId}/${key}`);
   }
 
+  async onChange<T = string>(cb: (key: string, value: T | undefined) => void) {
+    const store = await this.getStore();
+    return store.onChange(cb);
+  }
+
 }
 
-const strongholdWrapper = new StrongholdWrapper();
+const strongholdWrapper = new StrongholdWrapper("vault");
 
 export const useStronghold = () => {
   return strongholdWrapper;
+}
+
+const mediaStrongholdWrap = new StrongholdWrapper("media");
+
+mediaStrongholdWrap.onChange((key) => {
+  const serviceId = key.split("/")[2];
+  if (!serviceId) return;
+  useMediaServerStore().removeServerClient(serviceId);
+}).then(() => console.debug("媒体密钥监听"))
+
+// 媒体专用
+export const useMediaStronghold = () => {
+  return mediaStrongholdWrap;
 }
