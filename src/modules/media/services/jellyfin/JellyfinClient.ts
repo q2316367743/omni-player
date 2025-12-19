@@ -785,18 +785,16 @@ export class JellyfinClient implements IMediaServer {
       ? Math.floor(report.playbackStartTime * 10_000)
       : undefined;
 
-    const baseParams: Record<string, string> = {
+    const baseParams: Record<string, any> = {
       ItemId: report.itemId,
       MediaSourceId: report.itemId,
-      PositionTicks: positionTicks.toString(),
-      CanSeek: 'true',
-      IsMuted: 'false',
+      PositionTicks: positionTicks,
+      CanSeek: true,
+      IsMuted: false,
       PlayMethod: 'DirectPlay',
+      PlaybackStartTimeTicks: playbackStartTimeTicks
     };
 
-    if (typeof playbackStartTimeTicks === 'number') {
-      baseParams.PlaybackStartTimeTicks = playbackStartTimeTicks.toString();
-    }
 
     if (report.state === 'stopped') {
       await this.request(
@@ -824,9 +822,9 @@ export class JellyfinClient implements IMediaServer {
       endpoint,
       'POST',
       {
-        params: {
+        data: {
           ...baseParams,
-          IsPaused: isPaused ? 'true' : 'false',
+          IsPaused: isPaused,
           EventName: isPaused ? 'Pause' : 'TimeUpdate',
         },
         headers: {

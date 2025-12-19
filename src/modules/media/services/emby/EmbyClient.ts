@@ -429,8 +429,8 @@ export class EmbyClient implements IMediaServer {
       type
     } = options || {};
 
-    const params: Record<string, string> = {
-      Recursive: "true",
+    const params: Record<string, any> = {
+      Recursive: true,
       Fields: "ProviderIds,UserData,Genres,Overview,DateCreated,DateLastSaved,ChildCount,RecursiveItemCount",
       ImageTypeLimit: "1",
       EnableImageTypes: "Primary,Backdrop",
@@ -440,8 +440,8 @@ export class EmbyClient implements IMediaServer {
     };
 
     if (type) params.IncludeItemTypes = type;
-    if (isUnplayed) params.IsUnplayed = "true";
-    if (isFavorite) params.IsFavorite = "true";
+    if (isUnplayed) params.IsUnplayed = true;
+    if (isFavorite) params.IsFavorite = true;
     if (genres?.length) genres.forEach(g => params.Genres = g);
     if (years?.length) years.forEach(y => params.Years = y.toString());
     if (parentId) params.ParentId = parentId;
@@ -633,18 +633,16 @@ export class EmbyClient implements IMediaServer {
       ? Math.floor(report.playbackStartTime * 10_000)
       : undefined;
 
-    const baseParams: Record<string, string> = {
+    const baseParams: Record<string, any> = {
       ItemId: report.itemId,
       MediaSourceId: report.itemId,
-      PositionTicks: positionTicks.toString(),
-      CanSeek: "true",
-      IsMuted: "false",
+      PositionTicks: positionTicks,
+      CanSeek: true,
+      IsMuted: false,
       PlayMethod: "DirectPlay",
+      PlaybackStartTimeTicks: playbackStartTimeTicks
     };
 
-    if (typeof playbackStartTimeTicks === "number") {
-      baseParams.PlaybackStartTimeTicks = playbackStartTimeTicks.toString();
-    }
 
     if (report.state === "stopped") {
       await this.request(
@@ -674,7 +672,7 @@ export class EmbyClient implements IMediaServer {
       {
         params: {
           ...baseParams,
-          IsPaused: isPaused ? "true" : "false",
+          IsPaused: isPaused,
           EventName: isPaused ? "Pause" : "TimeUpdate",
         },
         headers: {
@@ -695,7 +693,7 @@ export class EmbyClient implements IMediaServer {
       `/Users/${userId}/Items`,
       {
         SearchTerm: query,
-        Recursive: "true",
+        Recursive: true,
         IncludeItemTypes: "Movie,Series,Person",
         Fields: "ProviderIds,UserData,Genres,Overview,DateCreated,DateLastSaved",
         SortBy: "SortName",

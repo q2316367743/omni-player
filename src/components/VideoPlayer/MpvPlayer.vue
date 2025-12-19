@@ -156,7 +156,13 @@ const props = defineProps({
     default: ''
   }
 })
-const emit = defineEmits(['next']);
+type PlaybackState = 'playing' | 'paused' | 'stopped';
+type PlaybackPayload = { state: PlaybackState; positionMs: number; durationMs?: number };
+
+const emit = defineEmits<{
+  (e: 'next'): void;
+  (e: 'playback', payload: PlaybackPayload): void;
+}>();
 
 const OBSERVED_PROPERTIES = [
   ['pause', 'flag'],
@@ -171,9 +177,9 @@ const mpvReady = ref(false);
 
 const fileLoaded = ref(false);
 const paused = ref(true);
-const timePos = ref<number | null>(null);
-const duration = ref<number | null>(null);
-const filename = ref<string | null>(null);
+const timePos = ref<number>();
+const duration = ref<number>();
+const filename = ref<string>();
 
 const volume = ref(100);
 const volumeDraft = ref(100);
@@ -193,13 +199,42 @@ const canTogglePlay = computed(() => mpvReady.value && fileLoaded.value);
 const timeText = computed(() => formatTime(timePos.value ?? 0));
 const durationText = computed(() => formatTime(duration.value ?? 0));
 
+const reportIntervalMs = 5000;
+let lastReportAt = 0;
+let lastKey = '';
+
+function getSnapshot(state: PlaybackState): PlaybackPayload {
+  const positionMs = Math.max(0, Math.floor((timePos.value ?? 0) * 1000));
+  const durationMs = typeof duration.value === 'number' && Number.isFinite(duration.value) && duration.value > 0
+    ? Math.floor(duration.value * 1000)
+    : undefined;
+  return {state, positionMs, durationMs};
+}
+
+function emitPlayback(state: PlaybackState, force = false) {
+  if (!force && state !== 'stopped' && !fileLoaded.value) return;
+
+  const payload = getSnapshot(state);
+  const key = `${payload.state}:${Math.floor(payload.positionMs / 1000)}:${typeof payload.durationMs === 'number' ? Math.floor(payload.durationMs / 1000) : ''}`;
+  const now = Date.now();
+
+  if (!force) {
+    if (payload.state === 'playing' && now - lastReportAt < reportIntervalMs) return;
+    if (key === lastKey) return;
+  }
+
+  lastReportAt = now;
+  lastKey = key;
+  emit('playback', payload);
+}
+
 watch([timePos, duration, seeking], () => {
   if (seeking.value) return;
   if (!duration.value || duration.value <= 0 || timePos.value === null) {
     progressDraft.value = 0;
     return;
   }
-  const p = (timePos.value / duration.value) * 100;
+  const p = ((timePos.value || 0) / duration.value) * 100;
   progressDraft.value = clamp(p, 0, 100);
 });
 
@@ -358,12 +393,13 @@ function setVolume(v: number | number[]) {
 }
 
 let unlisten: (() => void) | undefined;
+let destroyedUnlisten: (() => void) | undefined;
 
 function resetPlaybackState() {
   fileLoaded.value = false;
-  timePos.value = null;
-  duration.value = null;
-  filename.value = null;
+  timePos.value = undefined;
+  duration.value = undefined;
+  filename.value = undefined;
   seeking.value = false;
   progressDraft.value = 0;
   paused.value = true;
@@ -385,9 +421,9 @@ async function syncSnapshot() {
 
   if (typeof v === 'number') volume.value = v;
   if (typeof m === 'boolean') muted.value = m;
-  if (typeof f === 'string' || f === null) filename.value = f;
-  if (typeof d === 'number' || d === null) duration.value = d;
-  if (!seeking.value && (typeof t === 'number' || t === null)) timePos.value = t;
+  if (f === null) filename.value = undefined;
+  if (typeof d === 'number' || d === null) duration.value = d || undefined;
+  if (!seeking.value && (typeof t === 'number' || t === null)) timePos.value = t || undefined;
 
   if (typeof p === 'boolean') {
     paused.value = p;
@@ -421,15 +457,17 @@ onMounted(async () => {
   }
 
   // 监听url变化
-  watch(() => props.url, async (val) => {
+  watch(() => props.url, async (val, prev) => {
     if (!mpvReady.value) return;
 
     if (!val) {
+      emitPlayback('stopped', true);
       resetPlaybackState();
       await command('stop').catch(() => undefined);
       return;
     }
 
+    if (prev && prev !== val) emitPlayback('stopped', true);
     resetPlaybackState();
     await command('loadfile', [val, 'replace']).catch((error) => {
       MessageUtil.error('加载播放地址失败', error);
@@ -460,7 +498,9 @@ onMounted(async () => {
       if (event.event === 'file-loaded') {
         fileLoaded.value = true;
         controlsVisible.value = true;
-        void syncSnapshot();
+        void syncSnapshot().then(() => {
+          emitPlayback(paused.value ? 'paused' : 'playing', true);
+        });
         return;
       }
 
@@ -475,13 +515,15 @@ onMounted(async () => {
             } else {
               scheduleHide();
             }
+            emitPlayback(paused.value ? 'paused' : 'playing', true);
             break;
           case 'time-pos':
             if (seeking.value) break;
-            if (typeof event.data === 'number' || event.data === null) timePos.value = event.data;
+            if (typeof event.data === 'number' || event.data === null) timePos.value = event.data || undefined;
+            if (!seeking.value && fileLoaded.value && !paused.value) emitPlayback('playing');
             break;
           case 'duration':
-            if (typeof event.data === 'number' || event.data === null) duration.value = event.data;
+            if (typeof event.data === 'number' || event.data === null) duration.value = event.data || undefined;
             break;
           case 'volume':
             if (typeof event.data === 'number') volume.value = event.data;
@@ -490,7 +532,7 @@ onMounted(async () => {
             if (typeof event.data === 'boolean') muted.value = event.data;
             break;
           case 'filename':
-            if (typeof event.data === 'string' || event.data === null) filename.value = event.data;
+            if (typeof event.data === 'string' || event.data === null) filename.value = event.data || undefined;
             break;
         }
         return;
@@ -498,6 +540,7 @@ onMounted(async () => {
 
       if (event.event === 'end-file') {
         const endEvent = event as MpvEndFileEvent;
+        emitPlayback('stopped', true);
         resetPlaybackState();
 
         switch (endEvent.reason) {
@@ -559,12 +602,20 @@ onMounted(async () => {
   });
 
   // 窗口关闭后释放资源
-  await current.listen('tauri://destroyed', async () => {
+  destroyedUnlisten = await current.listen('tauri://destroyed', async () => {
+    emitPlayback('stopped', true);
     unlisten?.();
     await destroy();
   });
 })
 ;
+
+onUnmounted(() => {
+  emitPlayback('stopped', true);
+  destroyedUnlisten?.();
+  unlisten?.();
+  void destroy().catch(() => undefined);
+});
 </script>
 <style scoped lang="less">
 
