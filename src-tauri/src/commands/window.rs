@@ -49,6 +49,7 @@ pub async fn create_tauri_window(
     if let Some(fullscreen) = options.fullscreen {
         builder = builder.fullscreen(fullscreen);
     }
+    #[cfg(target_os = "windows")]
     if let Some(transparent) = options.transparent {
         builder = builder.transparent(transparent);
     }

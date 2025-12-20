@@ -721,9 +721,6 @@ export class JellyfinClient implements IMediaServer {
     if (!userId) {
       throw new Error('Not authenticated');
     }
-    // 简化：直接使用 Direct Stream（假设客户端支持硬解）
-    const streamUrl = `${this.baseUrl}/Videos/${itemId}/stream?static=true&mediaSourceId=${itemId}`;
-
     // 获取媒体源以提取容器和音轨
     const playbackData = await this.postAction(
       `/Items/${itemId}/PlaybackInfo`,
@@ -738,9 +735,49 @@ export class JellyfinClient implements IMediaServer {
         },
       }
     );
-    const mediaSource = playbackData.MediaSources?.[0];
+    type PlaybackMediaStream = {
+      Type?: string;
+      DeliveryUrl?: string;
+      Index?: number;
+      DisplayTitle?: string;
+      Language?: string;
+      IsDefault?: boolean;
+    };
+    type PlaybackMediaSource = {
+      Id?: string;
+      Container?: string;
+      MediaStreams?: PlaybackMediaStream[];
+      DirectStreamUrl?: string;
+      TranscodingUrl?: string;
+    };
 
-    const container = mediaSource?.Container || 'mp4';
+    const mediaSource = playbackData.MediaSources?.[0] as unknown as PlaybackMediaSource | undefined;
+
+    const baseUrl = this.baseUrl.replace(/\/+$/, '');
+    const resolveUrl = (u?: string): string | undefined => {
+      if (!u) return undefined;
+      if (/^https?:\/\//i.test(u)) return u;
+      if (u.startsWith('/')) return baseUrl + u;
+      return baseUrl + '/' + u;
+    };
+
+    const directStreamUrl = resolveUrl(mediaSource?.DirectStreamUrl);
+    const transcodingUrl = resolveUrl(mediaSource?.TranscodingUrl);
+    const fallbackUrl = `${baseUrl}/Videos/${itemId}/stream?static=true&mediaSourceId=${itemId}`;
+    const streamUrl = transcodingUrl || directStreamUrl || fallbackUrl;
+
+    let containerFromUrl: string | undefined = undefined;
+    try {
+      const path = new URL(streamUrl).pathname.toLowerCase();
+      if (path.endsWith('.m3u8')) containerFromUrl = 'm3u8';
+      else if (path.endsWith('.flv')) containerFromUrl = 'flv';
+      else if (path.endsWith('.mkv')) containerFromUrl = 'mkv';
+      else if (path.endsWith('.mp4')) containerFromUrl = 'mp4';
+    } catch {
+      containerFromUrl = undefined;
+    }
+
+    const container = containerFromUrl || mediaSource?.Container || 'mp4';
 
     // 构建字幕 URL（仅外挂字幕）
     const subtitleUrls: string[] = [];
@@ -767,11 +804,12 @@ export class JellyfinClient implements IMediaServer {
       subtitleUrls,
       audioTracks,
       container,
-      isDirectPlay: true, // 简化：假设直通
+      isDirectPlay: !transcodingUrl,
+      transcodingSessionId: transcodingUrl ? (playbackData as { PlaySessionId?: string })?.PlaySessionId : undefined,
       mediaSourceId: mediaSource?.Id || itemId,
       deviceId: 'tauri-desktop',
       accessToken: this.accessToken || '',
-      playSessionId: `session-${Date.now()}`,
+      playSessionId: (playbackData as { PlaySessionId?: string })?.PlaySessionId || `session-${Date.now()}`,
     };
   }
 

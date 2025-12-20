@@ -84,9 +84,11 @@
                 </t-button>
               </t-tooltip>
 
-              <div class="shrink-0">
-                <slot/>
-              </div>
+              <t-button theme="primary" variant="text" shape="circle" @click="$emit('info')" class="shrink-0">
+                <template #icon>
+                  <InfoCircleIcon/>
+                </template>
+              </t-button>
 
               <t-tooltip content="关闭" placement="top">
                 <t-button theme="primary" variant="text" shape="circle" @click="closeWindow" class="shrink-0">
@@ -158,7 +160,7 @@ import {
 } from 'tauri-plugin-libmpv-api';
 import {getCurrentWindow} from '@tauri-apps/api/window';
 import MessageUtil from '@/util/model/MessageUtil.ts';
-import PlayerSlider from '@/components/common/PlayerSlider.vue';
+import {InfoCircleIcon} from "tdesign-icons-vue-next";
 
 const props = defineProps({
   url: {
@@ -172,6 +174,7 @@ type PlaybackPayload = { state: PlaybackState; positionMs: number; durationMs?: 
 const emit = defineEmits<{
   (e: 'next'): void;
   (e: 'playback', payload: PlaybackPayload): void;
+  (e: 'info'): void;
 }>();
 
 const OBSERVED_PROPERTIES = [

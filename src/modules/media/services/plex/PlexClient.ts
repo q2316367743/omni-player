@@ -438,7 +438,11 @@ export class PlexClient implements IMediaServer {
     return items;
   }
 
-  async getPlaybackInfo(itemId: string): Promise<MediaPlaybackInfo> {
+  async getPlaybackInfo(itemId: string, options?: {
+    maxBitrate?: number;
+    audioTrackId?: string;
+    subtitleId?: string;
+  }): Promise<MediaPlaybackInfo> {
     const raw = await this.getMetadataItem(itemId);
     const mediaSource = raw.Media?.[0];
     const part = mediaSource?.Part?.[0];
@@ -470,6 +474,41 @@ export class PlexClient implements IMediaServer {
         isDefault: !!s.default,
       }))
       .filter(s => s.id);
+
+    if (typeof options?.maxBitrate === "number" && Number.isFinite(options.maxBitrate) && options.maxBitrate > 0) {
+      await this.ensureClientIdentifier();
+
+      const session = `session-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      const clientIdentifier = this.clientIdentifier || "tauri-desktop";
+      const maxVideoBitrateKbps = Math.max(64, Math.floor(options.maxBitrate / 1000));
+
+      const start = this.buildUrl("/video/:/transcode/universal/start.m3u8");
+      if (!start) throw new Error("Plex transcode url is missing");
+
+      const transcodeUrl = this.appendQuery(start, {
+        path: partKey,
+        mediaIndex: "0",
+        partIndex: "0",
+        protocol: "hls",
+        directPlay: "0",
+        directStream: "1",
+        fastSeek: "1",
+        maxVideoBitrate: maxVideoBitrateKbps.toString(),
+        session,
+        "X-Plex-Client-Identifier": clientIdentifier,
+        "X-Plex-Product": "omni-player",
+        "X-Plex-Platform": "Tauri",
+      });
+
+      return {
+        streamUrl: transcodeUrl,
+        subtitleUrls,
+        audioTracks,
+        container: "m3u8",
+        isDirectPlay: false,
+        transcodingSessionId: session,
+      };
+    }
 
     return {
       streamUrl,

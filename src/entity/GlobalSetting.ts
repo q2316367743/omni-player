@@ -1,4 +1,38 @@
+import {platform} from "@tauri-apps/plugin-os";
+import type {SelectOption} from "tdesign-vue-next";
+
 export type PlayerModeType = "h5" | "mpv" | "potplayer" | "vlc" | "custom";
+
+export function getPlayerModeType(): Array<SelectOption> {
+  switch (platform()){
+    case "windows":
+      return [
+        {
+          label: "内置播放器",
+          value: "h5"
+        },
+        {
+          label: "MPV",
+          value: "mpv"
+        },
+        {
+          label: "PotPlayer",
+          value: "potplayer"
+        },
+        {
+          label: "VLC",
+          value: "vlc"
+        }
+      ];
+    default:
+      return [
+        {
+          label: "内置播放器",
+          value: "h5"
+        }
+      ]
+  }
+}
 
 export interface GlobalSetting {
 

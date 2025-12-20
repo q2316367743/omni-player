@@ -574,8 +574,6 @@ export class EmbyClient implements IMediaServer {
       throw new Error("Not authenticated");
     }
 
-    const streamUrl = `${this.baseUrl}/Videos/${itemId}/stream?static=true&mediaSourceId=${itemId}`;
-
     const playbackData = await this.postAction<any>(
       `/Items/${itemId}/PlaybackInfo`,
       {
@@ -590,8 +588,49 @@ export class EmbyClient implements IMediaServer {
       }
     );
 
-    const mediaSource = playbackData.MediaSources?.[0];
-    const container = mediaSource?.Container || "mp4";
+    type PlaybackMediaStream = {
+      Type?: string;
+      DeliveryUrl?: string;
+      Index?: number;
+      DisplayTitle?: string;
+      Language?: string;
+      IsDefault?: boolean;
+    };
+    type PlaybackMediaSource = {
+      Id?: string;
+      Container?: string;
+      MediaStreams?: PlaybackMediaStream[];
+      DirectStreamUrl?: string;
+      TranscodingUrl?: string;
+    };
+
+    const mediaSource = playbackData.MediaSources?.[0] as unknown as PlaybackMediaSource | undefined;
+
+    const baseUrl = this.baseUrl.replace(/\/+$/, "");
+    const resolveUrl = (u?: string): string | undefined => {
+      if (!u) return undefined;
+      if (/^https?:\/\//i.test(u)) return u;
+      if (u.startsWith("/")) return baseUrl + u;
+      return baseUrl + "/" + u;
+    };
+
+    const directStreamUrl = resolveUrl(mediaSource?.DirectStreamUrl);
+    const transcodingUrl = resolveUrl(mediaSource?.TranscodingUrl);
+    const fallbackUrl = `${baseUrl}/Videos/${itemId}/stream?static=true&mediaSourceId=${itemId}`;
+    const streamUrl = transcodingUrl || directStreamUrl || fallbackUrl;
+
+    let containerFromUrl: string | undefined = undefined;
+    try {
+      const path = new URL(streamUrl).pathname.toLowerCase();
+      if (path.endsWith(".m3u8")) containerFromUrl = "m3u8";
+      else if (path.endsWith(".flv")) containerFromUrl = "flv";
+      else if (path.endsWith(".mkv")) containerFromUrl = "mkv";
+      else if (path.endsWith(".mp4")) containerFromUrl = "mp4";
+    } catch {
+      containerFromUrl = undefined;
+    }
+
+    const container = containerFromUrl || mediaSource?.Container || "mp4";
 
     const subtitleUrls: string[] = [];
     if (mediaSource?.MediaStreams) {
@@ -616,7 +655,8 @@ export class EmbyClient implements IMediaServer {
       subtitleUrls,
       audioTracks,
       container,
-      isDirectPlay: true,
+      isDirectPlay: !transcodingUrl,
+      transcodingSessionId: transcodingUrl ? (playbackData as { PlaySessionId?: string })?.PlaySessionId : undefined,
       extra: {
         headers: {
           ...this.getAuthHeaders(),
