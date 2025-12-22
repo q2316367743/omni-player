@@ -4,6 +4,7 @@ import * as tseslint from "typescript-eslint";
 import * as pluginVue from "eslint-plugin-vue";
 import css from "@eslint/css";
 import {defineConfig} from "eslint/config";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import autoImportGlobals from "./.eslintrc-auto-import.json";
 
@@ -21,4 +22,9 @@ export default defineConfig([
   pluginVue.configs["flat/essential"],
   {files: ["**/*.vue"], languageOptions: {parserOptions: {parser: tseslint.parser}}},
   {files: ["**/*.css"], plugins: {css}, language: "css/css", extends: ["css/recommended"]},
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off"
+    }
+  }
 ]);

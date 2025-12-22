@@ -1,5 +1,25 @@
-# Vue 3 + TypeScript + Vite
+# omni-player
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+> 全影播
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+## 媒体服务器
+
+支持一下服务
+
+- Jellyfin
+- Emby
+- Plex
+
+## 网络服务器
+
+懂得都懂
+
+## 文件服务器
+
+支持一下服务
+
+- web dav 服务器
+- OpenList
+- AList
+- ~~SMB（未来支持）~~
+- ~~FTP（未来支持）~~

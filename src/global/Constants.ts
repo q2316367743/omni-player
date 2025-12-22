@@ -15,3 +15,5 @@ export const {colorMode, isDark} = useColorMode();
 export const toggleColorMode = () => {
   colorMode.value = colorMode.value === 'light' ? 'dark' : 'light';
 }
+
+export const SUPPORT_MOVIE = /mp4|mkv|flv/i

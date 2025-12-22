@@ -1,5 +1,5 @@
 <template>
-  <div class="abs-0">
+  <div class="abs-0 onmi-player">
     <router-view/>
   </div>
 </template>
@@ -9,5 +9,10 @@
 #app {
   background-color: var(--td-bg-color-container);
   color: var(--td-text-color-primary);
+}
+
+.onmi-player {
+  border-radius: var(--td-radius-medium);
+  overflow: hidden;
 }
 </style>
