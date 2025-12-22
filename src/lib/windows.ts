@@ -3,6 +3,7 @@ import {getCurrentWindow} from "@tauri-apps/api/window";
 import {invoke} from '@tauri-apps/api/core'
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import type {NetworkListItem} from "@/modules/network/types/NetworkListItem.ts";
+import type {FileItem} from "@/modules/file/types/FileItem.ts";
 
 
 export type WindowLabel = "media" | "network" | "file";
@@ -12,7 +13,8 @@ export interface WindowPayload {
   serverId: string;
   mediaId: string;
   itemId: string;
-  item?: NetworkListItem
+  item?: NetworkListItem;
+  file?: FileItem;
 }
 
 export interface CreateTauriWindowOptions {

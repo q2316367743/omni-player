@@ -129,10 +129,20 @@ export class WebDavClient implements IFileServer {
     // But hrefs are absolute paths.
 
     for (const response of responses) {
-      const href = decodeURIComponent(response.href);
+      let href = response.href;
+      // Handle absolute URLs in href
+      if (href.startsWith('http://') || href.startsWith('https://')) {
+        try {
+          href = new URL(href).pathname;
+        } catch {
+          // ignore
+        }
+      }
+      href = decodeURIComponent(href);
+
       // Skip if it matches the requested URL's path (ignoring trailing slash)
       // We need to extract the path from 'url' variable above
-      const reqUrlPath = new URL(url).pathname;
+      const reqUrlPath = decodeURIComponent(new URL(url).pathname);
 
       // Normalize paths for comparison (remove trailing slashes)
       const normalizedHref = href.replace(/\/+$/, '');

@@ -43,9 +43,14 @@
             @click="handleItemClick(item)"
           >
             <div class="icon-wrapper">
-              <t-icon v-if="item.isDirectory" name="folder" class="file-icon folder" />
-              <t-icon v-else-if="isVideo(item)" name="video" class="file-icon video" />
-              <t-icon v-else name="file" class="file-icon file" />
+              <div v-if="getPoster(item)" class="poster-wrapper">
+                 <img :src="getPoster(item)" class="poster-img" loading="lazy" />
+              </div>
+              <template v-else>
+                <t-icon v-if="item.isDirectory" name="folder" class="file-icon folder" />
+                <t-icon v-else-if="isVideo(item)" name="video" class="file-icon video" />
+                <t-icon v-else name="file" class="file-icon file" />
+              </template>
             </div>
             <div class="item-info">
               <div class="item-name" :title="item.name">{{ item.name }}</div>
@@ -88,7 +93,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { MessagePlugin } from "tdesign-vue-next";
 import type { IFileServer } from "@/modules/file/IFileServer.ts";
@@ -96,6 +101,7 @@ import { useFileServerStore } from "@/store";
 import type { FileItem } from "@/modules/file/types/FileItem.ts";
 import { SUPPORT_MOVIE } from "@/global/Constants.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
+import {createWindows} from "@/lib/windows.ts";
 
 const route = useRoute();
 const clientId = route.params.id as string;
@@ -104,6 +110,8 @@ const loading = ref(false);
 const list = ref<FileItem[]>([]);
 const currentPath = ref("/");
 const viewMode = ref<'table' | 'grid'>('table');
+const posterMap = ref<Record<string, string>>({}); // path -> url
+
 let client: IFileServer | null = null;
 
 const columns = [
@@ -152,15 +160,50 @@ const fetchList = async (path: string) => {
   if (!client) return;
   try {
     loading.value = true;
+    posterMap.value = {}; // Clear posters on directory change
     const res = await client.list(path);
     console.log(res)
     list.value = res.content || [];
     currentPath.value = path;
+    
+    // Load posters asynchronously
+    loadPosters(list.value);
   } catch (e: any) {
     MessageUtil.error(`加载失败: ${e.message}`);
   } finally {
     loading.value = false;
   }
+};
+
+const loadPosters = async (items: FileItem[]) => {
+  if (!client) return;
+  
+  for (const item of items) {
+    if (!item.subtitles?.length) continue;
+    
+    // Check for poster in subtitles
+    const posterSub = item.subtitles.find(sub => sub.type === 'poster');
+    if (posterSub) {
+      try {
+        // Construct a temporary FileItem to get the URL
+        const url = await client.getPlayableUrl({
+          id: posterSub.path,
+          path: posterSub.path,
+          name: '',
+          basename: '',
+          extname: '',
+          isDirectory: false
+        });
+        posterMap.value[item.path] = url;
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+};
+
+const getPoster = (item: FileItem) => {
+  return posterMap.value[item.path];
 };
 
 const goUp = () => {
@@ -176,11 +219,15 @@ const handleItemClick = async (row: FileItem) => {
     await fetchList(row.path);
   } else if (client?.isPlayable(row)) {
     try {
-      const url = await client.getPlayableUrl(row);
-      MessagePlugin.success(`获取播放地址成功: ${url}`);
-      window.open(url, "_blank"); // Temporary behavior
+      await createWindows('file', {
+        title: row.name,
+        serverId: clientId,
+        mediaId: row.id,
+        itemId: row.path,
+        file: row
+      });
     } catch (e: any) {
-      MessagePlugin.error(`获取播放地址失败: ${e.message}`);
+      MessagePlugin.error(`打开播放窗口失败: ${e.message}`);
     }
   } else {
     MessagePlugin.info("该文件不支持播放");
@@ -282,12 +329,33 @@ onMounted(async () => {
 
     .icon-wrapper {
       margin-bottom: 8px;
+      width: 100%;
+      height: 64px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       
       .file-icon {
         font-size: 48px;
         &.folder { color: var(--td-warning-color); }
         &.video { color: var(--td-brand-color); }
         &.file { color: var(--td-text-color-secondary); }
+      }
+
+      .poster-wrapper {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        border-radius: 4px;
+
+        .poster-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
       }
     }
 
