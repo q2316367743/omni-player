@@ -75,6 +75,15 @@ export const router = createRouter({
       path: ':id/search',
       component: () => import('@/pages/network/search/index.vue')
     }]
+  }, {
+    name: "文件服务",
+    path: "/file",
+    component: () => import('@/layouts/file.vue'),
+    children: [{
+      name: '文件服务 - 列表',
+      path: ':id/home',
+      component: () => import('@/pages/file/home/file-home.vue')
+    }]
   }]
 });
 

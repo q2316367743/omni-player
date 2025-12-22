@@ -42,8 +42,7 @@ export class OpenListClient implements IFileServer {
     return data.data;
   }
 
-  async connect(): Promise<boolean> {
-    return true;
+  async connect(): Promise<void> {
   }
 
   async disconnect(): Promise<void> {

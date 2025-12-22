@@ -8,7 +8,7 @@ export interface IFileServer {
    * 初始化连接（如认证、建立会话）
    * @returns 是否成功
    */
-  connect(): Promise<boolean>;
+  connect(): Promise<void>;
 
   /**
    * 列出指定路径下的文件和目录

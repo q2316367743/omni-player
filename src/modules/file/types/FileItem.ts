@@ -16,7 +16,7 @@ export interface FileItem {
   extname: string;
   isDirectory: boolean;     // 是否为目录
   size?: number;            // 文件大小（字节）
-  modifiedAt?: Date;        // 修改时间
+  modifiedAt?: string;        // 修改时间
   path: string;             // 完整路径（用于后续请求）
   subtitles?: SubtitleItem[]; // 关联子项（可选）
   extra?: Record<string, any>; // 协议特有字段（如 WebDAV 的 ETag、SMB 的权限位）
@@ -78,10 +78,10 @@ export function renderFileItemContent(items: Array<FileItem>): Array<FileItem> {
     });
   });
 
-  return {
+  return [
     // 目录
     ...items.filter(e => e.isDirectory),
     // 视频
     ...videoItems,
-  };
+  ];
 }

@@ -252,7 +252,7 @@ const jumpNetwork = (id: string) => {
 }
 
 const jumpFile = (id: string) => {
-  MessageUtil.info(`文件服务「${id}」页面开发中...`);
+  router.push(`/file/${id}/home`)
 }
 
 const openNetworkServerRemove = (server: NetworkServer) => {
