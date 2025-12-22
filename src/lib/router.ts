@@ -12,7 +12,7 @@ export const router = createRouter({
       {
         name: '主页',
         path: '/home',
-        component: () => import('@/pages/home/index.vue')
+        component: () => import('@/pages/home/home-index.vue')
       }
     ]
   }, {
