@@ -23,6 +23,7 @@ const instance = axios.create({
 });
 
 instance.interceptors.response.use(e => {
+  console.debug(e)
   return e;
 }, e => {
   console.error(e);

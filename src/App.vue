@@ -1,7 +1,12 @@
 <template>
-  <div class="abs-0 onmi-player">
-    <router-view/>
-  </div>
+  <t-layout class="abs-0">
+    <t-aside>
+      <app-aside />
+    </t-aside>
+    <t-content class="h-full relative">
+      <router-view/>
+    </t-content>
+  </t-layout>
 </template>
 <script lang="ts" setup>
 </script>
@@ -11,8 +16,4 @@
   color: var(--td-text-color-primary);
 }
 
-.onmi-player {
-  border-radius: var(--td-radius-medium);
-  overflow: hidden;
-}
 </style>

@@ -112,16 +112,8 @@ export class PlexClient implements IMediaServer {
     const accessToken = await stronghold.getMediaRecord(this.server.id, "accessToken");
     if (accessToken) {
       this.accessToken = accessToken;
-      try {
-        const {status} = await requestAction({
-          url: "/identity",
-          method: "GET",
-          baseURL: this.baseUrl,
-          headers: this.getAuthHeaders(),
-          responseType: "text",
-        });
-        if (status === 200) return;
-      } catch {
+      if (await this.validateConnection()) {
+        return;
       }
       await this.invalidateAuthentication();
     }
@@ -133,27 +125,50 @@ export class PlexClient implements IMediaServer {
       throw new Error("Plex username or password is missing");
     }
 
-    const token = await this.tryGetPlexToken(username, password);
-    this.accessToken = token;
+    const parsed = password.match(/^(.*?)(?:[\\s:#|])(\\d{6})$/);
+    const signInPassword = parsed?.[1] ?? password;
+    const verificationCode = parsed?.[2];
 
+    // 1. 通过 Plex.tv 交换 Token
+    const token = await this.tryGetPlexToken(username, signInPassword, verificationCode);
+    if (token) {
+      this.accessToken = token;
+      if (await this.validateConnection()) {
+        await stronghold.setMediaRecord(this.server.id, "accessToken", this.accessToken, 30 * 24 * 60 * 60 * 1000);
+        return;
+      }
+    }
+
+    // 3. 全部失败，抛出错误
+    if (token) {
+      // 成功获取了 Token 但连不上服务器
+      await MessageBoxUtil.alert("Plex Token 无法访问当前服务器，请检查服务器地址或 token", "登录失败");
+    } else {
+      // 获取 Token 失败（账号密码错误或 2FA）
+      await MessageBoxUtil.alert(
+        "无法登录 Plex 服务器。\n\n1. 若使用密码登录，请确保账号密码正确，且未开启二步验证(2FA)。\n2. 若已开启 2FA，请直接使用 Plex Token 作为密码填入。\n3. 若使用 Token 登录，请检查 Token 是否有效。\n4. 请检查服务器地址能否访问。",
+        "登录失败"
+      );
+    }
+    throw new Error("Plex authentication failed");
+  }
+
+  private async validateConnection(): Promise<boolean> {
     try {
+      const token = this.accessToken;
       const {status} = await requestAction({
-        url: "/identity",
+        url: "/library/sections",
         method: "GET",
         baseURL: this.baseUrl,
         headers: this.getAuthHeaders(),
+        params: token ? { "X-Plex-Token": token } : undefined,
         responseType: "text",
+        validateStatus: () => true,
       });
-      if (status !== 200) {
-        await MessageBoxUtil.alert("Plex token 无法访问当前服务器，请检查服务器地址或 token", "登录失败");
-        throw new Error("Plex token is invalid for this server");
-      }
-    } catch (e) {
-      await this.invalidateAuthentication();
-      throw e;
+      return status === 200;
+    } catch {
+      return false;
     }
-
-    await stronghold.setMediaRecord(this.server.id, "accessToken", this.accessToken, 30 * 24 * 60 * 60 * 1000);
   }
 
   async getItem(id: string): Promise<MediaDetail> {
@@ -540,6 +555,7 @@ export class PlexClient implements IMediaServer {
         }
       );
     } catch {
+      void 0;
     }
   }
 
@@ -608,6 +624,7 @@ export class PlexClient implements IMediaServer {
     try {
       await useMediaStronghold().removeMediaRecord(this.server.id, "accessToken");
     } catch {
+      void 0;
     }
   }
 
@@ -627,11 +644,18 @@ export class PlexClient implements IMediaServer {
       try {
         await this.ensureAuthenticated();
 
+        const token = this.accessToken;
+        const baseParams = config?.params && typeof config.params === "object" ? (config.params as Record<string, unknown>) : undefined;
+        const params = token && baseParams && !("X-Plex-Token" in baseParams)
+          ? { ...baseParams, "X-Plex-Token": token }
+          : (token && !baseParams ? { "X-Plex-Token": token } : config?.params);
+
         const requestConfig: RequestConfig = {
           ...config,
           method,
           url,
           baseURL: this.baseUrl,
+          params,
           headers: {
             ...this.getClientHeaders(),
             ...config?.headers,
@@ -678,27 +702,90 @@ export class PlexClient implements IMediaServer {
     return data as T;
   }
 
-  private async tryGetPlexToken(username: string, password: string) {
+  private async tryGetPlexToken(username: string, password: string, verificationCode?: string) {
     await this.ensureClientIdentifier();
     try {
+      const extractToken = (data: unknown) => {
+        const body = this.parsePlexBody<{
+          authToken?: string;
+          user?: {
+            authToken?: string;
+            authentication_token?: string;
+            auth_token?: string;
+          };
+        }>(data);
+        return body?.authToken || body?.user?.authToken || body?.user?.authentication_token || body?.user?.auth_token || null;
+      };
+
+      const v2Res = await requestAction<unknown>({
+        url: "https://plex.tv/api/v2/users/signin",
+        method: "POST",
+        headers: {
+          ...this.getClientHeaders(),
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        data: {
+          login: username,
+          password,
+          verificationCode,
+        },
+        responseType: "text",
+        validateStatus: () => true,
+      });
+
+      if (v2Res.status === 200 || v2Res.status === 201) {
+        const token = extractToken(v2Res.data);
+        if (token) return token;
+      }
+
+      const form = new URLSearchParams();
+      form.set("user[login]", username);
+      form.set("user[password]", verificationCode ? `${password}${verificationCode}` : password);
+
+      const formRes = await requestAction<unknown>({
+        url: "https://plex.tv/users/sign_in.json",
+        method: "POST",
+        headers: {
+          ...this.getClientHeaders(),
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        },
+        data: form.toString(),
+        responseType: "text",
+        validateStatus: () => true,
+      });
+
+      if (formRes.status === 200 || formRes.status === 201) {
+        const token = extractToken(formRes.data);
+        if (token) return token;
+      }
+
+      const authStr = `${username}:${password}`;
+      // UTF-8 safe btoa
+      const encoded = btoa(encodeURIComponent(authStr).replace(/%([0-9A-F]{2})/g,
+        function toSolidBytes(match, p1) {
+          return String.fromCharCode(parseInt(p1, 16));
+        }));
+
       const {data, status} = await requestAction<unknown>({
         url: "https://plex.tv/users/sign_in.json",
         method: "POST",
         headers: {
           ...this.getClientHeaders(),
-          Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+          Authorization: `Basic ${encoded}`,
         },
         responseType: "text",
+        validateStatus: () => true,
       });
 
-      if (status === 200) {
-        const body = this.parsePlexBody<{ user?: { authToken?: string } }>(data);
-        const token = body?.user?.authToken;
+      if (status === 200 || status === 201) {
+        const token = extractToken(data);
         if (token) return token;
       }
-    } catch {
+    } catch (e) {
+      console.warn("Plex TV login failed", e);
     }
-    return password;
+    return null;
   }
 
   private async getMetadataItem(id: string): Promise<PlexMetadata> {
