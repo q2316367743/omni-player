@@ -30,6 +30,7 @@
     "hls.js": "^1.6.15",
     "less": "^4.5.1",
     "pinia": "^3.0.4",
+    "rss-parser": "^3.13.0",
     "tauri-plugin-libmpv-api": "^0.3.2",
     "tdesign-icons-vue-next": "^0.4.1",
     "tdesign-vue-next": "^1.17.6",
@@ -63,6 +64,9 @@
   "pnpm": {
     "overrides": {
       "vite": "npm:rolldown-vite@7.2.5"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "less"
+    ]
   }
 }
