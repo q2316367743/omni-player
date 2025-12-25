@@ -80,7 +80,7 @@ export function openMediaContextmenu(server: MediaServer, e: PointerEvent) {
         }
       },
       {
-        label: () => <span style={{color: 'var(--td-error-color)'}}>删除</span>,
+        label: () => <span style={{color: 'var(--td-error-color)'}} class={'label'}>删除</span>,
         icon: () => <DeleteIcon style={{color: 'var(--td-error-color)'}}/>,
         onClick: () => {
           MessageBoxUtil.confirm("确定要删除吗？", "提示", {

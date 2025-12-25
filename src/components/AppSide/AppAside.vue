@@ -5,7 +5,7 @@
       <div class="header-left">
         <t-button theme="primary" size="small" variant="text" shape="square" @click="toggleCollapsed()">
           <template #icon>
-            <menu-fold-icon />
+            <menu-fold-icon/>
           </template>
         </t-button>
         <span class="header-title">亦无悔</span>
@@ -35,9 +35,10 @@
       <div class="nav-group">
         <div class="group-title">
           <span>媒体库</span>
-          <t-button class="ml-auto" theme="primary" size="small" variant="text" shape="square" @click="openMediaServerEdit()">
+          <t-button class="ml-auto" theme="primary" size="small" variant="text" shape="square"
+                    @click="openMediaServerEdit()">
             <template #icon>
-              <add-icon />
+              <add-icon/>
             </template>
           </t-button>
         </div>
@@ -53,16 +54,18 @@
       <div class="nav-group">
         <div class="group-title">
           <span>网络资源</span>
-          <t-button class="ml-auto" theme="primary" size="small" variant="text" shape="square" @click="openNetworkServerEdit()">
+          <t-button class="ml-auto" theme="primary" size="small" variant="text" shape="square"
+                    @click="openNetworkServerEdit()">
             <template #icon>
-              <add-icon />
+              <add-icon/>
             </template>
           </t-button>
         </div>
         <div v-for="network in networks" :key="network.id" :class="{active: mediaActive(network.id), 'nav-item' : true}"
              @click="jumpNetword(network.id)" @contextmenu="openNetworkContextmenu(network, $event)">
           <div class="nav-item-content">
-            <div class="w-16px h-16px"/>
+              <internet-icon :fill-color='["transparent","transparent"]' :stroke-color='["currentColor","#0052d9"]'
+                             :stroke-width="2"/>
             <span class="nav-text">{{ network.name }}</span>
           </div>
         </div>
@@ -112,7 +115,7 @@ import {
   AddIcon,
   LogoGithubIcon,
   FileIcon,
-  SettingIcon, HomeIcon, ChevronLeftIcon, MenuFoldIcon
+  SettingIcon, HomeIcon, ChevronLeftIcon, MenuFoldIcon, InternetIcon
 } from 'tdesign-icons-vue-next';
 import {useMediaServerStore, useNetworkServerStore} from "@/store";
 import type {MediaServerType} from "@/entity/MediaServer.ts";

@@ -116,7 +116,6 @@
                         theme="default"
                         variant="light"
                         shape="round"
-                        class="border-0 bg-black/35 text-white"
                       >
                         <template #icon>
                           <calendar-icon/>
@@ -128,7 +127,6 @@
                         theme="default"
                         variant="light"
                         shape="round"
-                        class="border-0 bg-black/35 text-white"
                       >
                         <template #icon>
                           <location-icon/>
@@ -140,7 +138,6 @@
                         theme="default"
                         variant="light"
                         shape="round"
-                        class="border-0 bg-black/35 text-white"
                       >
                         <template #icon>
                           <translate-icon/>
