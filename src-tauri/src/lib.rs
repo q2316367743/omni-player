@@ -19,7 +19,6 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::window::create_tauri_window,
             commands::potplayer::launch_potplayer,
-            // 未来其他命令：commands::fetch_media_library, ...
         ])
         .plugin(tauri_plugin_sql::Builder::default().build())
         .plugin(tauri_plugin_libmpv::init())

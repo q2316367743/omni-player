@@ -61,13 +61,6 @@
         <div v-if="viewMode === 'read'" class="subscribe-info__paper">
           <article class="rss-article" v-html="contentHtml"></article>
         </div>
-        <iframe
-          v-else-if="viewMode === 'web' && content?.link"
-          :src="content.link"
-          class="subscribe-info__iframe"
-          frameborder="0"
-          allowfullscreen
-        />
       </div>
 
       <t-back-top container=".subscribe-info__scroll"/>
@@ -81,6 +74,7 @@ import {formatDate} from "@/util/lang/FormatUtil.ts";
 import EmptyResult from "@/components/Result/EmptyResult.vue";
 import {openUrl} from "@tauri-apps/plugin-opener";
 import {previewImages} from "@/pages/subscribe/func/previewImages.tsx";
+import {webviewManager} from "@/lib/webview.ts";
 
 const route = useRoute();
 
@@ -90,6 +84,7 @@ const errorTip = ref("");
 const scrollRef = ref<HTMLElement | null>(null);
 const viewMode = ref<"read" | "web">("read");
 const isFullscreen = ref(false);
+const webviewLabel = ref(`subscribe-webview-${Date.now()}`);
 
 const feedId = computed(() => route.params.feedId as string);
 const isNoneSelected = computed(() => feedId.value === "0");
@@ -100,6 +95,63 @@ function scrollToTop() {
   if (!scrollRef.value) return;
   scrollRef.value.scrollTop = 0;
 }
+
+async function createWebview() {
+  if (!scrollRef.value || !content.value?.link) return;
+
+  const rect = scrollRef.value.getBoundingClientRect();
+
+  try {
+    await webviewManager.createWebview({
+      label: webviewLabel.value,
+      url: content.value.link,
+      position: {
+        x: rect.left,
+        y: rect.top,
+        width: rect.width,
+        height: rect.height
+      }
+    });
+
+    webviewManager.startObserving(scrollRef.value, async (position) => {
+      await webviewManager.updatePosition({...position, height: position.height + 32});
+    });
+  } catch (e) {
+    console.error('Failed to create webview:', e);
+    MessageUtil.error("创建网页视图失败", e);
+  }
+}
+
+async function destroyWebview() {
+  try {
+    await webviewManager.destroyWebview();
+  } catch (e) {
+    console.error('Failed to destroy webview:', e);
+  }
+}
+
+watch(viewMode, async (newMode) => {
+  if (newMode === 'web') {
+    await createWebview();
+  } else {
+    await destroyWebview();
+  }
+});
+
+watch(feedId, async val => {
+  if (viewMode.value === 'web') {
+    await destroyWebview();
+    // 切换回阅读视图
+  }
+  await load(val);
+  if (viewMode.value === 'web') {
+    await createWebview();
+  }
+}, {immediate: true});
+
+onUnmounted(async () => {
+  await destroyWebview();
+});
 
 async function load(feedIdValue: string) {
   if (!feedIdValue || feedIdValue === "0") {
@@ -148,7 +200,7 @@ function toggleFullscreen() {
 
 function onContentClick(e: MouseEvent) {
   if (viewMode.value === "web") return;
-  
+
   const target = e.target as HTMLElement | null;
   const img = target?.closest?.("img") as HTMLImageElement | null;
   if (img && img.closest(".rss-article")) {
@@ -171,9 +223,6 @@ function onContentClick(e: MouseEvent) {
   void openUrl(href);
 }
 
-watch(feedId, async val => {
-  await load(val);
-}, {immediate: true});
 </script>
 <style scoped lang="less">
 .subscribe-info {
@@ -299,12 +348,6 @@ watch(feedId, async val => {
   border-radius: 14px;
   background-color: var(--td-bg-color-container);
   overflow-x: hidden;
-}
-
-.subscribe-info__iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
 }
 
 :deep(.rss-article) {
