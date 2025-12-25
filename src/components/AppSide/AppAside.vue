@@ -92,7 +92,11 @@
              :class="{active: isActive(sub.id, 'subscribe'), 'nav-item' : true}"
              @contextmenu="openSubscribeContextmenuWrap(sub, $event)">
           <div class="nav-item-content">
-            <img v-if="sub.icon" :src="sub.icon" class="feed-icon-img" alt=""/>
+            <t-image v-if="sub.icon" :src="sub.icon" class="feed-icon-img" alt="" width="16px" height="16px">
+              <template #error>
+                <logo-github-icon class="nav-icon"/>
+              </template>
+            </t-image>
             <logo-github-icon v-else class="nav-icon"/>
             <span class="nav-text">{{ sub.name }}</span>
           </div>

@@ -5,6 +5,7 @@ import type {PageResponse} from "@/global/PageResponse.ts";
 import {fetchFeedItems} from "@/modules/subscribe";
 import {map} from "@/util";
 import {fetchFeedContent} from "@/modules/subscribe/FeedContentFetch.ts";
+import {logDebug} from "@/lib/log.ts";
 
 export async function listFeed(subscribeId: string, page: number, pageSize: number): Promise<PageResponse<FeedItem>> {
   const query = await useSql().query<FeedItem>(TableName.FEED_ITEM);
@@ -12,21 +13,33 @@ export async function listFeed(subscribeId: string, page: number, pageSize: numb
 }
 
 export async function refreshFeed(subscribeId: string) {
-  const subscribeQuery = await useSql().query<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
-  const subscribe = await subscribeQuery.eq('id', subscribeId).one();
-  if (!subscribe) return Promise.reject(new Error("订阅不存在"));
   const feedQuery = await useSql().query<FeedItem>(TableName.FEED_ITEM)
-  const feedMapper = await useSql().mapper<FeedItem>(TableName.FEED_ITEM)
+  try {
+    const subscribeQuery = await useSql().query<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
+    const subscribe = await subscribeQuery.eq('id', subscribeId).one();
+    if (!subscribe) return Promise.reject(new Error("订阅不存在"));
+    const feedMapper = await useSql().mapper<FeedItem>(TableName.FEED_ITEM)
 
-  const feedItems = await fetchFeedItems(subscribe);
-  const hav = await feedQuery.in('signal', feedItems.map(e => e.signal)).select('signal', 'id').list();
-  const havMap = map(hav, 'signal');
-  for (const feedItem of feedItems) {
-    // 需要判断是否存在
-    if (!havMap.has(feedItem.signal)) {
-      await feedMapper.insert(feedItem);
+    const feedItems = await fetchFeedItems(subscribe);
+    const hav = await feedQuery.in('signal', feedItems.map(e => e.signal)).select('signal', 'id').list();
+    const havMap = map(hav, 'signal');
+    for (const feedItem of feedItems) {
+      // 需要判断是否存在
+      if (!havMap.has(feedItem.signal)) {
+        await feedMapper.insert(feedItem);
+      }
     }
+  } finally {
+    const subscribeMapper = await useSql().mapper<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
+    // 重新计算数量
+    logDebug("重新计算数量")
+    const count = await feedQuery.eq('subscribe_id', subscribeId).count();
+    logDebug(`订阅「${subscribeId}」有 feed 共 ${count} 个`)
+    await subscribeMapper.updateById(subscribeId, {
+      count
+    })
   }
+
 
 }
 
