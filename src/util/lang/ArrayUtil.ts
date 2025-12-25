@@ -169,48 +169,18 @@ export function distinct<T extends Record<string, any>, K extends keyof T>(
   return results;
 }
 
-export function toggleElement<T>(array: Array<T>, value: T, toggle: boolean) {
-  const index = array.indexOf(value);
-  if (toggle) {
-    if (index === -1) {
-      array.push(value);
-    }
-  } else {
-    if (index !== -1) {
-      array.splice(index, 1);
-    }
-  }
-  return array;
-}
-
-export function toggleArray<T>(array: Array<T>, value: T) {
-  const index = array.indexOf(value);
-  if (index === -1) {
-    array.push(value);
-  } else {
-    array.splice(index, 1);
-  }
-  return array;
-}
-/**
- * 创建一个指定长度的数组
- * @param length 数组长度
- * @returns 返回从0开始到length-1的数字数组
- */
-export function buildArray(length: number): number[];
 
 /**
- * 创建一个指定长度的数组
- * @param length 数组长度
- * @param render 渲染函数，用于生成每个元素的值
- * @returns 返回根据render函数生成的数组
+ * 生成占位符字符串，例如 generatePlaceholders(3) => "$1,$2,$3"
+ * @param n - 占位符数量（必须为正整数）
+ * @param offset - 占位符的起始索引（默认为 0）
+ * @returns 格式为 "$1,$2,...,$n" 的字符串
  */
-export function buildArray<T>(length: number, render: (i: number) => T): T[];
-
-export function buildArray<T>(length: number, render?: (i: number) => T): number[] | T[] {
-  if (render) {
-    return Array.from({length}, (_, i) => render(i));
-  } else {
-    return Array.from({length}, (_, i) => i);
+export function generatePlaceholders(n: number, offset = 0): string {
+  if (!Number.isInteger(n) || n < 0) {
+    throw new Error('Input must be a non-negative integer');
   }
+  if (n === 0) return '';
+
+  return Array.from({ length: n }, (_, i) => `$${i + 1 + offset}`).join(',');
 }

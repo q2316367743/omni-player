@@ -3,6 +3,10 @@ import {DrawerPlugin, Form, FormItem, Input, InputNumber, Radio, RadioGroup} fro
 import {useMediaStronghold} from "@/lib/Stronghold.ts";
 import {useMediaServerStore} from "@/store";
 import MessageUtil from "@/util/model/MessageUtil.ts";
+import Ctx from "@imengyu/vue3-context-menu";
+import {isDark} from "@/global/Constants.ts";
+import MessageBoxUtil from "@/util/model/MessageBoxUtil.tsx";
+import {DeleteIcon, EditIcon} from "tdesign-icons-vue-next";
 
 export function openMediaServerEdit(old?: MediaServer) {
 
@@ -25,7 +29,6 @@ export function openMediaServerEdit(old?: MediaServer) {
     header: (update ? "修改" : "新增") + "媒体服务器",
     confirmBtn: update ? "修改" : "新增",
     size: "600px",
-    attach: ".app-layout-content",
     default: () => <Form data={server.value}>
       <FormItem label={'名称'} labelAlign={"top"}>
         <Input v-model={server.value.name} clearable/>
@@ -57,6 +60,39 @@ export function openMediaServerEdit(old?: MediaServer) {
           plugin.destroy?.();
         }).catch(e => MessageUtil.error("操作失败", e));
     }
+  })
+
+}
+
+export function openMediaContextmenu(server: MediaServer, e: PointerEvent) {
+  e.preventDefault();
+  e.stopPropagation();
+  Ctx.showContextMenu({
+    x: e.x,
+    y: e.y,
+    theme: isDark.value ? 'mac dark' : 'mac',
+    items: [
+      {
+        label: "修改",
+        icon: () => <EditIcon/>,
+        onClick: () => {
+          openMediaServerEdit(server);
+        }
+      },
+      {
+        label: () => <span style={{color: 'var(--td-error-color)'}}>删除</span>,
+        icon: () => <DeleteIcon style={{color: 'var(--td-error-color)'}}/>,
+        onClick: () => {
+          MessageBoxUtil.confirm("确定要删除吗？", "提示", {
+            confirmButtonText: "确定",
+          }).then(() => {
+            useMediaServerStore().removeServer(server)
+              .then(() => MessageUtil.success("删除成功"))
+              .catch((e) => MessageUtil.error("删除失败", e))
+          })
+        }
+      }
+    ]
   })
 
 }

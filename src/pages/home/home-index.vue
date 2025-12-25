@@ -131,11 +131,11 @@
 </template>
 <script lang="ts" setup>
 import {useMediaServerStore, useNetworkServerStore} from "@/store";
-import {openMediaServerEdit} from "@/pages/home/func/MediaServerEdit";
+import {openMediaServerEdit} from "@/components/AppSide/func/MediaServerEdit.tsx";
 import type {MediaServer, MediaServerType} from "@/entity/MediaServer";
 import MessageBoxUtil from "@/util/model/MessageBoxUtil";
 import MessageUtil from "@/util/model/MessageUtil";
-import {openNetworkServerEdit} from "@/pages/home/func/NetworkServerEdit";
+import {openNetworkServerEdit} from "@/components/AppSide/func/NetworkServerEdit.tsx";
 import {type NetworkServer, NetworkServerTypeLabel} from "@/entity/NetworkServer";
 import JellyfinIcon from "@/modules/icon/JellyfinIcon.vue";
 import EmbyIcon from "@/modules/icon/EmbyIcon.vue";

@@ -11,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      '@imengyu/vue3-context-menu':
+        specifier: ^1.5.2
+        version: 1.5.2
       '@tauri-apps/plugin-dialog':
         specifier: ~2.4.2
         version: 2.4.2
@@ -21,7 +24,7 @@ importers:
         specifier: ~2.5.4
         version: 2.5.4
       '@tauri-apps/plugin-log':
-        specifier: ~2.7.1
+        specifier: ~2
         version: 2.7.1
       '@tauri-apps/plugin-opener':
         specifier: ~2.5.2
@@ -32,6 +35,9 @@ importers:
       '@tauri-apps/plugin-shell':
         specifier: ~2.3.3
         version: 2.3.3
+      '@tauri-apps/plugin-sql':
+        specifier: ^2.3.1
+        version: 2.3.1
       '@tauri-apps/plugin-store':
         specifier: ~2.4.1
         version: 2.4.1
@@ -374,6 +380,12 @@ packages:
   '@iconify/utils@3.1.0':
     resolution: {integrity: sha512-Zlzem1ZXhI1iHeeERabLNzBHdOa4VhQbqAcOQaMKuTuyZCpwKbC2R4Dd0Zo3g9EAc+Y4fiarO8HIHRAth7+skw==}
 
+  '@imengyu/vue-scroll-rect@0.1.7':
+    resolution: {integrity: sha512-a1ysL8LV2iFcHzMJ6tlrqr8JKtYIBrb1U3XcbjNmhponENUSbRvxs4b1sJd5sXdCFIIkDydwQM/SjVhfT7uBUw==}
+
+  '@imengyu/vue3-context-menu@1.5.2':
+    resolution: {integrity: sha512-JtM9y4JKsqwpsLQnK38Fm3DqV5ZwIs/HksxQYHU6yUuuWScdr5C+NTF16J0KxmSbMHOTwVTMwJCBkwcC1X6y1w==}
+
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
 
@@ -595,6 +607,9 @@ packages:
 
   '@tauri-apps/plugin-shell@2.3.3':
     resolution: {integrity: sha512-Xod+pRcFxmOWFWEnqH5yZcA7qwAMuaaDkMR1Sply+F8VfBj++CGnj2xf5UoialmjZ2Cvd8qrvSCbU+7GgNVsKQ==}
+
+  '@tauri-apps/plugin-sql@2.3.1':
+    resolution: {integrity: sha512-iNgHnFIR+jRkx9INKVKepzMlxXtNkJUaWuhagFjT4dOttPaNyRnVHgwTjpqZhyVjiklDh2UdEPAJkQKiCPAekw==}
 
   '@tauri-apps/plugin-store@2.4.1':
     resolution: {integrity: sha512-ckGSEzZ5Ii4Hf2D5x25Oqnm2Zf9MfDWAzR+volY0z/OOBz6aucPKEY0F649JvQ0Vupku6UJo7ugpGRDOFOunkA==}
@@ -2429,6 +2444,12 @@ snapshots:
       '@iconify/types': 2.0.0
       mlly: 1.8.0
 
+  '@imengyu/vue-scroll-rect@0.1.7': {}
+
+  '@imengyu/vue3-context-menu@1.5.2':
+    dependencies:
+      '@imengyu/vue-scroll-rect': 0.1.7
+
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -2591,6 +2612,10 @@ snapshots:
       '@tauri-apps/api': 2.9.1
 
   '@tauri-apps/plugin-shell@2.3.3':
+    dependencies:
+      '@tauri-apps/api': 2.9.1
+
+  '@tauri-apps/plugin-sql@2.3.1':
     dependencies:
       '@tauri-apps/api': 2.9.1
 

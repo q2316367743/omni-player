@@ -46,6 +46,8 @@
       ]
     },
     "core:window:allow-show",
-    "core:window:allow-set-focus"
+    "core:window:allow-set-focus",
+    "fs:allow-read-text-file",
+    "fs:allow-resource-read-recursive"
   ]
 }

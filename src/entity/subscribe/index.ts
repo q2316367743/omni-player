@@ -1,3 +1,3 @@
-export * from "./RssItem.ts";
-export * from "./RssContent.ts"
+export * from "./FeedItem.ts";
+export * from "./FeedContent.ts"
 export * from "./SubscribeItem.ts";

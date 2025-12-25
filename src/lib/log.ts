@@ -1,14 +1,18 @@
 import {debug, error, info} from '@tauri-apps/plugin-log';
 
 
-export function logDebug(message: string) {
-  debug(message);
+function renderMessage(message: string, ...args: any[]) {
+  return message + (args && args.length > 0 ? (": " + args.join(",")) : '');
 }
 
-export function logInfo(message: string) {
-  info(message);
+export function logDebug(message: string, ...args: any[]) {
+  debug(renderMessage(message, ...args));
 }
 
-export function logError(message: string) {
-  error(message);
+export function logInfo(message: string, ...args: any[]) {
+  info(renderMessage(message, ...args));
+}
+
+export function logError(message: string, ...args: any[]) {
+  error(renderMessage(message, ...args));
 }

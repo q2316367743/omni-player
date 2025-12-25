@@ -11,4 +11,9 @@ export interface SubscribeItem {
   // 所属文件夹
   folder: string;
 
+  /**
+   * 资讯数量
+   */
+  count: number;
+
 }

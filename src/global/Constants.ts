@@ -1,5 +1,6 @@
 import {appDataDir, join} from "@tauri-apps/api/path";
 import {useColorMode} from "@/hooks/ColorMode.ts";
+import {useBoolState} from "@/hooks/UseState.ts";
 
 export const APP_NAME = "omni-player";
 export const APP_VERSION = "0.0.1";
@@ -17,3 +18,10 @@ export const toggleColorMode = () => {
 }
 
 export const SUPPORT_MOVIE = /mp4|mkv|flv/i
+
+export const DB_MIGRATE_FILES = [{
+  file: 'migrate/0000_init.sql',
+  version: 0
+}];
+
+export const [collapsed, toggleCollapsed] = useBoolState( false);

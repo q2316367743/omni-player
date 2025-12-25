@@ -7,6 +7,10 @@ import {
   NetworkServerTypeOptions
 } from "@/entity/NetworkServer.ts";
 import {useNetworkServerStore} from "@/store/NetworkServerStore.ts";
+import Ctx from "@imengyu/vue3-context-menu";
+import {isDark} from "@/global/Constants.ts";
+import {DeleteIcon, EditIcon} from "tdesign-icons-vue-next";
+import MessageBoxUtil from "@/util/model/MessageBoxUtil.tsx";
 
 export function openNetworkServerEdit(old?: NetworkServer) {
 
@@ -18,7 +22,6 @@ export function openNetworkServerEdit(old?: NetworkServer) {
     header: (update ? "修改" : "新增") + "网络服务器",
     confirmBtn: update ? "修改" : "新增",
     size: "600px",
-    attach: ".app-layout-content",
     default: () => <Form data={server.value}>
       <FormItem label={'名称'} labelAlign={"top"}>
         <Input v-model={server.value.name} clearable/>
@@ -52,6 +55,40 @@ export function openNetworkServerEdit(old?: NetworkServer) {
           plugin.destroy?.();
         }).catch(e => MessageUtil.error("操作失败", e));
     }
+  })
+
+}
+
+
+export function openNetworkContextmenu(server: NetworkServer, e: PointerEvent) {
+  e.preventDefault();
+  e.stopPropagation();
+  Ctx.showContextMenu({
+    x: e.x,
+    y: e.y,
+    theme: isDark.value ? 'mac dark' : 'mac',
+    items: [
+      {
+        label: "修改",
+        icon: () => <EditIcon/>,
+        onClick: () => {
+          openNetworkServerEdit(server);
+        }
+      },
+      {
+        label: () => <span style={{color: 'var(--td-error-color)'}}>删除</span>,
+        icon: () => <DeleteIcon style={{color: 'var(--td-error-color)'}}/>,
+        onClick: () => {
+          MessageBoxUtil.confirm("确定要删除吗？", "提示", {
+            confirmButtonText: "确定",
+          }).then(() => {
+            useNetworkServerStore().removeServer(server)
+              .then(() => MessageUtil.success("删除成功"))
+              .catch((e) => MessageUtil.error("删除失败", e))
+          })
+        }
+      }
+    ]
   })
 
 }

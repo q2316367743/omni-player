@@ -1,4 +1,4 @@
-export interface RssContent {
+export interface FeedContent {
   id: string;
 
   // 外链

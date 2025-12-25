@@ -11,13 +11,15 @@
     "tauri:dev": "tauri dev"
   },
   "dependencies": {
+    "@imengyu/vue3-context-menu": "^1.5.2",
     "@tauri-apps/plugin-dialog": "~2.4.2",
     "@tauri-apps/plugin-fs": "~2.4.4",
     "@tauri-apps/plugin-http": "~2.5.4",
-    "@tauri-apps/plugin-log": "~2.7.1",
+    "@tauri-apps/plugin-log": "~2",
     "@tauri-apps/plugin-opener": "~2.5.2",
     "@tauri-apps/plugin-os": "~2.3.2",
     "@tauri-apps/plugin-shell": "~2.3.3",
+    "@tauri-apps/plugin-sql": "^2.3.1",
     "@tauri-apps/plugin-store": "~2.4.1",
     "@tauri-apps/plugin-stronghold": "~2.3.1",
     "@tauri-apps/plugin-updater": "~2.9.0",

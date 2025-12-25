@@ -1,7 +1,15 @@
 <template>
   <div class="app-layout">
-    <div class="app-layout-header" data-tauri-drag-region>
-      <div class="ml-4px flex gap-4px items-center shrink-0">
+    <div class="app-layout-header">
+      <div class="w-24px" v-if="collapsed">
+        <t-button theme="primary" size="small" variant="text" shape="square"
+                  @click="toggleCollapsed()">
+          <template #icon>
+            <menu-icon/>
+          </template>
+        </t-button>
+      </div>
+      <div class="flex gap-4px items-center shrink-0">
         <slot name="header"/>
       </div>
     </div>
@@ -11,6 +19,8 @@
   </div>
 </template>
 <script lang="ts" setup>
+import {MenuIcon} from "tdesign-icons-vue-next";
+import {collapsed, toggleCollapsed} from "@/global/Constants.ts";
 </script>
 <style scoped lang="less">
 .app-layout {
@@ -19,6 +29,7 @@
   width: 100%;
   overflow: hidden;
   user-select: none;
+  background-color: var(--td-bg-color-container);
 
   .app-layout-header {
     position: absolute;
@@ -28,7 +39,9 @@
     height: 32px;
     border-bottom: 1px solid var(--td-border-level-1-color);
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    padding-left: 16px;
+    gap: 8px;
   }
 
   .app-layout-content {

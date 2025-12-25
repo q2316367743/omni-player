@@ -12,7 +12,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AppAside: typeof import('./src/components/PageLayout/AppAside.vue')['default']
+    AppAside: typeof import('./src/components/AppSide/AppAside.vue')['default']
     ArtPlayer: typeof import('./src/components/VideoPlayer/ArtPlayer.vue')['default']
     EmptyResult: typeof import('./src/components/Result/EmptyResult.vue')['default']
     InfoResult: typeof import('./src/components/Result/InfoResult.vue')['default']
@@ -61,7 +61,7 @@ declare module 'vue' {
 
 // For TSX support
 declare global {
-  const AppAside: typeof import('./src/components/PageLayout/AppAside.vue')['default']
+  const AppAside: typeof import('./src/components/AppSide/AppAside.vue')['default']
   const ArtPlayer: typeof import('./src/components/VideoPlayer/ArtPlayer.vue')['default']
   const EmptyResult: typeof import('./src/components/Result/EmptyResult.vue')['default']
   const InfoResult: typeof import('./src/components/Result/InfoResult.vue')['default']

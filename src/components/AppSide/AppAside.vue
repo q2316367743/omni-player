@@ -1,9 +1,13 @@
 <template>
   <div class="app-aside">
     <!-- Header -->
-    <div class="aside-header" data-tauri-drag-region>
+    <div class="aside-header">
       <div class="header-left">
-        <book-open-icon class="header-icon"/>
+        <t-button theme="primary" size="small" variant="text" shape="square" @click="toggleCollapsed()">
+          <template #icon>
+            <menu-fold-icon />
+          </template>
+        </t-button>
         <span class="header-title">亦无悔</span>
       </div>
       <div class="header-actions">
@@ -27,14 +31,39 @@
 
     <!-- Scrollable Content -->
     <div class="aside-content">
-      <!-- Library Section -->
+      <!-- 媒体库 -->
       <div class="nav-group">
-        <div class="group-title">媒体库</div>
+        <div class="group-title">
+          <span>媒体库</span>
+          <t-button class="ml-auto" theme="primary" size="small" variant="text" shape="square" @click="openMediaServerEdit()">
+            <template #icon>
+              <add-icon />
+            </template>
+          </t-button>
+        </div>
         <div v-for="media in medias" :key="media.id" :class="{active: mediaActive(media.id), 'nav-item' : true}"
-             @click="jumpMedia(media.id)">
+             @click="jumpMedia(media.id)" @contextmenu="openMediaContextmenu(media, $event)">
           <div class="nav-item-content">
             <component :is="getMediaIcon(media.type)" class="w-16px h-16px"/>
             <span class="nav-text">{{ media.name }}</span>
+          </div>
+        </div>
+      </div>
+      <!-- 网络库 -->
+      <div class="nav-group">
+        <div class="group-title">
+          <span>网络资源</span>
+          <t-button class="ml-auto" theme="primary" size="small" variant="text" shape="square" @click="openNetworkServerEdit()">
+            <template #icon>
+              <add-icon />
+            </template>
+          </t-button>
+        </div>
+        <div v-for="network in networks" :key="network.id" :class="{active: mediaActive(network.id), 'nav-item' : true}"
+             @click="jumpNetword(network.id)" @contextmenu="openNetworkContextmenu(network, $event)">
+          <div class="nav-item-content">
+            <div class="w-16px h-16px"/>
+            <span class="nav-text">{{ network.name }}</span>
           </div>
         </div>
       </div>
@@ -80,17 +109,19 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
 import {
-  BookOpenIcon,
   AddIcon,
   LogoGithubIcon,
   FileIcon,
-  SettingIcon, HomeIcon, ChevronLeftIcon
+  SettingIcon, HomeIcon, ChevronLeftIcon, MenuFoldIcon
 } from 'tdesign-icons-vue-next';
-import {useMediaServerStore} from "@/store";
+import {useMediaServerStore, useNetworkServerStore} from "@/store";
 import type {MediaServerType} from "@/entity/MediaServer.ts";
 import JellyfinIcon from "@/modules/icon/JellyfinIcon.vue";
 import EmbyIcon from "@/modules/icon/EmbyIcon.vue";
 import PlexIcon from "@/modules/icon/PlexIcon.vue";
+import {openMediaContextmenu, openMediaServerEdit} from "@/components/AppSide/func/MediaServerEdit.tsx";
+import {openNetworkContextmenu, openNetworkServerEdit} from "@/components/AppSide/func/NetworkServerEdit.tsx";
+import {toggleCollapsed} from "@/global/Constants.ts";
 
 const router = useRouter();
 const route = useRoute();
@@ -102,6 +133,7 @@ const goBack = () => router.back();
 const goHome = () => router.replace('/home');
 
 const jumpMedia = (id: string) => router.push(`/media/${id}/home`);
+const jumpNetword = (id: string) => router.push(`/network/${id}/home`);
 const mediaActive = (id: string) => route.path.startsWith(`/media/${id}`);
 
 const getMediaIcon = (type: MediaServerType) => {
@@ -123,6 +155,16 @@ const medias = computed(() => {
   })
 });
 
+const networks = computed(() => {
+  return [...useNetworkServerStore().servers].sort((a, b) => {
+    const groupDiff = a.group.localeCompare(b.group);
+    if (groupDiff !== 0) return groupDiff;
+    const diff = a.sequence - b.sequence;
+    if (diff !== 0) return diff;
+    return a.name.localeCompare(b.name);
+  });
+});
+
 const subscriptions = ref([
   {name: '方糖07', count: 7, icon: ''},
   {name: 'SwiftUI Recipes', count: 10, icon: ''},
@@ -136,15 +178,16 @@ const subscriptions = ref([
   display: flex;
   flex-direction: column;
   height: 100vh;
-  width: calc(100% - 1px);
+  width: 231px;
   background-color: var(--td-bg-color-container); // Warm light background from image
   border-right: 1px solid var(--td-border-level-1-color);
   user-select: none;
   font-size: 13px;
   color: var(--td-text-color-primary);
+  overflow: hidden;
 
   .aside-header {
-    height: 44px; // Taller header to accommodate traffic lights area if needed, or just style
+    height: 32px; // Taller header to accommodate traffic lights area if needed, or just style
     padding: 0 16px;
     display: flex;
     align-items: center;
@@ -184,6 +227,8 @@ const subscriptions = ref([
       margin-bottom: 8px;
       padding-left: 8px;
       user-select: none;
+      display: flex;
+      align-items: center;
     }
   }
 
