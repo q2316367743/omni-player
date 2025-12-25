@@ -21,6 +21,7 @@ pub fn run() {
             commands::potplayer::launch_potplayer,
             // 未来其他命令：commands::fetch_media_library, ...
         ])
+        .plugin(tauri_plugin_sql::Builder::default().build())
         .plugin(tauri_plugin_libmpv::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(

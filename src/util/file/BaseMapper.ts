@@ -29,7 +29,9 @@ export class BaseMapper<T extends TableLike> {
       // 没有更新的
       return;
     }
-    const sql = `update ${this.tableName} set ${query.join(", ")} where id = ${values.length + 1}`;
+    const sql = `update ${this.tableName}
+                 set ${query.join(", ")}
+                 where id = ${values.length + 1}`;
     logDebug("update sql:\t\t" + sql);
     logDebug("update values:\t" + values);
     const r = await this.db.execute(sql, [...values, id]);
@@ -37,15 +39,19 @@ export class BaseMapper<T extends TableLike> {
   }
 
   async deleteById(id: string) {
-    const sql = `delete from ${this.tableName} where id = $1`;
+    const sql = `delete
+                 from ${this.tableName}
+                 where id = $1`;
     logDebug("delete sql:\t\t" + sql);
     logDebug("delete values:\t" + id);
-    const r = await this.db.execute(sql,[id]);
+    const r = await this.db.execute(sql, [id]);
     logDebug("delete result:\t" + r.rowsAffected);
   }
 
   async deleteByIds(ids: Array<string>) {
-    const sql = `delete from ${this.tableName} where id in (${generatePlaceholders(ids.length)})`;
+    const sql = `delete
+                 from ${this.tableName}
+                 where id in (${generatePlaceholders(ids.length)})`;
     logDebug("delete sql:\t\t" + sql);
     logDebug("delete values:\t" + ids.join(", "));
     const r = await this.db.execute(sql, ids);
@@ -61,12 +67,14 @@ export class BaseMapper<T extends TableLike> {
       values.push((params as any)[key]);
     }
     const sql = `insert into ${this.tableName} (id, ${query.join(
-      ", "
-    )}) values (${generatePlaceholders(query.length)})`;
+            ", "
+    )})
+                 values (${generatePlaceholders(query.length + 1)})`;
+    const id = useSnowflake().nextId();
+    values.unshift(id)
     logDebug("insert sql:\t\t" + sql);
     logDebug("insert values:\t" + values);
-    const id = useSnowflake().nextId();
-    const r = await this.db.execute(sql, [id, ...values]);
+    const r = await this.db.execute(sql, values);
     logDebug("insert result:\t" + r.rowsAffected);
     return {
       ...params,
@@ -102,12 +110,13 @@ export class BaseMapper<T extends TableLike> {
 
     // 构建SQL语句
     const valuePlaceholders = params
-      .map((_v, index) => `(${generatePlaceholders(keys.length  + 1, keys.length * index)})`)
+      .map((_v, index) => `(${generatePlaceholders(keys.length + 1, keys.length * index)})`)
       .join(", ");
 
     const sql = `insert into ${this.tableName} (id, ${columnNames.join(
-      ", "
-    )}) values ${valuePlaceholders}`;
+            ", "
+    )})
+                 values ${valuePlaceholders}`;
 
     logDebug("insertBatch sql:\t" + sql);
     logDebug("insertBatch values:\t" + allValues);
@@ -126,8 +135,9 @@ export class BaseMapper<T extends TableLike> {
       values.push(params[key]);
     }
     const sql = `insert into ${this.tableName} (${query.join(
-      ", "
-    )}) values (${generatePlaceholders(query.length)})`;
+            ", "
+    )})
+                 values (${generatePlaceholders(query.length)})`;
     logDebug("insert sql:\t\t" + sql);
     logDebug("insert values:\t" + values);
     const r = await this.db.execute(sql, values);

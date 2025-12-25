@@ -1,4 +1,17 @@
-export interface SubscribeItem {
+export interface SubscribeItemEdit {
+
+  // 订阅地址
+  url: string;
+  // 名称
+  name: string;
+  // 所属文件夹
+  folder: string;
+  // 排序
+  sequence: number;
+
+}
+
+export interface SubscribeItem  extends SubscribeItemEdit{
 
   id: string;
   created_at: number;
@@ -6,14 +19,18 @@ export interface SubscribeItem {
 
   // 图标
   icon: string;
-  // 名称
-  name: string;
-  // 所属文件夹
-  folder: string;
-
   /**
    * 资讯数量
    */
   count: number;
 
+}
+
+export function buildSubscribeItemEdit(): SubscribeItemEdit {
+  return {
+    url: "",
+    name: "",
+    folder: "",
+    sequence: 0
+  }
 }

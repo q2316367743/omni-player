@@ -3,6 +3,8 @@ export interface FeedItem {
   created_at: number;
   updated_at: number;
 
+  subscribe_id: string;
+
   // 唯一项
   signal: string;
   // 文章标题
@@ -10,13 +12,13 @@ export interface FeedItem {
   // 原文链接
   link: string;
   // 发布时间（ISO08601 格式）
-  pubDate: string;
+  pub_date: number;
   // 作者
   author: string;
   //  摘要
   summary: string;
   // 是否已读
-  isRead: boolean;
+  is_read: boolean;
   // 是否已获取内容
-  contentFetched: boolean;
+  content_fetched: boolean;
 }

@@ -1,19 +1,26 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>omni-player</title>
-    <style>
-      #app {
-        width: 100vw;
-        height: 100vh;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/svg+xml" href="/logo.svg"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>omni-player</title>
+  <style>
+    #app {
+      width: 100vw;
+      height: 100vh;
+      background-color: var(--td-bg-color-container);
+      color: var(--td-text-color-primary);
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+<script type="module" src="/src/main.ts"></script>
+</body>
 </html>

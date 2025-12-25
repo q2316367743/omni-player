@@ -48,3 +48,11 @@ export function getAction<T = Record<string, any>>(url: string, params?: Record<
 export function postAction<T = Record<string, any>>(url: string, data?: Record<string, any>, config?: RequestConfig) {
   return instance.post<T>(url, data, config);
 }
+
+export async function getTextAction(url: string, config?: RequestConfig): Promise<string> {
+  const {data} = await instance.get<string>(url, {
+    ...config,
+    responseType: 'text'
+  })
+  return data;
+}

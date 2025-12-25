@@ -75,7 +75,6 @@ export default defineConfig({
         main: _resolve('index.html'),
         'player-media': _resolve('player-media.html'),
         'player-network': _resolve('player-network.html'),
-        'player-file': _resolve('player-file.html'),
       },
     },
 

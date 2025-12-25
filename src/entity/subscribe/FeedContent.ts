@@ -1,16 +1,24 @@
-export interface FeedContent {
-  id: string;
+export interface FeedContentCore {
+
 
   // 外链
-  itemLink: string;
+  item_link: string;
   // 原始 HTML（可选，用于调试或重解析）
-  htmlContent: string;
+  html_content: string;
   // 从 HTML 中提取的更准确的标题（可覆盖 RSS 标题）
-  parsedTitle: string;
-  // 清洗后的正文（纯文本或简化 HTML）
-  parsedContent: string;
+  parsed_title: string;
+  // 清洗后的正文（简化 HTML，只保留基础标签）
+  parsed_content: string;
   // 获取时间
-  fetchTime: string;
+  fetch_time: string;
   // 是否会成功
-  parseSuccess: boolean;
+  parse_success: boolean;
+}
+
+export interface FeedContent extends FeedContentCore{
+  id: string;
+
+
+  subscribe_id: string;
+  feed_id: string;
 }

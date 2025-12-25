@@ -11,20 +11,19 @@ class Sql {
 
   private db: Database | null = null;
 
-  private async _getDb() {
-    if (this.db) return this.db;
-    const path = await APP_DATA_DB_PATH();
-    console.log("db path: ", path)
-    this.db = await Database.load(path);
-    return this.db;
-  }
 
   private promiseChain: Promise<unknown> = Promise.resolve();
 
   private async getDb(): Promise<Database> {
     // 将新的 SQL 调用追加到 Promise 链尾部
     this.promiseChain = this.promiseChain
-      .then(() => this._getDb())
+      .then(async () => {
+        if (this.db) return this.db;
+        const path = await APP_DATA_DB_PATH();
+        console.log("db path: ", path)
+        this.db = await Database.load(`sqlite:${path}`);
+        return this.db;
+      })
       .catch((err) => {
         console.error('get store error:', err);
         throw err; // 保证错误能被调用者捕获
@@ -33,11 +32,9 @@ class Sql {
     return this.promiseChain as Promise<Database>;
   }
 
-  private executeChain: Promise<unknown> = Promise.resolve();
-
   async execute(query: string, bindValues?: unknown[]): Promise<QueryResult> {
     // 将新的 SQL 调用追加到 Promise 链尾部
-    this.executeChain = this.executeChain
+    this.promiseChain = this.promiseChain
       .then(async () => {
         const db = await this.getDb();
         return db.execute(query, bindValues);
@@ -47,7 +44,21 @@ class Sql {
         throw err; // 保证错误能被调用者捕获
       });
 
-    return this.executeChain as Promise<QueryResult>;
+    return this.promiseChain as Promise<QueryResult>;
+  }
+
+  // 开启一个事务
+  async beginTransaction<T = any>(callback: (sql: Sql) => Promise<T>): Promise<T> {
+    const db = await this.getDb();
+    try {
+      await db.execute(`BEGIN`);
+      const r = await callback(this);
+      await db.execute(`COMMIT`);
+      return r;
+    }catch (e) {
+      await db.execute(`ROLLBACK`);
+      throw e;
+    }
   }
 
   async select<T>(query: string, bindValues?: unknown[]): Promise<T> {
@@ -100,7 +111,7 @@ class Sql {
         logInfo("执行sql文件");
         await this.execute(sql);
         logInfo("插入版本");
-        await this.execute("INSERT INTO schema_version(version) VALUES ($1)`", [version]);
+        await this.execute("INSERT INTO schema_version(version) VALUES ($1)", [version]);
         logInfo("提交事务");
         await this.execute("COMMIT");
         console.info(`✅ migration ${file} applied`);

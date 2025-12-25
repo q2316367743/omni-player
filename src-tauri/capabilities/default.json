@@ -48,6 +48,10 @@
     "core:window:allow-show",
     "core:window:allow-set-focus",
     "fs:allow-read-text-file",
-    "fs:allow-resource-read-recursive"
+    "fs:allow-resource-read-recursive",
+    "sql:default",
+    "sql:allow-load",
+    "sql:allow-execute",
+    "sql:allow-select"
   ]
 }

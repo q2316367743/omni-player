@@ -75,6 +75,15 @@ export const router = createRouter({
       path: ':id/search',
       component: () => import('@/pages/network/search/index.vue')
     }]
+  }, {
+    name: "订阅列表",
+    path: "/subscribe/:subscribeId",
+    component: () => import('@/pages/subscribe/subscribe-home.vue'),
+    children: [{
+      name: '订阅内容',
+      path: ':feedId',
+      component: () => import('@/pages/subscribe/subscribe-info.vue')
+    }]
   }]
 });
 

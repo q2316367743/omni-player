@@ -1,8 +1,104 @@
-import type {SubscribeItem} from "@/entity/subscribe";
+import type {FeedItem, SubscribeItem, SubscribeItemEdit} from "@/entity/subscribe";
 import {useSql} from "@/lib/sql.ts";
 import {TableName} from "@/global/TableName.ts";
+import {logError} from "@/lib/log.ts";
+import {getFaviconUrl} from "@/util/file/website.ts";
+import {fetchFeedItems} from "@/modules/subscribe";
 
 export async function listSubscribe() {
-  const query = await useSql().query<Array<SubscribeItem>>(TableName.SUBSCRIBE_ITEM)
+  const query = await useSql().query<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
   return query.list();
+}
+
+async function refreshFeedItem(id: string) {
+  const subscribeItemQuery = await useSql().query<SubscribeItem>(TableName.SUBSCRIBE_ITEM);
+  const item = await subscribeItemQuery.eq('id', id).one();
+  if (!item) return Promise.reject(new Error("订阅项未知道"))
+
+  const feedItemMapper = await useSql().mapper<FeedItem>(TableName.FEED_ITEM);
+  const feedItems = await fetchFeedItems(item);
+  await feedItemMapper.insertBatch(feedItems);
+}
+
+export async function addSubscribe(subscribe: SubscribeItemEdit) {
+  const mapper = await useSql().mapper<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
+  const item = await mapper.insert({
+    created_at: Date.now(),
+    updated_at: Date.now(),
+    count: 0,
+    icon: "",
+    name: subscribe.name,
+    url: subscribe.url,
+    folder: subscribe.folder,
+    sequence: subscribe.sequence,
+  });
+  // 异步获取图标
+  (async () => {
+
+    const favicon = await getFaviconUrl(subscribe.url);
+
+    await mapper.updateById(item.id, {icon: favicon});
+  })().catch(() => logError(`获取图标 ${subscribe.name} 失败`));
+
+  // 第一次刷新
+
+  refreshFeedItem(item.id).catch(() => logError(`第一次刷新 ${subscribe.name} 失败`));
+
+}
+
+export async function updateSubscribe(id: string, subscribe: SubscribeItemEdit) {
+  const query = await useSql().query<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
+  const mapper = await useSql().mapper<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
+  // 获取旧的
+  const old = await query.eq('id', id).one();
+  if (!old) {
+    // 没找到新增
+    await addSubscribe(subscribe);
+    return;
+  }
+
+  await mapper.updateById(id, {
+    updated_at: Date.now(),
+    name: subscribe.name,
+    url: subscribe.url,
+    folder: subscribe.folder,
+    sequence: subscribe.sequence,
+  });
+  // 异步获取图标
+  (async () => {
+
+    const favicon = await getFaviconUrl(subscribe.url);
+
+    await mapper.updateById(id, {icon: favicon});
+  })().catch(() => logError(`获取图标 ${subscribe.name} 失败`));
+
+  if (old.url !== subscribe.url) {
+    // 链接发生改变，删除旧的全部 rss
+    await useSql().beginTransaction(async (sql) => {
+      const feedItemQuery = await sql.query<FeedItem>(TableName.FEED_ITEM)
+      await feedItemQuery.eq('subscribe_id', id).delete();
+      const feedContentQuery = await sql.query<FeedItem>(TableName.FEED_CONTENT)
+      await feedContentQuery.eq('subscribe_id', id).delete();
+    });
+    // 请求新的 rss
+    refreshFeedItem(id).catch(() => logError(`第一次刷新 ${subscribe.name} 失败`));
+  }
+
+}
+
+export async function removeSubscribe(id: string) {
+  await useSql().beginTransaction(async (sql) => {
+    const feedItemQuery = await sql.query<FeedItem>(TableName.FEED_ITEM)
+    await feedItemQuery.eq('subscribe_id', id).delete();
+    const feedContentQuery = await sql.query<FeedItem>(TableName.FEED_CONTENT)
+    await feedContentQuery.eq('subscribe_id', id).delete();
+    const subscribeQuery = await sql.query<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
+    await subscribeQuery.eq('id', id).delete();
+  })
+}
+
+export async function getSubscribe(id: string) {
+  const query = await useSql().query<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
+  const res = await query.eq('id', id).one();
+  return res || undefined;
 }
