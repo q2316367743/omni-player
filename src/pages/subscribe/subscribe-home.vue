@@ -249,6 +249,18 @@ watch(subscribeId, async () => {
   background-color: var(--td-bg-color-container-active);
 }
 
+.feed-item.read {
+  opacity: 0.6;
+}
+
+.feed-item.read .feed-item__title {
+  font-weight: 400;
+}
+
+.feed-item.read .feed-item__summary {
+  opacity: 0.7;
+}
+
 .feed-item__main {
   min-width: 0;
   flex: 1;

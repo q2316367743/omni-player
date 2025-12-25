@@ -1,5 +1,5 @@
 <template>
-  <t-loading :loading="loading" class="subscribe-info">
+  <t-loading :loading="loading" :class="['subscribe-info', { 'is-fullscreen': isFullscreen }]">
     <div v-if="isNoneSelected" class="subscribe-info__center">
       <empty-result title="未选择内容" tip="从左侧选择一条文章查看详情"/>
     </div>
@@ -16,42 +16,37 @@
           <div class="subscribe-info__header-top">
             <div class="subscribe-info__title">{{ displayTitle }}</div>
             <div class="subscribe-info__actions">
-              <t-button
-                size="small"
-                variant="text"
-                theme="primary"
-                :disabled="!content?.link"
-                @click.stop="openOriginal()"
-              >
-                <template #icon>
-                  <t-icon name="link"/>
-                </template>
-                原文
-              </t-button>
-              <t-button
-                size="small"
-                variant="text"
-                theme="primary"
-                :disabled="!content?.link"
-                @click.stop="copyLink()"
-              >
-                <template #icon>
-                  <t-icon name="copy"/>
-                </template>
-                复制链接
-              </t-button>
-              <t-button
-                size="small"
-                variant="text"
-                theme="primary"
-                :disabled="!displayTitle"
-                @click.stop="copyTitle()"
-              >
-                <template #icon>
-                  <t-icon name="copy"/>
-                </template>
-                复制标题
-              </t-button>
+              <t-radio-group v-model="viewMode" size="small" variant="default-filled">
+                <t-radio-button value="read">阅读视图</t-radio-button>
+                <t-radio-button value="web" :disabled="!content?.link">网页视图</t-radio-button>
+              </t-radio-group>
+              <t-tooltip content="在外部打开">
+                <t-button
+                  size="small"
+                  variant="text"
+                  theme="primary"
+                  shape="square"
+                  :disabled="!content?.link"
+                  @click.stop="openOriginal()"
+                >
+                  <template #icon>
+                    <t-icon name="link"/>
+                  </template>
+                </t-button>
+              </t-tooltip>
+              <t-tooltip :content="isFullscreen ? '退出全屏' : '全屏'">
+                <t-button
+                  size="small"
+                  variant="text"
+                  theme="primary"
+                  shape="square"
+                  @click.stop="toggleFullscreen()"
+                >
+                  <template #icon>
+                    <t-icon :name="isFullscreen ? 'fullscreen-exit' : 'fullscreen'"/>
+                  </template>
+                </t-button>
+              </t-tooltip>
             </div>
           </div>
           <div class="subscribe-info__meta">
@@ -63,9 +58,16 @@
       </div>
 
       <div ref="scrollRef" class="subscribe-info__scroll">
-        <div class="subscribe-info__paper">
+        <div v-if="viewMode === 'read'" class="subscribe-info__paper">
           <article class="rss-article" v-html="contentHtml"></article>
         </div>
+        <iframe
+          v-else-if="viewMode === 'web' && content?.link"
+          :src="content.link"
+          class="subscribe-info__iframe"
+          frameborder="0"
+          allowfullscreen
+        />
       </div>
 
       <t-back-top container=".subscribe-info__scroll"/>
@@ -86,6 +88,8 @@ const content = ref<FeedWrapper>();
 const loading = ref(false);
 const errorTip = ref("");
 const scrollRef = ref<HTMLElement | null>(null);
+const viewMode = ref<"read" | "web">("read");
+const isFullscreen = ref(false);
 
 const feedId = computed(() => route.params.feedId as string);
 const isNoneSelected = computed(() => feedId.value === "0");
@@ -138,28 +142,13 @@ async function openOriginal() {
   }
 }
 
-async function copyText(text: string, okText: string) {
-  try {
-    await navigator.clipboard.writeText(text);
-    MessageUtil.success(okText);
-  } catch (e) {
-    MessageUtil.error("复制失败", e);
-  }
-}
-
-function copyLink() {
-  const url = content.value?.link || "";
-  if (!url) return;
-  void copyText(url, "链接已复制");
-}
-
-function copyTitle() {
-  const title = displayTitle.value;
-  if (!title) return;
-  void copyText(title, "标题已复制");
+function toggleFullscreen() {
+  isFullscreen.value = !isFullscreen.value;
 }
 
 function onContentClick(e: MouseEvent) {
+  if (viewMode.value === "web") return;
+  
   const target = e.target as HTMLElement | null;
   const img = target?.closest?.("img") as HTMLImageElement | null;
   if (img && img.closest(".rss-article")) {
@@ -191,6 +180,15 @@ watch(feedId, async val => {
   height: 100%;
   background-color: var(--td-bg-color-container);
   overflow: hidden;
+}
+
+.subscribe-info.is-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  //z-index: 9999;
 }
 
 .subscribe-info__wrap {
@@ -301,6 +299,12 @@ watch(feedId, async val => {
   border-radius: 14px;
   background-color: var(--td-bg-color-container);
   overflow-x: hidden;
+}
+
+.subscribe-info__iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
 }
 
 :deep(.rss-article) {
