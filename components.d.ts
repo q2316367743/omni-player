@@ -31,6 +31,8 @@ declare module 'vue' {
     TBreadcrumbItem: typeof import('tdesign-vue-next')['BreadcrumbItem']
     TButton: typeof import('tdesign-vue-next')['Button']
     TCard: typeof import('tdesign-vue-next')['Card']
+    TCheckbox: typeof import('tdesign-vue-next')['Checkbox']
+    TCheckboxGroup: typeof import('tdesign-vue-next')['CheckboxGroup']
     TContent: typeof import('tdesign-vue-next')['Content']
     TEmpty: typeof import('tdesign-vue-next')['Empty']
     TForm: typeof import('tdesign-vue-next')['Form']
@@ -58,6 +60,7 @@ declare module 'vue' {
     TTabPanel: typeof import('tdesign-vue-next')['TabPanel']
     TTabs: typeof import('tdesign-vue-next')['Tabs']
     TTag: typeof import('tdesign-vue-next')['Tag']
+    TTextarea: typeof import('tdesign-vue-next')['Textarea']
     TTooltip: typeof import('tdesign-vue-next')['Tooltip']
     WindowControl: typeof import('./src/components/WindowControl/WindowControl.vue')['default']
   }
@@ -84,6 +87,8 @@ declare global {
   const TBreadcrumbItem: typeof import('tdesign-vue-next')['BreadcrumbItem']
   const TButton: typeof import('tdesign-vue-next')['Button']
   const TCard: typeof import('tdesign-vue-next')['Card']
+  const TCheckbox: typeof import('tdesign-vue-next')['Checkbox']
+  const TCheckboxGroup: typeof import('tdesign-vue-next')['CheckboxGroup']
   const TContent: typeof import('tdesign-vue-next')['Content']
   const TEmpty: typeof import('tdesign-vue-next')['Empty']
   const TForm: typeof import('tdesign-vue-next')['Form']
@@ -111,6 +116,7 @@ declare global {
   const TTabPanel: typeof import('tdesign-vue-next')['TabPanel']
   const TTabs: typeof import('tdesign-vue-next')['Tabs']
   const TTag: typeof import('tdesign-vue-next')['Tag']
+  const TTextarea: typeof import('tdesign-vue-next')['Textarea']
   const TTooltip: typeof import('tdesign-vue-next')['Tooltip']
   const WindowControl: typeof import('./src/components/WindowControl/WindowControl.vue')['default']
 }

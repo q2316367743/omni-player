@@ -73,6 +73,15 @@ export const router = createRouter({
       path: ':feedId',
       component: () => import('@/pages/subscribe/subscribe-info.vue')
     }]
+  }, {
+    name: "app",
+    path: "/app",
+    component: () => import('@/pages/app/index.vue'),
+    children: [{
+      name: 'AppRegex',
+      path: 'regex',
+      component: () => import('@/pages/app/regex/app-regex.vue')
+    }]
   }]
 });
 

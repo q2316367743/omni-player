@@ -3,21 +3,24 @@
     <div class="group-title">
       <span> APP</span>
     </div>
-    <div :class="{'nav-item': true, active: activeKey === '/app/news'}">
+    <div :class="{'nav-item': true, active: activeKey === '/app/regex'}" @click="jumpTo('regex')">
       <div class="nav-item-content">
-        <article-icon class="nav-icon"/>
-        <span class="nav-text">新闻</span>
+        <code-icon class="nav-icon"/>
+        <span class="nav-text">正则</span>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import {ArticleIcon} from "tdesign-icons-vue-next";
+import {CodeIcon} from "tdesign-icons-vue-next";
 
 defineProps({
   activeKey: String
 });
 
+const router = useRouter();
+
+const jumpTo = (module: string) => router.push(`/app/${module}`)
 </script>
 <style scoped lang="less">
 
