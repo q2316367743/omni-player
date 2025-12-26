@@ -1,61 +1,48 @@
 <template>
-  <div class="home-container">
-    <div class="home-header">
-      <div class="home-title">
-        <div class="home-logo">
-          <div class="w-24px" v-if="collapsed">
-            <t-button theme="primary" size="small" variant="text" shape="square"
-                      @click="toggleCollapsed()">
-              <template #icon>
-                <menu-icon/>
-              </template>
-            </t-button>
+  <MainLayout>
+    <template #content>
+      <div class="home-container">
+        <div class="home-content">
+          <div class="welcome-section">
+            <div class="welcome-text">
+              <h1 class="welcome-title">欢迎使用亦无悔</h1>
+              <p class="welcome-subtitle">一站式多媒体管理平台</p>
+            </div>
+            <div class="welcome-stats">
+              <div class="stat-item">
+                <div class="stat-value">{{ mediaCount }}</div>
+                <div class="stat-label">媒体库</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">{{ networkCount }}</div>
+                <div class="stat-label">网络资源</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">{{ subscribeCount }}</div>
+                <div class="stat-label">订阅源</div>
+              </div>
+            </div>
           </div>
 
-        </div>
-      </div>
-    </div>
-    <div class="home-content">
-      <div class="welcome-section">
-        <div class="welcome-text">
-          <h1 class="welcome-title">欢迎使用亦无悔</h1>
-          <p class="welcome-subtitle">一站式多媒体管理平台</p>
-        </div>
-        <div class="welcome-stats">
-          <div class="stat-item">
-            <div class="stat-value">{{ mediaCount }}</div>
-            <div class="stat-label">媒体库</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value">{{ networkCount }}</div>
-            <div class="stat-label">网络资源</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value">{{ subscribeCount }}</div>
-            <div class="stat-label">订阅源</div>
+          <div class="tips-section">
+            <div class="tips-card">
+              <div class="tips-content">
+                <div class="tips-title">使用提示</div>
+                <div class="tips-text">点击左侧导航栏的 + 号可以添加媒体库、网络资源和订阅源</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      <div class="tips-section">
-        <div class="tips-card">
-          <help-icon class="tips-icon" size="24"/>
-          <div class="tips-content">
-            <div class="tips-title">使用提示</div>
-            <div class="tips-text">点击左侧导航栏的 + 号可以添加媒体库、网络资源和订阅源</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+    </template>
+  </MainLayout>
 </template>
 
 <script lang="ts" setup>
-import {HelpIcon, MenuIcon} from 'tdesign-icons-vue-next';
+import MainLayout from "@/components/PageLayout/MainLayout.vue";
 import {useMediaServerStore, useNetworkServerStore} from "@/store";
 import {useRequest} from "@/hooks/UseRequest.ts";
 import {listSubscribe} from "@/services";
-import {collapsed, toggleCollapsed} from "@/global/Constants.ts";
 
 
 const mediaCount = computed(() => useMediaServerStore().servers.length);
@@ -68,11 +55,10 @@ const subscribeCount = computed(() => subscriptions.value.length);
 
 <style scoped lang="less">
 .home-container {
-  width: calc(100% - 32px);
-  height: calc(100% - 32px);
+  width: 100%;
+  height: 100%;
   overflow-y: auto;
   padding: 16px;
-  background: var(--td-bg-color-container);
 }
 
 .home-content {
