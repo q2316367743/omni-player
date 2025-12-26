@@ -1,12 +1,12 @@
 <template>
   <div class="nav-group">
     <div class="group-title">
-      <span> APP</span>
+      <span>更多</span>
     </div>
-    <div :class="{'nav-item': true, active: activeKey === '/app/regex'}" @click="jumpTo('regex')">
+    <div :class="{'nav-item': true, active: activeKey === '/app/tool'}" @click="jumpTo('tool/home')">
       <div class="nav-item-content">
         <code-icon class="nav-icon"/>
-        <span class="nav-text">正则</span>
+        <span class="nav-text">小工具</span>
       </div>
     </div>
   </div>

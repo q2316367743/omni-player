@@ -1,26 +1,33 @@
 <template>
   <div class="app-layout">
     <div class="app-layout-header">
-      <div class="w-24px" v-if="collapsed">
-        <t-button theme="primary" variant="text" shape="square"
-                  @click="toggleCollapsed()">
-          <template #icon>
-            <menu-icon/>
-          </template>
-        </t-button>
-      </div>
+      <t-button theme="primary"  variant="text" shape="square"
+                @click="goBack()">
+        <template #icon>
+          <chevron-left-icon/>
+        </template>
+      </t-button>
+      <t-button v-if="collapsed" theme="primary"  variant="text" shape="square"
+                @click="toggleCollapsed()">
+        <template #icon>
+          <menu-icon/>
+        </template>
+      </t-button>
       <div class="flex gap-4px items-center shrink-0">
         <slot name="header"/>
       </div>
     </div>
     <div class="app-layout-content">
-      <slot name="content"/>
+      <slot/>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import {MenuIcon} from "tdesign-icons-vue-next";
+import {ChevronLeftIcon, MenuIcon} from "tdesign-icons-vue-next";
 import {collapsed, toggleCollapsed} from "@/global/Constants.ts";
+
+const router = useRouter();
+const goBack = () => router.back();
 </script>
 <style scoped lang="less">
 .app-layout {
@@ -51,6 +58,7 @@ import {collapsed, toggleCollapsed} from "@/global/Constants.ts";
     width: 100%;
     height: calc(100vh - 33px);
     transform: scale(1);
+    overflow: auto;
   }
 }
 </style>

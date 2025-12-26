@@ -1,7 +1,7 @@
 <template>
   <div class="aside-header">
     <div class="header-left">
-      <t-button theme="primary" size="small" variant="text" shape="square" @click="toggleCollapsed()">
+      <t-button theme="primary" variant="text" shape="square" @click="toggleCollapsed()">
         <template #icon>
           <menu-fold-icon/>
         </template>
@@ -9,12 +9,12 @@
       <span class="header-title">亦无悔</span>
     </div>
     <div class="header-actions">
-      <t-button theme="primary" size="small" variant="text" shape="square" :disabled="disableBack" @click="goBack">
+      <t-button theme="primary" variant="text" shape="square" :disabled="disableBack" @click="goBack">
         <template #icon>
           <chevron-left-icon/>
         </template>
       </t-button>
-      <t-button theme="primary" size="small" variant="text" shape="square" :disabled="disableHome" @click="goHome">
+      <t-button theme="primary" variant="text" shape="square" :disabled="disableHome" @click="goHome">
         <template #icon>
           <home-icon/>
         </template>

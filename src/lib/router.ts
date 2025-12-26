@@ -75,9 +75,14 @@ export const router = createRouter({
     }]
   }, {
     name: "app",
-    path: "/app",
+    path: "/app/tool",
+    redirect: '/app/tool/home',
     component: () => import('@/pages/app/index.vue'),
     children: [{
+      name: 'AppHome',
+      path: 'home',
+      component: () => import('@/pages/app/home/app-home.vue')
+    }, {
       name: 'AppRegex',
       path: 'regex',
       component: () => import('@/pages/app/regex/app-regex.vue')

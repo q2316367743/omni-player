@@ -12,6 +12,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AppToolLayout: typeof import('./src/components/PageLayout/AppToolLayout.vue')['default']
     ArtPlayer: typeof import('./src/components/VideoPlayer/ArtPlayer.vue')['default']
     EmptyResult: typeof import('./src/components/Result/EmptyResult.vue')['default']
     InfoResult: typeof import('./src/components/Result/InfoResult.vue')['default']
@@ -34,6 +35,7 @@ declare module 'vue' {
     TCheckbox: typeof import('tdesign-vue-next')['Checkbox']
     TCheckboxGroup: typeof import('tdesign-vue-next')['CheckboxGroup']
     TContent: typeof import('tdesign-vue-next')['Content']
+    TDivider: typeof import('tdesign-vue-next')['Divider']
     TEmpty: typeof import('tdesign-vue-next')['Empty']
     TForm: typeof import('tdesign-vue-next')['Form']
     TFormItem: typeof import('tdesign-vue-next')['FormItem']
@@ -68,6 +70,7 @@ declare module 'vue' {
 
 // For TSX support
 declare global {
+  const AppToolLayout: typeof import('./src/components/PageLayout/AppToolLayout.vue')['default']
   const ArtPlayer: typeof import('./src/components/VideoPlayer/ArtPlayer.vue')['default']
   const EmptyResult: typeof import('./src/components/Result/EmptyResult.vue')['default']
   const InfoResult: typeof import('./src/components/Result/InfoResult.vue')['default']
@@ -90,6 +93,7 @@ declare global {
   const TCheckbox: typeof import('tdesign-vue-next')['Checkbox']
   const TCheckboxGroup: typeof import('tdesign-vue-next')['CheckboxGroup']
   const TContent: typeof import('tdesign-vue-next')['Content']
+  const TDivider: typeof import('tdesign-vue-next')['Divider']
   const TEmpty: typeof import('tdesign-vue-next')['Empty']
   const TForm: typeof import('tdesign-vue-next')['Form']
   const TFormItem: typeof import('tdesign-vue-next')['FormItem']
