@@ -1,5 +1,5 @@
 <template>
-  <app-tool-layout>
+  <app-tool-layout title="正则表达式工具">
     <div class="regex-tool">
       <div class="regex-section">
         <div class="regex-input-wrapper">
