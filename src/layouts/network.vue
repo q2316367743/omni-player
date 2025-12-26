@@ -3,13 +3,12 @@
     <template #header>
       <t-head-menu v-model="value">
         <t-menu-item :value="home">首页</t-menu-item>
-        <t-menu-item :value="video">分类</t-menu-item>
         <t-menu-item :value="search">搜索</t-menu-item>
       </t-head-menu>
     </template>
     <template #content>
       <router-view v-slot="{ Component, route }">
-        <keep-alive :include="['NetworkHome']">
+        <keep-alive :include="['NetworkHome', 'NetworkSearch']">
           <component :is="Component" :key="route.fullPath"/>
         </keep-alive>
       </router-view>

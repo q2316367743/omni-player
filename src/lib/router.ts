@@ -67,11 +67,7 @@ export const router = createRouter({
       path: ':id/detail/:mediaId',
       component: () => import('@/pages/network/detail/index.vue')
     }, {
-      name: '网络服务 - 分类',
-      path: ':id/video',
-      component: () => import('@/pages/network/video/index.vue')
-    }, {
-      name: '网络服务 - 搜索',
+      name: 'NetworkSearch',
       path: ':id/search',
       component: () => import('@/pages/network/search/index.vue')
     }]

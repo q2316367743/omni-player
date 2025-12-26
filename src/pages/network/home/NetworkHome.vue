@@ -47,7 +47,7 @@
       <!-- 视频网格 -->
       <div v-else class="video-content">
         <div class="video-grid">
-          <HomeVideoCard v-for="item in items" :item="item" :key="`video-${item.id}`" @click="goToDetail"/>
+          <NetworkVideoCard v-for="item in items" :item="item" :key="`video-${item.id}`" @click="goToDetail"/>
         </div>
 
         <!-- 加载更多提示 -->
@@ -77,7 +77,6 @@ import type {NetworkCategory} from '@/modules/network/types/NetworkCategory';
 import type {INetworkServer} from '@/modules/network/INetworkServer';
 import type {NetworkListItem} from '@/modules/network/types/NetworkListItem';
 import MessageUtil from "@/util/model/MessageUtil.ts";
-import HomeVideoCard from '@/pages/network/home/components/HomeVideoCard.vue';
 
 const route = useRoute();
 const router = useRouter();

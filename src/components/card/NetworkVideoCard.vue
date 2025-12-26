@@ -126,8 +126,8 @@ import {
   UserIcon,
   VideoIcon
 } from "tdesign-icons-vue-next"
-import type {NetworkListItem} from '@/modules/network/types/NetworkListItem';
-import {setNetworkListItem} from '../../components/detail';
+import type {NetworkListItem} from '@/modules/network/types/NetworkListItem.ts';
+import {setNetworkListItem} from '../../pages/network/components/detail.ts';
 import {createWindows} from "@/lib/windows.ts";
 
 interface Props {

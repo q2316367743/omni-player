@@ -6,13 +6,13 @@
           <div class="subscribe-aside__title">
             <div class="subscribe-aside__title-text">
               <div class="subscribe-aside__name">
-                <t-button v-if="collapsed" theme="primary" size="small" variant="text" shape="square"
+                <t-button v-if="collapsed" theme="primary" size="small" variant="text" shape="square" class="mr-8px"
                           @click="toggleCollapsed()">
                   <template #icon>
                     <menu-icon/>
                   </template>
                 </t-button>
-                <span class="ml-8px">{{ subscribe?.name || 'RSS' }}</span>
+                <span>{{ subscribe?.name || 'RSS' }}</span>
               </div>
               <div class="subscribe-aside__sub">
                 <span class="subscribe-aside__sub-item">已加载 {{ feeds.length }}/{{ total }}</span>
