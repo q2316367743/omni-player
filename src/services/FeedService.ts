@@ -6,6 +6,7 @@ import {fetchFeedItems} from "@/modules/subscribe";
 import {map} from "@/util";
 import {fetchFeedContent} from "@/modules/subscribe/FeedContentFetch.ts";
 import {logDebug} from "@/lib/log.ts";
+import {useSubscribeStore} from "@/store/SubscribeStore.ts";
 
 export async function listFeed(subscribeId: string, page: number, pageSize: number, keyword?: string): Promise<PageResponse<FeedItem>> {
   const query = await useSql().query<FeedItem>(TableName.FEED_ITEM);
@@ -42,7 +43,8 @@ export async function refreshFeed(subscribeId: string) {
     logDebug(`订阅「${subscribeId}」有 feed 共 ${count} 个`)
     await subscribeMapper.updateById(subscribeId, {
       count
-    })
+    });
+    useSubscribeStore().refresh();
   }
 
 

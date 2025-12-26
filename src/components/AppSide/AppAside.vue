@@ -21,11 +21,6 @@
             <home-icon/>
           </template>
         </t-button>
-        <t-button variant="text" shape="square" size="small" theme="primary">
-          <template #icon>
-            <add-icon/>
-          </template>
-        </t-button>
       </div>
     </div>
 
@@ -56,7 +51,8 @@
       <div class="nav-group">
         <div class="group-title">
           <span>网络资源</span>
-          <t-button class="ml-auto" theme="primary" size="small" variant="text" shape="square">
+          <t-button class="ml-auto" theme="primary" size="small" variant="text" shape="square"
+                    @click="openSearchModelWrap()">
             <template #icon>
               <search-icon/>
             </template>
@@ -84,7 +80,7 @@
         <div class="group-title justify-between">
           <div>订阅源</div>
           <div class="flex gap-4px">
-            <t-button theme="primary" size="small" variant="text" shape="square" @click="run()">
+            <t-button theme="primary" size="small" variant="text" shape="square" @click="subscribeStore.refresh()">
               <template #icon>
                 <refresh-icon/>
               </template>
@@ -97,7 +93,7 @@
             </t-button>
           </div>
         </div>
-        <div v-for="sub in subscriptions" :key="sub.id" @click="jumpSubscribe(sub.id)"
+        <div v-for="sub in subscribes" :key="sub.id" @click="jumpSubscribe(sub.id)"
              :class="{active: isActive(sub.id, 'subscribe'), 'nav-item' : true}"
              @contextmenu="openSubscribeContextmenuWrap(sub, $event)">
           <div class="nav-item-content">
@@ -153,10 +149,10 @@ import PlexIcon from "@/modules/icon/PlexIcon.vue";
 import {openMediaContextmenu, openMediaServerEdit} from "@/components/AppSide/func/MediaServerEdit.tsx";
 import {openNetworkContextmenu, openNetworkServerEdit} from "@/components/AppSide/func/NetworkServerEdit.tsx";
 import {toggleCollapsed} from "@/global/Constants.ts";
-import {useRequest} from "@/hooks/UseRequest.ts";
-import {listSubscribe} from "@/services";
 import {openSubscribeContextmenu, openSubscribeEdit} from "@/components/AppSide/func/SubscribeEdit.tsx";
 import type {SubscribeItem} from "@/entity/subscribe";
+import {openSearchModel} from "@/util/model/SearchUtil.tsx";
+import {useSubscribeStore} from "@/store/SubscribeStore.ts";
 
 const router = useRouter();
 const route = useRoute();
@@ -183,9 +179,8 @@ const networks = computed(() => {
 });
 
 
-const {data: subscriptions, run} = useRequest(listSubscribe, {
-  defaultValue: []
-})
+const subscribeStore = useSubscribeStore();
+const subscribes = computed(() => subscribeStore.subscribes);
 
 const goBack = () => router.back();
 const goHome = () => router.replace('/home');
@@ -206,8 +201,11 @@ const getMediaIcon = (type: MediaServerType) => {
       return PlexIcon;
   }
 };
-const openSubscribeEditWrap = () => openSubscribeEdit(run);
-const openSubscribeContextmenuWrap = (server: SubscribeItem, e: PointerEvent) => openSubscribeContextmenu(run, server, e)
+const openSubscribeEditWrap = () => openSubscribeEdit(subscribeStore.refresh);
+const openSubscribeContextmenuWrap = (server: SubscribeItem, e: PointerEvent) => openSubscribeContextmenu(subscribeStore.refresh, server, e)
+const openSearchModelWrap = () => {
+  openSearchModel()
+}
 </script>
 
 <style scoped lang="less">

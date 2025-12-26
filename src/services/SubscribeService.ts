@@ -3,21 +3,11 @@ import {useSql} from "@/lib/sql.ts";
 import {TableName} from "@/global/TableName.ts";
 import {logError} from "@/lib/log.ts";
 import {getFaviconUrl} from "@/util/file/website.ts";
-import {fetchFeedItems} from "@/modules/subscribe";
+import {refreshFeed} from "@/services/FeedService.ts";
 
 export async function listSubscribe() {
   const query = await useSql().query<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
   return query.list();
-}
-
-async function refreshFeedItem(id: string) {
-  const subscribeItemQuery = await useSql().query<SubscribeItem>(TableName.SUBSCRIBE_ITEM);
-  const item = await subscribeItemQuery.eq('id', id).one();
-  if (!item) return Promise.reject(new Error("订阅项未知道"))
-
-  const feedItemMapper = await useSql().mapper<FeedItem>(TableName.FEED_ITEM);
-  const feedItems = await fetchFeedItems(item);
-  await feedItemMapper.insertBatch(feedItems);
 }
 
 export async function addSubscribe(subscribe: SubscribeItemEdit) {
@@ -42,7 +32,7 @@ export async function addSubscribe(subscribe: SubscribeItemEdit) {
 
   // 第一次刷新
 
-  refreshFeedItem(item.id).catch(() => logError(`第一次刷新 ${subscribe.name} 失败`));
+  refreshFeed(item.id).catch(() => logError(`第一次刷新 ${subscribe.name} 失败`));
 
 }
 
@@ -81,7 +71,7 @@ export async function updateSubscribe(id: string, subscribe: SubscribeItemEdit) 
       await feedContentQuery.eq('subscribe_id', id).delete();
     });
     // 请求新的 rss
-    refreshFeedItem(id).catch(() => logError(`第一次刷新 ${subscribe.name} 失败`));
+    refreshFeed(id).catch(() => logError(`第一次刷新 ${subscribe.name} 失败`));
   }
 
 }

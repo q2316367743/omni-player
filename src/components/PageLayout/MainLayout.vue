@@ -36,7 +36,7 @@ import {collapsed, toggleCollapsed} from "@/global/Constants.ts";
     top: 0;
     left: 0;
     width: 100%;
-    height: 32px;
+    height: 56px;
     border-bottom: 1px solid var(--td-border-level-1-color);
     display: flex;
     align-items: center;
@@ -46,7 +46,7 @@ import {collapsed, toggleCollapsed} from "@/global/Constants.ts";
 
   .app-layout-content {
     position: absolute;
-    top: 33px;
+    top: 57px;
     left: 0;
     width: 100%;
     height: calc(100vh - 33px);

@@ -344,7 +344,6 @@ function onContentClick(e: MouseEvent) {
   max-width: 920px;
   margin: 14px auto 0;
   padding: 18px 18px 22px;
-  border: 1px solid var(--td-border-level-1-color);
   border-radius: 14px;
   background-color: var(--td-bg-color-container);
   overflow-x: hidden;
