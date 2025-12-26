@@ -15,6 +15,8 @@
       <!-- 订阅 -->
       <AppAsideSubscribe :active-key="activeKey"/>
 
+      <AppAsideApp :active-key="activeKey"/>
+
       <!-- Notes Section -->
       <div class="nav-group">
         <div class="group-title">笔记</div>
@@ -49,6 +51,7 @@ import AppAsideMedia from "@/layouts/AppSide/components/AppAsideMedia.vue";
 import AppAsideNetwork from "@/layouts/AppSide/components/AppAsideNetwork.vue";
 import AppAsideSubscribe from "@/layouts/AppSide/components/AppAsideSubscribe.vue";
 import AppAsideHeader from "@/layouts/AppSide/components/AppAsideHeader.vue";
+import AppAsideApp from "@/layouts/AppSide/components/AppAsideApp.vue";
 
 const route = useRoute();
 
