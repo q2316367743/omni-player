@@ -109,7 +109,7 @@ function normalizeEntry(entry: RssLikeItem, subscribeId: string, now: number): F
   return {
     created_at: now,
     updated_at: now,
-    is_read: false,
+    is_read: 0,
     signal,
     title: title || "",
     link: link || "",

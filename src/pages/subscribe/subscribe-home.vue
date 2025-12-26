@@ -103,6 +103,7 @@ async function run() {
   try {
     const data = await listFeed(subscribeId.value, page.value, pageSize.value, keyword.value);
     if (page.value === 1) {
+      console.log(data)
       feeds.value = data.records;
     } else {
       feeds.value.push(...data.records);
@@ -132,6 +133,7 @@ function onRefresh() {
 const jumpInfo = (feed: FeedItem) => {
   const target = `/subscribe/${subscribeId.value}/${feed.id}`;
   if (router.currentRoute.value.fullPath !== target) router.push(target);
+  feed.is_read = 1;
 };
 
 function loadMore() {

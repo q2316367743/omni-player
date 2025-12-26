@@ -55,12 +55,6 @@ export async function updateSubscribe(id: string, subscribe: SubscribeItemEdit) 
     sequence: subscribe.sequence,
   });
   // 异步获取图标
-  (async () => {
-
-    const favicon = await getFaviconUrl(subscribe.url);
-
-    await mapper.updateById(id, {icon: favicon});
-  })().catch(() => logError(`获取图标 ${subscribe.name} 失败`));
 
   if (old.url !== subscribe.url) {
     // 链接发生改变，删除旧的全部 rss
@@ -71,7 +65,14 @@ export async function updateSubscribe(id: string, subscribe: SubscribeItemEdit) 
       await feedContentQuery.eq('subscribe_id', id).delete();
     });
     // 请求新的 rss
-    refreshFeed(id).catch(() => logError(`第一次刷新 ${subscribe.name} 失败`));
+    refreshFeed(id)
+      .then(() => {
+        (async () => {
+          const favicon = await getFaviconUrl(subscribe.url);
+          await mapper.updateById(id, {icon: favicon});
+        })().catch(() => logError(`获取图标 ${subscribe.name} 失败`));
+      })
+      .catch(() => logError(`第一次刷新 ${subscribe.name} 失败`));
   }
 
 }

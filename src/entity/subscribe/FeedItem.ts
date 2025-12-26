@@ -18,7 +18,7 @@ export interface FeedItem {
   //  摘要
   summary: string;
   // 是否已读
-  is_read: boolean;
+  is_read: number;
   // 是否已获取内容
   content_fetched: boolean;
 }

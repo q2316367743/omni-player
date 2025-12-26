@@ -61,7 +61,7 @@ export async function getFeedContent(feedId: string): Promise<FeedWrapper> {
 
   if (!feed.is_read) {
     const feedMapper = await useSql().mapper<FeedItem>(TableName.FEED_ITEM)
-    await feedMapper.updateById(feedId, {is_read: true})
+    await feedMapper.updateById(feedId, {is_read: 1})
   }
 
   const feedContentQuery = await useSql().query<FeedContent>(TableName.FEED_CONTENT)
