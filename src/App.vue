@@ -10,6 +10,7 @@
 </template>
 <script lang="ts" setup>
 import {collapsed} from "@/global/Constants.ts";
+import AppAside from "@/layouts/AppSide/AppAside.vue";
 </script>
 <style lang="less">
 </style>

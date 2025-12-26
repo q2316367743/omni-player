@@ -6,10 +6,11 @@ import {DeleteIcon, EditIcon} from "tdesign-icons-vue-next";
 import MessageBoxUtil from "@/util/model/MessageBoxUtil.tsx";
 import {buildSubscribeItemEdit, type SubscribeItem, type SubscribeItemEdit} from "@/entity/subscribe";
 import {addSubscribe, removeSubscribe, updateSubscribe} from "@/services";
+import {cloneDeep} from "es-toolkit";
 
-export function openSubscribeEdit(onUpdate: () => void,old?: SubscribeItem) {
+export function openSubscribeEdit(onUpdate: () => void, old?: SubscribeItem) {
 
-  const server = ref<SubscribeItemEdit>(old || buildSubscribeItemEdit());
+  const server = ref<SubscribeItemEdit>(old ? cloneDeep(old) : buildSubscribeItemEdit());
   const update = !!old;
 
 
@@ -38,7 +39,7 @@ export function openSubscribeEdit(onUpdate: () => void,old?: SubscribeItem) {
           plugin.destroy?.();
           onUpdate();
         }).catch(e => {
-          console.error(e);
+        console.error(e);
         MessageUtil.error("操作失败", e)
       });
     }
