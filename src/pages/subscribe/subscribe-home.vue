@@ -38,9 +38,9 @@
         />
       </div>
 
-      <div class="subscribe-aside__list" tabindex="0">
+      <div class="subscribe-aside__list" tabindex="0" @scroll="onScroll">
         <div
-          v-for="feed in filteredFeeds"
+          v-for="feed in feeds"
           :key="feed.id"
           class="feed-item"
           :class="{active: activeFeedId === feed.id}"
@@ -56,7 +56,11 @@
           <div class="feed-item__time">{{ formatDate(feed.pub_date, 'MM-DD') }}</div>
         </div>
 
-        <div v-if="!filteredFeeds.length" class="feed-empty">
+        <div v-if="loading && page > 1" class="feed-loading">
+          <t-loading size="small" />
+        </div>
+
+        <div v-if="!feeds.length && !loading" class="feed-empty">
           <div class="feed-empty__title">暂无内容</div>
           <div class="feed-empty__desc">尝试刷新或调整搜索关键词</div>
           <t-button size="small" variant="outline" :loading="refreshing" @click="onRefresh()">刷新</t-button>
@@ -82,35 +86,41 @@ const router = useRouter();
 
 const subscribe = ref<SubscribeItem>();
 const page = ref(1);
-const pageSize = ref(10);
+const pageSize = ref(20);
 const total = ref(0);
 const feeds = ref(new Array<FeedItem>());
 const keyword = ref("");
 const refreshing = ref(false);
+const loading = ref(false);
+const hasMore = ref(true);
 
 const subscribeId = computed(() => route.params.subscribeId as string);
 const activeFeedId = computed(() => route.params.feedId as string | undefined);
 const unreadCount = computed(() => feeds.value.filter(e => !e.is_read).length);
-const filteredFeeds = computed(() => {
-  const key = keyword.value.trim().toLowerCase();
-  if (!key) return feeds.value;
-  return feeds.value.filter((feed) => {
-    const title = (feed.title || "").toLowerCase();
-    const summary = (feed.summary || "").toLowerCase();
-    return title.includes(key) || summary.includes(key);
-  });
-});
 
 async function run() {
-  const data = await listFeed(subscribeId.value, page.value, pageSize.value);
-  feeds.value = data.records;
-  total.value = data.total;
+  loading.value = true;
+  try {
+    const data = await listFeed(subscribeId.value, page.value, pageSize.value, keyword.value);
+    if (page.value === 1) {
+      feeds.value = data.records;
+    } else {
+      feeds.value.push(...data.records);
+    }
+    total.value = data.total;
+    hasMore.value = feeds.value.length < data.total;
+  } finally {
+    loading.value = false;
+  }
 }
 
 function onRefresh() {
   refreshing.value = true;
   refreshFeed(subscribeId.value)
-    .then(() => run())
+    .then(() => {
+      page.value = 1;
+      return run();
+    })
     .catch(e => {
       MessageUtil.error("刷新失败", e);
     })
@@ -124,13 +134,33 @@ const jumpInfo = (feed: FeedItem) => {
   if (router.currentRoute.value.fullPath !== target) router.push(target);
 };
 
+function loadMore() {
+  if (loading.value || !hasMore.value) return;
+  page.value++;
+  run();
+}
+
+function onScroll(e: Event) {
+  const target = e.target as HTMLElement;
+  const {scrollTop, scrollHeight, clientHeight} = target;
+  if (scrollHeight - scrollTop - clientHeight < 50) {
+    loadMore();
+  }
+}
+
+watch(keyword, () => {
+  page.value = 1;
+  run();
+});
+
 watch(subscribeId, async () => {
   subscribe.value = await getSubscribe(subscribeId.value);
   page.value = 1;
-  pageSize.value = 10;
+  pageSize.value = 20;
   total.value = 0;
   feeds.value = [];
   keyword.value = "";
+  hasMore.value = true;
   await run();
   const currentFeedId = route.params.feedId as string | undefined;
   if (!currentFeedId) {
@@ -332,6 +362,12 @@ watch(subscribeId, async () => {
 .feed-empty__desc {
   font-size: 12px;
   color: var(--td-text-color-secondary);
+}
+
+.feed-loading {
+  display: flex;
+  justify-content: center;
+  padding: 12px;
 }
 
 </style>

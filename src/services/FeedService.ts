@@ -7,9 +7,14 @@ import {map} from "@/util";
 import {fetchFeedContent} from "@/modules/subscribe/FeedContentFetch.ts";
 import {logDebug} from "@/lib/log.ts";
 
-export async function listFeed(subscribeId: string, page: number, pageSize: number): Promise<PageResponse<FeedItem>> {
+export async function listFeed(subscribeId: string, page: number, pageSize: number, keyword?: string): Promise<PageResponse<FeedItem>> {
   const query = await useSql().query<FeedItem>(TableName.FEED_ITEM);
-  return query.eq('subscribe_id', subscribeId).orderByDesc('pub_date').page(page, pageSize)
+  let q = query.eq('subscribe_id', subscribeId).orderByDesc('pub_date');
+  if (keyword && keyword.trim()) {
+    const key = keyword.trim();
+    q = q.like('title', key).lastSql(`or \`summary\` like '%${key}%'`);
+  }
+  return q.page(page, pageSize)
 }
 
 export async function refreshFeed(subscribeId: string) {

@@ -3,7 +3,7 @@
     <t-aside :width="collapsed ? '0' : '232px'">
       <app-aside/>
     </t-aside>
-    <t-content class="h-full relative">
+    <t-content class="h-full relative z-2">
       <router-view/>
     </t-content>
   </t-layout>

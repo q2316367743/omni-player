@@ -31,6 +31,7 @@
 
     <!-- Scrollable Content -->
     <div class="aside-content">
+
       <!-- 媒体库 -->
       <div class="nav-group">
         <div class="group-title">
@@ -50,11 +51,17 @@
           </div>
         </div>
       </div>
+
       <!-- 网络库 -->
       <div class="nav-group">
         <div class="group-title">
           <span>网络资源</span>
-          <t-button class="ml-auto" theme="primary" size="small" variant="text" shape="square"
+          <t-button class="ml-auto" theme="primary" size="small" variant="text" shape="square">
+            <template #icon>
+              <search-icon/>
+            </template>
+          </t-button>
+          <t-button class="ml-4px" theme="primary" size="small" variant="text" shape="square"
                     @click="openNetworkServerEdit()">
             <template #icon>
               <add-icon/>
@@ -74,19 +81,21 @@
 
       <!-- 订阅 -->
       <div class="nav-group">
-        <div class="group-title">
-          <span>订阅源</span>
-          <t-button class="ml-auto" theme="primary" size="small" variant="text" shape="square" @click="run()">
-            <template #icon>
-              <refresh-icon/>
-            </template>
-          </t-button>
-          <t-button class="ml-4px" theme="primary" size="small" variant="text" shape="square"
-                    @click="openSubscribeEditWrap()">
-            <template #icon>
-              <add-icon/>
-            </template>
-          </t-button>
+        <div class="group-title justify-between">
+          <div>订阅源</div>
+          <div class="flex gap-4px">
+            <t-button theme="primary" size="small" variant="text" shape="square" @click="run()">
+              <template #icon>
+                <refresh-icon/>
+              </template>
+            </t-button>
+            <t-button theme="primary" size="small" variant="text" shape="square"
+                      @click="openSubscribeEditWrap()">
+              <template #icon>
+                <add-icon/>
+              </template>
+            </t-button>
+          </div>
         </div>
         <div v-for="sub in subscriptions" :key="sub.id" @click="jumpSubscribe(sub.id)"
              :class="{active: isActive(sub.id, 'subscribe'), 'nav-item' : true}"
@@ -134,7 +143,7 @@ import {
   AddIcon,
   LogoGithubIcon,
   FileIcon,
-  SettingIcon, HomeIcon, ChevronLeftIcon, MenuFoldIcon, InternetIcon, RefreshIcon
+  SettingIcon, HomeIcon, ChevronLeftIcon, MenuFoldIcon, InternetIcon, RefreshIcon, SearchIcon
 } from 'tdesign-icons-vue-next';
 import {useMediaServerStore, useNetworkServerStore} from "@/store";
 import type {MediaServerType} from "@/entity/MediaServer.ts";
