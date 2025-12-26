@@ -11,6 +11,10 @@
 <script lang="ts" setup>
 import {collapsed} from "@/global/Constants.ts";
 import AppAside from "@/layouts/AppSide/AppAside.vue";
+import {setupRefreshFeedTask} from "@/modules/subscribe/RefreshFeedTask.ts";
+
+// 注册定时刷新任务
+setupRefreshFeedTask();
 </script>
 <style lang="less">
 </style>

@@ -6,15 +6,8 @@ export const router = createRouter({
   routes: [{
     name: "首页",
     path: '/',
-    redirect: '/home',
-    component: () => import('@/layouts/default.vue'),
-    children: [
-      {
-        name: '主页',
-        path: '/home',
-        component: () => import('@/pages/home/home-index.vue')
-      }
-    ]
+    alias: '/home',
+    component: () => import('@/pages/home/home-index.vue'),
   }, {
     name: "管理后台",
     path: "/admin",
