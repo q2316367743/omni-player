@@ -53,6 +53,10 @@
       user-select: none;
       display: flex;
       align-items: center;
+      .group-title-text {
+        user-select: none;
+        cursor: pointer;
+      }
     }
   }
 
@@ -101,7 +105,18 @@
       }
     }
 
-    .count-badge {
+    .folder-count-badge {
+      font-size: 11px;
+      background-color: var(--td-bg-color-component); // Light reddish grey
+      color: var(--td-text-color-secondary);
+      padding: 1px 6px;
+      border-radius: 10px;
+      min-width: 16px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .item-count-badge {
       font-size: 11px;
       background-color: #f0e6e6; // Light reddish grey
       color: #b85c5c;

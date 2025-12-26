@@ -10,6 +10,7 @@ export interface TreeNode {
   children?: TreeNode[];
   data?: SubscribeItem;
   expanded?: boolean;
+  count?: number;
 }
 
 export const useSubscribeStore = defineStore('subscribe', () => {
@@ -25,6 +26,20 @@ export const useSubscribeStore = defineStore('subscribe', () => {
   const subscribeTree = computed(() => {
     const tree: TreeNode[] = [];
     const folderMap = new Map<string, TreeNode>();
+
+    const calculateCount = (node: TreeNode): number => {
+      if (node.type === 'item') {
+        const count = node.data?.count || 0;
+        node.count = count;
+        return count;
+      }
+      if (node.type === 'folder' && node.children) {
+        const count = node.children.reduce((sum, child) => sum + calculateCount(child), 0);
+        node.count = count;
+        return count;
+      }
+      return 0;
+    };
 
     const getOrCreateFolder = (path: string): TreeNode | null => {
       if (!path) return null;
@@ -87,6 +102,8 @@ export const useSubscribeStore = defineStore('subscribe', () => {
         });
       }
     });
+
+    tree.forEach(node => calculateCount(node));
 
     return tree;
   });

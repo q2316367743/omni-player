@@ -31,5 +31,10 @@ export const LocalName = {
 
   PAGE_MEDIA_COLLECTION_SORT_BY: "/page/media/collection/sortBy",
 
-  PAGE_MEDIA_COLLECTION_SORT_ORDER: "/page/media/collection/sortOrder"
+  PAGE_MEDIA_COLLECTION_SORT_ORDER: "/page/media/collection/sortOrder",
+
+  // '/app/aside/subscribe/expanded'
+  APP_ASIDE_SUBSCRIBE_EXPANDED: '/app/aside/subscribe/expanded',
+  APP_ASIDE_MEDIA_EXPANDED: '/app/aside/media/expanded',
+  APP_ASIDE_NETWORK_EXPANDED: '/app/aside/network/expanded',
 }

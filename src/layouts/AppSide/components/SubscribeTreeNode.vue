@@ -28,7 +28,7 @@
           <span class="nav-text">{{ node.name }}</span>
         </template>
       </div>
-      <span v-if="node.data?.count" class="count-badge">{{ node.data.count }}</span>
+      <span v-if="node.count" :class="node.type === 'folder' ? 'folder-count-badge' : 'item-count-badge'">{{ node.count }}</span>
     </div>
     <div v-if="node.type === 'folder' && expanded && node.children" class="tree-children">
       <SubscribeTreeNode 
