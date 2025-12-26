@@ -22,7 +22,6 @@ const router = useRouter();
 const value = ref(`/network/${route.params.id}/home`)
 
 const home = computed(() => `/network/${route.params.id}/home`);
-const video = computed(() => `/network/${route.params.id}/video`);
 const search = computed(() => `/network/${route.params.id}/search`);
 
 watch(value, val => {

@@ -1,9 +1,9 @@
 <template>
   <MainLayout>
     <template #header>
-      <t-button v-for="menu in menus" :key="menu.path" :theme="menu.value" size="small" @click="jumpTo(menu)">
-        {{ menu.label }}
-      </t-button>
+      <t-head-menu v-model="value">
+        <t-menu-item v-for="menu in menus" :key="menu.value" :value="menu.value">{{ menu.label }}</t-menu-item>
+      </t-head-menu>
     </template>
     <template #content>
       <router-view v-slot="{ Component, route }">
@@ -18,8 +18,7 @@
 
 interface MenuItem {
   label: string;
-  path: string;
-  value: 'primary' | 'default'
+  value: string;
 }
 
 const route = useRoute();
@@ -35,34 +34,31 @@ const collection = computed(() => `/media/${route.params.id}/collection`);
 const menus = computed<Array<MenuItem>>(() => ([
   {
     label: '全部',
-    path: home.value,
-    value: home.value === value.value ? 'primary' : 'default'
+    value: home.value
   },
   {
     label: '电影',
-    path: movie.value,
-    value: movie.value === value.value ? 'primary' : 'default'
+    value: movie.value
   },
   {
     label: '剧集',
-    path: series.value,
-    value: series.value === value.value ? 'primary' : 'default'
+    value: series.value
   },
   {
     label: '已收藏',
-    path: collection.value,
-    value: collection.value === value.value ? 'primary' : 'default'
+    value: collection.value
   }
 ]))
 
+watch(value, val => {
+  router.push(val);
+});
 watch(() => route.path, val => {
   if (val !== value.value) {
     value.value = val;
   }
 })
-const jumpTo = (item: MenuItem) => {
-  router.push(item.path);
-}
+
 </script>
 <style scoped lang="less">
 </style>

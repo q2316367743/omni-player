@@ -33,6 +33,9 @@ export const LocalName = {
 
   PAGE_MEDIA_COLLECTION_SORT_ORDER: "/page/media/collection/sortOrder",
 
+  PAGE_HOME_SHI_CI_TIME: '/page/home/shi_ci/time',
+  PAGE_HOME_SHI_CI_TEXT: '/page/home/shi_ci/text',
+
   // '/app/aside/subscribe/expanded'
   APP_ASIDE_SUBSCRIBE_EXPANDED: '/app/aside/subscribe/expanded',
   APP_ASIDE_MEDIA_EXPANDED: '/app/aside/media/expanded',

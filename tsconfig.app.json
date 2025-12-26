@@ -25,6 +25,7 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
+    "src/vite-env.d.ts",
     "auto-imports.d.ts",
     "components.d.ts",
     "vite.config.ts"

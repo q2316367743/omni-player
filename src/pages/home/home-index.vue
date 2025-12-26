@@ -2,6 +2,10 @@
   <MainLayout>
     <template #content>
       <div class="home-container">
+        <div class="clock-wrapper">
+          <NowClock />
+        </div>
+
         <div class="home-content">
           <div class="welcome-section">
             <div class="welcome-text">
@@ -33,6 +37,7 @@
             </div>
           </div>
         </div>
+        <shi-ci />
       </div>
     </template>
   </MainLayout>
@@ -40,17 +45,17 @@
 
 <script lang="ts" setup>
 import MainLayout from "@/components/PageLayout/MainLayout.vue";
+import NowClock from "./components/NowClock.vue";
 import {useMediaServerStore, useNetworkServerStore} from "@/store";
 import {useRequest} from "@/hooks/UseRequest.ts";
 import {listSubscribe} from "@/services";
+import ShiCi from "@/pages/home/components/ShiCi.vue";
 
 
 const mediaCount = computed(() => useMediaServerStore().servers.length);
 const networkCount = computed(() => useNetworkServerStore().servers.length);
 const {data: subscriptions} = useRequest(listSubscribe, {defaultValue: []});
 const subscribeCount = computed(() => subscriptions.value.length);
-
-
 </script>
 
 <style scoped lang="less">
@@ -59,7 +64,9 @@ const subscribeCount = computed(() => subscriptions.value.length);
   height: calc(100% - 32px);
   overflow-y: auto;
   padding: 16px;
+  position: relative;
 }
+
 
 .home-content {
   max-width: 1200px;
