@@ -3,6 +3,7 @@ import {refreshFeed} from "@/services/FeedService.ts";
 import {logError, logInfo} from "@/lib/log.ts";
 
 const SPLIT = 15 * 60 * 1000;
+const PREFIX = 13 * 60 * 1000;
 
 export async function setupRefreshFeedTask() {
 
@@ -13,7 +14,7 @@ export async function setupRefreshFeedTask() {
     const subscribes = await listSubscribe();
     for (const subscribe of subscribes) {
       // 刷新
-      if (now - subscribe.updated_at < SPLIT) {
+      if (now - subscribe.updated_at < PREFIX) {
         logInfo(`${subscribe.name} 距上次刷新时间不足15分钟，跳过刷新`);
         continue;
       }

@@ -55,8 +55,8 @@ const subscribeCount = computed(() => subscriptions.value.length);
 
 <style scoped lang="less">
 .home-container {
-  width: 100%;
-  height: 100%;
+  width: calc(100% - 32px);
+  height: calc(100% - 32px);
   overflow-y: auto;
   padding: 16px;
 }
