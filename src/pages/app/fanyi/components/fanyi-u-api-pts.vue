@@ -621,6 +621,8 @@ onUnmounted(() => {
         color: var(--td-text-color-primary);
         min-height: 60px;
         position: relative;
+        white-space: pre-wrap;
+        word-wrap: break-word;
 
         &.translated {
           background: var(--td-success-color-1);

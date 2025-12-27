@@ -415,6 +415,8 @@ function getLanguageName(code: string): string {
         line-height: 1.6;
         color: var(--td-text-color-primary);
         min-height: 60px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
 
         &.translated {
           background: var(--td-success-color-1);

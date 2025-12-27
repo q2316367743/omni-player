@@ -43,6 +43,9 @@ export const LocalName = {
   PAGE_APP_FAN_YI_UAPIS_PAT_FAST_MODE: '/page/app/fan_yi/uapis/pat/fast_mode',
   PAGE_APP_FAN_YI_UAPIS_PTS_SOURCE_LANG: '/page/app/fan_yi/uapis/pts/source_lang',
   PAGE_APP_FAN_YI_UAPIS_PTS_TARGET_LANG: '/page/app/fan_yi/uapis/pts/fast_mode',
+  PAGE_APP_FAN_YI_PEAR_API_13_TYPE: '/page/app/fan_yi/pear/api_13/type',
+  PAGE_APP_FAN_YI_PEAR_API_303_SOURCE_LANG: '/page/app/fan_yi/pear/api_303/source_lang',
+  PAGE_APP_FAN_YI_PEAR_API_303_TARGET_LANG: '/page/app/fan_yi/pear/api_303/target_lang',
 
   // '/app/aside/subscribe/expanded'
   APP_ASIDE_SUBSCRIBE_EXPANDED: '/app/aside/subscribe/expanded',
