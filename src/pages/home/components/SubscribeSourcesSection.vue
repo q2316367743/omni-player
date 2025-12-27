@@ -6,17 +6,20 @@
         订阅源
       </h3>
       <div class="flex gap-4px">
-
-        <t-button theme="primary" size="small" variant="text" shape="square">
-          <template #icon>
-            <file-import-icon/>
-          </template>
-        </t-button>
-        <t-button theme="primary" size="small" variant="text" shape="square">
-          <template #icon>
-            <file-export-icon/>
-          </template>
-        </t-button>
+        <t-tooltip content="从opml导入">
+          <t-button theme="primary" size="small" variant="text" shape="square" @click="importSubscribe">
+            <template #icon>
+              <file-import-icon/>
+            </template>
+          </t-button>
+        </t-tooltip>
+        <t-tooltip content="导出为opml">
+          <t-button theme="primary" size="small" variant="text" shape="square" @click="exportSubscribe">
+            <template #icon>
+              <file-export-icon/>
+            </template>
+          </t-button>
+        </t-tooltip>
         <t-button theme="primary" size="small" variant="text" shape="square" @click="subscribeStore.refresh()">
           <template #icon>
             <refresh-icon/>
@@ -53,6 +56,7 @@ import type {SubscribeItem} from "@/entity/subscribe";
 import {useSubscribeStore} from "@/store/SubscribeStore.ts";
 import {openSubscribeContextmenu, openSubscribeEdit} from "@/pages/home/func/SubscribeEdit.tsx";
 import SubscribeTreeView from "./SubscribeTreeView.vue";
+import {exportSubscribe, importSubscribe} from "@/pages/home/func/SubscribeExtra.tsx";
 
 const router = useRouter();
 

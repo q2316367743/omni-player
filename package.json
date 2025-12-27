@@ -13,7 +13,7 @@
   "dependencies": {
     "@imengyu/vue3-context-menu": "^1.5.2",
     "@monaco-editor/loader": "^1.7.0",
-    "@tauri-apps/plugin-dialog": "~2.4.2",
+    "@tauri-apps/plugin-dialog": "~2",
     "@tauri-apps/plugin-fs": "~2.4.4",
     "@tauri-apps/plugin-http": "~2.5.4",
     "@tauri-apps/plugin-log": "~2",
