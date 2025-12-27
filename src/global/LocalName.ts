@@ -36,6 +36,14 @@ export const LocalName = {
   PAGE_HOME_SHI_CI_TIME: '/page/home/shi_ci/time',
   PAGE_HOME_SHI_CI_TEXT: '/page/home/shi_ci/text',
 
+  PAGE_APP_FAN_YI_INDEX_ACTIVE: '/page/app/fan_yi/index/active',
+
+  PAGE_APP_FAN_YI_UAPIS_PAT_SOURCE_LANG: '/page/app/fan_yi/uapis/pat/source_lang',
+  PAGE_APP_FAN_YI_UAPIS_PAT_TARGET_LANG: '/page/app/fan_yi/uapis/pat/target_lang',
+  PAGE_APP_FAN_YI_UAPIS_PAT_FAST_MODE: '/page/app/fan_yi/uapis/pat/fast_mode',
+  PAGE_APP_FAN_YI_UAPIS_PTS_SOURCE_LANG: '/page/app/fan_yi/uapis/pts/source_lang',
+  PAGE_APP_FAN_YI_UAPIS_PTS_TARGET_LANG: '/page/app/fan_yi/uapis/pts/fast_mode',
+
   // '/app/aside/subscribe/expanded'
   APP_ASIDE_SUBSCRIBE_EXPANDED: '/app/aside/subscribe/expanded',
   APP_ASIDE_MEDIA_EXPANDED: '/app/aside/media/expanded',

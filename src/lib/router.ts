@@ -90,6 +90,10 @@ export const router = createRouter({
       name: 'AppHttp',
       path: 'http',
       component: () => import('@/pages/app/http/app-http.vue')
+    }, {
+      name: 'AppFanyi',
+      path: 'fanyi',
+      component: () => import('@/pages/app/fanyi/app-fanyi.vue')
     }]
   }]
 });
