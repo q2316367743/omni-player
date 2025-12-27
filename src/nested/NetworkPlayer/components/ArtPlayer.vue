@@ -10,9 +10,11 @@ const props = withDefaults(defineProps<{
   url: string;
   type?: string;
   subtitleUrls?: string[];
+  initialPositionMs?: number;
 }>(), {
   type: undefined,
   subtitleUrls: () => [],
+  initialPositionMs: undefined,
 });
 type PlaybackState = 'playing' | 'paused' | 'stopped';
 type PlaybackPayload = { state: PlaybackState; positionMs: number; durationMs?: number };
@@ -20,7 +22,6 @@ type PlaybackPayload = { state: PlaybackState; positionMs: number; durationMs?: 
 const emit = defineEmits<{
   (e: 'next'): void;
   (e: 'playback', payload: PlaybackPayload): void;
-  (e: 'info'): void;
 }>();
 const art = shallowRef<Artplayer>();
 const videoRef = useTemplateRef<HTMLDivElement>('art-player');
@@ -162,16 +163,6 @@ onMounted(() => {
       url: selectedSubtitleUrl.value,
     },
 
-    controls: [
-      {
-        position: 'right',
-        html: '<svg t="1766212041318" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7314" width="32" height="32"><path d="M473.173333 220.586667a35.84 35.84 0 1 0 35.84-35.84 35.84 35.84 0 0 0-35.84 35.84z m157.013334 485.12h-85.333334V355.413333a35.84 35.84 0 0 0-35.84-35.84H413.013333a35.84 35.84 0 1 0 0 72.106667h60.16v314.026667h-85.333333a35.84 35.84 0 1 0 0 72.106666h242.346667a35.84 35.84 0 1 0 0-72.106666z m192.853333 117.333333A439.893333 439.893333 0 1 1 341.333333 106.666667a439.893333 439.893333 0 0 1 481.706667 716.373333zM512 0a512 512 0 1 0 512 512A512 512 0 0 0 512 0z" fill="#5E5C5C" p-id="7315"></path></svg>',
-        index: 1,
-        click() {
-          emit('info')
-        },
-      },
-    ],
     flip: true,
     playbackRate: true,
     aspectRatio: true,
@@ -192,6 +183,14 @@ onMounted(() => {
     emitPlayback('stopped', true);
     emit('next');
   })
+  if (typeof props.initialPositionMs === 'number' && props.initialPositionMs > 0) {
+    const initialSeconds = props.initialPositionMs / 1000;
+    art.value.once('video:loadedmetadata', () => {
+      if (art.value) {
+        art.value.currentTime = initialSeconds;
+      }
+    });
+  }
   art.value.play();
 });
 watch(() => props.url, async url => {
@@ -201,7 +200,18 @@ watch(() => props.url, async url => {
   lastKey = '';
   await art.value.switchUrl(url);
   applySelectedSubtitle();
+  if (typeof props.initialPositionMs === 'number' && props.initialPositionMs > 0) {
+    const initialSeconds = props.initialPositionMs / 1000;
+    art.value.currentTime = initialSeconds;
+  }
   await art.value.play();
+})
+watch(() => props.initialPositionMs, (newPos) => {
+  if (!art.value) return;
+  if (typeof newPos === 'number' && newPos > 0) {
+    const initialSeconds = newPos / 1000;
+    art.value.currentTime = initialSeconds;
+  }
 })
 watch(() => props.type, type => {
   if (!art.value || !type) return;

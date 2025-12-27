@@ -40,6 +40,12 @@ export interface MediaPlaybackInfo {
   transcodingSessionId?: string;
 
   /**
+   * 初始播放位置（毫秒）
+   * 用于从上次播放位置继续播放
+   */
+  initialPositionMs?: number;
+
+  /**
    * 额外参数（如 headers、cookies）
    */
   extra?: {

@@ -650,6 +650,12 @@ export class EmbyClient implements IMediaServer {
         isDefault: s.IsDefault,
       }));
 
+    let initialPositionMs: number | undefined = undefined;
+    const userData = (playbackData as any).UserData;
+    if (userData?.PlaybackPositionTicks) {
+      initialPositionMs = Math.floor(userData.PlaybackPositionTicks / 10_000);
+    }
+
     return {
       streamUrl,
       subtitleUrls,
@@ -657,6 +663,7 @@ export class EmbyClient implements IMediaServer {
       container,
       isDirectPlay: !transcodingUrl,
       transcodingSessionId: transcodingUrl ? (playbackData as { PlaySessionId?: string })?.PlaySessionId : undefined,
+      initialPositionMs,
       extra: {
         headers: {
           ...this.getAuthHeaders(),

@@ -490,6 +490,8 @@ export class PlexClient implements IMediaServer {
       }))
       .filter(s => s.id);
 
+    const initialPositionMs = typeof raw.viewOffset === "number" ? raw.viewOffset : undefined;
+
     if (typeof options?.maxBitrate === "number" && Number.isFinite(options.maxBitrate) && options.maxBitrate > 0) {
       await this.ensureClientIdentifier();
 
@@ -522,6 +524,7 @@ export class PlexClient implements IMediaServer {
         container: "m3u8",
         isDirectPlay: false,
         transcodingSessionId: session,
+        initialPositionMs,
       };
     }
 
@@ -531,6 +534,7 @@ export class PlexClient implements IMediaServer {
       audioTracks,
       container: mediaSource?.container || "mkv",
       isDirectPlay: true,
+      initialPositionMs,
       extra: {
         headers: {
           ...this.getAuthHeaders(),

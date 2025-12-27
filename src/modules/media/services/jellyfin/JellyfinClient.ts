@@ -799,6 +799,13 @@ export class JellyfinClient implements IMediaServer {
         isDefault: s.IsDefault,
       }));
 
+    // 获取上次播放位置
+    let initialPositionMs: number | undefined = undefined;
+    const userData = (playbackData as any).UserData;
+    if (userData?.PlaybackPositionTicks) {
+      initialPositionMs = Math.floor(userData.PlaybackPositionTicks / 10_000);
+    }
+
     return {
       streamUrl,
       subtitleUrls,
@@ -810,6 +817,7 @@ export class JellyfinClient implements IMediaServer {
       deviceId: 'tauri-desktop',
       accessToken: this.accessToken || '',
       playSessionId: (playbackData as { PlaySessionId?: string })?.PlaySessionId || `session-${Date.now()}`,
+      initialPositionMs,
     };
   }
 
