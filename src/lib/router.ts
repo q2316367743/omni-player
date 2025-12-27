@@ -9,6 +9,14 @@ export const router = createRouter({
     alias: '/home',
     component: () => import('@/pages/home/home-index.vue'),
   }, {
+    name: 'NetworkAggregation',
+    path: '/network/aggregation',
+    component: () => import('@/pages/network/aggregation/NetworkAggregation.vue')
+  }, {
+    name: '网络服务 - 影视详情',
+    path: '/network/:id/detail/:mediaId',
+    component: () => import('@/pages/network/detail/index.vue')
+  }, {
     name: "管理后台",
     path: "/admin",
     redirect: '/admin/global-setting',
@@ -55,10 +63,6 @@ export const router = createRouter({
       name: 'NetworkHome',
       path: ':id/home',
       component: () => import('@/pages/network/home/NetworkHome.vue')
-    }, {
-      name: '网络服务 - 影视详情',
-      path: ':id/detail/:mediaId',
-      component: () => import('@/pages/network/detail/index.vue')
     }, {
       name: 'NetworkSearch',
       path: ':id/search',

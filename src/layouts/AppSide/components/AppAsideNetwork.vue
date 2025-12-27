@@ -68,7 +68,16 @@ const toggleGroup = () => {
 const jumpNetwork = (id: string) => router.push(`/network/${id}/home`);
 
 const openSearchModelWrap = () => {
-  openSearchModel()
+  openSearchModel().then(keyword => {
+    if (!keyword) return;
+    router.push({
+      path: '/network/aggregation',
+      query: {
+        keyword
+      }
+    })
+
+  })
 }
 </script>
 <style scoped lang="less">
@@ -78,7 +87,7 @@ const openSearchModelWrap = () => {
     font-size: 12px;
     color: var(--td-text-color-secondary);
     transition: transform 0.2s;
-    
+
     &:hover {
       color: var(--td-text-color-primary);
     }

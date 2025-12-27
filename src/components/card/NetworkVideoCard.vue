@@ -129,6 +129,7 @@ import {
 import type {NetworkListItem} from '@/modules/network/types/NetworkListItem.ts';
 import {setNetworkListItem} from '../../pages/network/components/detail.ts';
 import {createWindows} from "@/lib/windows.ts";
+import {openNetworkDetail} from "@/pages/network/detail/network-detail.tsx";
 
 interface Props {
   item: NetworkListItem;
@@ -150,8 +151,9 @@ const handleImageError = (event: Event) => {
 // 处理卡片点击
 const handleClick = () => {
   // 这里可以添加跳转逻辑
-  setNetworkListItem(props.item);
-  router.push(`/network/${networkId}/detail/${props.item.id}`);
+  openNetworkDetail(networkId, props.item)
+  // setNetworkListItem(props.item);
+  // router.push(`/network/${networkId}/detail/${props.item.id}`);
 };
 
 const handlePlayer = () => {

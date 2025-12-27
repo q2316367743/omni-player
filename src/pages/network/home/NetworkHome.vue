@@ -47,7 +47,7 @@
       <!-- 视频网格 -->
       <div v-else class="video-content">
         <div class="video-grid">
-          <NetworkVideoCard v-for="item in items" :item="item" :key="`video-${item.id}`" @click="goToDetail"/>
+          <NetworkVideoCard v-for="item in items" :item="item" :key="`video-${item.id}`"/>
         </div>
 
         <!-- 加载更多提示 -->
@@ -72,14 +72,12 @@
 
 <script setup lang="ts">
 import {useNetworkServerStore} from '@/store';
-import type {NetworkRecommend} from '@/modules/network/types/NetworkRecommend';
 import type {NetworkCategory} from '@/modules/network/types/NetworkCategory';
 import type {INetworkServer} from '@/modules/network/INetworkServer';
 import type {NetworkListItem} from '@/modules/network/types/NetworkListItem';
 import MessageUtil from "@/util/model/MessageUtil.ts";
 
 const route = useRoute();
-const router = useRouter();
 
 // 网络服务ID
 const networkId = route.params.id as string;
@@ -187,11 +185,6 @@ const loadMoreData = async () => {
     loadingMore.value = false;
     isLoading = false;
   }
-};
-
-// 跳转到详情页
-const goToDetail = (item: NetworkRecommend | NetworkListItem) => {
-  router.push(`/network/${networkId}/detail/${item.id}`);
 };
 
 // 监听分类变化
