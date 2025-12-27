@@ -9,9 +9,12 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, onUnmounted, ref} from 'vue';
 import dayjs from 'dayjs';
-import {Lunar} from 'lunar-javascript';
+import lunisolar from 'lunisolar'
+import festivals from 'lunisolar/markers/festivals.zh-cn' // 简体版
+
+// 全局加载节日列表
+lunisolar.Markers.add(festivals)
 
 const currentTime = ref('');
 const currentDate = ref('');
@@ -20,10 +23,10 @@ const lunarDate = ref('');
 let timeTimer: number | null = null;
 
 const getLunarDate = (date: Date): string => {
-  const lunar = Lunar.fromDate(date);
-  const lunarMonth = lunar.getMonthInChinese();
-  const lunarDay = lunar.getDayInChinese();
-  const jieQi = lunar.getJieQi();
+  const lunar = lunisolar(date);
+  const lunarMonth = lunar.lunar.getMonthName();
+  const lunarDay = lunar.lunar.getDayName();
+  const jieQi = lunar.markers.list.map(e => e.name).join(",");
   
   return `农历${lunarMonth}${lunarDay}${jieQi ? ' · ' + jieQi : ''}`;
 };

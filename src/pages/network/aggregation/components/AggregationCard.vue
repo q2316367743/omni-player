@@ -111,7 +111,6 @@ import {
 } from "tdesign-icons-vue-next"
 import type {NetworkListItem} from '@/modules/network/types/NetworkListItem.ts';
 import {createWindows} from "@/lib/windows.ts";
-import {setNetworkListItem} from "@/pages/network/components/detail.ts";
 import {openNetworkDetail} from "@/pages/network/detail/network-detail.tsx";
 
 interface AggregatedItem {
@@ -126,8 +125,6 @@ interface AggregatedItem {
 interface Props {
   aggregationItem: AggregatedItem;
 }
-
-const router = useRouter();
 
 const props = defineProps<Props>();
 

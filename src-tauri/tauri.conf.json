@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "omni-player",
+        "title": "亦无悔",
         "width": 1200,
         "height": 800,
         "minWidth": 1200,
@@ -40,7 +40,11 @@
     "createUpdaterArtifacts": true,
     "resources": [
       "lib/**/*"
-    ]
+    ],
+    "category": "Entertainment",
+    "macOS": {
+      "entitlements": "./Entitlements.plist"
+    }
   },
   "plugins": {
     "updater": {

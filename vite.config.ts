@@ -73,7 +73,7 @@ export default defineConfig({
     // produce sourcemaps for debug builds
     sourcemap: !!process.env.TAURI_ENV_DEBUG,
 
-    rolldownOptions: {
+    rollupOptions: {
       input: {
         main: _resolve('index.html'),
         'player-media': _resolve('player-media.html'),

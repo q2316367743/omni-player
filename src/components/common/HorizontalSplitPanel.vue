@@ -36,7 +36,7 @@ const topHeight = ref(props.defaultTopHeight);
 
 const bottomHeight = computed(() => 100 - topHeight.value);
 
-const startResize = (e: MouseEvent | TouchEvent) => {
+const startResize = () => {
   isResizing.value = true;
   document.addEventListener('mousemove', onResize);
   document.addEventListener('mouseup', stopResize);
@@ -47,7 +47,7 @@ const startResize = (e: MouseEvent | TouchEvent) => {
 const onResize = (e: MouseEvent | TouchEvent) => {
   if (!panelRef.value || !isResizing.value) return;
 
-  const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+  const clientY = 'touches' in e ? e.touches[0]!.clientY : e.clientY;
   const rect = panelRef.value.getBoundingClientRect();
   
   if (!rect) return;

@@ -20,7 +20,7 @@ const ShiCiText = useLocalStorage(LocalName.PAGE_HOME_SHI_CI_TEXT, "");
 onMounted(() => {
   if (Date.now() - shiCiTime.value > 60*60*1000) {
     jrsc.load(function (result) {
-      ShiCiText.value = result.data.content;
+      ShiCiText.value = Array.isArray(result.data.content) ? result.data.content.join('；') : result.data.content;
       shiCiTime.value = Date.now();
     });
   }

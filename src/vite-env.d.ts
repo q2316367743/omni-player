@@ -1,10 +1,4 @@
-import 'vite/client';
-
-declare module '*.vue' {
-  import type { DefineComponent } from 'vue';
-  const component: DefineComponent<Record<string, never>, Record<string, never>, unknown>;
-  export default component;
-}
+/// <reference types="vite/client" />
 
 declare module 'jinrishici' {
   export interface JinrishiciResult {
@@ -23,13 +17,4 @@ declare module 'jinrishici' {
   }
 
   export function load(callback: (result: JinrishiciResult) => void): void;
-}
-
-declare module 'lunar-javascript' {
-  export class Lunar {
-    static fromDate(date: Date): Lunar;
-    getMonthInChinese(): string;
-    getDayInChinese(): string;
-    getJieQi(): string | null;
-  }
 }

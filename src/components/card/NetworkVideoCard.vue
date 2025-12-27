@@ -127,7 +127,6 @@ import {
   VideoIcon
 } from "tdesign-icons-vue-next"
 import type {NetworkListItem} from '@/modules/network/types/NetworkListItem.ts';
-import {setNetworkListItem} from '../../pages/network/components/detail.ts';
 import {createWindows} from "@/lib/windows.ts";
 import {openNetworkDetail} from "@/pages/network/detail/network-detail.tsx";
 
@@ -137,7 +136,6 @@ interface Props {
 
 const props = defineProps<Props>();
 const route = useRoute();
-const router = useRouter();
 
 const networkId = route.params.id as string;
 

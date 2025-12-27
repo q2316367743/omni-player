@@ -36,7 +36,7 @@ const leftWidth = ref(props.defaultLeftWidth);
 
 const rightWidth = computed(() => 100 - leftWidth.value);
 
-const startResize = (e: MouseEvent | TouchEvent) => {
+const startResize = () => {
   isResizing.value = true;
   document.addEventListener('mousemove', onResize);
   document.addEventListener('mouseup', stopResize);
@@ -47,7 +47,7 @@ const startResize = (e: MouseEvent | TouchEvent) => {
 const onResize = (e: MouseEvent | TouchEvent) => {
   if (!panelRef.value || !isResizing.value) return;
 
-  const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+  const clientX = 'touches' in e ? e.touches[0]!.clientX : e.clientX;
   const rect = panelRef.value.getBoundingClientRect();
   const totalWidth = rect.width;
   
