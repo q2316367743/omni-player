@@ -86,6 +86,10 @@ export const router = createRouter({
       name: 'AppRegex',
       path: 'regex',
       component: () => import('@/pages/app/regex/app-regex.vue')
+    }, {
+      name: 'AppHttp',
+      path: 'http',
+      component: () => import('@/pages/app/http/app-http.vue')
     }]
   }]
 });

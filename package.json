@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@imengyu/vue3-context-menu": "^1.5.2",
+    "@monaco-editor/loader": "^1.7.0",
     "@tauri-apps/plugin-dialog": "~2.4.2",
     "@tauri-apps/plugin-fs": "~2.4.4",
     "@tauri-apps/plugin-http": "~2.5.4",
@@ -35,6 +36,7 @@
     "jinrishici": "^1.0.6",
     "less": "^4.5.1",
     "lunar-javascript": "^1.7.7",
+    "monaco-editor": "^0.55.1",
     "pinia": "^3.0.4",
     "tauri-plugin-libmpv-api": "^0.3.2",
     "tdesign-icons-vue-next": "^0.4.1",

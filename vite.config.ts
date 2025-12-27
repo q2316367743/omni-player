@@ -37,6 +37,9 @@ export default defineConfig({
       "@": _resolve("src"),
     }
   },
+  optimizeDeps: {
+    include: ['monaco-editor']
+  },
   server: {
     // make sure this port matches the devUrl port in tauri.conf.json file
     port: 5123,
