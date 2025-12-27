@@ -31,10 +31,10 @@ onMounted(() => {
 }
 
 .shici-card {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, var(--td-bg-color-page) 0%, var(--td-gray-color-2) 100%);
   border-radius: 16px;
   padding: 24px 32px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--td-shadow-1);
   position: relative;
   overflow: hidden;
 
@@ -45,7 +45,7 @@ onMounted(() => {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(90deg, var(--td-brand-color-5) 0%, var(--td-brand-color-7) 100%);
   }
 }
 
@@ -57,7 +57,7 @@ onMounted(() => {
 .shici-text {
   font-size: 16px;
   line-height: 1.8;
-  color: #2c3e50;
+  color: var(--td-text-color-primary);
   font-weight: 500;
   letter-spacing: 0.05em;
   white-space: pre-wrap;
@@ -68,12 +68,12 @@ onMounted(() => {
   justify-content: center;
   margin-top: 16px;
   padding-top: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 1px solid var(--td-border-level-1-color);
 }
 
 .shici-label {
   font-size: 11px;
-  color: #7f8c8d;
+  color: var(--td-text-color-secondary);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }

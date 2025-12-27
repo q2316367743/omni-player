@@ -5,6 +5,22 @@ export const NetworkServerTypeOptions = [{
   value: "mc10"
 }]
 
+export function checkNetworkType(type: string) {
+  for (const networkServerTypeOption of NetworkServerTypeOptions) {
+    if (networkServerTypeOption.value === type) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+export function checkNetworkFormat(format: string) {
+  return format === "json" || format === "xml";
+
+}
+
+
 export const NetworkServerTypeLabel = {
   mc10: "苹果CMS10"
 }
@@ -27,7 +43,7 @@ export interface NetworkServerEdit {
   m3u8Parse: string;
 }
 
-export interface NetworkServer extends NetworkServerEdit{
+export interface NetworkServer extends NetworkServerEdit {
   id: string;
   created_at: number;
   updated_at: number;

@@ -7,6 +7,18 @@
       </h3>
       <div class="flex gap-4px">
         <t-button theme="primary" variant="text" shape="square"
+                  @click="importNetwork()">
+          <template #icon>
+            <file-import-icon/>
+          </template>
+        </t-button>
+        <t-button theme="primary" variant="text" shape="square"
+                  @click="exportNetwork()">
+          <template #icon>
+            <file-export-icon/>
+          </template>
+        </t-button>
+        <t-button theme="primary" variant="text" shape="square"
                   @click="openSearchModelWrap()">
           <template #icon>
             <search-icon/>
@@ -43,10 +55,11 @@
 
 <script lang="ts" setup>
 import {useNetworkServerStore} from "@/store";
-import {InternetIcon, AddIcon, SearchIcon} from "tdesign-icons-vue-next";
+import {InternetIcon, AddIcon, SearchIcon, FileImportIcon, FileExportIcon} from "tdesign-icons-vue-next";
 import type {NetworkServer} from "@/entity/NetworkServer.ts";
 import {openNetworkContextmenu, openNetworkServerEdit} from "@/pages/home/func/NetworkServerEdit.tsx";
 import {openSearchModel} from "@/util/model/SearchUtil.tsx";
+import {exportNetwork, importNetwork} from "@/pages/home/func/NetworkExtra.tsx";
 
 const router = useRouter();
 

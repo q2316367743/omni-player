@@ -9,7 +9,7 @@
                 <t-button theme="primary" size="small" variant="text" shape="square" class="mr-8px"
                           @click="goHome()">
                   <template #icon>
-                    <home-icon />
+                    <home-icon/>
                   </template>
                 </t-button>
                 <span>{{ subscribe?.name || 'RSS' }}</span>
@@ -57,7 +57,7 @@
         </div>
 
         <div v-if="loading && page > 1" class="feed-loading">
-          <t-loading size="small" />
+          <t-loading size="small"/>
         </div>
 
         <div v-if="!feeds.length && !loading" class="feed-empty">
@@ -118,6 +118,7 @@ function onRefresh() {
   refreshing.value = true;
   refreshFeed(subscribeId.value)
     .then(() => {
+      getSubscribe(subscribeId.value).then(res => subscribe.value = res);
       page.value = 1;
       return run();
     })

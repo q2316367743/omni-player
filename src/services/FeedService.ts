@@ -42,7 +42,8 @@ export async function refreshFeed(subscribeId: string) {
     const count = await feedQuery.eq('subscribe_id', subscribeId).count();
     logDebug(`订阅「${subscribeId}」有 feed 共 ${count} 个`)
     await subscribeMapper.updateById(subscribeId, {
-      count
+      count,
+      updated_at: Date.now()
     });
     useSubscribeStore().refresh();
   }

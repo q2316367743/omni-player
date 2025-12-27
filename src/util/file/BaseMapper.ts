@@ -32,9 +32,10 @@ export class BaseMapper<T extends TableLike> {
     const sql = `update ${this.tableName}
                  set ${query.join(", ")}
                  where id = $${values.length + 1}`;
+    const val = [...values, id];
     logDebug("update sql:\t\t" + sql);
-    logDebug("update values:\t" + values);
-    const r = await this.db.execute(sql, [...values, id]);
+    logDebug("update values:\t" + val);
+    const r = await this.db.execute(sql, val);
     logDebug("update result:\t" + r.rowsAffected);
   }
 

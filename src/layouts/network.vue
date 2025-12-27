@@ -1,9 +1,11 @@
 <template>
   <MainLayout>
     <template #header>
-      <t-head-menu v-model="value">
-        <t-menu-item :value="home">首页</t-menu-item>
-        <t-menu-item :value="search">搜索</t-menu-item>
+      <t-head-menu :value="value">
+        <t-menu-item v-for="option in options" :key="option.value" :value="option.value" @click="to(option.value)">{{
+            option.label
+          }}
+        </t-menu-item>
       </t-head-menu>
     </template>
     <template #content>
@@ -19,19 +21,18 @@
 const route = useRoute();
 const router = useRouter();
 
-const value = ref(`/network/${route.params.id}/home`)
+const value = computed(() => route.path)
 
-const home = computed(() => `/network/${route.params.id}/home`);
-const search = computed(() => `/network/${route.params.id}/search`);
+const options = [{
+  label: '全部',
+  value: `/network/${route.params.id}/home`
+},
+  {
+    label: '搜索',
+    value: `/network/${route.params.id}/search`
+  }]
 
-watch(value, val => {
-  router.push(val);
-});
-watch(() => route.path, val => {
-  if (val !== value.value) {
-    value.value = val;
-  }
-})
+const to = (path: string) => router.push(path);
 
 </script>
 <style scoped lang="less">

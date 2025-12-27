@@ -2,7 +2,7 @@
   width: 100%;
   height: 100%;
   overflow-y: auto;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+  background: linear-gradient(135deg, var(--td-bg-color-page) 0%, var(--td-gray-color-1) 100%);
   position: relative;
   padding: 16px;
   box-sizing: border-box;
@@ -92,7 +92,7 @@
         font-weight: 700;
         line-height: 1;
         margin-bottom: 6px;
-        background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+        background: linear-gradient(135deg, var(--td-text-color-anti) 0%, var(--td-gray-color-1) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -115,10 +115,10 @@
 }
 
 .tools-container {
-  background: white;
+  background: var(--td-bg-color-container);
   border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--td-shadow-1);
 }
 
 .section-header {
@@ -173,7 +173,7 @@
   gap: 14px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--td-shadow-1);
   border: 1.5px solid transparent;
   position: relative;
   overflow: hidden;
@@ -192,7 +192,7 @@
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--td-shadow-2);
     border-color: var(--td-brand-color);
 
     &::before {
@@ -218,27 +218,27 @@
     z-index: 1;
 
     &.regex {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      background: linear-gradient(135deg, var(--td-brand-color-5) 0%, var(--td-brand-color-7) 100%);
+      color: var(--td-text-color-anti);
+      box-shadow: var(--td-shadow-1);
     }
 
     &.http {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(240, 147, 251, 0.3);
+      background: linear-gradient(135deg, var(--td-error-color-4) 0%, var(--td-error-color-5) 100%);
+      color: var(--td-text-color-anti);
+      box-shadow: var(--td-shadow-1);
     }
 
     &.online {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+      background: linear-gradient(135deg, var(--td-brand-color-4) 0%, var(--td-brand-color-5) 100%);
+      color: var(--td-text-color-anti);
+      box-shadow: var(--td-shadow-1);
     }
 
     &.media {
-      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(250, 112, 154, 0.3);
+      background: linear-gradient(135deg, var(--td-warning-color-4) 0%, var(--td-warning-color-5) 100%);
+      color: var(--td-text-color-anti);
+      box-shadow: var(--td-shadow-1);
     }
   }
 
@@ -273,10 +273,10 @@
 }
 
 .resources-container {
-  background: white;
+  background: var(--td-bg-color-container);
   border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--td-shadow-1);
 }
 
 .resource-section {
@@ -329,7 +329,7 @@
     gap: 12px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--td-shadow-1);
     border: 1.5px solid transparent;
     position: relative;
     overflow: hidden;
@@ -348,7 +348,7 @@
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--td-shadow-2);
       border-color: var(--td-brand-color);
 
       &::before {
@@ -374,33 +374,33 @@
       z-index: 1;
 
       &.jellyfin {
-        background: linear-gradient(135deg, #000b25 0%, #00a4dc 100%);
-        color: white;
-        box-shadow: 0 4px 12px rgba(0, 164, 220, 0.3);
+        background: linear-gradient(135deg, var(--td-gray-color-10) 0%, var(--td-brand-color-5) 100%);
+        color: var(--td-text-color-anti);
+        box-shadow: var(--td-shadow-1);
       }
 
       &.emby {
-        background: linear-gradient(135deg, #52b54b 0%, #81c341 100%);
-        color: white;
-        box-shadow: 0 4px 12px rgba(82, 181, 75, 0.3);
+        background: linear-gradient(135deg, var(--td-success-color-5) 0%, var(--td-success-color-4) 100%);
+        color: var(--td-text-color-anti);
+        box-shadow: var(--td-shadow-1);
       }
 
       &.plex {
-        background: linear-gradient(135deg, #e5a00d 0%, #f5b400 100%);
-        color: white;
-        box-shadow: 0 4px 12px rgba(229, 160, 13, 0.3);
+        background: linear-gradient(135deg, var(--td-warning-color-5) 0%, var(--td-warning-color-4) 100%);
+        color: var(--td-text-color-anti);
+        box-shadow: var(--td-shadow-1);
       }
 
       &.network {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        color: white;
-        box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+        background: linear-gradient(135deg, var(--td-brand-color-4) 0%, var(--td-brand-color-5) 100%);
+        color: var(--td-text-color-anti);
+        box-shadow: var(--td-shadow-1);
       }
 
       &.subscribe {
-        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-        color: white;
-        box-shadow: 0 4px 12px rgba(250, 112, 154, 0.3);
+        background: linear-gradient(135deg, var(--td-warning-color-4) 0%, var(--td-warning-color-5) 100%);
+        color: var(--td-text-color-anti);
+        box-shadow: var(--td-shadow-1);
       }
     }
 

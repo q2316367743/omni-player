@@ -30,10 +30,10 @@ export const useNetworkServerStore = defineStore('network-server', () => {
 
   const addServer = async (res: NetworkServerEdit) => {
     const server = {
+      ...res,
       id: useSnowflake().nextId(),
       created_at: Date.now(),
       updated_at: Date.now(),
-      ...res
     };
     servers.value.push(server);
     await useStore().save(LocalName.LIST_NETWORK_SERVER, servers.value);

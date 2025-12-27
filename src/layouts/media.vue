@@ -1,8 +1,11 @@
 <template>
   <MainLayout>
     <template #header>
-      <t-head-menu v-model="value">
-        <t-menu-item v-for="menu in menus" :key="menu.value" :value="menu.value">{{ menu.label }}</t-menu-item>
+      <t-head-menu :value="value">
+        <t-menu-item v-for="menu in menus" :key="menu.value" :value="menu.value" @click="to(menu.value)">{{
+            menu.label
+          }}
+        </t-menu-item>
       </t-head-menu>
     </template>
     <template #content>
@@ -24,40 +27,28 @@ interface MenuItem {
 const route = useRoute();
 const router = useRouter();
 
-const value = ref(`/media/${route.params.id}/home`)
-
-const home = computed(() => `/media/${route.params.id}/home`);
-const movie = computed(() => `/media/${route.params.id}/movie`);
-const series = computed(() => `/media/${route.params.id}/series`);
-const collection = computed(() => `/media/${route.params.id}/collection`);
+const value = computed(() => route.path)
 
 const menus = computed<Array<MenuItem>>(() => ([
   {
     label: '全部',
-    value: home.value
+    value: `/media/${route.params.id}/home`
   },
   {
     label: '电影',
-    value: movie.value
+    value: `/media/${route.params.id}/movie`
   },
   {
     label: '剧集',
-    value: series.value
+    value: `/media/${route.params.id}/series`
   },
   {
     label: '已收藏',
-    value: collection.value
+    value: `/media/${route.params.id}/collection`
   }
 ]))
 
-watch(value, val => {
-  router.push(val);
-});
-watch(() => route.path, val => {
-  if (val !== value.value) {
-    value.value = val;
-  }
-})
+const to = (path: string) => router.push(path);
 
 </script>
 <style scoped lang="less">
