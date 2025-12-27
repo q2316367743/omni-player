@@ -92,7 +92,6 @@ export async function openNetworkDetail(clientId: string, item: NetworkListItem)
     closeOnEscKeydown: false,
     footer: false,
     size: '100%',
-    attach: '.app-content',
     default: () => (
       <div class="h-full w-full overflow-auto">
         <div

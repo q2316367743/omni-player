@@ -49,18 +49,22 @@ onUnmounted(() => {
 
 <style scoped lang="less">
 .datetime-widget {
-  background: var(--td-bg-color-container);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   backdrop-filter: blur(10px);
-  border-radius: var(--td-radius-medium);
-  padding: 16px 20px;
-  box-shadow: var(--td-shadow-1);
+  border-radius: 16px;
+  padding: 24px 32px;
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.25);
   min-width: 200px;
   width: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
 
   .time-display {
-    font-size: 36px;
+    font-size: 32px;
     font-weight: 700;
-    color: var(--td-text-color-primary);
+    color: white;
     line-height: 1;
     margin-bottom: 8px;
     font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
@@ -68,15 +72,15 @@ onUnmounted(() => {
 
   .date-display {
     .date-main {
-      font-size: 14px;
-      color: var(--td-text-color-secondary);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.9);
       margin-bottom: 4px;
       font-weight: 500;
     }
 
     .date-lunar {
-      font-size: 12px;
-      color: var(--td-text-color-placeholder);
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.7);
     }
   }
 }

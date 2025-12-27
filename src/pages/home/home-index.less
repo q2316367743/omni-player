@@ -4,7 +4,7 @@
   overflow-y: auto;
   background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
   position: relative;
-  padding: 24px;
+  padding: 16px;
   box-sizing: border-box;
 }
 
@@ -15,37 +15,38 @@
   z-index: 100;
 }
 
-.clock-section {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 24px;
+.main-content {
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
-.main-content {
-  max-width: 1400px;
-  margin: 0 auto;
+.top-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: stretch;
 }
 
 .welcome-card {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 20px;
-  padding: 40px;
-  margin-bottom: 32px;
+  border-radius: 16px;
+  padding: 24px 32px;
   color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.25);
   position: relative;
   overflow: hidden;
+  flex: 1;
 
   &::before {
     content: '';
     position: absolute;
     top: -50%;
     right: -10%;
-    width: 400px;
-    height: 400px;
+    width: 300px;
+    height: 300px;
     background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
     border-radius: 50%;
   }
@@ -54,14 +55,14 @@
     flex: 1;
 
     .welcome-title {
-      font-size: 36px;
+      font-size: 28px;
       font-weight: 700;
-      margin: 0 0 12px 0;
-      letter-spacing: 1px;
+      margin: 0 0 6px 0;
+      letter-spacing: 0.5px;
     }
 
     .welcome-subtitle {
-      font-size: 18px;
+      font-size: 15px;
       opacity: 0.95;
       margin: 0;
       font-weight: 300;
@@ -70,27 +71,27 @@
 
   .stats-grid {
     display: flex;
-    gap: 40px;
+    gap: 24px;
 
     .stat-card {
       text-align: center;
       background: rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 20px 28px;
-      min-width: 120px;
+      border-radius: 12px;
+      padding: 14px 20px;
+      min-width: 90px;
       transition: transform 0.3s ease;
 
       &:hover {
-        transform: translateY(-4px);
+        transform: translateY(-3px);
         background: rgba(255, 255, 255, 0.25);
       }
 
       .stat-value {
-        font-size: 42px;
+        font-size: 32px;
         font-weight: 700;
         line-height: 1;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -98,7 +99,7 @@
       }
 
       .stat-label {
-        font-size: 15px;
+        font-size: 13px;
         opacity: 0.9;
         font-weight: 500;
       }
@@ -106,68 +107,74 @@
   }
 }
 
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
 .tools-container {
   background: white;
-  border-radius: 20px;
-  padding: 32px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  margin-bottom: 24px;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 .section-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 
   .section-title {
-    font-size: 32px;
+    font-size: 22px;
     font-weight: 700;
     color: var(--td-text-color-primary);
-    margin: 0 0 8px 0;
+    margin: 0 0 4px 0;
   }
 
   .section-subtitle {
-    font-size: 16px;
+    font-size: 13px;
     color: var(--td-text-color-secondary);
     margin: 0;
   }
 }
 
 .tools-group {
-  margin-bottom: 32px;
+  margin-bottom: 16px;
 
   &:last-child {
     margin-bottom: 0;
   }
 
   .group-title {
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--td-text-color-primary);
-    margin-bottom: 20px;
-    padding-left: 12px;
-    border-left: 4px solid var(--td-brand-color);
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 3px solid var(--td-brand-color);
     display: flex;
     align-items: center;
   }
 
   .tools-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
   }
 }
 
 .tool-card {
   background: var(--td-bg-color-container);
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 12px;
+  padding: 14px 16px;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  border: 2px solid transparent;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+  border: 1.5px solid transparent;
   position: relative;
   overflow: hidden;
 
@@ -184,8 +191,8 @@
   }
 
   &:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     border-color: var(--td-brand-color);
 
     &::before {
@@ -193,18 +200,18 @@
     }
 
     .tool-icon {
-      transform: scale(1.1) rotate(5deg);
+      transform: scale(1.05);
     }
   }
 
   .tool-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: 24px;
     flex-shrink: 0;
     transition: transform 0.3s ease;
     position: relative;
@@ -213,25 +220,25 @@
     &.regex {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
 
     &.http {
       background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
       color: white;
-      box-shadow: 0 8px 20px rgba(240, 147, 251, 0.4);
+      box-shadow: 0 4px 12px rgba(240, 147, 251, 0.3);
     }
 
     &.online {
       background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
       color: white;
-      box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+      box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
     }
 
     &.media {
       background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
       color: white;
-      box-shadow: 0 8px 20px rgba(250, 112, 154, 0.4);
+      box-shadow: 0 4px 12px rgba(250, 112, 154, 0.3);
     }
   }
 
@@ -242,15 +249,15 @@
     z-index: 1;
 
     .tool-name {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 600;
       color: var(--td-text-color-primary);
-      margin-bottom: 6px;
-      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      letter-spacing: 0.3px;
     }
 
     .tool-desc {
-      font-size: 14px;
+      font-size: 12px;
       color: var(--td-text-color-secondary);
       white-space: nowrap;
       overflow: hidden;
@@ -260,21 +267,20 @@
 }
 
 .poetry-section {
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 24px 0;
+  padding: 16px 0;
 }
 
 .resources-container {
-  margin-top: 32px;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 .resource-section {
-  background: white;
-  border-radius: 20px;
-  padding: 32px;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
 
   &:last-child {
     margin-bottom: 0;
@@ -284,19 +290,19 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 14px;
 
     .resource-title {
-      font-size: 24px;
+      font-size: 18px;
       font-weight: 700;
       color: var(--td-text-color-primary);
       margin: 0;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
 
       .title-icon {
-        font-size: 28px;
+        font-size: 20px;
         color: var(--td-brand-color);
       }
     }
@@ -304,27 +310,27 @@
 
   .resource-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
   }
 
   .subscribe-tree-wrapper {
     background: var(--td-bg-color-container);
-    border-radius: 16px;
-    padding: 16px;
+    border-radius: 12px;
+    padding: 12px;
   }
 
   .resource-card {
     background: var(--td-bg-color-container);
-    border-radius: 16px;
-    padding: 20px;
+    border-radius: 12px;
+    padding: 14px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-    border: 2px solid transparent;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+    border: 1.5px solid transparent;
     position: relative;
     overflow: hidden;
 
@@ -341,8 +347,8 @@
     }
 
     &:hover {
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
       border-color: var(--td-brand-color);
 
       &::before {
@@ -350,18 +356,18 @@
       }
 
       .resource-icon {
-        transform: scale(1.1) rotate(5deg);
+        transform: scale(1.05);
       }
     }
 
     .resource-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 14px;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
+      font-size: 20px;
       flex-shrink: 0;
       transition: transform 0.3s ease;
       position: relative;
@@ -370,31 +376,31 @@
       &.jellyfin {
         background: linear-gradient(135deg, #000b25 0%, #00a4dc 100%);
         color: white;
-        box-shadow: 0 8px 20px rgba(0, 164, 220, 0.4);
+        box-shadow: 0 4px 12px rgba(0, 164, 220, 0.3);
       }
 
       &.emby {
         background: linear-gradient(135deg, #52b54b 0%, #81c341 100%);
         color: white;
-        box-shadow: 0 8px 20px rgba(82, 181, 75, 0.4);
+        box-shadow: 0 4px 12px rgba(82, 181, 75, 0.3);
       }
 
       &.plex {
         background: linear-gradient(135deg, #e5a00d 0%, #f5b400 100%);
         color: white;
-        box-shadow: 0 8px 20px rgba(229, 160, 13, 0.4);
+        box-shadow: 0 4px 12px rgba(229, 160, 13, 0.3);
       }
 
       &.network {
         background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         color: white;
-        box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+        box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
       }
 
       &.subscribe {
         background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
         color: white;
-        box-shadow: 0 8px 20px rgba(250, 112, 154, 0.4);
+        box-shadow: 0 4px 12px rgba(250, 112, 154, 0.3);
       }
     }
 
@@ -405,17 +411,17 @@
       z-index: 1;
 
       .resource-name {
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 600;
         color: var(--td-text-color-primary);
-        margin-bottom: 4px;
+        margin-bottom: 3px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
       .resource-type {
-        font-size: 13px;
+        font-size: 12px;
         color: var(--td-text-color-secondary);
         white-space: nowrap;
         overflow: hidden;
@@ -426,22 +432,28 @@
 
   .empty-state {
     grid-column: 1 / -1;
-    padding: 60px 20px;
+    padding: 32px 16px;
     text-align: center;
     background: var(--td-bg-color-container);
-    border-radius: 16px;
+    border-radius: 12px;
     border: 2px dashed var(--td-border-level-2-color);
 
     .empty-icon {
-      font-size: 48px;
+      font-size: 36px;
       color: var(--td-text-color-placeholder);
-      margin-bottom: 16px;
+      margin-bottom: 10px;
     }
 
     .empty-text {
-      font-size: 16px;
+      font-size: 14px;
       color: var(--td-text-color-secondary);
     }
+  }
+}
+
+@media (max-width: 1200px) {
+  .content-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -449,54 +461,16 @@
   .welcome-card {
     flex-direction: column;
     text-align: center;
-    padding: 32px;
+    padding: 20px 24px;
 
     .welcome-info {
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
 
     .stats-grid {
-      gap: 20px;
+      gap: 16px;
       width: 100%;
       justify-content: center;
-
-      .stat-card {
-        min-width: 100px;
-        padding: 16px 20px;
-
-        .stat-value {
-          font-size: 36px;
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .home-container {
-    padding: 16px;
-  }
-
-  .clock-section {
-    margin-bottom: 16px;
-  }
-
-  .welcome-card {
-    padding: 24px;
-    margin-bottom: 24px;
-
-    .welcome-info {
-      .welcome-title {
-        font-size: 28px;
-      }
-
-      .welcome-subtitle {
-        font-size: 16px;
-      }
-    }
-
-    .stats-grid {
-      gap: 12px;
 
       .stat-card {
         min-width: 80px;
@@ -505,45 +479,98 @@
         .stat-value {
           font-size: 28px;
         }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .home-container {
+    padding: 12px;
+  }
+
+  .clock-wrapper {
+    top: 12px;
+    right: 12px;
+  }
+
+  .welcome-card {
+    padding: 18px 20px;
+    margin-bottom: 12px;
+
+    .welcome-info {
+      .welcome-title {
+        font-size: 22px;
+      }
+
+      .welcome-subtitle {
+        font-size: 13px;
+      }
+    }
+
+    .stats-grid {
+      gap: 10px;
+
+      .stat-card {
+        min-width: 70px;
+        padding: 10px 14px;
+
+        .stat-value {
+          font-size: 24px;
+        }
 
         .stat-label {
-          font-size: 13px;
+          font-size: 12px;
         }
       }
     }
   }
 
+  .content-grid {
+    gap: 12px;
+    margin-top: 12px;
+  }
+
   .tools-container {
-    padding: 20px;
+    padding: 16px;
   }
 
   .section-header {
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 
     .section-title {
-      font-size: 24px;
+      font-size: 18px;
     }
   }
 
-  .tools-grid {
-    grid-template-columns: 1fr;
+  .tools-group {
+    margin-bottom: 12px;
+
+    .group-title {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
   }
 
   .tool-card {
-    padding: 20px;
+    padding: 12px 14px;
+  }
+
+  .resources-container {
+    padding: 16px;
   }
 
   .resource-section {
-    padding: 20px;
+    margin-bottom: 12px;
 
     .resource-header {
-      margin-bottom: 20px;
+      margin-bottom: 12px;
 
       .resource-title {
-        font-size: 20px;
+        font-size: 16px;
 
         .title-icon {
-          font-size: 24px;
+          font-size: 18px;
         }
       }
     }
@@ -553,7 +580,7 @@
     }
 
     .subscribe-tree-wrapper {
-      padding: 12px;
+      padding: 10px;
     }
   }
 }

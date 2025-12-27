@@ -1,200 +1,204 @@
 <template>
   <div class="home-container">
-
-    <div class="clock-section">
-      <NowClock/>
-    </div>
-
     <div class="main-content">
-      <div class="welcome-card">
-        <div class="welcome-info">
-          <h1 class="welcome-title">欢迎使用亦无悔</h1>
-          <p class="welcome-subtitle">一站式多媒体管理平台</p>
+      <div class="top-row">
+        <div class="welcome-card">
+          <div class="welcome-info">
+            <h1 class="welcome-title">欢迎使用亦无悔</h1>
+            <p class="welcome-subtitle">一站式多媒体管理平台</p>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value">{{ mediaCount }}</div>
+              <div class="stat-label">媒体库</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">{{ networkCount }}</div>
+              <div class="stat-label">网络资源</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">{{ subscribeCount }}</div>
+              <div class="stat-label">订阅源</div>
+            </div>
+          </div>
         </div>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-value">{{ mediaCount }}</div>
-            <div class="stat-label">媒体库</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">{{ networkCount }}</div>
-            <div class="stat-label">网络资源</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">{{ subscribeCount }}</div>
-            <div class="stat-label">订阅源</div>
-          </div>
-        </div>
+        <NowClock/>
       </div>
 
-      <div class="tools-container">
-        <div class="section-header">
-          <h2 class="section-title">实用工具箱</h2>
-          <p class="section-subtitle">高效便捷的在线工具集合</p>
-        </div>
+      <div class="content-grid">
+        <div class="left-column">
+          <div class="tools-container">
+            <div class="section-header">
+              <h2 class="section-title">实用工具箱</h2>
+              <p class="section-subtitle">高效便捷的在线工具集合</p>
+            </div>
 
-        <div class="tools-group">
-          <div class="group-title">本地工具</div>
-          <div class="tools-grid">
-            <div class="tool-card" @click="jumpTool('regex')">
-              <div class="tool-icon regex">
-                <code-icon/>
-              </div>
-              <div class="tool-info">
-                <div class="tool-name">正则表达式</div>
-                <div class="tool-desc">测试和调试正则表达式</div>
+            <div class="tools-group">
+              <div class="group-title">本地工具</div>
+              <div class="tools-grid">
+                <div class="tool-card" @click="jumpTool('regex')">
+                  <div class="tool-icon regex">
+                    <code-icon/>
+                  </div>
+                  <div class="tool-info">
+                    <div class="tool-name">正则表达式</div>
+                    <div class="tool-desc">测试和调试正则表达式</div>
+                  </div>
+                </div>
+                <div class="tool-card" @click="jumpTool('http')">
+                  <div class="tool-icon http">
+                    <internet-icon/>
+                  </div>
+                  <div class="tool-info">
+                    <div class="tool-name">简单请求</div>
+                    <div class="tool-desc">快速发送 HTTP 请求</div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="tool-card" @click="jumpTool('http')">
-              <div class="tool-icon http">
-                <internet-icon/>
-              </div>
-              <div class="tool-info">
-                <div class="tool-name">简单请求</div>
-                <div class="tool-desc">快速发送 HTTP 请求</div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <div class="tools-group">
-          <div class="group-title">在线工具</div>
-          <div class="tools-grid">
-            <div class="tool-card" @click="jumpTool('fanyi')">
-              <div class="tool-icon online">
-                <translate-icon/>
-              </div>
-              <div class="tool-info">
-                <div class="tool-name">在线翻译</div>
-                <div class="tool-desc">在线双向翻译</div>
+            <div class="tools-group">
+              <div class="group-title">在线工具</div>
+              <div class="tools-grid">
+                <div class="tool-card" @click="jumpTool('fanyi')">
+                  <div class="tool-icon online">
+                    <translate-icon/>
+                  </div>
+                  <div class="tool-info">
+                    <div class="tool-name">在线翻译</div>
+                    <div class="tool-desc">在线双向翻译</div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div class="tools-group">
-          <div class="group-title">媒体工具</div>
-          <div class="tools-grid">
-            <div class="tool-card" @click="jumpTool('qushuiyin')">
-              <div class="tool-icon media">
-                <video-icon/>
+            <div class="tools-group">
+              <div class="group-title">媒体工具</div>
+              <div class="tools-grid">
+                <div class="tool-card" @click="jumpTool('qushuiyin')">
+                  <div class="tool-icon media">
+                    <video-icon/>
+                  </div>
+                  <div class="tool-info">
+                    <div class="tool-name">去水印</div>
+                    <div class="tool-desc">视频图片水印去除</div>
+                  </div>
+                </div>
               </div>
-              <div class="tool-info">
-                <div class="tool-name">去水印</div>
-                <div class="tool-desc">视频图片水印去除</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="resources-container">
-        <div class="resource-section">
-          <div class="resource-header">
-            <h3 class="resource-title">
-              <server-icon class="title-icon"/>
-              媒体库
-            </h3>
-            <t-button theme="primary" variant="text" shape="square"
-                      @click="openMediaServerEdit()">
-              <template #icon>
-                <add-icon/>
-              </template>
-            </t-button>
-          </div>
-          <div class="resource-grid">
-            <div v-for="media in medias" :key="media.id" class="resource-card" @click="jumpMedia(media.id)"
-                 @contextmenu="handleMediaContextmenu(media, $event)">
-              <div class="resource-icon" :class="media.type">
-                <component :is="getMediaIcon(media.type)"/>
-              </div>
-              <div class="resource-info">
-                <div class="resource-name">{{ media.name }}</div>
-                <div class="resource-type">{{ getMediaTypeName(media.type) }}</div>
-              </div>
-            </div>
-            <div v-if="medias.length === 0" class="empty-state">
-              <div class="empty-icon">
-                <server-icon/>
-              </div>
-              <div class="empty-text">暂无媒体库</div>
             </div>
           </div>
         </div>
 
-        <div class="resource-section">
-          <div class="resource-header">
-            <h3 class="resource-title">
-              <internet-icon class="title-icon"/>
-              网络资源
-            </h3>
-            <div class="flex gap-4px">
-              <t-button theme="primary" variant="text" shape="square"
-                        @click="openSearchModelWrap()">
-                <template #icon>
-                  <search-icon/>
-                </template>
-              </t-button>
-              <t-button theme="primary" variant="text" shape="square"
-                        @click="openNetworkServerEdit()">
-                <template #icon>
-                  <add-icon/>
-                </template>
-              </t-button>
-            </div>
-          </div>
-          <div class="resource-grid">
-            <div v-for="network in networks" :key="network.id" class="resource-card" @click="jumpNetwork(network.id)"
-                 @contextmenu="handleNetworkContextmenu(network, $event)">
-              <div class="resource-icon network">
-                <internet-icon/>
+        <div class="right-column">
+          <div class="resources-container">
+            <div class="resource-section">
+              <div class="resource-header">
+                <h3 class="resource-title">
+                  <server-icon class="title-icon"/>
+                  媒体库
+                </h3>
+                <t-button theme="primary" variant="text" shape="square"
+                          @click="openMediaServerEdit()">
+                  <template #icon>
+                    <add-icon/>
+                  </template>
+                </t-button>
               </div>
-              <div class="resource-info">
-                <div class="resource-name">{{ network.name }}</div>
-                <div class="resource-type">{{ network.group || '未分组' }}</div>
+              <div class="resource-grid">
+                <div v-for="media in medias" :key="media.id" class="resource-card" @click="jumpMedia(media.id)"
+                     @contextmenu="handleMediaContextmenu(media, $event)">
+                  <div class="resource-icon" :class="media.type">
+                    <component :is="getMediaIcon(media.type)"/>
+                  </div>
+                  <div class="resource-info">
+                    <div class="resource-name">{{ media.name }}</div>
+                    <div class="resource-type">{{ getMediaTypeName(media.type) }}</div>
+                  </div>
+                </div>
+                <div v-if="medias.length === 0" class="empty-state">
+                  <div class="empty-icon">
+                    <server-icon/>
+                  </div>
+                  <div class="empty-text">暂无媒体库</div>
+                </div>
               </div>
             </div>
-            <div v-if="networks.length === 0" class="empty-state">
-              <div class="empty-icon">
-                <internet-icon/>
-              </div>
-              <div class="empty-text">暂无网络资源</div>
-            </div>
-          </div>
-        </div>
 
-        <div class="resource-section">
-          <div class="resource-header">
-            <h3 class="resource-title">
-              <rss-icon class="title-icon"/>
-              订阅源
-            </h3>
-            <div class="flex gap-4px">
-              <t-button theme="primary" size="small" variant="text" shape="square" @click="subscribeStore.refresh()">
-                <template #icon>
-                  <refresh-icon/>
-                </template>
-              </t-button>
-              <t-button theme="primary" size="small" variant="text" shape="square"
-                        @click="openSubscribeEditWrap()">
-                <template #icon>
-                  <add-icon/>
-                </template>
-              </t-button>
-            </div>
-          </div>
-          <div class="subscribe-tree-wrapper">
-            <subscribe-tree-view
-              v-if="subscribeTree.length > 0"
-              :nodes="subscribeTree"
-              @jump="jumpSubscribe"
-              @contextmenu="handleSubscribeContextmenu"
-            />
-            <div v-else class="empty-state">
-              <div class="empty-icon">
-                <rss-icon/>
+            <div class="resource-section">
+              <div class="resource-header">
+                <h3 class="resource-title">
+                  <internet-icon class="title-icon"/>
+                  网络资源
+                </h3>
+                <div class="flex gap-4px">
+                  <t-button theme="primary" variant="text" shape="square"
+                            @click="openSearchModelWrap()">
+                    <template #icon>
+                      <search-icon/>
+                    </template>
+                  </t-button>
+                  <t-button theme="primary" variant="text" shape="square"
+                            @click="openNetworkServerEdit()">
+                    <template #icon>
+                      <add-icon/>
+                    </template>
+                  </t-button>
+                </div>
               </div>
-              <div class="empty-text">暂无订阅源</div>
+              <div class="resource-grid">
+                <div v-for="network in networks" :key="network.id" class="resource-card" @click="jumpNetwork(network.id)"
+                     @contextmenu="handleNetworkContextmenu(network, $event)">
+                  <div class="resource-icon network">
+                    <internet-icon/>
+                  </div>
+                  <div class="resource-info">
+                    <div class="resource-name">{{ network.name }}</div>
+                    <div class="resource-type">{{ network.group || '未分组' }}</div>
+                  </div>
+                </div>
+                <div v-if="networks.length === 0" class="empty-state">
+                  <div class="empty-icon">
+                    <internet-icon/>
+                  </div>
+                  <div class="empty-text">暂无网络资源</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="resource-section">
+              <div class="resource-header">
+                <h3 class="resource-title">
+                  <rss-icon class="title-icon"/>
+                  订阅源
+                </h3>
+                <div class="flex gap-4px">
+                  <t-button theme="primary" size="small" variant="text" shape="square" @click="subscribeStore.refresh()">
+                    <template #icon>
+                      <refresh-icon/>
+                    </template>
+                  </t-button>
+                  <t-button theme="primary" size="small" variant="text" shape="square"
+                            @click="openSubscribeEditWrap()">
+                    <template #icon>
+                      <add-icon/>
+                    </template>
+                  </t-button>
+                </div>
+              </div>
+              <div class="subscribe-tree-wrapper">
+                <subscribe-tree-view
+                  v-if="subscribeTree.length > 0"
+                  :nodes="subscribeTree"
+                  @jump="jumpSubscribe"
+                  @contextmenu="handleSubscribeContextmenu"
+                />
+                <div v-else class="empty-state">
+                  <div class="empty-icon">
+                    <rss-icon/>
+                  </div>
+                  <div class="empty-text">暂无订阅源</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
