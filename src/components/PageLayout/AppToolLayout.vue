@@ -7,12 +7,6 @@
           <chevron-left-icon/>
         </template>
       </t-button>
-      <t-button v-if="collapsed" theme="primary" variant="text" shape="square"
-                @click="toggleCollapsed()">
-        <template #icon>
-          <menu-icon/>
-        </template>
-      </t-button>
       <div>{{ title }}</div>
     </div>
     <div class="app-layout-content">
@@ -21,8 +15,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {ChevronLeftIcon, MenuIcon} from "tdesign-icons-vue-next";
-import {collapsed, toggleCollapsed} from "@/global/Constants.ts";
+import {ChevronLeftIcon} from "tdesign-icons-vue-next";
 
 defineProps({
   title: String

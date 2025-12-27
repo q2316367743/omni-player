@@ -28,10 +28,6 @@ onMounted(() => {
 </script>
 <style scoped lang="less">
 .shici-container {
-  position: fixed;
-  bottom: 32px;
-  right: 8px;
-  z-index: 100;
 }
 
 .shici-card {

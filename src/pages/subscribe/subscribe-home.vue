@@ -6,10 +6,10 @@
           <div class="subscribe-aside__title">
             <div class="subscribe-aside__title-text">
               <div class="subscribe-aside__name">
-                <t-button v-if="collapsed" theme="primary" size="small" variant="text" shape="square" class="mr-8px"
-                          @click="toggleCollapsed()">
+                <t-button theme="primary" size="small" variant="text" shape="square" class="mr-8px"
+                          @click="goHome()">
                   <template #icon>
-                    <menu-icon/>
+                    <home-icon />
                   </template>
                 </t-button>
                 <span>{{ subscribe?.name || 'RSS' }}</span>
@@ -78,8 +78,7 @@ import type {FeedItem, SubscribeItem} from "@/entity/subscribe";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {getSubscribe} from "@/services";
 import {formatDate} from "@/util/lang/FormatUtil.ts";
-import {MenuIcon} from "tdesign-icons-vue-next";
-import {collapsed, toggleCollapsed} from "@/global/Constants.ts";
+import {HomeIcon} from "tdesign-icons-vue-next";
 
 const route = useRoute();
 const router = useRouter();
@@ -149,6 +148,8 @@ function onScroll(e: Event) {
     loadMore();
   }
 }
+
+const goHome = () => router.push('/home')
 
 watch(keyword, () => {
   page.value = 1;

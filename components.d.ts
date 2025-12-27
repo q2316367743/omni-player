@@ -14,6 +14,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppToolLayout: typeof import('./src/components/PageLayout/AppToolLayout.vue')['default']
     ArtPlayer: typeof import('./src/components/VideoPlayer/ArtPlayer.vue')['default']
+    BackHome: typeof import('./src/components/common/BackHome.vue')['default']
     EmptyResult: typeof import('./src/components/Result/EmptyResult.vue')['default']
     HorizontalSplitPanel: typeof import('./src/components/common/HorizontalSplitPanel.vue')['default']
     InfoResult: typeof import('./src/components/Result/InfoResult.vue')['default']
@@ -82,6 +83,7 @@ declare module 'vue' {
 declare global {
   const AppToolLayout: typeof import('./src/components/PageLayout/AppToolLayout.vue')['default']
   const ArtPlayer: typeof import('./src/components/VideoPlayer/ArtPlayer.vue')['default']
+  const BackHome: typeof import('./src/components/common/BackHome.vue')['default']
   const EmptyResult: typeof import('./src/components/Result/EmptyResult.vue')['default']
   const HorizontalSplitPanel: typeof import('./src/components/common/HorizontalSplitPanel.vue')['default']
   const InfoResult: typeof import('./src/components/Result/InfoResult.vue')['default']

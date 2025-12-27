@@ -1,14 +1,12 @@
 <template>
   <div class="app-layout">
     <div class="app-layout-header">
-      <div class="w-24px" v-if="collapsed">
-        <t-button theme="primary" variant="text" shape="square"
-                  @click="toggleCollapsed()">
-          <template #icon>
-            <menu-icon/>
-          </template>
-        </t-button>
-      </div>
+      <t-button theme="primary" variant="text" shape="square"
+                @click="goHome()">
+        <template #icon>
+          <home-icon />
+        </template>
+      </t-button>
       <div class="flex gap-4px items-center shrink-0">
         <slot name="header"/>
       </div>
@@ -19,8 +17,13 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {MenuIcon} from "tdesign-icons-vue-next";
-import {collapsed, toggleCollapsed} from "@/global/Constants.ts";
+import {HomeIcon} from "tdesign-icons-vue-next";
+
+const router = useRouter();
+
+const goHome = () => {
+  router.push('/');
+};
 </script>
 <style scoped lang="less">
 .app-layout {
