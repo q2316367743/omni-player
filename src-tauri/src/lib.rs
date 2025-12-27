@@ -5,7 +5,6 @@ use tauri::{
 };
 use tauri_plugin_log::{Target, TargetKind};
 
-mod commands;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -16,12 +15,7 @@ pub fn run() {
                 .build(),
         )
         // 注册所有命令（现在从 commands 模块导入）
-        .invoke_handler(tauri::generate_handler![
-            commands::window::create_tauri_window,
-            commands::potplayer::launch_potplayer,
-        ])
         .plugin(tauri_plugin_sql::Builder::default().build())
-        .plugin(tauri_plugin_libmpv::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(
             tauri_plugin_stronghold::Builder::new(|password| {

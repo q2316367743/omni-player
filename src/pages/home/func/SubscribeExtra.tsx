@@ -1,4 +1,5 @@
 import {open, save} from '@tauri-apps/plugin-dialog';
+import {revealItemInDir} from '@tauri-apps/plugin-opener'
 import {readTextFile, writeTextFile} from '@tauri-apps/plugin-fs';
 import {export2Opml, importByOpml} from "@/util/file/opml.ts";
 import {addSubscribe, listSubscribe} from "@/services";
@@ -49,6 +50,7 @@ async function _exportSubscribe() {
   const items = await listSubscribe();
   const opml = export2Opml(items);
   await writeTextFile(path, opml);
+  await revealItemInDir(path);
 }
 
 export async function exportSubscribe() {

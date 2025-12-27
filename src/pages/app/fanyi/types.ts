@@ -1,1 +1,0 @@
-export type fanYiFunc = (text: string) => Promise<string>;

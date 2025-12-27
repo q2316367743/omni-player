@@ -6,24 +6,30 @@
         网络资源
       </h3>
       <div class="flex gap-4px">
-        <t-button theme="primary" variant="text" shape="square"
-                  @click="importNetwork()">
-          <template #icon>
-            <file-import-icon/>
-          </template>
-        </t-button>
-        <t-button theme="primary" variant="text" shape="square"
-                  @click="exportNetwork()">
-          <template #icon>
-            <file-export-icon/>
-          </template>
-        </t-button>
-        <t-button theme="primary" variant="text" shape="square"
-                  @click="openSearchModelWrap()">
-          <template #icon>
-            <search-icon/>
-          </template>
-        </t-button>
+        <t-tooltip content="导入">
+          <t-button theme="primary" variant="text" shape="square"
+                    @click="importNetwork()">
+            <template #icon>
+              <file-import-icon/>
+            </template>
+          </t-button>
+        </t-tooltip>
+        <t-tooltip content="导出">
+          <t-button theme="primary" variant="text" shape="square"
+                    @click="exportNetwork()">
+            <template #icon>
+              <file-export-icon/>
+            </template>
+          </t-button>
+        </t-tooltip>
+        <t-tooltip content="聚合搜索">
+          <t-button theme="primary" variant="text" shape="square"
+                    @click="openSearchModelWrap()">
+            <template #icon>
+              <search-icon/>
+            </template>
+          </t-button>
+        </t-tooltip>
         <t-button theme="primary" variant="text" shape="square"
                   @click="openNetworkServerEdit()">
           <template #icon>

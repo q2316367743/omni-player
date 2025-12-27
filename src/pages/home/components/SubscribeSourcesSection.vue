@@ -7,25 +7,25 @@
       </h3>
       <div class="flex gap-4px">
         <t-tooltip content="从opml导入">
-          <t-button theme="primary" size="small" variant="text" shape="square" @click="importSubscribe">
+          <t-button theme="primary" variant="text" shape="square" @click="importSubscribe">
             <template #icon>
               <file-import-icon/>
             </template>
           </t-button>
         </t-tooltip>
         <t-tooltip content="导出为opml">
-          <t-button theme="primary" size="small" variant="text" shape="square" @click="exportSubscribe">
+          <t-button theme="primary" variant="text" shape="square" @click="exportSubscribe">
             <template #icon>
               <file-export-icon/>
             </template>
           </t-button>
         </t-tooltip>
-        <t-button theme="primary" size="small" variant="text" shape="square" @click="subscribeStore.refresh()">
+        <t-button theme="primary" variant="text" shape="square" @click="subscribeStore.refresh()">
           <template #icon>
             <refresh-icon/>
           </template>
         </t-button>
-        <t-button theme="primary" size="small" variant="text" shape="square"
+        <t-button theme="primary" variant="text" shape="square"
                   @click="openSubscribeEditWrap()">
           <template #icon>
             <add-icon/>

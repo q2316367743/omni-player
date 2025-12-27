@@ -98,6 +98,10 @@ export const router = createRouter({
       name: 'AppFanyi',
       path: 'fanyi',
       component: () => import('@/pages/app/fanyi/app-fanyi.vue')
+    }, {
+      name: 'AppQushuiyin',
+      path: 'qushuiyin',
+      component: () => import('@/pages/app/qushuiyin/app-qushuiyin.vue')
     }]
   }]
 });

@@ -1,6 +1,6 @@
 import Database, {type QueryResult} from '@tauri-apps/plugin-sql';
-import { resolveResource } from '@tauri-apps/api/path';
-import { readTextFile } from '@tauri-apps/plugin-fs';
+import {resolveResource} from '@tauri-apps/api/path';
+import {readTextFile} from '@tauri-apps/plugin-fs';
 import {APP_DATA_DB_PATH, DB_MIGRATE_FILES} from "@/global/Constants.ts";
 import {logInfo} from "@/lib/log.ts";
 import {QueryChain} from "@/util/file/QueryWrapper.ts";
@@ -55,7 +55,7 @@ class Sql {
       const r = await callback(this);
       await db.execute(`COMMIT`);
       return r;
-    }catch (e) {
+    } catch (e) {
       await db.execute(`ROLLBACK`);
       throw e;
     }
@@ -86,7 +86,9 @@ class Sql {
   async migrate() {
 // 1. 检查 schema_version 表是否存在
     logInfo("1. 检查 schema_version 表是否存在");
-    const rows = await this.select<Array<{name: string}>>("SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version';");
+    const rows = await this.select<Array<{
+      name: string
+    }>>("SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version';");
     if (!rows || !rows.length) {
       logInfo("表不存在，创建 schema_version 表");
       await this.execute("CREATE TABLE schema_version (version int PRIMARY KEY,applied_at DATETIME DEFAULT CURRENT_TIMESTAMP);");
@@ -102,7 +104,7 @@ class Sql {
       .filter((m) => m.version > current)
       .sort((a, b) => a.version - b.version);
 
-    for (const { file, version } of pending) {
+    for (const {file, version} of pending) {
       const resourcePath = await resolveResource(file);
       const sql = await readTextFile(resourcePath);
       logInfo("开始处理文件：", file, ",版本：", version);

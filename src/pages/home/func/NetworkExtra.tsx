@@ -1,5 +1,6 @@
 import {open, save} from '@tauri-apps/plugin-dialog';
 import {readTextFile, writeTextFile} from '@tauri-apps/plugin-fs';
+import {revealItemInDir} from '@tauri-apps/plugin-opener'
 import {useNetworkServerStore} from "@/store";
 import {parseJsonWithBigIntSupport, stringifyJsonWithBigIntSupport} from "@/util";
 import MessageUtil from "@/util/model/MessageUtil.ts";
@@ -22,6 +23,7 @@ async function _exportNetwork() {
   const {servers} = useNetworkServerStore();
   const json = stringifyJsonWithBigIntSupport(servers);
   await writeTextFile(path, json);
+  await revealItemInDir(path);
 }
 
 export function exportNetwork() {

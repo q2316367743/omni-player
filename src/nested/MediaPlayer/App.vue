@@ -26,7 +26,6 @@
       @playback="handlePlayback"
       @info="openDetail"
     />
-    <MpvPlayer :url="url" v-else-if="status === 'mpv'" @playback="handlePlayback" @info="openDetail" />
     <t-loading v-else text="正在加载中"/>
   </div>
 </template>
@@ -34,14 +33,13 @@
 <script setup lang="ts">
 import {computed, onMounted, onUnmounted, ref, shallowRef} from 'vue';
 import {getAllWindows, getCurrentWindow} from '@tauri-apps/api/window';
-import type {WindowPayload} from '../../lib/windows';
-import {fetchMediaClient} from '../../store';
-import type {IMediaServer} from "../../modules/media/IMediaServer";
-import type {MediaPlaybackReport, MediaPlaybackState} from "../../modules/media/types/playback/MediaPlaybackReport";
-import type {MediaPlaybackInfo} from "../../modules/media/types/playback/MediaPlaybackInfo";
+import type {WindowPayload} from '@/lib/windows.ts';
+import {fetchMediaClient} from '@/store';
+import type {IMediaServer} from "@/modules/media/IMediaServer.ts";
+import type {MediaPlaybackReport, MediaPlaybackState} from "@/modules/media/types/playback/MediaPlaybackReport.ts";
+import type {MediaPlaybackInfo} from "@/modules/media/types/playback/MediaPlaybackInfo.ts";
 import {openDetailDrawer} from './detailDrawer';
 import ArtPlayer from "../NetworkPlayer/components/ArtPlayer.vue";
-import {useGlobalSettingStore} from "../../store/GlobalSettingStore";
 
 const url = ref('')
 
@@ -58,7 +56,7 @@ function openDetail() {
   openDetailDrawer(clientRef.value, windowPayload);
 }
 
-const status = ref<'artplayer' | "mpv" | "loading">('loading');
+const status = ref<'artplayer' | "loading">('loading');
 const type = ref('mp4');
 
 type QualityOption =
@@ -271,9 +269,7 @@ async function handleQualityChange(optionId: string) {
 onMounted(async () => {
 
   const current = getCurrentWindow();
-  const {playerModeType} = useGlobalSettingStore()
-  if (playerModeType === 'h5') status.value = 'artplayer';
-  else status.value = 'mpv';
+  status.value = 'artplayer';
 
   const unlistenInit = await current.listen<WindowPayload>('init', async ({payload}) => {
     const {serverId, itemId} = payload;
