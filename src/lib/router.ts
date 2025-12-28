@@ -83,10 +83,6 @@ export const router = createRouter({
     redirect: '/app/tool/home',
     component: () => import('@/pages/app/index.vue'),
     children: [{
-      name: 'AppHome',
-      path: 'home',
-      component: () => import('@/pages/app/home/app-home.vue')
-    }, {
       name: 'AppRegex',
       path: 'regex',
       component: () => import('@/pages/app/regex/app-regex.vue')
@@ -102,6 +98,10 @@ export const router = createRouter({
       name: 'AppQushuiyin',
       path: 'qushuiyin',
       component: () => import('@/pages/app/qushuiyin/app-qushuiyin.vue')
+    }, {
+      name: 'AppDailyHot',
+      path: 'dailyhot',
+      component: () => import('@/pages/app/dailyhot/app-dailyhot.vue')
     }]
   }]
 });

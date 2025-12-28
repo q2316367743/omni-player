@@ -1,120 +1,120 @@
 <template>
   <app-tool-layout title="正则表达式工具">
-    <div class="regex-tool">
-      <div class="regex-section">
-        <div class="regex-input-wrapper">
-          <t-input
-            v-model="regexPattern"
-            placeholder="请输入正则表达式"
-            size="large"
-            clearable
-            @input="handleRegexChange"
-          />
-          <t-popup placement="bottom-right" trigger="click">
-            <template #content>
-              <div class="regex-help">
-                <h4>正则表达式语法帮助</h4>
-                <div class="help-section">
-                  <h5>字符匹配</h5>
-                  <ul>
-                    <li><code>.</code> 匹配任意单个字符（除换行符）</li>
-                    <li><code>\d</code> 匹配数字 [0-9]</li>
-                    <li><code>\w</code> 匹配字母、数字、下划线 [a-zA-Z0-9_]</li>
-                    <li><code>\s</code> 匹配空白字符（空格、制表符、换行符）</li>
-                    <li><code>[abc]</code> 匹配方括号内任意一个字符</li>
-                    <li><code>[^abc]</code> 匹配不在方括号内的任意字符</li>
-                  </ul>
+    <div class="regex-tool flex flex-col gap-16px">
+      <t-card>
+        <div class="regex-section">
+          <div class="regex-input-wrapper">
+            <t-input
+              v-model="regexPattern"
+              placeholder="请输入正则表达式"
+              size="large"
+              clearable
+              @input="handleRegexChange"
+            />
+            <t-popup placement="bottom-right" trigger="click">
+              <template #content>
+                <div class="regex-help">
+                  <h4>正则表达式语法帮助</h4>
+                  <div class="help-section">
+                    <h5>字符匹配</h5>
+                    <ul>
+                      <li><code>.</code> 匹配任意单个字符（除换行符）</li>
+                      <li><code>\d</code> 匹配数字 [0-9]</li>
+                      <li><code>\w</code> 匹配字母、数字、下划线 [a-zA-Z0-9_]</li>
+                      <li><code>\s</code> 匹配空白字符（空格、制表符、换行符）</li>
+                      <li><code>[abc]</code> 匹配方括号内任意一个字符</li>
+                      <li><code>[^abc]</code> 匹配不在方括号内的任意字符</li>
+                    </ul>
+                  </div>
+                  <div class="help-section">
+                    <h5>量词</h5>
+                    <ul>
+                      <li><code>*</code> 匹配0次或多次</li>
+                      <li><code>+</code> 匹配1次或多次</li>
+                      <li><code>?</code> 匹配0次或1次</li>
+                      <li><code>{n}</code> 匹配恰好n次</li>
+                      <li><code>{n,m}</code> 匹配n到m次</li>
+                    </ul>
+                  </div>
+                  <div class="help-section">
+                    <h5>边界匹配</h5>
+                    <ul>
+                      <li><code>^</code> 匹配字符串开头</li>
+                      <li><code>$</code> 匹配字符串结尾</li>
+                      <li><code>\b</code> 匹配单词边界</li>
+                    </ul>
+                  </div>
+                  <div class="help-section">
+                    <h5>分组和引用</h5>
+                    <ul>
+                      <li><code>(abc)</code> 捕获分组</li>
+                      <li><code>(?:abc)</code> 非捕获分组</li>
+                      <li><code>a|b</code> 匹配a或b</li>
+                      <li><code>\1</code> 引用第一个捕获组</li>
+                    </ul>
+                  </div>
+                  <div class="help-section">
+                    <h5>标志</h5>
+                    <ul>
+                      <li><code>i</code> 忽略大小写</li>
+                      <li><code>g</code> 全局匹配</li>
+                      <li><code>m</code> 多行模式</li>
+                      <li><code>s</code> 点号匹配换行符</li>
+                    </ul>
+                  </div>
                 </div>
-                <div class="help-section">
-                  <h5>量词</h5>
-                  <ul>
-                    <li><code>*</code> 匹配0次或多次</li>
-                    <li><code>+</code> 匹配1次或多次</li>
-                    <li><code>?</code> 匹配0次或1次</li>
-                    <li><code>{n}</code> 匹配恰好n次</li>
-                    <li><code>{n,m}</code> 匹配n到m次</li>
-                  </ul>
-                </div>
-                <div class="help-section">
-                  <h5>边界匹配</h5>
-                  <ul>
-                    <li><code>^</code> 匹配字符串开头</li>
-                    <li><code>$</code> 匹配字符串结尾</li>
-                    <li><code>\b</code> 匹配单词边界</li>
-                  </ul>
-                </div>
-                <div class="help-section">
-                  <h5>分组和引用</h5>
-                  <ul>
-                    <li><code>(abc)</code> 捕获分组</li>
-                    <li><code>(?:abc)</code> 非捕获分组</li>
-                    <li><code>a|b</code> 匹配a或b</li>
-                    <li><code>\1</code> 引用第一个捕获组</li>
-                  </ul>
-                </div>
-                <div class="help-section">
-                  <h5>标志</h5>
-                  <ul>
-                    <li><code>i</code> 忽略大小写</li>
-                    <li><code>g</code> 全局匹配</li>
-                    <li><code>m</code> 多行模式</li>
-                    <li><code>s</code> 点号匹配换行符</li>
-                  </ul>
-                </div>
-              </div>
-            </template>
-            <t-button variant="text" size="large" shape="square" theme="primary">
-              <template #icon>
-                <help-circle-icon/>
               </template>
-            </t-button>
-          </t-popup>
+              <t-button variant="text" size="large" shape="square" theme="primary">
+                <template #icon>
+                  <help-circle-icon/>
+                </template>
+              </t-button>
+            </t-popup>
+          </div>
         </div>
-      </div>
 
-      <div class="flags-section">
-        <t-checkbox-group v-model="regexFlags" variant="default">
-          <t-checkbox value="i">i (忽略大小写)</t-checkbox>
-          <t-checkbox value="g">g (全局匹配)</t-checkbox>
-          <t-checkbox value="m">m (多行模式)</t-checkbox>
-          <t-checkbox value="s">s (点号匹配换行)</t-checkbox>
-        </t-checkbox-group>
-      </div>
+        <div class="flags-section">
+          <t-checkbox-group v-model="regexFlags" variant="default">
+            <t-checkbox value="i">i (忽略大小写)</t-checkbox>
+            <t-checkbox value="g">g (全局匹配)</t-checkbox>
+            <t-checkbox value="m">m (多行模式)</t-checkbox>
+            <t-checkbox value="s">s (点号匹配换行)</t-checkbox>
+          </t-checkbox-group>
+        </div>
+      </t-card>
 
-      <div class="test-text-section">
-        <div class="section-label">待测试文本</div>
+      <t-card title="待测试文本">
         <t-textarea
           v-model="testText"
           placeholder="请输入待测试的文本"
           :autosize="{ minRows: 6, maxRows: 12 }"
           @input="handleTextChange"
         />
-      </div>
+      </t-card>
 
-      <div class="result-section">
-        <div class="section-label">匹配结果</div>
-        <div class="result-content">
-          <div v-if="highlightedText" class="highlighted-text" v-html="highlightedText"></div>
-          <div v-else class="result-empty">
-            <t-empty title="暂无匹配结果"/>
+      <t-card title="匹配结果">
+        <div v-if="highlightedText" class="highlighted-text" v-html="highlightedText"></div>
+        <div v-else class="result-empty">
+          <t-empty title="暂无匹配结果"/>
+        </div>
+      </t-card>
+
+      <t-card>
+        <div class="stats-section">
+          <div class="stat-item">
+            <span class="stat-label">匹配数量:</span>
+            <span class="stat-value">{{ matchCount }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">总字符数:</span>
+            <span class="stat-value">{{ totalChars }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">匹配率:</span>
+            <span class="stat-value">{{ matchRate }}%</span>
           </div>
         </div>
-      </div>
-
-      <div class="stats-section">
-        <div class="stat-item">
-          <span class="stat-label">匹配数量:</span>
-          <span class="stat-value">{{ matchCount }}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">总字符数:</span>
-          <span class="stat-value">{{ totalChars }}</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">匹配率:</span>
-          <span class="stat-value">{{ matchRate }}%</span>
-        </div>
-      </div>
+      </t-card>
     </div>
   </app-tool-layout>
 </template>
@@ -219,9 +219,9 @@ const performMatch = () => {
 
 <style lang="less">
 .regex-tool {
-  padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 20px 20px 48px;
 }
 
 .regex-section {
@@ -291,10 +291,7 @@ const performMatch = () => {
 .stats-section {
   display: flex;
   justify-content: space-between;
-  gap: 24px;
-  background: var(--td-bg-color-container);
-  border-radius: var(--td-radius-default);
-  border-top: 2px solid var(--td-brand-color);
+
 }
 
 .stat-item {

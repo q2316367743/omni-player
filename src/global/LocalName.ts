@@ -51,4 +51,8 @@ export const LocalName = {
   APP_ASIDE_SUBSCRIBE_EXPANDED: '/app/aside/subscribe/expanded',
   APP_ASIDE_MEDIA_EXPANDED: '/app/aside/media/expanded',
   APP_ASIDE_NETWORK_EXPANDED: '/app/aside/network/expanded',
+
+  PAGE_APP_DAILY_HOT_REFRESH_TIME: '/page/app/dailyhot/refresh_time',
+  PAGE_APP_DAILY_HOT_LIST_PLATFORM: '/page/app/dailyhot/list_platform',
+  PAGE_APP_DAILY_HOT_SELECTED_PLATFORM: '/page/app/dailyhot/selected_platform',
 }

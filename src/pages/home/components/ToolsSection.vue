@@ -51,13 +51,22 @@
             <div class="tool-desc">视频图片水印去除</div>
           </div>
         </div>
+        <div class="tool-card" @click="jumpTool('dailyhot')">
+          <div class="tool-icon media">
+            <article-icon />
+          </div>
+          <div class="tool-info">
+            <div class="tool-name">今日热搜</div>
+            <div class="tool-desc">查看各大榜单的今日热榜排行</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {CodeIcon, InternetIcon, TranslateIcon, VideoIcon} from "tdesign-icons-vue-next";
+import {ArticleIcon, CodeIcon, InternetIcon, TranslateIcon, VideoIcon} from "tdesign-icons-vue-next";
 
 const router = useRouter();
 
