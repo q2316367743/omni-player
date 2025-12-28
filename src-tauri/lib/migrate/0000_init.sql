@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS feed_item
     pub_date        INTEGER NOT NULL,
     author          TEXT,
     summary         TEXT,
-    isRead          BOOLEAN NOT NULL DEFAULT 0, -- SQLite 用 0/1 表示布尔
-    content_fetched BOOLEAN NOT NULL DEFAULT 0
+    is_read         INTEGER NOT NULL DEFAULT 0, -- SQLite 用 0/1 表示布尔
+    content_fetched INTEGER NOT NULL DEFAULT 0
 );
 
 -- 为 feed_items 添加索引：加速按 signal 查询（关联内容时使用）

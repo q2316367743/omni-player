@@ -6,6 +6,8 @@ import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 import 'virtual:uno.css'
 import {createPinia} from "pinia";
 import {router} from "@/lib/router.ts";
+import {useSql} from "@/lib/sql.ts";
+import {logError, logInfo} from "@/lib/log.ts";
 
 // 👇 必须在 import monaco 之前设置！
 self.MonacoEnvironment = {
@@ -34,7 +36,18 @@ self.MonacoEnvironment = {
   },
 };
 
-createApp(App)
-  .use(createPinia())
-  .use(router)
-  .mount('#app')
+useSql().migrate()
+  .then(() => {
+    logInfo("数据库合并成功")
+  })
+  .catch(e => {
+    logError("数据库合并失败");
+    console.error(e);
+  })
+  .finally(() => {
+    document.getElementById("init")?.remove();
+    createApp(App)
+      .use(createPinia())
+      .use(router)
+      .mount('#app')
+  })

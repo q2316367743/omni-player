@@ -1,10 +1,10 @@
 [package]
-name = "app"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
+name = "nor-regret"
+version = "1.0.0"
+description = "一个书影音全能的客户端"
+authors = ["esion"]
+license = "Apache-2.0"
+repository = "https://github.com/q2316367743/nor-regret"
 edition = "2021"
 rust-version = "1.77.2"
 
@@ -30,8 +30,6 @@ tauri-plugin-opener = "2"
 tauri-plugin-os = "2"
 tauri-plugin-shell = "2"
 tauri-plugin-store = "2"
-tauri-plugin-stronghold = "2"
-argon2 = "0.5.3"
 tauri-plugin-updater = "2"
 
 [dependencies.tauri-plugin-sql]

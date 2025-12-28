@@ -4,7 +4,6 @@ import {readTextFile} from '@tauri-apps/plugin-fs';
 import {APP_DATA_DB_PATH, DB_MIGRATE_FILES} from "@/global/Constants.ts";
 import {logInfo} from "@/lib/log.ts";
 import {QueryChain} from "@/util/file/QueryWrapper.ts";
-import MessageUtil from "@/util/model/MessageUtil.ts";
 import {BaseMapper, type TableLike} from "@/util";
 
 class Sql {
@@ -12,26 +11,19 @@ class Sql {
   private db: Database | null = null;
 
 
-  private promiseChain: Promise<unknown> = Promise.resolve();
-
   private async getDb(): Promise<Database> {
     // 将新的 SQL 调用追加到 Promise 链尾部
-    this.promiseChain = this.promiseChain
-      .then(async () => {
-        if (this.db) return this.db;
-        const path = await APP_DATA_DB_PATH();
-        console.log("db path: ", path)
-        this.db = await Database.load(`sqlite:${path}`);
-        return this.db;
-      })
-      .catch((err) => {
-        console.error('get store error:', err);
-        throw err; // 保证错误能被调用者捕获
-      });
-
-    return this.promiseChain as Promise<Database>;
+    if (this.db) return this.db;
+    const path = await APP_DATA_DB_PATH();
+    console.log("db path: ", path)
+    this.db = await Database.load(`sqlite:${path}`);
+    logInfo("db init success", this.db);
+    return this.db;
   }
 
+  private promiseChain: Promise<unknown> = Promise.resolve();
+
+  // sqlite不支持并发执行
   async execute(query: string, bindValues?: unknown[]): Promise<QueryResult> {
     // 将新的 SQL 调用追加到 Promise 链尾部
     this.promiseChain = this.promiseChain
@@ -136,9 +128,6 @@ class Sql {
 }
 
 const sql = new Sql();
-
-// 开始合并
-sql.migrate().catch(e => MessageUtil.error("数据库合并失败", e));
 
 export const useSql = () => {
   return sql;

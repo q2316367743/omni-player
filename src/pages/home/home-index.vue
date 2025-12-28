@@ -5,7 +5,7 @@
         <div class="welcome-card">
           <div class="welcome-info">
             <h1 class="welcome-title">欢迎使用亦无悔</h1>
-            <p class="welcome-subtitle">一站式多媒体管理平台</p>
+            <p class="welcome-subtitle"><shi-ci/></p>
           </div>
           <div class="stats-grid">
             <div class="stat-card">
@@ -40,9 +40,6 @@
       </div>
     </div>
 
-    <div class="poetry-section">
-      <shi-ci/>
-    </div>
   </div>
 </template>
 

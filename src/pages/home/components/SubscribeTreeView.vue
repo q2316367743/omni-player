@@ -46,6 +46,7 @@
 <script lang="ts" setup>
 import {ChevronDownIcon, ChevronRightIcon, FolderIcon, RssIcon} from "tdesign-icons-vue-next";
 import type {TreeNode} from "@/store/SubscribeStore.ts";
+import {useSubscribeStore} from "@/store/SubscribeStore.ts";
 
 interface Props {
   nodes: TreeNode[];
@@ -56,9 +57,11 @@ const { level = 0 } = defineProps<Props>();
 
 const emit = defineEmits(['jump', 'contextmenu']);
 
+const subscribeStore = useSubscribeStore();
+
 const toggleExpand = (node: TreeNode) => {
   if (node.type === 'folder') {
-    node.expanded = !node.expanded;
+    subscribeStore.toggleFolderExpanded(node.path);
   }
 };
 

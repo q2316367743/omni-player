@@ -15,6 +15,7 @@ export interface TreeNode {
 
 export const useSubscribeStore = defineStore('subscribe', () => {
   const subscribes = ref<Array<SubscribeItem>>([]);
+  const folderExpandedMap = ref<Map<string, boolean>>(new Map());
 
   const refresh = () => {
     listSubscribe().then(res => {
@@ -22,6 +23,11 @@ export const useSubscribeStore = defineStore('subscribe', () => {
     });
   }
   refresh();
+
+  const toggleFolderExpanded = (path: string) => {
+    const current = folderExpandedMap.value.get(path) ?? true;
+    folderExpandedMap.value.set(path, !current);
+  };
 
   const subscribeTree = computed(() => {
     const tree: TreeNode[] = [];
@@ -59,7 +65,7 @@ export const useSubscribeStore = defineStore('subscribe', () => {
         type: 'folder',
         path: path,
         children: [],
-        expanded: true
+        expanded: folderExpandedMap.value.get(path) ?? true
       };
 
       folderMap.set(path, node);
@@ -111,7 +117,8 @@ export const useSubscribeStore = defineStore('subscribe', () => {
   return {
     subscribes,
     subscribeTree,
-    refresh
+    refresh,
+    toggleFolderExpanded
   }
 
 })
