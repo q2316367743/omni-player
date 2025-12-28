@@ -9,7 +9,7 @@ export function formatDate(date: Date | string | number, format: string = 'YYYY-
   return dayjs(date).format(format);
 }
 
-export const prettyBetweenTime = (timestamp: string) => {
+export const prettyBetweenTime = (timestamp: string | number | Date) => {
   const date = new Date(timestamp);
   const now = new Date();
   const diff = now.getTime() - date.getTime();

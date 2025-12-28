@@ -38,11 +38,10 @@
 <script lang="ts" setup>
 import {RefreshIcon, SearchIcon} from "tdesign-icons-vue-next";
 import {LocalName} from "@/global/LocalName.ts";
-import {getAction} from "@/lib/http.ts";
-import type {PlatformListResponse} from "@/pages/app/dailyhot/types.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {useFuse} from "@vueuse/integrations/useFuse"
-import type {SelectOption} from "@/global/CommonType.ts";
+import type {CommonOption} from "@/global/CommonType.ts";
+import {useNewsService} from "@/modules/news/NewsFactory.ts";
 
 const props = defineProps({
   selectedPlatform: {
@@ -52,12 +51,9 @@ const props = defineProps({
 });
 const emit = defineEmits(['choose']);
 
-const API_URL = 'https://api.pearktrue.cn/api/dailyhot/';
-
-
 const searchKeyword = ref('');
 const refreshingPlatforms = ref(false);
-const platforms = useLocalStorage(LocalName.PAGE_APP_DAILY_HOT_LIST_PLATFORM, new Array<SelectOption>());
+const platforms = useLocalStorage(LocalName.PAGE_APP_DAILY_HOT_LIST_PLATFORM, new Array<CommonOption>());
 const refreshTime = useLocalStorage(LocalName.PAGE_APP_DAILY_HOT_REFRESH_TIME, 0);
 
 
@@ -81,20 +77,14 @@ const fetchPlatforms = async (forceRefresh = false) => {
 
   refreshingPlatforms.value = true;
   try {
-    const {data} = await getAction<PlatformListResponse>(API_URL);
-
-    if (data.code === 200 && data.data?.platforms) {
-      platforms.value = data.data.platforms.map(e => ({label: e, value: e}));
-      refreshTime.value = Date.now();
-      MessageUtil.success('平台列表已更新');
-      if (!props.selectedPlatform || !platforms.value.map(e => e.value).includes(props.selectedPlatform)) {
-        const first = platforms.value[0]?.value;
-        if (first) {
-          selectPlatform(first);
-        }
+    platforms.value = await useNewsService().platforms();
+    refreshTime.value = Date.now();
+    MessageUtil.success('平台列表已更新');
+    if (!props.selectedPlatform || !platforms.value.map(e => e.value).includes(props.selectedPlatform)) {
+      const first = platforms.value[0]?.value;
+      if (first) {
+        selectPlatform(first);
       }
-    } else {
-      MessageUtil.error('获取平台列表失败');
     }
   } catch (error) {
     console.error('获取平台列表错误:', error);

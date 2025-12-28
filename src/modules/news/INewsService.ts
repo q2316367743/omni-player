@@ -1,4 +1,4 @@
-import type {SelectOption} from "@/global/CommonType.ts";
+import type {CommonOption} from "@/global/CommonType.ts";
 
 export interface NewItem {
   id: string;
@@ -7,13 +7,13 @@ export interface NewItem {
   desc?: string;
   cover?: string;
   author?: string;
-  time?: number;
+  timestamp?: number;
   hot?: number;
 }
 
 export interface INewsService {
 
-  platforms: () => Promise<Array<SelectOption>>;
+  platforms: () => Promise<Array<CommonOption>>;
 
   getNews(platform: string): Promise<Array<NewItem>>;
 

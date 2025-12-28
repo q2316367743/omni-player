@@ -13,7 +13,7 @@
         v-for="(item, index) in hotList"
         :key="item.id"
         class="hot-item"
-        @click="openLink(item.url || item.mobileUrl)"
+        @click="openLink(item.url)"
       >
         <div class="hot-index" :class="getHotIndexClass(index)">{{ index + 1 }}</div>
         <div class="hot-info">
@@ -45,10 +45,10 @@
 <script lang="ts" setup>
 import {openUrl} from "@tauri-apps/plugin-opener";
 import {TimeIcon} from "tdesign-icons-vue-next";
-import type {ApiResponse, HotItem} from "@/pages/app/dailyhot/types.ts";
-import {getAction} from "@/lib/http.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
-import {prettyBetweenTime} from "@/util/lang/FormatUtil.ts";
+import {formatDate, prettyBetweenTime} from "@/util/lang/FormatUtil.ts";
+import {useNewsService} from "@/modules/news/NewsFactory.ts";
+import type {NewItem} from "@/modules/news/INewsService.ts";
 
 const props = defineProps({
   selectedPlatform: {
@@ -57,10 +57,8 @@ const props = defineProps({
   }
 });
 
-const API_URL = 'https://api.pearktrue.cn/api/dailyhot/';
-
 const updateTime = ref('');
-const hotList = ref<HotItem[]>([]);
+const hotList = ref<NewItem[]>([]);
 const loading = ref(false);
 
 const getHotIndexClass = (index: number) => {
@@ -71,15 +69,8 @@ const getHotIndexClass = (index: number) => {
 const fetchHotList = async (platform: string) => {
   loading.value = true;
   try {
-    const {data} = await getAction<ApiResponse>(API_URL, {title: platform});
-
-    if (data.code === 200 && data.data) {
-      hotList.value = data.data;
-      updateTime.value = data.updateTime || '';
-    } else {
-      hotList.value = [];
-      MessageUtil.warning('获取热榜数据失败');
-    }
+    hotList.value = await useNewsService().getNews(platform);
+    updateTime.value = formatDate(new Date());
   } catch (error) {
     console.error('获取热榜数据错误:', error);
     MessageUtil.error('网络请求失败');
