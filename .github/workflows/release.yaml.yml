@@ -1,4 +1,4 @@
-name: 'publish'
+name: upgrade
 
 on:
   workflow_dispatch:
@@ -8,19 +8,21 @@ on:
 
 jobs:
   publish-tauri:
+    # 添加输出定义
+    outputs:
+      appVersion: ${{ steps.set_output.outputs.appVersion }}
+
     permissions:
       contents: write
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest' # for Arm based macs (M1 and above).
+          - platform: 'macos-latest'
             args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest' # for Intel based macs.
+          - platform: 'macos-latest'
             args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-22.04'
-            args: ''
-          - platform: 'ubuntu-22.04-arm' # Only available in public repos.
+          - platform: 'ubuntu-24.04'
             args: ''
           - platform: 'windows-latest'
             args: ''
@@ -29,40 +31,67 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: true
 
       - name: setup node
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'pnpm' # Set this to npm, yarn or pnpm.
+          cache: 'pnpm'
 
       - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable # Set this to dtolnay/rust-toolchain@nightly
+        uses: dtolnay/rust-toolchain@stable
         with:
-          # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: './src-tauri -> target'
+      # ----------------------------------------------------------
+      #  修复 WiX light.exe 找不到 VC++ 运行库的问题（仅 Windows）
+      # ----------------------------------------------------------
+      - name: Install VC++ redist (Windows only)
+        if: matrix.platform == 'windows-latest'
+        run: |
+          Invoke-WebRequest -Uri https://aka.ms/vs/17/release/vc_redist.x64.exe -OutFile vc_redist.x64.exe
+          Start-Process -Wait -FilePath .\vc_redist.x64.exe -ArgumentList "/quiet", "/norestart"
+
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-24.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libclang-dev libxcb1-dev libxrandr-dev \
+                                  libdbus-1-dev libpipewire-0.3-dev libwayland-dev libegl-dev \
+                                  libglib2.0-dev libgtk-3-dev libwebkit2gtk-4.1-dev libgbm-dev \
+                                  libappindicator3-dev librsvg2-dev patchelf
 
       - name: install frontend dependencies
-        # If you don't have `beforeBuildCommand` configured you may want to build your frontend here too.
-        run: pnpm install # change this to npm or pnpm depending on which one you use.
+        run: pnpm install
 
       - uses: tauri-apps/tauri-action@v0
+        id: tauri-action  # 添加 id 以便后续引用
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
-          releaseName: 'App v__VERSION__'
+          tagName: v__VERSION__
+          releaseName: 'v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
-          prerelease: false
+          releaseDraft: false # 不创建草稿版本
+          prerelease: false # 不作为预发布版本
           args: ${{ matrix.args }}
+
+      # 保留原有「获取版本号」逻辑
+      - name: Generate release tag
+        id: save_tag
+        if: matrix.platform == 'ubuntu-24.04'
+        run: |
+          echo ${{ steps.tauri-action.outputs.appVersion }}
+          echo "appVersion=${{ steps.tauri-action.outputs.appVersion }}" >> $GITHUB_OUTPUT
+
+      - name: Set job output
+        id: set_output
+        if: matrix.platform == 'ubuntu-24.04'
+        run: |
+          echo "appVersion=${{ steps.save_tag.outputs.appVersion }}" >> $GITHUB_OUTPUT
