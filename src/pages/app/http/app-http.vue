@@ -270,7 +270,7 @@
                 <div v-if="response" class="response-body">
                   <MonacoEditor
                     :model-value="formatResponseBody(response.data)"
-                    :language="getResponseLanguage(response.data)"
+                    :language="getResponseLanguage(response)"
                     :readonly="true"
                     height="400px"
                   />
@@ -679,10 +679,40 @@ const formatSize = (bytes: number) => {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 };
 
-const getResponseLanguage = (data: any): 'json' | 'plaintext' => {
-  if (typeof data === 'object') {
+const getResponseLanguage = (response: ResponseData): 'plaintext' | 'json' | 'html' | 'javascript' | 'xml' | 'css' | 'markdown' => {
+  const contentType = response.headers?.find(h => h.key.toLowerCase() === 'content-type')?.value || '';
+  
+  if (!contentType) {
+    return typeof response.data === 'object' ? 'json' : 'plaintext';
+  }
+
+  const type = contentType.toLowerCase();
+  
+  if (type.includes('application/json') || type.includes('text/json')) {
     return 'json';
   }
+  if (type.includes('text/html')) {
+    return 'html';
+  }
+  if (type.includes('text/javascript') || type.includes('application/javascript') || type.includes('application/x-javascript')) {
+    return 'javascript';
+  }
+  if (type.includes('text/xml') || type.includes('application/xml') || type.includes('application/atom+xml') || type.includes('application/rss+xml')) {
+    return 'xml';
+  }
+  if (type.includes('text/css')) {
+    return 'css';
+  }
+  if (type.includes('text/markdown')) {
+    return 'markdown';
+  }
+  if (type.includes('application/x-www-form-urlencoded')) {
+    return 'plaintext';
+  }
+  if (type.includes('multipart/form-data')) {
+    return 'plaintext';
+  }
+  
   return 'plaintext';
 };
 </script>

@@ -4,6 +4,7 @@ import {TableName} from "@/global/TableName.ts";
 import {logError} from "@/lib/log.ts";
 import {getFaviconUrl} from "@/util/file/website.ts";
 import {refreshFeed} from "@/services/FeedService.ts";
+import {LocalName} from "@/global/LocalName.ts";
 
 export async function listSubscribe() {
   const query = await useSql().query<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
@@ -86,6 +87,7 @@ export async function removeSubscribe(id: string) {
     const subscribeQuery = await sql.query<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
     await subscribeQuery.eq('id', id).delete();
   })
+  localStorage.removeItem(LocalName.PAGE_SUBSCRIBE_VIEW_MODE(id));
 }
 
 export async function getSubscribe(id: string) {
