@@ -221,7 +221,7 @@ const performMatch = () => {
 .regex-tool {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 20px 48px;
+  padding: 24px;
 }
 
 .regex-section {

@@ -20,6 +20,13 @@ export const LocalName = {
   // 订阅收起
   STORE_SUBSCRIBE_COLLAPSED: '/store/subscribe/collapsed',
 
+  // 全部计划
+  STORE_TODO_PLAN: '/store/todo/plan',
+  // 待办分组，id 为计划 ID
+  STORE_TODO_GROUP: (id: string) => `/store/todo/group/${id}`,
+  // 待办项列表
+  STORE_TODO_ITEM: (planId: string, groupId: string) => `/store/todo/item/${planId}/${groupId}`,
+
   PAGE_MEDIA_HOME_SORT_BY: "/page/media/home/sortBy",
   PAGE_MEDIA_HOME_SORT_ORDER: "/page/media/home/sortOrder",
   PAGE_MEDIA_MOVIE_SORT_BY: "/page/media/movie/sortBy",

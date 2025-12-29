@@ -102,6 +102,14 @@ export const router = createRouter({
       name: 'AppDailyHot',
       path: 'dailyhot',
       component: () => import('@/pages/app/dailyhot/app-dailyhot.vue')
+    }, {
+      name: "AppTodo",
+      path: "todo",
+      component: () => import('@/pages/app/todo/app-todo.vue')
+    }, {
+      name: "AppEditor",
+      path: "editor",
+      component: () => import('@/pages/app/editor/app-editor.vue')
     }]
   }]
 });

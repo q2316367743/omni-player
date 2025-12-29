@@ -3,7 +3,13 @@ import {APP_DATA_STORE_PATH} from "@/global/Constants";
 
 
 class StoreWrapper {
+
+  private readonly storeName: string
   private store: Store | null = null;
+
+  constructor(storeName: string) {
+    this.storeName = storeName;
+  }
 
   private promiseChain: Promise<unknown> = Promise.resolve();
 
@@ -21,7 +27,7 @@ class StoreWrapper {
 
   private async _getStore() {
     if (!this.store) {
-      this.store = await Store.load(await APP_DATA_STORE_PATH());
+      this.store = await Store.load(await APP_DATA_STORE_PATH(this.storeName));
     }
     return this.store;
   }
@@ -55,6 +61,10 @@ class StoreWrapper {
   }
 }
 
-let instance = new StoreWrapper();
+const instance = new StoreWrapper("store");
 
 export const useStore = () => instance;
+
+const todoStore = new StoreWrapper("todo");
+
+export const useTodoStore = () => todoStore;

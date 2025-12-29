@@ -89,7 +89,9 @@ export function openMediaContextmenu(server: MediaServer, e: PointerEvent) {
             useMediaServerStore().removeServer(server)
               .then(() => MessageUtil.success("删除成功"))
               .catch((e) => MessageUtil.error("删除失败", e))
-          })
+          }).catch(() => {
+            console.log('删除已取消');
+          });
         }
       }
     ]

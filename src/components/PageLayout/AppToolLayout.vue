@@ -51,7 +51,7 @@ const goBack = () => router.back();
     top: 57px;
     left: 0;
     width: 100%;
-    height: calc(100vh - 33px);
+    height: calc(100vh - 57px);
     transform: scale(1);
     overflow: auto;
   }

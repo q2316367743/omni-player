@@ -8,5 +8,6 @@ export interface TodoGroup {
   updatedAt: number;
 
   name: string;
+  allCompleted: boolean;
 
 }

@@ -25,6 +25,7 @@
     "store:allow-set",
     "store:allow-save",
     "store:allow-load",
+    "store:allow-delete",
     "core:webview:allow-set-webview-position",
     "core:webview:allow-create-webview",
     "core:webview:allow-webview-show",

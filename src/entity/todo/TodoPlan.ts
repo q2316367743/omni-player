@@ -9,4 +9,5 @@ export interface TodoPlan {
   name: string;
   folder: boolean;
   parentId: string;
+  groupCount: number;
 }

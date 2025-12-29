@@ -3,7 +3,7 @@
     <div class="tools-group">
       <div class="group-title">程序员三件套</div>
       <div class="tools-grid">
-        <div class="tool-card" @click="jumpTool('regex')">
+        <div class="tool-card" @click="jumpTool('todo')">
           <div class="tool-icon todo">
             <check-rectangle-icon />
           </div>
@@ -12,7 +12,7 @@
             <div class="tool-desc">分组待办更高效</div>
           </div>
         </div>
-        <div class="tool-card" @click="jumpTool('http')">
+        <div class="tool-card" @click="jumpTool('editor')">
           <div class="tool-icon editor">
             <edit1-icon />
           </div>

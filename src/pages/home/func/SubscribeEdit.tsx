@@ -76,7 +76,9 @@ export function openSubscribeContextmenu(onUpdate: () => void, server: Subscribe
                 onUpdate();
               })
               .catch((e) => MessageUtil.error("删除失败", e))
-          })
+          }).catch(() => {
+            console.log('删除已取消');
+          });
         }
       }
     ]
