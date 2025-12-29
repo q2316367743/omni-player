@@ -26,12 +26,7 @@
             <span class="item-count">{{ getTotalCount(node) }}</span>
           </template>
           <template v-else-if="node.type === 'item' && node.data">
-            <t-image v-if="node.icon" :src="node.icon" class="w-20px h-20px">
-              <template #error>
-                <rss-icon class="item-icon subscribe-icon-color"/>
-              </template>
-            </t-image>
-            <rss-icon v-else class="item-icon subscribe-icon-color"/>
+            <rss-icon class="item-icon subscribe-icon-color"/>
             <span class="item-text">{{ node.data.name }}</span>
             <span v-if="node.data.count" class="item-count">{{ node.data.count }}</span>
           </template>
