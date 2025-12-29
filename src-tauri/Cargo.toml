@@ -1,6 +1,6 @@
 [package]
 name = "nor-regret"
-version = "1.0.0"
+version = "1.0.1"
 description = "一个书影音全能的客户端"
 authors = ["esion"]
 license = "Apache-2.0"
