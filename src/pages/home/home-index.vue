@@ -5,7 +5,9 @@
         <div class="welcome-card">
           <div class="welcome-info">
             <h1 class="welcome-title">欢迎使用亦无悔</h1>
-            <p class="welcome-subtitle"><shi-ci/></p>
+            <p class="welcome-subtitle">
+              <shi-ci/>
+            </p>
           </div>
           <div class="stats-grid">
             <div class="stat-card">
@@ -25,39 +27,45 @@
         <NowClock/>
       </div>
 
-      <div class="content-grid">
-        <div class="left-column">
-          <tools-section/>
-        </div>
-
-        <div class="right-column">
-          <div class="resources-container">
-            <media-library-section/>
-            <network-resources-section/>
+      <t-card>
+        <t-tabs v-model="activeKey">
+          <t-tab-panel label="书" value="book" draggable>
             <subscribe-sources-section/>
-          </div>
-        </div>
-      </div>
+          </t-tab-panel>
+          <t-tab-panel label="影" value="video" draggable>
+            <video-section/>
+          </t-tab-panel>
+          <t-tab-panel label="音" value="music" draggable/>
+          <t-tab-panel label="工" value="tool" draggable>
+            <tools-section/>
+          </t-tab-panel>
+        </t-tabs>
+      </t-card>
+
     </div>
 
   </div>
 </template>
 
 <script lang="ts" setup>
-import NowClock from "./components/NowClock.vue";
-import ToolsSection from "./components/ToolsSection.vue";
-import MediaLibrarySection from "./components/MediaLibrarySection.vue";
-import NetworkResourcesSection from "./components/NetworkResourcesSection.vue";
-import SubscribeSourcesSection from "./components/SubscribeSourcesSection.vue";
 import {useMediaServerStore, useNetworkServerStore} from "@/store";
 import {useRequest} from "@/hooks/UseRequest.ts";
 import {listSubscribe} from "@/services";
+import {LocalName} from "@/global/LocalName.ts";
+import NowClock from "./components/NowClock.vue";
+import ToolsSection from "./components/ToolsSection.vue";
+import SubscribeSourcesSection from "./components/SubscribeSourcesSection.vue";
 import ShiCi from "@/pages/home/components/ShiCi.vue";
+import VideoSection from "@/pages/home/components/VideoSection.vue";
+
+const activeKey = useLocalStorage(LocalName.PAGE_HOME_ACTIVE, 'book');
 
 const mediaCount = computed(() => useMediaServerStore().servers.length);
 const networkCount = computed(() => useNetworkServerStore().servers.length);
 const {data: subscriptions} = useRequest(listSubscribe, {defaultValue: []});
 const subscribeCount = computed(() => subscriptions.value.length);
+
+
 </script>
 
 <style scoped lang="less">

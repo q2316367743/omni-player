@@ -35,6 +35,7 @@ export const LocalName = {
 
   PAGE_HOME_SHI_CI_TIME: '/page/home/shi_ci/time',
   PAGE_HOME_SHI_CI_TEXT: '/page/home/shi_ci/text',
+  PAGE_HOME_ACTIVE: '/page/home/active',
 
   PAGE_APP_FAN_YI_INDEX_ACTIVE: '/page/app/fan_yi/index/active',
 
