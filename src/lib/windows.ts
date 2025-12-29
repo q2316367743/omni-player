@@ -56,3 +56,13 @@ export async function createWindows(label: WindowLabel, payload: WindowPayload) 
     MessageUtil.error("创建窗口失败", e)
   }
 }
+
+export async function setupWindow() {
+  const appWindow = getCurrentWindow();
+
+  // 拦截关闭请求
+  await appWindow.onCloseRequested((event) => {
+    event.preventDefault(); // 阻止窗口真正关闭
+    appWindow.hide();       // 隐藏窗口而非退出
+  });
+}
