@@ -1,10 +1,12 @@
 import {defineStore} from "pinia";
 import type {SubscribeItem} from "@/entity/subscribe";
 import {listSubscribe} from "@/services";
+import {LocalName} from "@/global/LocalName.ts";
 
 export interface TreeNode {
   id: string;
   name: string;
+  icon: string;
   type: 'folder' | 'item';
   path: string;
   children?: TreeNode[];
@@ -15,7 +17,7 @@ export interface TreeNode {
 
 export const useSubscribeStore = defineStore('subscribe', () => {
   const subscribes = ref<Array<SubscribeItem>>([]);
-  const folderExpandedMap = ref<Map<string, boolean>>(new Map());
+  const folderExpandedMap = useLocalStorage<Record<string, boolean>>(LocalName.STORE_SUBSCRIBE_COLLAPSED, {});
 
   const refresh = () => {
     listSubscribe().then(res => {
@@ -25,8 +27,8 @@ export const useSubscribeStore = defineStore('subscribe', () => {
   refresh();
 
   const toggleFolderExpanded = (path: string) => {
-    const current = folderExpandedMap.value.get(path) ?? true;
-    folderExpandedMap.value.set(path, !current);
+    const current = folderExpandedMap.value[path] ?? true;
+    folderExpandedMap.value[path] = !current;
   };
 
   const subscribeTree = computed(() => {
@@ -65,7 +67,8 @@ export const useSubscribeStore = defineStore('subscribe', () => {
         type: 'folder',
         path: path,
         children: [],
-        expanded: folderExpandedMap.value.get(path) ?? true
+        expanded: folderExpandedMap.value[path] ?? true,
+        icon: ''
       };
 
       folderMap.set(path, node);
@@ -95,7 +98,8 @@ export const useSubscribeStore = defineStore('subscribe', () => {
             name: item.name,
             type: 'item',
             path: item.folder,
-            data: item
+            data: item,
+            icon: item.icon
           });
         }
       } else {
@@ -104,7 +108,8 @@ export const useSubscribeStore = defineStore('subscribe', () => {
           name: item.name,
           type: 'item',
           path: '',
-          data: item
+          data: item,
+          icon: item.icon
         });
       }
     });

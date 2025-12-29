@@ -14,15 +14,22 @@
       <div class="subscribe-info__header">
         <div class="subscribe-info__header-inner">
           <div class="subscribe-info__header-top">
-            <div class="subscribe-info__title">{{ displayTitle }}</div>
+            <div class="subscribe-info__title">
+              <t-button theme="primary" shape="square" variant="text" @click="toggleFullscreen()">
+                <template #icon>
+                  <view-list-icon v-if="isFullscreen"/>
+                  <menu-fold-icon v-else/>
+                </template>
+              </t-button>
+              <span class="ml-8px">{{ displayTitle }}</span>
+            </div>
             <div class="subscribe-info__actions">
-              <t-radio-group v-model="viewMode" size="small" variant="default-filled">
+              <t-radio-group v-model="viewMode" variant="default-filled">
                 <t-radio-button value="read">阅读视图</t-radio-button>
                 <t-radio-button value="web" :disabled="!content?.link">网页视图</t-radio-button>
               </t-radio-group>
-              <t-tooltip content="在外部打开">
+              <t-tooltip content="在外部打开" placement="bottom-right">
                 <t-button
-                  size="small"
                   variant="text"
                   theme="primary"
                   shape="square"
@@ -30,20 +37,7 @@
                   @click.stop="openOriginal()"
                 >
                   <template #icon>
-                    <t-icon name="link"/>
-                  </template>
-                </t-button>
-              </t-tooltip>
-              <t-tooltip :content="isFullscreen ? '退出全屏' : '全屏'">
-                <t-button
-                  size="small"
-                  variant="text"
-                  theme="primary"
-                  shape="square"
-                  @click.stop="toggleFullscreen()"
-                >
-                  <template #icon>
-                    <t-icon :name="isFullscreen ? 'fullscreen-exit' : 'fullscreen'"/>
+                    <share-icon/>
                   </template>
                 </t-button>
               </t-tooltip>
@@ -75,6 +69,7 @@ import EmptyResult from "@/components/Result/EmptyResult.vue";
 import {openUrl} from "@tauri-apps/plugin-opener";
 import {previewImages} from "@/pages/subscribe/func/previewImages.tsx";
 import {webviewManager} from "@/lib/webview.ts";
+import {MenuFoldIcon, ShareIcon, ViewListIcon} from "tdesign-icons-vue-next";
 
 const route = useRoute();
 
@@ -300,9 +295,10 @@ function onContentClick(e: MouseEvent) {
 
 .subscribe-info__title {
   font-size: 18px;
+  height: 32px;
+  line-height: 32px;
   font-weight: 650;
   color: var(--td-text-color-primary);
-  line-height: 24px;
   min-width: 0;
   flex: 1;
   white-space: nowrap;

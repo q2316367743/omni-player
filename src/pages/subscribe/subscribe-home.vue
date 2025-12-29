@@ -6,7 +6,7 @@
           <div class="subscribe-aside__title">
             <div class="subscribe-aside__title-text">
               <div class="subscribe-aside__name">
-                <t-button theme="primary" size="small" variant="text" shape="square" class="mr-8px"
+                <t-button theme="primary" variant="text" shape="square" class="mr-8px"
                           @click="goHome()">
                   <template #icon>
                     <home-icon/>
@@ -219,12 +219,13 @@ watch(subscribeId, async () => {
 }
 
 .subscribe-aside__name {
-  font-size: 13px;
   font-weight: 600;
   color: var(--td-text-color-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  height: 32px;
+  line-height: 32px;
 }
 
 .subscribe-aside__sub {

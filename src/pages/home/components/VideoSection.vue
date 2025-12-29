@@ -1,5 +1,5 @@
 <template>
-  <media-library-section />
+  <media-library-section/>
   <network-resources-section/>
 </template>
 <script lang="ts" setup>
