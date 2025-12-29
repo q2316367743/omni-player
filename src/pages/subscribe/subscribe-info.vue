@@ -1,65 +1,66 @@
 <template>
-  <t-loading :loading="loading" :class="['subscribe-info', { 'is-fullscreen': isFullscreen }]">
-    <div v-if="isNoneSelected" class="subscribe-info__center">
-      <empty-result title="未选择内容" tip="从左侧选择一条文章查看详情"/>
-    </div>
-
-    <div v-else-if="errorTip" class="subscribe-info__center">
-      <empty-result title="加载失败" :tip="errorTip">
-        <t-button variant="outline" @click="reload()">重试</t-button>
-      </empty-result>
-    </div>
-
-    <div v-else class="subscribe-info__wrap" @click="onContentClick">
-      <div class="subscribe-info__header">
-        <div class="subscribe-info__header-inner">
-          <div class="subscribe-info__header-top">
-            <div class="subscribe-info__title">
-              <t-button theme="primary" shape="square" variant="text" @click="toggleFullscreen()">
+  <div :class="['subscribe-info', { 'is-fullscreen': isFullscreen }]">
+    <div class="subscribe-info__header">
+      <div class="subscribe-info__header-inner">
+        <div class="subscribe-info__header-top">
+          <div class="subscribe-info__title">
+            <t-button theme="primary" shape="square" variant="text" @click="toggleFullscreen()">
+              <template #icon>
+                <view-list-icon v-if="isFullscreen"/>
+                <menu-fold-icon v-else/>
+              </template>
+            </t-button>
+            <span class="ml-8px">{{ displayTitle }}</span>
+          </div>
+          <div class="subscribe-info__actions">
+            <t-radio-group v-model="viewMode" variant="default-filled">
+              <t-radio-button value="read">阅读视图</t-radio-button>
+              <t-radio-button value="web" :disabled="!content?.link">网页视图</t-radio-button>
+            </t-radio-group>
+            <t-tooltip content="在外部打开" placement="bottom-right">
+              <t-button
+                variant="text"
+                theme="primary"
+                shape="square"
+                :disabled="!content?.link"
+                @click.stop="openOriginal()"
+              >
                 <template #icon>
-                  <view-list-icon v-if="isFullscreen"/>
-                  <menu-fold-icon v-else/>
+                  <share-icon/>
                 </template>
               </t-button>
-              <span class="ml-8px">{{ displayTitle }}</span>
-            </div>
-            <div class="subscribe-info__actions">
-              <t-radio-group v-model="viewMode" variant="default-filled">
-                <t-radio-button value="read">阅读视图</t-radio-button>
-                <t-radio-button value="web" :disabled="!content?.link">网页视图</t-radio-button>
-              </t-radio-group>
-              <t-tooltip content="在外部打开" placement="bottom-right">
-                <t-button
-                  variant="text"
-                  theme="primary"
-                  shape="square"
-                  :disabled="!content?.link"
-                  @click.stop="openOriginal()"
-                >
-                  <template #icon>
-                    <share-icon/>
-                  </template>
-                </t-button>
-              </t-tooltip>
-            </div>
-          </div>
-          <div class="subscribe-info__meta">
-            <span v-if="content?.author" class="subscribe-info__meta-item">{{ content.author }}</span>
-            <span v-if="content?.pub_date" class="subscribe-info__meta-item">{{ formatDate(content.pub_date) }}</span>
-            <span v-if="content?.parse_success === false" class="subscribe-info__badge">解析可能不完整</span>
+            </t-tooltip>
           </div>
         </div>
-      </div>
-
-      <div ref="scrollRef" class="subscribe-info__scroll">
-        <div v-if="viewMode === 'read'" class="subscribe-info__paper">
-          <article class="rss-article" v-html="contentHtml"></article>
+        <div class="subscribe-info__meta">
+          <span v-if="content?.author" class="subscribe-info__meta-item">{{ content.author }}</span>
+          <span v-if="content?.pub_date" class="subscribe-info__meta-item">{{ formatDate(content.pub_date) }}</span>
+          <span v-if="content?.parse_success === false" class="subscribe-info__badge">解析可能不完整</span>
         </div>
       </div>
+    </div>
 
+    <div class="subscribe-info__wrap" ref="scrollRef" @click="onContentClick">
+      <t-loading :loading="loading" class="subscribe-info__scroll">
+        <div class="subscribe-info__scroll-inner">
+          <div v-if="isNoneSelected" class="subscribe-info__center">
+            <empty-result title="未选择内容" tip="从左侧选择一条文章查看详情"/>
+          </div>
+
+          <div v-else-if="errorTip" class="subscribe-info__center">
+            <empty-result title="加载失败" :tip="errorTip">
+              <t-button variant="outline" @click="reload()">重试</t-button>
+            </empty-result>
+          </div>
+
+          <div v-else-if="viewMode === 'read'" class="subscribe-info__paper">
+            <article class="rss-article" v-html="contentHtml"></article>
+          </div>
+        </div>
+      </t-loading>
       <t-back-top container=".subscribe-info__scroll"/>
     </div>
-  </t-loading>
+  </div>
 </template>
 <script lang="ts" setup>
 import {type FeedWrapper, getFeedContent} from "@/services/FeedService.ts";
@@ -70,6 +71,7 @@ import {openUrl} from "@tauri-apps/plugin-opener";
 import {previewImages} from "@/pages/subscribe/func/previewImages.tsx";
 import {webviewManager} from "@/lib/webview.ts";
 import {MenuFoldIcon, ShareIcon, ViewListIcon} from "tdesign-icons-vue-next";
+import {LocalName} from "@/global/LocalName.ts";
 
 const route = useRoute();
 
@@ -77,7 +79,7 @@ const content = ref<FeedWrapper>();
 const loading = ref(false);
 const errorTip = ref("");
 const scrollRef = ref<HTMLElement | null>(null);
-const viewMode = ref<"read" | "web">("read");
+const viewMode = useLocalStorage<"read" | "web">(LocalName.PAGE_SUBSCRIBE_VIEW_MODE(route.params.subscribeId as string), "read");
 const isFullscreen = ref(false);
 const webviewLabel = ref(`subscribe-webview-${Date.now()}`);
 
@@ -136,7 +138,6 @@ watch(viewMode, async (newMode) => {
 watch(feedId, async val => {
   if (viewMode.value === 'web') {
     await destroyWebview();
-    // 切换回阅读视图
   }
   await load(val);
   if (viewMode.value === 'web') {
@@ -236,29 +237,32 @@ function onContentClick(e: MouseEvent) {
 }
 
 .subscribe-info__wrap {
-  position: relative;
-  height: 100%;
-}
-
-.subscribe-info__center {
-  height: 100%;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.subscribe-info__scroll {
   --subscribe-info-header-height: 74px;
   position: absolute;
   top: var(--subscribe-info-header-height);
   bottom: 0;
   left: 0;
   right: 0;
+  overflow: auto;
+}
+
+.subscribe-info__center {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.subscribe-info__scroll {
+  overflow: hidden;
+  margin: 18px 18px 48px;
+  box-sizing: border-box;
+}
+
+.subscribe-info__scroll-inner {
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 18px 18px 48px;
-  box-sizing: border-box;
 }
 
 .subscribe-info__header {

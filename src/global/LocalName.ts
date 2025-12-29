@@ -46,6 +46,8 @@ export const LocalName = {
   PAGE_APP_DAILY_HOT_LIST_PLATFORM: '/page/app/dailyhot/list_platform',
   PAGE_APP_DAILY_HOT_SELECTED_PLATFORM: '/page/app/dailyhot/selected_platform',
 
+  PAGE_SUBSCRIBE_VIEW_MODE: (id: string) => `/page/subscribe/view_mode/${id}`,
+
   // '/app/aside/subscribe/expanded'
   APP_ASIDE_SUBSCRIBE_EXPANDED: '/app/aside/subscribe/expanded',
   APP_ASIDE_MEDIA_EXPANDED: '/app/aside/media/expanded',
