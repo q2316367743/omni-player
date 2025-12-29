@@ -48,10 +48,9 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDI0NTlFRjZEQjc1Qjg5NDcKUldSSGlWdTNiZTlaSkticFg5SDBmM3hHWnFMUFhGQjlzNG40VmI1S1RPbzNSNjRjeExTYzJyZ0kK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVEMDRDRkNEOTNENkVBNTYKUldSVzZ0YVR6YzhFN1FXemdoQ3daTWp1U3BNeHIyRlIrZTdaTXJxODNWeUFvZ2pLVzZGbkY2dzAK",
       "endpoints": [
-        "https://releases.myapp.com/{{target}}/{{arch}}/{{current_version}}",
-        "https://github.com/user/repo/releases/latest/download/latest.json"
+        "https://github.com/q2316367743/omni-player/releases/latest/download/latest.json"
       ]
     }
   }
