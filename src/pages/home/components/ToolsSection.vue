@@ -1,6 +1,29 @@
 <template>
   <div class="tools-container">
     <div class="tools-group">
+      <div class="group-title">程序员三件套</div>
+      <div class="tools-grid">
+        <div class="tool-card" @click="jumpTool('regex')">
+          <div class="tool-icon todo">
+            <check-rectangle-icon />
+          </div>
+          <div class="tool-info">
+            <div class="tool-name">待办</div>
+            <div class="tool-desc">分组待办更高效</div>
+          </div>
+        </div>
+        <div class="tool-card" @click="jumpTool('http')">
+          <div class="tool-icon editor">
+            <edit1-icon />
+          </div>
+          <div class="tool-info">
+            <div class="tool-name">笔记</div>
+            <div class="tool-desc">妙笔生花</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tools-group">
       <div class="group-title">本地工具</div>
       <div class="tools-grid">
         <div class="tool-card" @click="jumpTool('regex')">
@@ -53,7 +76,7 @@
         </div>
         <div class="tool-card" @click="jumpTool('dailyhot')">
           <div class="tool-icon media">
-            <article-icon />
+            <article-icon/>
           </div>
           <div class="tool-info">
             <div class="tool-name">今日热搜</div>
@@ -66,7 +89,14 @@
 </template>
 
 <script lang="ts" setup>
-import {ArticleIcon, CodeIcon, InternetIcon, TranslateIcon, VideoIcon} from "tdesign-icons-vue-next";
+import {
+  ArticleIcon,
+  CheckRectangleIcon,
+  CodeIcon, Edit1Icon,
+  InternetIcon,
+  TranslateIcon,
+  VideoIcon
+} from "tdesign-icons-vue-next";
 
 const router = useRouter();
 

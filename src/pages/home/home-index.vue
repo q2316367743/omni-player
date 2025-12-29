@@ -29,6 +29,9 @@
 
       <t-card size="small">
         <t-tabs v-model="activeKey">
+          <t-tab-panel label="工" value="tool" draggable>
+            <tools-section/>
+          </t-tab-panel>
           <t-tab-panel label="书" value="book" draggable>
             <subscribe-sources-section/>
           </t-tab-panel>
@@ -36,9 +39,6 @@
             <video-section/>
           </t-tab-panel>
           <t-tab-panel label="音" value="music" draggable/>
-          <t-tab-panel label="工" value="tool" draggable>
-            <tools-section/>
-          </t-tab-panel>
         </t-tabs>
       </t-card>
 

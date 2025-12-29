@@ -4,7 +4,7 @@
   overflow-y: auto;
   background: linear-gradient(135deg, var(--td-bg-color-page) 0%, var(--td-gray-color-1) 100%);
   position: relative;
-  padding: 16px;
+  padding: 8px;
   box-sizing: border-box;
 }
 
@@ -22,8 +22,8 @@
 
 .top-row {
   display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 8px;
   align-items: stretch;
 }
 
@@ -47,7 +47,7 @@
     right: -10%;
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
     border-radius: 50%;
   }
 
@@ -188,7 +188,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, transparent 0%, rgba(0,0,0,0.02) 100%);
+    background: linear-gradient(135deg, transparent 0%, rgba(0, 0, 0, 0.02) 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
   }
@@ -219,6 +219,18 @@
     transition: transform 0.3s ease;
     position: relative;
     z-index: 1;
+
+    &.todo {
+      background: linear-gradient(135deg, var(--td-brand-color-5) 0%, var(--td-brand-color-7) 100%);
+      color: var(--td-text-color-anti);
+      box-shadow: var(--td-shadow-1);
+    }
+
+    &.editor {
+      background: linear-gradient(135deg, var(--td-brand-color-5) 0%, var(--td-brand-color-7) 100%);
+      color: var(--td-text-color-anti);
+      box-shadow: var(--td-shadow-1);
+    }
 
     &.regex {
       background: linear-gradient(135deg, var(--td-brand-color-5) 0%, var(--td-brand-color-7) 100%);
@@ -348,7 +360,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(135deg, transparent 0%, rgba(0,0,0,0.02) 100%);
+      background: linear-gradient(135deg, transparent 0%, rgba(0, 0, 0, 0.02) 100%);
       opacity: 0;
       transition: opacity 0.3s ease;
     }
