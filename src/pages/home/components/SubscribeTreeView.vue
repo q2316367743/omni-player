@@ -17,12 +17,9 @@
       >
         <div class="item-content">
           <template v-if="node.type === 'folder'">
-            <span class="folder-icon" @click.stop="toggleExpand(node)">
-              <chevron-down-icon v-if="node.expanded"/>
-              <chevron-right-icon v-else />
-            </span>
-            <folder-icon class="item-icon folder-icon-color"/>
-            <span class="item-text">{{ node.name }}</span>
+            <folder-open-icon v-if="node.expanded" class="item-icon folder-icon-color"/>
+            <folder-icon v-else class="item-icon folder-icon-color"/>
+            <span class="item-text font-bold">{{ node.name }}</span>
             <span class="item-count">{{ getTotalCount(node) }}</span>
           </template>
           <template v-else-if="node.type === 'item' && node.data">
@@ -44,7 +41,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ChevronDownIcon, ChevronRightIcon, FolderIcon, RssIcon} from "tdesign-icons-vue-next";
+import {FolderIcon, FolderOpenIcon, RssIcon} from "tdesign-icons-vue-next";
 import type {TreeNode} from "@/store/SubscribeStore.ts";
 import {useSubscribeStore} from "@/store/SubscribeStore.ts";
 
@@ -146,7 +143,6 @@ const handleContextMenu = (node: TreeNode, e: PointerEvent) => {
 
     .item-text {
       font-size: 13px;
-      font-weight: 500;
       color: var(--td-text-color-primary);
       white-space: nowrap;
       overflow: hidden;
@@ -165,16 +161,5 @@ const handleContextMenu = (node: TreeNode, e: PointerEvent) => {
     }
   }
 
-  .folder-item {
-    .item-text {
-      font-weight: 600;
-    }
-  }
-
-  .subscribe-item {
-    .item-text {
-      font-weight: 500;
-    }
-  }
 }
 </style>
