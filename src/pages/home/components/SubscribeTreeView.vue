@@ -93,35 +93,35 @@ const handleContextMenu = (node: TreeNode, e: PointerEvent) => {
 <style scoped lang="less">
 .subscribe-tree-container {
   .tree-node {
-    margin-bottom: 4px;
+    margin-bottom: 2px;
   }
 
   .tree-item {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
-    border-radius: 12px;
+    padding: 6px 10px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     background: var(--td-bg-color-container);
-    border: 2px solid transparent;
+    border: 1px solid transparent;
 
     &:hover {
       background: var(--td-bg-color-container-hover);
       border-color: var(--td-brand-color-light);
-      transform: translateX(4px);
+      transform: translateX(2px);
     }
 
     .item-content {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       flex: 1;
       min-width: 0;
     }
 
     .folder-icon {
-      font-size: 12px;
+      font-size: 10px;
       color: var(--td-text-color-secondary);
       transition: transform 0.2s ease;
       flex-shrink: 0;
@@ -132,7 +132,7 @@ const handleContextMenu = (node: TreeNode, e: PointerEvent) => {
     }
 
     .item-icon {
-      font-size: 20px;
+      font-size: 16px;
       flex-shrink: 0;
     }
 
@@ -145,21 +145,21 @@ const handleContextMenu = (node: TreeNode, e: PointerEvent) => {
     }
 
     .item-text {
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 500;
       color: var(--td-text-color-primary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      margin-left: 6px;
+      margin-left: 2px;
     }
 
     .item-count {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--td-text-color-secondary);
       background: var(--td-bg-color-page);
-      padding: 2px 8px;
-      border-radius: 10px;
+      padding: 1px 6px;
+      border-radius: 8px;
       margin-left: auto;
       flex-shrink: 0;
     }

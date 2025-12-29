@@ -54,9 +54,9 @@ onUnmounted(() => {
 .datetime-widget {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 24px 32px;
-  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.25);
+  border-radius: var(--td-radius-medium);
+  padding: 26px 32px;
+  box-shadow: var(--td-shadow-1);
   min-width: 200px;
   width: 200px;
   display: flex;
