@@ -3,53 +3,34 @@
 </template>
 <script lang="ts" setup>
 import Artplayer from 'artplayer';
-import {playFlv, playM3u8} from "@/lib/artplayer.ts";
+import {useArtPlayer} from "@/hooks/UseArtPlayer.ts";
 
 const props = defineProps({
   url: {
     type: String,
     required: true
-  },
-  type: {
-    type: String,
-    required: false
   }
 });
 const emit = defineEmits(['next']);
 const art = shallowRef<Artplayer>();
 const videoRef = useTemplateRef('art-player');
+let offFunc: (() => void) | null = null;
 
 
-onMounted(() => {
+onMounted(async () => {
   if (!videoRef.value) return;
-  art.value = new Artplayer({
-    container: videoRef.value,
-    url: '',
-    type: props.type,
-    customType: {
-      flv: playFlv,
-      m3u8: playM3u8
-    },
-    flip: true,
-    playbackRate: true,
-    aspectRatio: true,
-    screenshot: true,
-    fullscreen: true,
-    fullscreenWeb: true,
-    setting: true,
-  });
-  art.value.on('video:ended', () => {
+  const {instance, switchUrl, videoEnded} = useArtPlayer(videoRef.value);
+  art.value = instance;
+  const {off} = videoEnded.on(() => {
     emit('next');
   })
+  offFunc = off;
   watch(() => props.url, async url => {
-    if (!art.value) return;
-    await art.value.switchUrl(url);
-    await art.value.play();
-  }, { immediate: true })
+    switchUrl(url);
+  }, {immediate: true})
 });
-watch(() => props.type, type => {
-  if (!art.value || !type) return;
-  art.value.type = type;
+onUnmounted(() => {
+  offFunc?.();
 })
 </script>
 <style scoped lang="less">

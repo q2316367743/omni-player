@@ -1,6 +1,6 @@
 <template>
   <div class="fanyi-u-api-stream">
-    <t-card bordered>
+    <t-card :bordered="false">
       <template #title>
         <span>流式翻译（实时打字效果）</span>
         <div
@@ -551,7 +551,6 @@ onUnmounted(() => {
 
 <style scoped lang="less">
 .fanyi-u-api-stream {
-  padding: 20px;
   max-width: 1400px;
   margin: 0 auto;
 

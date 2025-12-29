@@ -27,7 +27,7 @@
         <NowClock/>
       </div>
 
-      <t-card>
+      <t-card size="small">
         <t-tabs v-model="activeKey">
           <t-tab-panel label="书" value="book" draggable>
             <subscribe-sources-section/>

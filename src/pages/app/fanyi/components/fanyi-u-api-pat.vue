@@ -1,6 +1,6 @@
 <template>
   <div class="fanyi-u-api">
-    <t-card bordered>
+    <t-card :bordered="false">
       <template #title>
         <span>AI 智能翻译</span>
         <div
@@ -353,7 +353,6 @@ function getLanguageName(code: string): string {
 
 <style scoped lang="less">
 .fanyi-u-api {
-  padding: 20px;
   max-width: 1400px;
   margin: 0 auto;
 

@@ -20,7 +20,6 @@
 
     <art-player
       :url="url"
-      :type="type"
       :subtitle-urls="subtitleUrls"
       :initial-position-ms="playbackInfoRef?.initialPositionMs"
       v-if="status === 'artplayer'"
@@ -265,7 +264,6 @@ const switchEpisode = async (ep: MediaEpisodeItem) => {
   playbackInfoRef.value = playbackInfo;
 
   url.value = playbackInfo.streamUrl;
-  type.value = inferTypeFromUrl(url.value, playbackInfo.container);
   void loadHlsVariants(url.value);
 };
 
@@ -278,7 +276,6 @@ watch(selectedSeasonId, (id) => {
 });
 
 const status = ref<'artplayer' | "loading">('loading');
-const type = ref('mp4');
 
 type QualityOption =
   | { id: string; label: string; kind: 'hls'; url: string }
@@ -468,7 +465,6 @@ async function handleQualityChange(optionId: string) {
 
   if (option.kind === 'hls') {
     url.value = option.url;
-    type.value = inferTypeFromUrl(option.url, 'm3u8');
     if (seq === qualitySwitchSeq) void loadHlsVariants(option.url);
     return;
   }
@@ -483,7 +479,6 @@ async function handleQualityChange(optionId: string) {
 
   playbackInfoRef.value = playbackInfo;
   url.value = playbackInfo.streamUrl;
-  type.value = inferTypeFromUrl(url.value, playbackInfo.container);
   void loadHlsVariants(url.value);
 }
 
@@ -514,7 +509,6 @@ onMounted(async () => {
 
     url.value = playbackInfo.streamUrl;
 
-    type.value = inferTypeFromUrl(url.value, playbackInfo.container);
     void loadHlsVariants(url.value);
 
     if (mediaId) {

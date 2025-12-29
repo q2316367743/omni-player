@@ -1,6 +1,6 @@
 <template>
   <div class="fanyi-pear-api">
-    <t-card bordered>
+    <t-card :bordered="false">
       <template #title>
         <span>万能翻译</span>
       </template>
@@ -153,7 +153,6 @@ async function handleTranslate() {
 
 <style scoped lang="less">
 .fanyi-pear-api {
-  padding: 20px;
   max-width: 1400px;
   margin: 0 auto;
 
