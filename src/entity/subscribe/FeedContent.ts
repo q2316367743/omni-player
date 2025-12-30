@@ -12,7 +12,7 @@ export interface FeedContentCore {
   // 获取时间
   fetch_time: string;
   // 是否会成功
-  parse_success: boolean;
+  parse_success: number;
 }
 
 export interface FeedContent extends FeedContentCore{

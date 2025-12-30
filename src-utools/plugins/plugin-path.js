@@ -1,0 +1,69 @@
+const {join} = require("path");
+
+
+/**
+ * 执行指定命令
+ * @param cmd {string} 命令
+ * @param args {Record<string, any>} 参数
+ */
+module.exports = async (cmd, args) => {
+  if (cmd === 'plugin:path|join') {
+    const {paths} = args;
+    return join(...paths);
+  } else if (cmd === 'plugin:path|resolve_directory') {
+    const {path, directory} = args;
+    if (!path) {
+      switch (directory) {
+        case 1:
+          return Promise.resolve(utools.getPath("music"));
+        case 2:
+          return Promise.resolve(utools.getPath("cache"));
+        case 3:
+          return Promise.resolve(utools.getPath("config"));
+        case 4:
+          return Promise.resolve(utools.getPath("userData"));
+        case 5:
+          return Promise.resolve(utools.getPath("localData"));
+        case 6:
+          return Promise.resolve(utools.getPath("documents"));
+        case 7:
+          return Promise.resolve(utools.getPath("downloads"));
+        case 8:
+          return Promise.resolve(utools.getPath("pictures"));
+        case 9:
+          return Promise.resolve(utools.getPath("public"));
+        case 10:
+          return Promise.resolve(utools.getPath("videos"));
+        case 11:
+          return Promise.resolve(utools.getPath("resource"));
+        case 12:
+          return Promise.resolve(utools.getPath("temp"));
+        case 13:
+          return Promise.resolve(utools.getPath("appConfig"));
+        case 14:
+          return Promise.resolve(join(utools.getPath("appData"), "uTools", "plugins", "nor-regret"));
+        case 15:
+          return Promise.resolve(utools.getPath("appLocalData"));
+        case 16:
+          return Promise.resolve(utools.getPath("appCache"));
+        case 17:
+          return Promise.resolve(utools.getPath("appLog"));
+        case 18:
+          return Promise.resolve(utools.getPath("desktop"));
+        case 19:
+          return Promise.resolve(utools.getPath("executable"));
+        case 20:
+          return Promise.resolve(utools.getPath("font"));
+        case 21:
+          return Promise.resolve(utools.getPath("home"));
+        case 22:
+          return Promise.resolve(utools.getPath("runtime"));
+        case 23:
+          return Promise.resolve(utools.getPath("template"));
+        default:
+          return Promise.resolve(join(utools.getPath("appData"), "uTools", "plugins", "nor-regret"));
+      }
+    }
+    return join("/Users/esion/Documents/workspace/omni-player/src-tauri", path);
+  }
+}

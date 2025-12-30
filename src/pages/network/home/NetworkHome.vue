@@ -228,7 +228,7 @@ export default {
 <style scoped lang="less">
 .network-home-container {
   background: linear-gradient(135deg, var(--td-bg-color-container) 0%, var(--td-bg-color-secondarycontainer) 100%);
-  padding: 0;
+  padding: 0 0 32px;
 }
 
 /* 粘性头部样式 */
@@ -284,7 +284,7 @@ export default {
 .category-section {
   flex-shrink: 0;
   width: 240px;
-  height: calc(100vh - 116px);
+  height: calc(100vh - 148px);
   position: sticky;
   top: 72px;
 }

@@ -20,5 +20,5 @@ export interface FeedItem {
   // 是否已读
   is_read: number;
   // 是否已获取内容
-  content_fetched: boolean;
+  content_fetched: number;
 }

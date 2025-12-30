@@ -116,7 +116,7 @@ function normalizeEntry(entry: RssLikeItem, subscribeId: string, now: number): F
     pub_date: publishedTs,
     author,
     summary,
-    content_fetched: false,
+    content_fetched: 0,
     subscribe_id: subscribeId
   };
 }

@@ -253,7 +253,7 @@ export async function fetchFeedContent(feed: FeedItem): Promise<FeedContentInser
       parsed_title: parsedTitle,
       parsed_content: parsedContent,
       fetch_time: fetchTime,
-      parse_success: parseSuccess,
+      parse_success: parseSuccess ? 1 : 0,
     };
   } catch {
     const parsedTitle = feed.title || "";
@@ -264,7 +264,7 @@ export async function fetchFeedContent(feed: FeedItem): Promise<FeedContentInser
       parsed_title: parsedTitle,
       parsed_content: parsedContent,
       fetch_time: fetchTime,
-      parse_success: false,
+      parse_success: 0,
     };
   }
 }

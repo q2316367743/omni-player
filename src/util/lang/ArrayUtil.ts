@@ -1,3 +1,5 @@
+import {isTauri} from "@tauri-apps/api/core";
+
 export function contains<T>(arr: T[], keyword: T): boolean {
   try {
     for (const item of arr) {
@@ -181,6 +183,10 @@ export function generatePlaceholders(n: number, offset = 0): string {
     throw new Error('Input must be a non-negative integer');
   }
   if (n === 0) return '';
+  if (isTauri()) {
+    return Array.from({length: n}, (_, i) => `$${i + 1 + offset}`).join(',');
+  } else {
+    return Array.from({length: n}, () => `?`).join(',');
+  }
 
-  return Array.from({ length: n }, (_, i) => `$${i + 1 + offset}`).join(',');
 }

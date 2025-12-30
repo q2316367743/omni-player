@@ -102,7 +102,6 @@ async function run() {
   try {
     const data = await listFeed(subscribeId.value, page.value, pageSize.value, keyword.value);
     if (page.value === 1) {
-      console.log(data)
       feeds.value = data.records;
     } else {
       feeds.value.push(...data.records);

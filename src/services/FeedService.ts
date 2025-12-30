@@ -65,10 +65,6 @@ export async function getFeedContent(feedId: string): Promise<FeedWrapper> {
   const feed = await feedQuery.eq('id', feedId).one();
   if (!feed) return Promise.reject(new Error(`feed item 「${feedId}」不存在`));
 
-  if (!feed.is_read) {
-    const feedMapper = await useSql().mapper<FeedItem>(TableName.FEED_ITEM)
-    await feedMapper.updateById(feedId, {is_read: 1})
-  }
 
   const feedContentQuery = await useSql().query<FeedContent>(TableName.FEED_CONTENT)
   const feedContentMapper = await useSql().mapper<FeedContent>(TableName.FEED_CONTENT)
@@ -80,5 +76,8 @@ export async function getFeedContent(feedId: string): Promise<FeedWrapper> {
     feed_id: feedId,
     subscribe_id: feed.subscribe_id
   });
+
+  const feedMapper = await useSql().mapper<FeedItem>(TableName.FEED_ITEM)
+  await feedMapper.updateById(feedId, {is_read: 1, content_fetched: 1})
   return {...save, ...feed, feed_id: feedId};
 }

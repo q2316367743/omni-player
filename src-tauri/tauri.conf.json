@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "亦无悔",
+  "productName": "nor-regret",
   "version": "1.0.1",
   "identifier": "nor-regret",
   "build": {

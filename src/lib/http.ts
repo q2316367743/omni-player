@@ -1,4 +1,5 @@
 import axios, {type AxiosRequestConfig} from "axios";
+import {isTauri} from "@tauri-apps/api/core";
 import {fetch} from '@tauri-apps/plugin-http'
 
 export type Method =
@@ -16,9 +17,9 @@ export type Method =
 const instance = axios.create({
   timeout: 150000,
   adapter: 'fetch',
-  env: {
+  env: isTauri() ? {
     fetch: fetch
-  }
+  } : undefined
   // 配置代理等信息
 });
 

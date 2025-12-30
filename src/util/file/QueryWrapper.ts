@@ -36,7 +36,7 @@ export class QueryChain<T extends Record<string, any>, K extends keyof T = keyof
   private simpleWhere(k: K, v: T[K], op: string) {
     if (typeof v === "undefined" || v === null) return this;
     this.values.push(v);
-    this.params.push(`\`${String(k)}\` ${op} $${this.values.length}`);
+    this.params.push(`\`${String(k)}\` ${op} ${generatePlaceholders(1, this.values.length)}`);
     return this;
   }
 
@@ -66,21 +66,21 @@ export class QueryChain<T extends Record<string, any>, K extends keyof T = keyof
 
   like(k: K, v: T[K]) {
     if (typeof v === "undefined" || v === null) return this;
-    this.params.push(`\`${String(k)}\` like CONCAT('%', ?, '%')`);
+    this.params.push(`\`${String(k)}\` like CONCAT('%', ${generatePlaceholders(1, this.values.length)}, '%')`);
     this.values.push(v);
     return this;
   }
 
   likeLeft(k: K, v: T[K]) {
     if (typeof v === "undefined" || v === null) return this;
-    this.params.push(`\`${String(k)}\` like CONCAT('%', ?)`);
+    this.params.push(`\`${String(k)}\` like CONCAT('%', ${generatePlaceholders(1, this.values.length)})`);
     this.values.push(v);
     return this;
   }
 
   likeRight(k: K, v: T[K]) {
     if (typeof v === "undefined" || v === null) return this;
-    this.params.push(`\`${String(k)}\` like CONCAT(?, '%')`);
+    this.params.push(`\`${String(k)}\` like CONCAT(${generatePlaceholders(1, this.values.length)}, '%')`);
     this.values.push(v);
     return this;
   }

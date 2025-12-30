@@ -14,6 +14,9 @@ export default defineConfig([
     files: ["**/*.{js,mjs,cjs,ts,mts,cts,vue}"], plugins: {js}, extends: ["js/recommended"], languageOptions: {
       globals: {
         ...globals.browser,
+        ...globals.commonjs,
+        utools: true,
+        Buffer: true,
         ...autoImportGlobals.globals, // 👈 合并自动导入的全局变量
       }
     }

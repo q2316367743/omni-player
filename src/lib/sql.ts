@@ -2,9 +2,9 @@ import Database, {type QueryResult} from '@tauri-apps/plugin-sql';
 import {resolveResource} from '@tauri-apps/api/path';
 import {readTextFile} from '@tauri-apps/plugin-fs';
 import {APP_DATA_DB_PATH, DB_MIGRATE_FILES} from "@/global/Constants.ts";
-import {logInfo} from "@/lib/log.ts";
+import {logError, logInfo} from "@/lib/log.ts";
 import {QueryChain} from "@/util/file/QueryWrapper.ts";
-import {BaseMapper, type TableLike} from "@/util";
+import {BaseMapper, generatePlaceholders, type TableLike} from "@/util";
 
 class Sql {
 
@@ -15,7 +15,7 @@ class Sql {
     // 将新的 SQL 调用追加到 Promise 链尾部
     if (this.db) return this.db;
     const path = await APP_DATA_DB_PATH();
-    console.log("db path: ", path)
+    logInfo("db path: ", path)
     this.db = await Database.load(`sqlite:${path}`);
     logInfo("db init success", this.db);
     return this.db;
@@ -32,7 +32,7 @@ class Sql {
         return db.execute(query, bindValues);
       })
       .catch((err) => {
-        console.error('get store error:', err);
+        logError('get store error:', err);
         throw err; // 保证错误能被调用者捕获
       });
 
@@ -105,13 +105,14 @@ class Sql {
         logInfo("执行sql文件");
         await this.execute(sql);
         logInfo("插入版本");
-        await this.execute("INSERT INTO schema_version(version) VALUES ($1)", [version]);
+        await this.execute(`INSERT INTO schema_version(version)
+                            VALUES (${generatePlaceholders(1)})`, [version]);
         logInfo("提交事务");
         await this.execute("COMMIT");
-        console.info(`✅ migration ${file} applied`);
+        logInfo(`✅ migration ${file} applied`);
       } catch (e) {
         await this.execute("ROLLBACK");
-        console.error(`❌ migration ${file} failed`, e);
+        logError(`❌ migration ${file} failed`, e);
         throw e;
       }
     }

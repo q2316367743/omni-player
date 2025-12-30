@@ -22,7 +22,7 @@ export class BaseMapper<T extends TableLike> {
     for (const key in params) {
       const value = params[key];
       if (typeof value === "undefined" || value === null) continue;
-      query.push(`\`${key}\` = $${values.length + 1}`);
+      query.push(`\`${key}\` = ${generatePlaceholders(1, values.length)}`);
       values.push(value);
     }
     if (query.length === 0) {
@@ -31,7 +31,7 @@ export class BaseMapper<T extends TableLike> {
     }
     const sql = `update ${this.tableName}
                  set ${query.join(", ")}
-                 where id = $${values.length + 1}`;
+                 where id = ${generatePlaceholders(1, values.length)}`;
     const val = [...values, id];
     logDebug("update sql:\t\t" + sql);
     logDebug("update values:\t" + val);
@@ -42,7 +42,7 @@ export class BaseMapper<T extends TableLike> {
   async deleteById(id: string) {
     const sql = `delete
                  from ${this.tableName}
-                 where id = $1`;
+                 where id = ${generatePlaceholders(1)}`;
     logDebug("delete sql:\t\t" + sql);
     logDebug("delete values:\t" + id);
     const r = await this.db.execute(sql, [id]);

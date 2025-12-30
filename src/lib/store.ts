@@ -1,5 +1,6 @@
 import {Store} from "@tauri-apps/plugin-store";
 import {APP_DATA_STORE_PATH} from "@/global/Constants";
+import {cloneDeep} from "es-toolkit";
 
 
 class StoreWrapper {
@@ -39,7 +40,7 @@ class StoreWrapper {
 
   async set<T>(key: string, value: T) {
     const store = await this.getStore();
-    await store.set(key, value);
+    await store.set(key, cloneDeep(value));
     await store.save();
   }
 
@@ -49,15 +50,12 @@ class StoreWrapper {
   }
 
   async list<T = any>(key: string) {
-    const store = await this.getStore();
-    const res = await store.get<Array<T>>(key);
+    const res = await this.get<Array<T>>(key);
     return res || [];
   }
 
   async save<T = any>(key: string, value: Array<T>) {
-    const store = await this.getStore();
-    await store.set(key, value);
-    await store.save();
+    await this.set(key, value);
   }
 }
 
