@@ -35,8 +35,8 @@ export class QueryChain<T extends Record<string, any>, K extends keyof T = keyof
 
   private simpleWhere(k: K, v: T[K], op: string) {
     if (typeof v === "undefined" || v === null) return this;
-    this.values.push(v);
     this.params.push(`\`${String(k)}\` ${op} ${generatePlaceholders(1, this.values.length)}`);
+    this.values.push(v);
     return this;
   }
 
