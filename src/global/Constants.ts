@@ -10,6 +10,7 @@ export const APP_DATA_DIR = () => appDataDir();
 export const APP_DATA_DB_PATH = async () => join(await APP_DATA_DIR(), "db.sqlite");
 export const APP_DATA_VAULT_PATH = async (vaultName: string) => join(await APP_DATA_DIR(), `${vaultName}.hold`);
 export const APP_DATA_STORE_PATH = async (storeName: string) => join(await APP_DATA_DIR(), `${storeName}.json`);
+export const APP_DATA_NOTE_PATH = async () => join(await APP_DATA_DIR(), 'note');
 
 export const {colorMode, isDark} = useColorMode();
 
