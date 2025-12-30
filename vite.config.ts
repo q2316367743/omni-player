@@ -15,7 +15,16 @@ function _resolve(dir: string) {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), vueJsx(),
+  plugins: [vue({
+    template: {
+      compilerOptions: {
+        // 忽略所有带连字符的标签（常见于 Web Components）
+        isCustomElement: (tag) => tag === 'webview'
+        // 或者更精确地匹配，例如只忽略 ion- 开头的：
+        // isCustomElement: (tag) => tag.startsWith('ion-')
+      }
+    }
+  }), vueJsx(),
     AutoImport({
       resolvers: [TDesignResolver({
         library: 'vue-next'

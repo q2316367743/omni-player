@@ -29,7 +29,6 @@ export async function createWindows(label: WindowLabel, payload: WindowPayload) 
       resizable: true,
       fullscreen: false,
       transparent: true
-
     })
 
     await mainWindow.once("complete", () => {

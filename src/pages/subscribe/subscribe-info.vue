@@ -35,14 +35,16 @@
         <div class="subscribe-info__meta">
           <span v-if="content?.author" class="subscribe-info__meta-item">{{ content.author }}</span>
           <span v-if="content?.pub_date" class="subscribe-info__meta-item">{{ formatDate(content.pub_date) }}</span>
-          <span v-if="content?.parse_success === false" class="subscribe-info__badge">解析可能不完整</span>
+          <span v-if="content?.parse_success === 0" class="subscribe-info__badge">解析可能不完整</span>
         </div>
       </div>
     </div>
 
     <div class="subscribe-info__wrap" ref="scrollRef" @click="onContentClick">
-      <t-loading :loading="loading" class="subscribe-info__scroll">
+      <custome-webview v-if="viewMode === 'web' && content?.link" :url="content.link"/>
+      <t-loading v-else :loading="loading" class="subscribe-info__scroll">
         <div class="subscribe-info__scroll-inner">
+
           <div v-if="isNoneSelected" class="subscribe-info__center">
             <empty-result title="未选择内容" tip="从左侧选择一条文章查看详情"/>
           </div>
@@ -69,7 +71,6 @@ import {formatDate} from "@/util/lang/FormatUtil.ts";
 import EmptyResult from "@/components/Result/EmptyResult.vue";
 import {openUrl} from "@tauri-apps/plugin-opener";
 import {previewImages} from "@/pages/subscribe/func/previewImages.tsx";
-import {webviewManager} from "@/lib/webview.ts";
 import {MenuFoldIcon, ShareIcon, ViewListIcon} from "tdesign-icons-vue-next";
 import {LocalName} from "@/global/LocalName.ts";
 
@@ -81,7 +82,6 @@ const errorTip = ref("");
 const scrollRef = ref<HTMLElement | null>(null);
 const viewMode = useLocalStorage<"read" | "web">(LocalName.PAGE_SUBSCRIBE_VIEW_MODE(route.params.subscribeId as string), "read");
 const isFullscreen = ref(false);
-const webviewLabel = ref(`subscribe-webview-${Date.now()}`);
 
 const feedId = computed(() => route.params.feedId as string);
 const isNoneSelected = computed(() => feedId.value === "0");
@@ -93,61 +93,11 @@ function scrollToTop() {
   scrollRef.value.scrollTop = 0;
 }
 
-async function createWebview() {
-  if (!scrollRef.value || !content.value?.link) return;
-
-  const rect = scrollRef.value.getBoundingClientRect();
-
-  try {
-    await webviewManager.createWebview({
-      label: webviewLabel.value,
-      url: content.value.link,
-      position: {
-        x: rect.left,
-        y: rect.top,
-        width: rect.width,
-        height: rect.height
-      }
-    });
-
-    webviewManager.startObserving(scrollRef.value, async (position) => {
-      await webviewManager.updatePosition({...position, height: position.height + 32});
-    });
-  } catch (e) {
-    console.error('Failed to create webview:', e);
-    MessageUtil.error("创建网页视图失败", e);
-  }
-}
-
-async function destroyWebview() {
-  try {
-    await webviewManager.destroyWebview();
-  } catch (e) {
-    console.error('Failed to destroy webview:', e);
-  }
-}
-
-watch(viewMode, async (newMode) => {
-  if (newMode === 'web') {
-    await createWebview();
-  } else {
-    await destroyWebview();
-  }
-});
 
 watch(feedId, async val => {
-  if (viewMode.value === 'web') {
-    await destroyWebview();
-  }
   await load(val);
-  if (viewMode.value === 'web') {
-    await createWebview();
-  }
 }, {immediate: true});
 
-onUnmounted(async () => {
-  await destroyWebview();
-});
 
 async function load(feedIdValue: string) {
   if (!feedIdValue || feedIdValue === "0") {
@@ -221,264 +171,5 @@ function onContentClick(e: MouseEvent) {
 
 </script>
 <style scoped lang="less">
-.subscribe-info {
-  height: 100%;
-  background-color: var(--td-bg-color-container);
-  overflow: hidden;
-}
-
-.subscribe-info.is-fullscreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  //z-index: 9999;
-}
-
-.subscribe-info__wrap {
-  --subscribe-info-header-height: 74px;
-  position: absolute;
-  top: var(--subscribe-info-header-height);
-  bottom: 0;
-  left: 0;
-  right: 0;
-  overflow: auto;
-}
-
-.subscribe-info__center {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.subscribe-info__scroll {
-  overflow: hidden;
-  margin: 18px 18px 48px;
-  box-sizing: border-box;
-}
-
-.subscribe-info__scroll-inner {
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.subscribe-info__header {
-  --subscribe-info-header-height: 74px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 2;
-  height: var(--subscribe-info-header-height);
-  border-bottom: 1px solid var(--td-border-level-1-color);
-  background-color: var(--td-bg-color-container);
-  box-sizing: border-box;
-}
-
-.subscribe-info__header-inner {
-  height: 100%;
-  max-width: 920px;
-  margin: 0 auto;
-  padding: 10px 18px 8px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-}
-
-.subscribe-info__header-top {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-
-.subscribe-info__title {
-  font-size: 18px;
-  height: 32px;
-  line-height: 32px;
-  font-weight: 650;
-  color: var(--td-text-color-primary);
-  min-width: 0;
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.subscribe-info__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  font-size: 11px;
-  color: var(--td-text-color-secondary);
-}
-
-.subscribe-info__meta-item {
-  white-space: nowrap;
-}
-
-.subscribe-info__badge {
-  padding: 2px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--td-border-level-1-color);
-  background-color: var(--td-bg-color-container);
-  color: var(--td-text-color-secondary);
-  font-size: 11px;
-  line-height: 16px;
-}
-
-.subscribe-info__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  flex: 0 0 auto;
-}
-
-.subscribe-info__paper {
-  max-width: 920px;
-  margin: 14px auto 0;
-  padding: 18px 18px 22px;
-  border-radius: 14px;
-  background-color: var(--td-bg-color-container);
-  overflow-x: hidden;
-}
-
-:deep(.rss-article) {
-  color: var(--td-text-color-primary);
-  font-size: 14px;
-  line-height: 1.9;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-}
-
-:deep(.rss-article a) {
-  color: var(--td-brand-color);
-  text-decoration: none;
-  border-bottom: 1px solid var(--td-brand-color);
-  padding-bottom: 1px;
-}
-
-:deep(.rss-article a:hover) {
-  color: var(--td-brand-color-hover);
-  border-bottom-color: var(--td-brand-color-hover);
-}
-
-:deep(.rss-article p) {
-  margin: 10px 0;
-  color: var(--td-text-color-primary);
-}
-
-:deep(.rss-article h1),
-:deep(.rss-article h2),
-:deep(.rss-article h3),
-:deep(.rss-article h4) {
-  margin: 18px 0 10px;
-  color: var(--td-text-color-primary);
-  line-height: 1.35;
-}
-
-:deep(.rss-article h1) {
-  font-size: 20px;
-  font-weight: 700;
-}
-
-:deep(.rss-article h2) {
-  font-size: 18px;
-  font-weight: 680;
-}
-
-:deep(.rss-article h3) {
-  font-size: 16px;
-  font-weight: 650;
-}
-
-:deep(.rss-article ul),
-:deep(.rss-article ol) {
-  margin: 10px 0;
-  padding-left: 20px;
-  color: var(--td-text-color-primary);
-}
-
-:deep(.rss-article li) {
-  margin: 6px 0;
-}
-
-:deep(.rss-article blockquote) {
-  margin: 12px 0;
-  padding: 10px 12px;
-  border-left: 3px solid var(--td-brand-color);
-  background-color: var(--td-bg-color-component);
-  color: var(--td-text-color-secondary);
-}
-
-:deep(.rss-article pre) {
-  margin: 12px 0;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid var(--td-border-level-1-color);
-  background-color: var(--td-bg-color-component);
-  overflow: auto;
-  max-width: 100%;
-}
-
-:deep(.rss-article code) {
-  padding: 0 6px;
-  border-radius: 6px;
-  border: 1px solid var(--td-border-level-1-color);
-  background-color: var(--td-bg-color-component);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 12px;
-}
-
-:deep(.rss-article pre code) {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  font-size: 12px;
-}
-
-:deep(.rss-article hr) {
-  margin: 16px 0;
-  border: 0;
-  border-top: 1px solid var(--td-border-level-1-color);
-}
-
-:deep(.rss-article img) {
-  display: block;
-  max-width: 100%;
-  height: auto;
-  margin: 12px auto;
-  border-radius: 12px;
-  border: 1px solid var(--td-border-level-1-color);
-  cursor: zoom-in;
-}
-
-:deep(.rss-article table) {
-  display: block;
-  max-width: 100%;
-  width: 100%;
-  border-collapse: collapse;
-  margin: 12px 0;
-  overflow: auto;
-}
-
-:deep(.rss-article th),
-:deep(.rss-article td) {
-  border: 1px solid var(--td-border-level-1-color);
-  padding: 8px 10px;
-  word-break: break-word;
-}
-
-:deep(.rss-article th) {
-  background-color: var(--td-bg-color-component);
-  color: var(--td-text-color-primary);
-  font-weight: 650;
-}
-
+@import "./subscribe-info.less";
 </style>

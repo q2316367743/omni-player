@@ -26,7 +26,6 @@ class WebviewManager {
       await this.destroyWebview();
 
       const window = getCurrentWindow();
-
       this.webview = new Webview(window, options.label, {
         url: options.url,
         x: options.position.x,

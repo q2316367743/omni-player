@@ -14,6 +14,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppToolLayout: typeof import('./src/components/PageLayout/AppToolLayout.vue')['default']
     ArtPlayer: typeof import('./src/components/VideoPlayer/ArtPlayer.vue')['default']
+    CustomeWebview: typeof import('./src/components/webview/CustomeWebview.vue')['default']
     EmptyResult: typeof import('./src/components/Result/EmptyResult.vue')['default']
     HorizontalSplitPanel: typeof import('./src/components/common/HorizontalSplitPanel.vue')['default']
     InfoResult: typeof import('./src/components/Result/InfoResult.vue')['default']
@@ -29,6 +30,8 @@ declare module 'vue' {
     SuccessResult: typeof import('./src/components/Result/SuccessResult.vue')['default']
     TAlert: typeof import('tdesign-vue-next')['Alert']
     TAside: typeof import('tdesign-vue-next')['Aside']
+    TauriWebview: typeof import('./src/components/webview/TauriWebview.vue')['default']
+    TauriWebView: typeof import('./src/components/webview/TauriWebView.vue')['default']
     TBackTop: typeof import('tdesign-vue-next')['BackTop']
     TButton: typeof import('tdesign-vue-next')['Button']
     TCard: typeof import('tdesign-vue-next')['Card']
@@ -65,8 +68,8 @@ declare module 'vue' {
     TTag: typeof import('tdesign-vue-next')['Tag']
     TTextarea: typeof import('tdesign-vue-next')['Textarea']
     TTooltip: typeof import('tdesign-vue-next')['Tooltip']
+    UtoolsWebview: typeof import('./src/components/webview/UtoolsWebview.vue')['default']
     VerticalSplitPanel: typeof import('./src/components/common/VerticalSplitPanel.vue')['default']
-    WindowControl: typeof import('./src/components/WindowControl/WindowControl.vue')['default']
   }
 }
 
@@ -74,6 +77,7 @@ declare module 'vue' {
 declare global {
   const AppToolLayout: typeof import('./src/components/PageLayout/AppToolLayout.vue')['default']
   const ArtPlayer: typeof import('./src/components/VideoPlayer/ArtPlayer.vue')['default']
+  const CustomeWebview: typeof import('./src/components/webview/CustomeWebview.vue')['default']
   const EmptyResult: typeof import('./src/components/Result/EmptyResult.vue')['default']
   const HorizontalSplitPanel: typeof import('./src/components/common/HorizontalSplitPanel.vue')['default']
   const InfoResult: typeof import('./src/components/Result/InfoResult.vue')['default']
@@ -89,6 +93,8 @@ declare global {
   const SuccessResult: typeof import('./src/components/Result/SuccessResult.vue')['default']
   const TAlert: typeof import('tdesign-vue-next')['Alert']
   const TAside: typeof import('tdesign-vue-next')['Aside']
+  const TauriWebview: typeof import('./src/components/webview/TauriWebview.vue')['default']
+  const TauriWebView: typeof import('./src/components/webview/TauriWebView.vue')['default']
   const TBackTop: typeof import('tdesign-vue-next')['BackTop']
   const TButton: typeof import('tdesign-vue-next')['Button']
   const TCard: typeof import('tdesign-vue-next')['Card']
@@ -125,6 +131,6 @@ declare global {
   const TTag: typeof import('tdesign-vue-next')['Tag']
   const TTextarea: typeof import('tdesign-vue-next')['Textarea']
   const TTooltip: typeof import('tdesign-vue-next')['Tooltip']
+  const UtoolsWebview: typeof import('./src/components/webview/UtoolsWebview.vue')['default']
   const VerticalSplitPanel: typeof import('./src/components/common/VerticalSplitPanel.vue')['default']
-  const WindowControl: typeof import('./src/components/WindowControl/WindowControl.vue')['default']
 }
