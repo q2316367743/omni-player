@@ -41,13 +41,16 @@ export async function refreshFeed(subscribeId: string) {
     const subscribeMapper = await useSql().mapper<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
     // 重新计算数量
     let count = subscribe.count;
+    let unReadCount = 0;
     if (update) {
       logDebug("重新计算数量")
       count = await feedQuery.eq('subscribe_id', subscribeId).count();
+      unReadCount = 1;
     }
     logDebug(`订阅「${subscribeId}」有 feed 共 ${count} 个`)
     await subscribeMapper.updateById(subscribeId, {
       count,
+      un_read_count: unReadCount,
       updated_at: Date.now()
     });
     useSubscribeStore().refresh();

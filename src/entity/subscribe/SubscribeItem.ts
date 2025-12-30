@@ -24,6 +24,11 @@ export interface SubscribeItem  extends SubscribeItemEdit{
    */
   count: number;
 
+  /**
+   * 未读数量
+   */
+  un_read_count: number;
+
 }
 
 export function buildSubscribeItemEdit(): SubscribeItemEdit {

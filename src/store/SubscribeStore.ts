@@ -2,6 +2,8 @@ import {defineStore} from "pinia";
 import type {SubscribeItem} from "@/entity/subscribe";
 import {listSubscribe} from "@/services";
 import {LocalName} from "@/global/LocalName.ts";
+import {useSql} from "@/lib/sql.ts";
+import {TableName} from "@/global/TableName.ts";
 
 export interface TreeNode {
   id: string;
@@ -13,6 +15,7 @@ export interface TreeNode {
   data?: SubscribeItem;
   expanded?: boolean;
   count?: number;
+  unRead: boolean;
 }
 
 export const useSubscribeStore = defineStore('subscribe', () => {
@@ -68,7 +71,8 @@ export const useSubscribeStore = defineStore('subscribe', () => {
         path: path,
         children: [],
         expanded: folderExpandedMap.value[path] ?? true,
-        icon: ''
+        icon: '',
+        unRead: false
       };
 
       folderMap.set(path, node);
@@ -99,7 +103,8 @@ export const useSubscribeStore = defineStore('subscribe', () => {
             type: 'item',
             path: item.folder,
             data: item,
-            icon: item.icon
+            icon: item.icon,
+            unRead: item.un_read_count > 0
           });
         }
       } else {
@@ -109,7 +114,8 @@ export const useSubscribeStore = defineStore('subscribe', () => {
           type: 'item',
           path: '',
           data: item,
-          icon: item.icon
+          icon: item.icon,
+          unRead: item.un_read_count > 0
         });
       }
     });
@@ -119,11 +125,20 @@ export const useSubscribeStore = defineStore('subscribe', () => {
     return tree;
   });
 
+  const read = async (id: string) => {
+    const mapper = await useSql().mapper<SubscribeItem>(TableName.SUBSCRIBE_ITEM);
+    await mapper.updateById(id, {
+      un_read_count: 0
+    });
+    refresh();
+  }
+
   return {
     subscribes,
     subscribeTree,
     refresh,
-    toggleFolderExpanded
+    toggleFolderExpanded,
+    read
   }
 
 })

@@ -1,16 +1,17 @@
 -- 订阅源（对应 SubscribeItem）
 CREATE TABLE IF NOT EXISTS subscribe_item
 (
-    id         TEXT PRIMARY KEY,
-    created_at INTEGER NOT NULL,           -- Unix 毫秒时间戳（与 JS Date.now() 一致）
-    updated_at INTEGER NOT NULL,
+    id            TEXT PRIMARY KEY,
+    created_at    INTEGER NOT NULL,           -- Unix 毫秒时间戳（与 JS Date.now() 一致）
+    updated_at    INTEGER NOT NULL,
 
-    url        TEXT    NOT NULL,
-    icon       TEXT    NOT NULL,
-    name       TEXT    NOT NULL,
-    folder     TEXT    NOT NULL,
-    count      INTEGER NOT NULL DEFAULT 0, -- 资讯数量
-    sequence   INTEGER NOT NULL DEFAULT 0  -- 排序
+    url           TEXT    NOT NULL,
+    icon          TEXT    NOT NULL,
+    name          TEXT    NOT NULL,
+    folder        TEXT    NOT NULL,
+    count         INTEGER NOT NULL DEFAULT 0, -- 资讯数量
+    un_read_count INTEGER NOT NULL DEFAULT 0, -- 未读数量
+    sequence      INTEGER NOT NULL DEFAULT 0  -- 排序
 );
 
 -- 新闻项（对应 FeedItem）

@@ -1,12 +1,12 @@
 <template>
   <div class="subscribe-tree-container">
-    <div 
-      v-for="node in nodes" 
-      :key="node.id" 
+    <div
+      v-for="node in nodes"
+      :key="node.id"
       class="tree-node"
       :style="{ paddingLeft: level * 20 + 'px' }"
     >
-      <div 
+      <div
         :class="{
           'tree-item': true,
           'folder-item': node.type === 'folder',
@@ -24,14 +24,15 @@
           </template>
           <template v-else-if="node.type === 'item' && node.data">
             <rss-icon class="item-icon subscribe-icon-color"/>
+            <span class="item-new" v-if="node.unRead">新</span>
             <span class="item-text">{{ node.data.name }}</span>
             <span v-if="node.data.count" class="item-count">{{ node.data.count }}</span>
           </template>
         </div>
       </div>
-      <subscribe-tree-view 
-        v-if="node.type === 'folder' && node.expanded && node.children" 
-        :nodes="node.children" 
+      <subscribe-tree-view
+        v-if="node.type === 'folder' && node.expanded && node.children"
+        :nodes="node.children"
         :level="level + 1"
         @jump="$emit('jump', $event)"
         @contextmenu="$emit('contextmenu', $event)"
@@ -50,7 +51,7 @@ interface Props {
   level?: number;
 }
 
-const { level = 0 } = defineProps<Props>();
+const {level = 0} = defineProps<Props>();
 
 const emit = defineEmits(['jump', 'contextmenu']);
 
@@ -133,12 +134,19 @@ const handleContextMenu = (node: TreeNode, e: PointerEvent) => {
       flex-shrink: 0;
     }
 
+    .item-new {
+      color: #ff6b6b;
+      border: 1px solid #ff6b6b;
+      border-radius: var(--td-radius-medium);
+      padding: 0 4px;
+    }
+
     .folder-icon-color {
       color: #f5a623;
     }
 
     .subscribe-icon-color {
-      color: #ff6b6b;
+      color: #F18751;
     }
 
     .item-text {

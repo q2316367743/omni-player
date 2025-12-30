@@ -5,6 +5,7 @@ import {logError} from "@/lib/log.ts";
 import {getFaviconUrl} from "@/util/file/website.ts";
 import {refreshFeed} from "@/services/FeedService.ts";
 import {LocalName} from "@/global/LocalName.ts";
+import {useSubscribeStore} from "@/store/SubscribeStore.ts";
 
 export async function listSubscribe() {
   const query = await useSql().query<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
@@ -93,5 +94,8 @@ export async function removeSubscribe(id: string) {
 export async function getSubscribe(id: string) {
   const query = await useSql().query<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
   const res = await query.eq('id', id).one();
+  if (res && res.un_read_count > 0) {
+    await useSubscribeStore().read(id)
+  }
   return res || undefined;
 }
