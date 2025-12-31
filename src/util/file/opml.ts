@@ -1,6 +1,7 @@
 import type {SubscribeItem} from "@/entity/subscribe";
 import {XMLBuilder} from "fast-xml-parser";
 import {XMLParser} from "fast-xml-parser";
+import { useSnowflake } from "@/util";
 
 export function export2Opml(items: Array<SubscribeItem>): string {
   const folderMap = new Map<string, Array<SubscribeItem>>();
@@ -92,11 +93,12 @@ export function importByOpml(opml: string): Array<SubscribeItem> {
     outlineArray.forEach((outline: any) => {
       if (outline.xmlUrl) {
         items.push({
-          id: crypto.randomUUID(),
+          id: useSnowflake().nextId(),
           created_at: now,
           updated_at: now,
           icon: "",
           count: 0,
+          un_read_count: 0,
           url: outline.xmlUrl,
           name: outline.text || outline.title || "",
           folder: folder,

@@ -68,12 +68,15 @@
             <div class="tool-desc">在线双向翻译</div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <div class="tools-group">
-      <div class="group-title">媒体工具</div>
-      <div class="tools-grid">
+        <div class="tool-card" @click="jumpTool('dailyhot')">
+          <div class="tool-icon media">
+            <article-icon/>
+          </div>
+          <div class="tool-info">
+            <div class="tool-name">今日热搜</div>
+            <div class="tool-desc">查看各大榜单的今日热榜排行</div>
+          </div>
+        </div>
         <div class="tool-card" @click="jumpTool('qushuiyin')">
           <div class="tool-icon media">
             <video-icon/>
@@ -83,13 +86,19 @@
             <div class="tool-desc">视频图片水印去除</div>
           </div>
         </div>
-        <div class="tool-card" @click="jumpTool('dailyhot')">
+      </div>
+    </div>
+
+    <div class="tools-group">
+      <div class="group-title">系统工具</div>
+      <div class="tools-grid">
+        <div class="tool-card" @click="jumpTool('system/port')">
           <div class="tool-icon media">
-            <article-icon/>
+            <portrait-icon />
           </div>
           <div class="tool-info">
-            <div class="tool-name">今日热搜</div>
-            <div class="tool-desc">查看各大榜单的今日热榜排行</div>
+            <div class="tool-name">端口扫描</div>
+            <div class="tool-desc">看看哪个端口在占用</div>
           </div>
         </div>
       </div>
@@ -102,7 +111,7 @@ import {
   ArticleIcon,
   CheckRectangleIcon,
   CodeIcon, Edit1Icon,
-  InternetIcon, MoneyIcon,
+  InternetIcon, MoneyIcon, PortraitIcon,
   TranslateIcon,
   VideoIcon
 } from "tdesign-icons-vue-next";

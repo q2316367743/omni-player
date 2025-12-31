@@ -114,6 +114,15 @@ export const router = createRouter({
       name: "AppBookkeeping",
       path: "bookkeeping",
       component: () => import('@/pages/app/bookkeeping/app-bookkeeping.vue')
+    }, {
+      name: "AppSystem",
+      path: "system",
+      component: () => import('@/pages/app/system/index.vue'),
+      children: [{
+        name: "AppSystemPort",
+        path: "port",
+        component: () => import('@/pages/app/system/port/app-system-port.vue')
+      }]
     }]
   }]
 });
