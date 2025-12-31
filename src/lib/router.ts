@@ -110,6 +110,10 @@ export const router = createRouter({
       name: "AppEditor",
       path: "editor",
       component: () => import('@/pages/app/editor/app-editor.vue')
+    }, {
+      name: "AppBookkeeping",
+      path: "bookkeeping",
+      component: () => import('@/pages/app/bookkeeping/app-bookkeeping.vue')
     }]
   }]
 });

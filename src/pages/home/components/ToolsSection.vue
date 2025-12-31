@@ -9,7 +9,7 @@
           </div>
           <div class="tool-info">
             <div class="tool-name">待办</div>
-            <div class="tool-desc">分组待办更高效</div>
+            <div class="tool-desc">井井有条</div>
           </div>
         </div>
         <div class="tool-card" @click="jumpTool('editor')">
@@ -19,6 +19,15 @@
           <div class="tool-info">
             <div class="tool-name">笔记</div>
             <div class="tool-desc">妙笔生花</div>
+          </div>
+        </div>
+        <div class="tool-card" @click="jumpTool('bookkeeping')">
+          <div class="tool-icon editor">
+            <money-icon />
+          </div>
+          <div class="tool-info">
+            <div class="tool-name">记账</div>
+            <div class="tool-desc">精打细算</div>
           </div>
         </div>
       </div>
@@ -93,7 +102,7 @@ import {
   ArticleIcon,
   CheckRectangleIcon,
   CodeIcon, Edit1Icon,
-  InternetIcon,
+  InternetIcon, MoneyIcon,
   TranslateIcon,
   VideoIcon
 } from "tdesign-icons-vue-next";
