@@ -1,5 +1,6 @@
 import {readDir, readTextFile, writeTextFile, mkdir, exists, remove, writeFile, rename} from "@tauri-apps/plugin-fs";
 import {join, basename} from "@tauri-apps/api/path";
+import {convertFileSrc} from "@tauri-apps/api/core"
 
 export interface NoteNode {
   id: string;
@@ -20,7 +21,7 @@ export interface ArticleInfo {
 const ARTICLE_SUFFIX = '.md';
 
 export class NoteFs {
-  private basePath: string;
+  private readonly basePath: string;
 
   constructor(basePath: string) {
     this.basePath = basePath;
@@ -139,6 +140,11 @@ export class NoteFs {
     const attachmentPath = await join(articlePath, fileName);
     await writeFile(attachmentPath, data);
     return attachmentPath;
+  }
+
+  renderAttachment(articlePath: string, fileName: string) {
+    const path = articlePath + fileName.substring(1);
+    return convertFileSrc(path)
   }
 
   async getAttachments(articlePath: string): Promise<string[]> {

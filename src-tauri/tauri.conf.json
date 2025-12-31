@@ -23,7 +23,14 @@
       }
     ],
     "security": {
-      "csp": null
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["$APPDATA/**/*"]
+      },
+      "csp": {
+        "default-src": ["'self'", "ipc:", "http://ipc.localhost"],
+        "img-src": ["'self'", "assets:", "http://asset.localhost"]
+      }
     },
     "withGlobalTauri": true
   },

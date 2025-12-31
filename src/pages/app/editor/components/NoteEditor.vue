@@ -1,15 +1,15 @@
 <template>
   <div class="note-editor-container">
-    <div ref="vditorRef" class="vditor-container"></div>
+    <div ref="cherryRef" class="cherry-container"></div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {ref, onMounted, watch, onBeforeUnmount} from 'vue';
-import Vditor from 'vditor';
-import 'vditor/dist/index.css';
+import Cherry from 'cherry-markdown';
+import 'cherry-markdown/dist/cherry-markdown.css';
 import {NoteFs} from "../func/noteFs.ts";
 import {isDark} from "@/global/Constants.ts";
+import {useSnowflake} from "@/util/lang/Snowflake.ts";
 
 interface Props {
   content: string;
@@ -21,54 +21,46 @@ const props = defineProps<Props>();
 
 const emit = defineEmits(['update:content', 'save', 'manualSave']);
 
-const vditorRef = ref<HTMLElement | null>(null);
-let vditor: Vditor | null = null;
+const cherryRef = ref<HTMLElement | null>(null);
+let cherry: Cherry | null = null;
 let saveTimer: number | null = null;
+const snowflake = useSnowflake();
 
-const initVditor = () => {
-  if (!vditorRef.value) return;
+const initCherry = () => {
+  if (!cherryRef.value) return;
 
-  vditor = new Vditor(vditorRef.value, {
-    height: '100%',
+  cherry = new Cherry({
+    el: cherryRef.value,
     value: props.content,
-    mode: 'wysiwyg',
-    placeholder: '开始写作...',
-    theme: isDark.value ? 'dark' : 'classic',
-    icon: 'ant',
-    cache: {
-      enable: false,
+    theme: isDark.value ? 'dark' : 'default',
+    autoScroll: true,
+    toolbars: {
+      theme: 'dark',
     },
-    upload: {
-      handler: async (files: File[]) => {
-        if (!files || files.length === 0) {
-          return '';
+    engine: {
+      global: {
+        urlProcessor(url: string) {
+          if (url.startsWith('data:') || url.startsWith('http')) {
+            return url;
+          }
+          return props.noteFs.renderAttachment(props.articlePath, url);
         }
-        const file = files[0]!;
-        const arrayBuffer = await file.arrayBuffer();
-        const uint8Array = new Uint8Array(arrayBuffer);
-        
-        try {
-          const uploadedPath = await props.noteFs.uploadAttachment(
-            props.articlePath,
-            file.name,
-            uint8Array
-          );
-          
-          const fileName = uploadedPath.split('/').pop() || file.name;
-          return `![](${fileName})`;
-        } catch (error) {
-          console.error('Upload failed:', error);
-          throw error;
-        }
+      }
+    },
+    fileUpload: async (file: File, callback: (url: string, meta: { name: string }) => void) => {
+      const ext = file.name.split('.').pop() || '';
+      const newFileName = `${snowflake.nextId()}.${ext}`;
+      const arrayBuffer = await file.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      await props.noteFs.uploadAttachment(props.articlePath, newFileName, uint8Array);
+      callback(`./${newFileName}`, { name: file.name });
+      return `./${newFileName}`;
+    },
+    callback: {
+      afterChange: (markdown: string) => {
+        emit('update:content', markdown);
+        debouncedSave();
       },
-      filename: (name: string) => name
-    },
-    input: (value: string) => {
-      emit('update:content', value);
-      debouncedSave();
-    },
-    after: () => {
-      vditor?.setValue(props.content);
     }
   });
 };
@@ -83,8 +75,8 @@ const debouncedSave = () => {
 };
 
 const saveContent = async () => {
-  if (vditor && props.articlePath) {
-    const content = vditor.getValue();
+  if (cherry && props.articlePath) {
+    const content = cherry.getMarkdown();
     try {
       await props.noteFs.saveArticleContent(props.articlePath, content);
       emit('save');
@@ -103,19 +95,19 @@ const manualSave = () => {
 };
 
 watch(() => props.content, (newContent) => {
-  if (vditor && vditor.getValue() !== newContent) {
-    vditor.setValue(newContent);
+  if (cherry && cherry.getMarkdown() !== newContent) {
+    cherry.setMarkdown(newContent);
   }
 });
 
 watch(() => props.articlePath, () => {
-  if (vditor) {
-    vditor.setValue(props.content);
+  if (cherry) {
+    cherry.setMarkdown(props.content);
   }
 });
 
 onMounted(() => {
-  initVditor();
+  initCherry();
 });
 
 onBeforeUnmount(() => {
@@ -123,8 +115,8 @@ onBeforeUnmount(() => {
     clearTimeout(saveTimer);
   }
   manualSave();
-  vditor?.destroy();
-  vditor = null;
+  cherry?.destroy();
+  cherry = null;
 });
 
 defineExpose({
@@ -138,13 +130,9 @@ defineExpose({
   width: 100%;
   overflow: hidden;
 
-  .vditor-container {
+  .cherry-container {
     height: 100%;
     width: 100%;
-
-    :deep(.vditor-reset) {
-      color: var(--td-text-color-primary);
-    }
   }
 }
 </style>

@@ -1,13 +1,13 @@
 <template>
-  <div class="note-editor-page">
-    <div class="note-sidebar">
+  <t-layout class="note-editor-page">
+    <t-aside class="note-sidebar shrink-0" :width="collapsed ? '0px' : '232px'">
       <div class="sidebar-header">
         <t-button theme="primary" variant="text" shape="square" @click="goBack">
           <template #icon>
             <chevron-left-icon/>
           </template>
         </t-button>
-        <span class="ml-2">笔记</span>
+        <span class="ml-4px">笔记</span>
         <t-dropdown trigger="click">
           <t-button class="ml-auto" theme="primary" variant="text">
             <template #icon>
@@ -29,10 +29,15 @@
           @contextmenu="handleContextMenu"
         />
       </div>
-    </div>
-    <div class="note-main">
+    </t-aside>
+    <t-content class="note-main">
       <div v-if="selectedArticlePath" class="editor-container">
         <div class="editor-header">
+          <t-button theme="primary" variant="text" shape="square" @click="collapsed = !collapsed">
+            <template #icon>
+              <view-list-icon />
+            </template>
+          </t-button>
           <span class="article-title">{{ currentArticleTitle }}</span>
           <t-button theme="primary" size="small" @click="editorRef?.save()">
             <template #icon>
@@ -56,13 +61,13 @@
         </div>
         <div class="empty-text">选择或创建一个笔记开始编辑</div>
       </div>
-    </div>
-  </div>
+    </t-content>
+  </t-layout>
 </template>
 
 <script lang="ts" setup>
 import {onMounted, ref} from 'vue';
-import {AddIcon, ChevronLeftIcon, FileIcon, SaveIcon} from 'tdesign-icons-vue-next';
+import {AddIcon, ChevronLeftIcon, FileIcon, SaveIcon, ViewListIcon} from 'tdesign-icons-vue-next';
 import {APP_DATA_NOTE_PATH} from "@/global/Constants.ts";
 import {NoteFs, type NoteNode} from "./func/noteFs.ts";
 import NoteTree from "./components/NoteTree.vue";
@@ -77,6 +82,7 @@ const selectedArticlePath = ref('');
 const currentContent = ref('');
 const currentArticleTitle = ref('');
 const editorRef = ref<InstanceType<typeof NoteEditor> | null>(null);
+const collapsed = ref(false);
 
 let noteFs: NoteFs | null = null;
 
@@ -245,19 +251,18 @@ onMounted(async () => {
   overflow: hidden;
 
   .note-sidebar {
-    width: 280px;
-    min-width: 280px;
     border-right: 1px solid var(--td-border-level-1-color);
     display: flex;
     flex-direction: column;
     background: var(--td-bg-color-container);
 
     .sidebar-header {
-      padding: 12px;
+      padding: 8px;
       border-bottom: 1px solid var(--td-border-level-1-color);
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
+      line-height: 32px;
     }
 
     .sidebar-content {
@@ -268,7 +273,6 @@ onMounted(async () => {
   }
 
   .note-main {
-    flex: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -279,7 +283,7 @@ onMounted(async () => {
       height: 100%;
 
       .editor-header {
-        padding: 12px 16px;
+        padding: 8px 16px;
         border-bottom: 1px solid var(--td-border-level-1-color);
         display: flex;
         align-items: center;
