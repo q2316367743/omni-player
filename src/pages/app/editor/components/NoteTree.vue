@@ -83,7 +83,8 @@ const handleContextMenu = (node: NoteNode, e: PointerEvent) => {
     display: flex;
     align-items: center;
     padding: 8px 12px;
-    border-radius: 8px;
+    margin-left: 2px;
+    border-radius: var(--td-radius-medium);
     cursor: pointer;
     transition: all 0.2s ease;
     background: var(--td-bg-color-container);
@@ -92,7 +93,6 @@ const handleContextMenu = (node: NoteNode, e: PointerEvent) => {
     &:hover {
       background: var(--td-bg-color-container-hover);
       border-color: var(--td-brand-color-light);
-      transform: translateX(2px);
     }
 
     &.active {

@@ -3,6 +3,7 @@ import App from './App.vue'
 import "@/assets/style/global.less"
 import 'tdesign-vue-next/es/style/index.css';
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
+import 'cherry-markdown/dist/cherry-markdown.css';
 import 'virtual:uno.css'
 import {createPinia} from "pinia";
 import {router} from "@/lib/router.ts";

@@ -38,21 +38,12 @@
               <view-list-icon />
             </template>
           </t-button>
-          <span class="article-title">{{ currentArticleTitle }}</span>
-          <t-button theme="primary" size="small" @click="editorRef?.save()">
-            <template #icon>
-              <save-icon/>
-            </template>
-            保存
-          </t-button>
+          <div class="article-title">{{ currentArticleTitle }}</div>
+          <div class="w-32px"></div>
         </div>
         <note-editor
-          ref="editorRef"
-          v-model:content="currentContent"
           :article-path="selectedArticlePath"
           :note-fs="noteFs!"
-          @save="handleAutoSave"
-          @manual-save="handleManualSave"
         />
       </div>
       <div v-else class="empty-state">
@@ -67,7 +58,7 @@
 
 <script lang="ts" setup>
 import {onMounted, ref} from 'vue';
-import {AddIcon, ChevronLeftIcon, FileIcon, SaveIcon, ViewListIcon} from 'tdesign-icons-vue-next';
+import {AddIcon, ChevronLeftIcon, FileIcon, ViewListIcon} from 'tdesign-icons-vue-next';
 import {APP_DATA_NOTE_PATH} from "@/global/Constants.ts";
 import {NoteFs, type NoteNode} from "./func/noteFs.ts";
 import NoteTree from "./components/NoteTree.vue";
@@ -79,9 +70,7 @@ const router = useRouter();
 
 const treeNodes = ref<NoteNode[]>([]);
 const selectedArticlePath = ref('');
-const currentContent = ref('');
 const currentArticleTitle = ref('');
-const editorRef = ref<InstanceType<typeof NoteEditor> | null>(null);
 const collapsed = ref(false);
 
 let noteFs: NoteFs | null = null;
@@ -99,11 +88,14 @@ const loadRootNodes = async () => {
 };
 
 const handleSelectArticle = async (path: string) => {
+  if (selectedArticlePath.value === path) {
+    selectedArticlePath.value = '';
+    return;
+  }
   selectedArticlePath.value = path;
   if (!noteFs) return;
 
   try {
-    currentContent.value = await noteFs.readArticleContent(path);
     currentArticleTitle.value = await noteFs.getArticleNameFromPath(path);
   } catch (error) {
     console.error('Failed to load article:', error);
@@ -164,7 +156,6 @@ const handleContextMenu = async (node: NoteNode, event: PointerEvent) => {
         await fs.deleteNode(node.path);
         if (selectedArticlePath.value === node.path) {
           selectedArticlePath.value = '';
-          currentContent.value = '';
           currentArticleTitle.value = '';
         }
         await loadRootNodes();
@@ -226,13 +217,6 @@ const handleContextMenu = async (node: NoteNode, event: PointerEvent) => {
       }
     }
   });
-};
-
-const handleAutoSave = () => {
-};
-
-const handleManualSave = () => {
-  MessageUtil.success('保存成功');
 };
 
 onMounted(async () => {
