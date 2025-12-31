@@ -41,9 +41,80 @@
           {{ typeof row.pid === 'number' ? row.pid : '-' }}
         </template>
         <template #process="{ row }">
-          {{ row.process || '-' }}
+          <t-link
+            v-if="typeof row.pid === 'number'"
+            theme="primary"
+            hover="color"
+            @click.stop="openProcessDialog(row)"
+          >
+            {{ row.process || `PID ${row.pid}` }}
+          </t-link>
+          <span v-else>{{ row.process || '-' }}</span>
         </template>
       </t-table>
+
+      <t-dialog
+        v-model:visible="detailVisible"
+        header="进程详情"
+        width="720px"
+        placement="center"
+        :close-on-overlay-click="false"
+      >
+        <t-loading :loading="detailLoading">
+          <div class="process-detail">
+            <div class="process-detail__grid">
+              <div class="process-detail__item">
+                <div class="process-detail__key">协议</div>
+                <div class="process-detail__value">{{ detailRow?.protocol || '-' }}</div>
+              </div>
+              <div class="process-detail__item">
+                <div class="process-detail__key">地址</div>
+                <div class="process-detail__value">{{ detailRow?.local_addr || '-' }}</div>
+              </div>
+              <div class="process-detail__item">
+                <div class="process-detail__key">端口</div>
+                <div class="process-detail__value">{{ typeof detailRow?.local_port === 'number' ? detailRow.local_port : '-' }}</div>
+              </div>
+              <div class="process-detail__item">
+                <div class="process-detail__key">状态</div>
+                <div class="process-detail__value">{{ detailRow?.state || '-' }}</div>
+              </div>
+              <div class="process-detail__item">
+                <div class="process-detail__key">PID</div>
+                <div class="process-detail__value">{{ typeof detailRow?.pid === 'number' ? detailRow.pid : '-' }}</div>
+              </div>
+              <div class="process-detail__item">
+                <div class="process-detail__key">进程名</div>
+                <div class="process-detail__value">{{ detail?.name || detailRow?.process || '-' }}</div>
+              </div>
+              <div class="process-detail__item">
+                <div class="process-detail__key">PPID</div>
+                <div class="process-detail__value">{{ typeof detail?.ppid === 'number' ? detail.ppid : '-' }}</div>
+              </div>
+              <div class="process-detail__item">
+                <div class="process-detail__key">用户</div>
+                <div class="process-detail__value">{{ detail?.user || '-' }}</div>
+              </div>
+              <div class="process-detail__item">
+                <div class="process-detail__key">运行时长</div>
+                <div class="process-detail__value">{{ detail?.elapsed || '-' }}</div>
+              </div>
+              <div class="process-detail__item process-detail__item--full">
+                <div class="process-detail__key">命令行</div>
+                <div class="process-detail__value process-detail__value--mono">{{ detail?.command || '-' }}</div>
+              </div>
+            </div>
+          </div>
+        </t-loading>
+        <template #footer>
+          <t-space size="small">
+            <t-button variant="outline" @click="detailVisible = false">关闭</t-button>
+            <t-button theme="danger" :loading="killing" :disabled="!canKill" @click="killSelected">
+              关闭进程
+            </t-button>
+          </t-space>
+        </template>
+      </t-dialog>
 
       <t-back-top container=".t-table__content" />
     </div>
@@ -53,6 +124,7 @@
 import {invoke, isTauri} from "@tauri-apps/api/core";
 import {RefreshIcon} from "tdesign-icons-vue-next";
 import MessageUtil from "@/util/model/MessageUtil.ts";
+import MessageBoxUtil from "@/util/model/MessageBoxUtil.tsx";
 
 interface PortUsage {
   protocol: string;
@@ -65,6 +137,15 @@ interface PortUsage {
 
 interface PortUsageRow extends PortUsage {
   key: string;
+}
+
+interface ProcessDetail {
+  pid: number;
+  ppid?: number | null;
+  user?: string | null;
+  elapsed?: string | null;
+  name?: string | null;
+  command?: string | null;
 }
 
 const tauri = isTauri();
@@ -146,6 +227,14 @@ const displayRows = computed(() => {
   return descending ? list.reverse() : list;
 });
 
+const detailVisible = ref(false);
+const detailRow = ref<PortUsageRow | null>(null);
+const detailLoading = ref(false);
+const detail = ref<ProcessDetail | null>(null);
+const killing = ref(false);
+
+const canKill = computed(() => tauri && typeof detailRow.value?.pid === 'number');
+
 function formatTime(ts: number) {
   return new Date(ts).toLocaleTimeString();
 }
@@ -172,6 +261,55 @@ function onSortChange(s: any) {
   sort.value = s;
 }
 
+async function openProcessDialog(row: PortUsageRow) {
+  detailRow.value = row;
+  detail.value = null;
+  detailVisible.value = true;
+  if (!tauri) return;
+  if (typeof row.pid !== 'number') return;
+  detailLoading.value = true;
+  try {
+    detail.value = await invoke<ProcessDetail>('system_process_detail', {pid: row.pid});
+  } catch (e) {
+    console.error(e);
+    MessageUtil.error('查询进程详情失败', e);
+  } finally {
+    detailLoading.value = false;
+  }
+}
+
+async function killSelected() {
+  if (!tauri) return;
+  const row = detailRow.value;
+  if (!row || typeof row.pid !== 'number') return;
+  try {
+    await MessageBoxUtil.confirm(`确定要关闭进程 ${row.process || ''} (PID ${row.pid}) 吗？`, '关闭进程');
+  } catch {
+    return;
+  }
+  killing.value = true;
+  try {
+    await invoke('system_process_kill', {pid: row.pid});
+    MessageUtil.success('进程已关闭');
+    detailVisible.value = false;
+    await refresh();
+  } catch (e) {
+    console.error(e);
+    MessageUtil.error('关闭进程失败', e);
+  } finally {
+    killing.value = false;
+  }
+}
+
+watch(detailVisible, v => {
+  if (!v) {
+    detailRow.value = null;
+    detail.value = null;
+    detailLoading.value = false;
+    killing.value = false;
+  }
+});
+
 useTimeoutFn(refresh, 3000, {immediateCallback: true})
 </script>
 <style scoped lang="less">
@@ -194,6 +332,41 @@ useTimeoutFn(refresh, 3000, {immediateCallback: true})
       font-size: 12px;
       user-select: none;
     }
+  }
+}
+
+.process-detail {
+  padding: 4px 0;
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 16px;
+  }
+
+  &__item {
+    min-width: 0;
+  }
+
+  &__item--full {
+    grid-column: 1 / -1;
+  }
+
+  &__key {
+    font-size: 12px;
+    color: var(--td-text-color-secondary);
+    margin-bottom: 4px;
+    user-select: none;
+  }
+
+  &__value {
+    font-size: 13px;
+    color: var(--td-text-color-primary);
+    word-break: break-all;
+  }
+
+  &__value--mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   }
 }
 </style>
