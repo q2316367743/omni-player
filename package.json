@@ -33,6 +33,7 @@
     "cherry-markdown": "^0.10.3",
     "dayjs": "^1.11.19",
     "echarts": "^6.0.0",
+    "echarts-wordcloud": "^2.1.0",
     "es-toolkit": "^1.43.0",
     "fast-xml-parser": "^5.3.3",
     "flv.js": "^1.6.2",
