@@ -15,25 +15,33 @@
 
       <div class="profile-section">
         <t-card title="消费画像">
-          <div class="profile-content">
-            <div class="profile-stat">
-              <div class="stat-label">总支出</div>
-              <div class="stat-value expense">{{ formatAmount(insightData.profile.totalExpense) }}</div>
-            </div>
-            <div class="profile-stat">
-              <div class="stat-label">总交易</div>
-              <div class="stat-value">{{ insightData.profile.totalTransactions }} 笔</div>
-            </div>
-            <div class="profile-stat">
-              <div class="stat-label">平均单笔</div>
-              <div class="stat-value">{{ formatAmount(insightData.profile.avgTransactionAmount) }}</div>
-            </div>
-            <div class="profile-stat highlight">
-              <div class="stat-label">主要消费</div>
-              <div class="stat-value">{{ insightData.profile.topCategory }}</div>
-              <div class="stat-desc">{{ insightData.profile.topCategoryPercentage.toFixed(1) }}%</div>
-            </div>
-          </div>
+          <t-row :gutter="16">
+            <t-col :span="3">
+              <div class="profile-stat">
+                <div class="stat-label">总支出</div>
+                <div class="stat-value expense">{{ formatAmount(insightData.profile.totalExpense) }}</div>
+              </div>
+            </t-col>
+            <t-col :span="3">
+              <div class="profile-stat">
+                <div class="stat-label">总交易</div>
+                <div class="stat-value">{{ insightData.profile.totalTransactions }} 笔</div>
+              </div>
+            </t-col>
+            <t-col :span="3">
+              <div class="profile-stat">
+                <div class="stat-label">平均单笔</div>
+                <div class="stat-value">{{ formatAmount(insightData.profile.avgTransactionAmount) }}</div>
+              </div>
+            </t-col>
+            <t-col :span="3">
+              <div class="profile-stat highlight">
+                <div class="stat-label">主要消费</div>
+                <div class="stat-value">{{ insightData.profile.topCategory }}</div>
+                <div class="stat-desc">{{ insightData.profile.topCategoryPercentage.toFixed(1) }}%</div>
+              </div>
+            </t-col>
+          </t-row>
         </t-card>
       </div>
 
@@ -67,111 +75,125 @@
 
       <div class="habits-section">
         <t-card title="消费习惯">
-          <div class="habits-grid">
-            <div class="habit-item">
-              <div class="habit-icon">
-                <calendar-icon/>
+          <t-row :gutter="16">
+            <t-col :span="3">
+              <div class="habit-item">
+                <div class="habit-icon">
+                  <calendar-icon/>
+                </div>
+                <div class="habit-content">
+                  <div class="habit-label">日均支出</div>
+                  <div class="habit-value">{{ formatAmount(insightData.habits.avgDailyExpense) }}</div>
+                </div>
               </div>
-              <div class="habit-content">
-                <div class="habit-label">日均支出</div>
-                <div class="habit-value">{{ formatAmount(insightData.habits.avgDailyExpense) }}</div>
+            </t-col>
+            <t-col :span="3">
+              <div class="habit-item">
+                <div class="habit-icon">
+                  <time-icon/>
+                </div>
+                <div class="habit-content">
+                  <div class="habit-label">月均支出</div>
+                  <div class="habit-value">{{ formatAmount(insightData.habits.avgMonthlyExpense) }}</div>
+                </div>
               </div>
-            </div>
-            <div class="habit-item">
-              <div class="habit-icon">
-                <time-icon/>
+            </t-col>
+            <t-col :span="3">
+              <div class="habit-item">
+                <div class="habit-icon">
+                  <time-icon/>
+                </div>
+                <div class="habit-content">
+                  <div class="habit-label">高峰时段</div>
+                  <div class="habit-value">{{ insightData.habits.peakSpendingHour }}:00</div>
+                </div>
               </div>
-              <div class="habit-content">
-                <div class="habit-label">月均支出</div>
-                <div class="habit-value">{{ formatAmount(insightData.habits.avgMonthlyExpense) }}</div>
+            </t-col>
+            <t-col :span="3">
+              <div class="habit-item">
+                <div class="habit-icon">
+                  <chart-icon/>
+                </div>
+                <div class="habit-content">
+                  <div class="habit-label">活跃日</div>
+                  <div class="habit-value">{{ insightData.habits.peakSpendingDay }}</div>
+                </div>
               </div>
-            </div>
-            <div class="habit-item">
-              <div class="habit-icon">
-                <time-icon/>
-              </div>
-              <div class="habit-content">
-                <div class="habit-label">高峰时段</div>
-                <div class="habit-value">{{ insightData.habits.peakSpendingHour }}:00</div>
-              </div>
-            </div>
-            <div class="habit-item">
-              <div class="habit-icon">
-                <chart-icon/>
-              </div>
-              <div class="habit-content">
-                <div class="habit-label">活跃日</div>
-                <div class="habit-value">{{ insightData.habits.peakSpendingDay }}</div>
-              </div>
-            </div>
-          </div>
+            </t-col>
+          </t-row>
         </t-card>
       </div>
 
       <div class="advanced-insights">
-        <div class="insight-grid">
-          <t-card title="拿铁因子">
-            <div class="insight-content">
-              <div class="insight-big">{{ formatAmount(insightData.latteFactor.totalAmount) }}</div>
-              <div class="insight-desc">小额消费总额</div>
-              <div class="insight-meta">
-                {{ insightData.latteFactor.topMerchant }} · {{ insightData.latteFactor.transactionCount }} 笔
-              </div>
-            </div>
-          </t-card>
-
-          <t-card title="隐形订阅">
-            <div class="insight-content">
-              <div v-if="insightData.subscriptions.length > 0" class="subscriptions-list">
-                <div v-for="sub in insightData.subscriptions.slice(0, 3)" :key="sub.name" class="sub-item">
-                  <div class="sub-name">{{ sub.name }}</div>
-                  <div class="sub-amount">{{ formatAmount(sub.monthlyAmount) }}/月</div>
+        <t-row :gutter="[16, 16]">
+          <t-col :span="4">
+            <t-card title="拿铁因子">
+              <div class="insight-content">
+                <div class="insight-big">{{ formatAmount(insightData.latteFactor.totalAmount) }}</div>
+                <div class="insight-desc">小额消费总额</div>
+                <div class="insight-meta">
+                  {{ insightData.latteFactor.topMerchant }} · {{ insightData.latteFactor.transactionCount }} 笔
                 </div>
               </div>
-              <div v-else class="empty-sub">
-                未发现明显订阅
-              </div>
-            </div>
-          </t-card>
-
-          <t-card title="消费通胀">
-            <div class="insight-content">
-              <div class="insight-big" :class="insightData.inflation.trend">
-                {{ insightData.inflation.trend === 'up' ? '↑' : insightData.inflation.trend === 'down' ? '↓' : '-' }}
-                {{ Math.abs(insightData.inflation.rate).toFixed(2) }}%
-              </div>
-              <div class="insight-desc">季度客单价变化</div>
-              <div class="insight-meta">
-                {{ formatAmount(insightData.inflation.firstAvg) }} → {{ formatAmount(insightData.inflation.lastAvg) }}
-              </div>
-            </div>
-          </t-card>
-
-          <t-card title="品牌忠诚">
-            <div class="insight-content">
-              <div class="loyalty-row">
-                <div class="loyalty-item">
-                  <div class="loyalty-label">真金白银</div>
-                  <div class="loyalty-value">{{ insightData.brandLoyalty.topAmount.name }}</div>
-                  <div class="loyalty-amount">{{ formatAmount(insightData.brandLoyalty.topAmount.value) }}</div>
+            </t-card>
+          </t-col>
+          <t-col :span="4">
+            <t-card title="隐形订阅">
+              <div class="insight-content">
+                <div v-if="insightData.subscriptions.length > 0" class="subscriptions-list">
+                  <div v-for="sub in insightData.subscriptions.slice(0, 3)" :key="sub.name" class="sub-item">
+                    <div class="sub-name">{{ sub.name }}</div>
+                    <div class="sub-amount">{{ formatAmount(sub.monthlyAmount) }}/月</div>
+                  </div>
                 </div>
-                <div class="loyalty-item">
-                  <div class="loyalty-label">最为长情</div>
-                  <div class="loyalty-value">{{ insightData.brandLoyalty.topCount.name }}</div>
-                  <div class="loyalty-count">{{ insightData.brandLoyalty.topCount.value }} 次</div>
+                <div v-else class="empty-sub">
+                  未发现明显订阅
                 </div>
               </div>
-            </div>
-          </t-card>
-
-          <t-card title="周末效应">
-            <div class="insight-content">
-              <div class="insight-big">{{ insightData.weekendEffect.ratio.toFixed(2) }}x</div>
-              <div class="insight-desc">周末/周一消费比</div>
-              <div class="insight-meta">{{ insightData.weekendEffect.type }}</div>
-            </div>
-          </t-card>
-        </div>
+            </t-card>
+          </t-col>
+          <t-col :span="4">
+            <t-card title="消费通胀">
+              <div class="insight-content">
+                <div class="insight-big" :class="insightData.inflation.trend">
+                  {{ insightData.inflation.trend === 'up' ? '↑' : insightData.inflation.trend === 'down' ? '↓' : '-' }}
+                  {{ Math.abs(insightData.inflation.rate).toFixed(2) }}%
+                </div>
+                <div class="insight-desc">季度客单价变化</div>
+                <div class="insight-meta">
+                  {{ formatAmount(insightData.inflation.firstAvg) }} → {{ formatAmount(insightData.inflation.lastAvg) }}
+                </div>
+              </div>
+            </t-card>
+          </t-col>
+          <t-col :span="6">
+            <t-card title="品牌忠诚">
+              <div class="insight-content">
+                <div class="loyalty-row">
+                  <div class="loyalty-item">
+                    <div class="loyalty-label">真金白银</div>
+                    <div class="loyalty-value">{{ insightData.brandLoyalty.topAmount.name }}</div>
+                    <div class="loyalty-amount">{{ formatAmount(insightData.brandLoyalty.topAmount.value) }}</div>
+                  </div>
+                  <div class="loyalty-item">
+                    <div class="loyalty-label">最为长情</div>
+                    <div class="loyalty-value">{{ insightData.brandLoyalty.topCount.name }}</div>
+                    <div class="loyalty-count">{{ insightData.brandLoyalty.topCount.value }} 次</div>
+                  </div>
+                </div>
+              </div>
+            </t-card>
+          </t-col>
+          <t-col :span="6">
+            <t-card title="周末效应">
+              <div class="insight-content">
+                <div class="insight-big">{{ insightData.weekendEffect.ratio.toFixed(2) }}x</div>
+                <div class="insight-desc">周末/周一消费比</div>
+                <div class="insight-meta">{{ insightData.weekendEffect.type }}</div>
+              </div>
+            </t-card>
+          </t-col>
+        </t-row>
       </div>
 
       <div class="sankey-section">
@@ -183,58 +205,67 @@
       <div class="advanced-viz-section">
         <h2 class="section-title">时间密码</h2>
 
-        <div class="viz-row">
-          <t-card title="消费趋势河流">
-            <div ref="themeRiverChartRef" class="chart-container"></div>
-          </t-card>
-        </div>
-
-        <div class="viz-row">
-          <t-card title="消费生物钟 (热力图)">
-            <div ref="heatmapChartRef" class="chart-container"></div>
-          </t-card>
-          <t-card title="季度消费结构">
-            <div ref="radarChartRef" class="chart-container"></div>
-          </t-card>
-        </div>
+        <t-row :gutter="[16,16]">
+          <t-col :span="12">
+            <t-card title="消费趋势河流">
+              <div ref="themeRiverChartRef" class="chart-container"></div>
+            </t-card>
+          </t-col>
+          <t-col :span="6">
+            <t-card title="消费生物钟 (热力图)">
+              <div ref="heatmapChartRef" class="chart-container"></div>
+            </t-card>
+          </t-col>
+          <t-col :span="6">
+            <t-card title="季度消费结构">
+              <div ref="radarChartRef" class="chart-container"></div>
+            </t-card>
+          </t-col>
+        </t-row>
       </div>
 
       <div class="advanced-viz-section">
         <h2 class="section-title">决策心理</h2>
 
-        <div class="viz-row">
-          <t-card title="消费象限 (频次 vs 均价)" class="full-width">
-            <div ref="quadrantChartRef" class="chart-container quadrant-chart"></div>
-          </t-card>
-        </div>
-
-        <div class="viz-row">
-          <t-card title="消费关联和弦">
-            <div ref="chordChartRef" class="chart-container"></div>
-          </t-card>
-          <t-card title="消费金额漏斗">
-            <div ref="funnelChartRef" class="chart-container"></div>
-          </t-card>
-        </div>
+        <t-row :gutter="[16, 16]">
+          <t-col :span="12">
+            <t-card title="消费象限 (频次 vs 均价)">
+              <div ref="quadrantChartRef" class="chart-container quadrant-chart"></div>
+            </t-card>
+          </t-col>
+          <t-col :span="6">
+            <t-card title="消费关联和弦">
+              <div ref="chordChartRef" class="chart-container"></div>
+            </t-card>
+          </t-col>
+          <t-col :span="6">
+            <t-card title="消费金额漏斗">
+              <div ref="funnelChartRef" class="chart-container"></div>
+            </t-card>
+          </t-col>
+        </t-row>
       </div>
 
       <div class="advanced-viz-section">
         <h2 class="section-title">结构解析</h2>
 
-        <div class="viz-row">
-          <t-card title="核心支出来源 (帕累托图)" class="full-width">
-            <div ref="paretoChartRef" class="chart-container"></div>
-          </t-card>
-        </div>
-
-        <div class="viz-row">
-          <t-card title="消费热词云">
-            <div ref="wordCloudChartRef" class="chart-container"></div>
-          </t-card>
-          <t-card title="消费分布云图">
-            <div ref="boxPlotChartRef" class="chart-container"></div>
-          </t-card>
-        </div>
+        <t-row :gutter="[16, 16]">
+          <t-col :span="12">
+            <t-card title="核心支出来源 (帕累托图)">
+              <div ref="paretoChartRef" class="chart-container"></div>
+            </t-card>
+          </t-col>
+          <t-col :span="6">
+            <t-card title="消费热词云">
+              <div ref="wordCloudChartRef" class="chart-container"></div>
+            </t-card>
+          </t-col>
+          <t-col :span="6">
+            <t-card title="消费分布云图">
+              <div ref="boxPlotChartRef" class="chart-container"></div>
+            </t-card>
+          </t-col>
+        </t-row>
       </div>
     </div>
     <div v-else class="empty-state">
@@ -1233,12 +1264,6 @@ const updateBoxPlotChart = () => {
 }
 
 .profile-section {
-  .profile-content {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--td-comp-margin-m);
-  }
-
   .profile-stat {
     text-align: center;
     padding: var(--td-comp-paddingTB-m) var(--td-comp-paddingLR-s);
@@ -1361,12 +1386,6 @@ const updateBoxPlotChart = () => {
 }
 
 .habits-section {
-  .habits-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--td-comp-margin-m);
-  }
-
   .habit-item {
     display: flex;
     align-items: center;
@@ -1412,12 +1431,6 @@ const updateBoxPlotChart = () => {
 }
 
 .advanced-insights {
-  .insight-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--td-comp-margin-m);
-  }
-
   .insight-content {
     display: flex;
     flex-direction: column;
@@ -1532,17 +1545,6 @@ const updateBoxPlotChart = () => {
     border-bottom: 2px solid var(--td-component-border);
   }
 
-  .viz-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--td-comp-margin-m);
-    margin-bottom: var(--td-comp-margin-m);
-
-    &.full-width {
-      grid-template-columns: 1fr;
-    }
-  }
-
   .chart-container {
     height: 350px;
   }
@@ -1572,16 +1574,5 @@ const updateBoxPlotChart = () => {
 }
 
 @media (max-width: 768px) {
-  .profile-content {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-
-  .habits-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-
-  .insight-grid {
-    grid-template-columns: 1fr !important;
-  }
 }
 </style>

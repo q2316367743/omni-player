@@ -7,7 +7,8 @@
           <chevron-left-icon/>
         </template>
       </t-button>
-      <div>{{ title }}</div>
+      <slot v-if="slot.title" name="title"/>
+      <div v-else>{{ title }}</div>
     </div>
     <div class="app-layout-content">
       <slot/>
@@ -16,10 +17,15 @@
 </template>
 <script lang="ts" setup>
 import {ChevronLeftIcon} from "tdesign-icons-vue-next";
+import type { JSX } from "vue/jsx-runtime";
 
 defineProps({
   title: String
 })
+const slot = defineSlots<{
+  default: () => JSX.Element,
+  title: () => JSX.Element
+}>()
 
 const router = useRouter();
 const goBack = () => router.back();
