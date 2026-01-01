@@ -54,3 +54,64 @@ CREATE TABLE IF NOT EXISTS feed_content
 
 -- 为 feed_contents 添加索引：通过 itemLink 快速查找内容
 CREATE UNIQUE INDEX IF NOT EXISTS idx_feed_contents_itemlink ON feed_content (item_link);
+
+CREATE TABLE analysis_session
+(
+    id               TEXT PRIMARY KEY,
+    created_at       INTEGER NOT NULL,
+    updated_at       INTEGER NOT NULL,
+
+    filename         TEXT    NOT NULL, -- 原始文件名（如 "alipay_2025.csv"）
+    source_type      TEXT,             -- 'bank', 'alipay', 'wechat' 等（可选）
+    record_count     INTEGER,          -- 解析出的有效交易数
+    date_range_start INTEGER,             -- 账单最早日期
+    date_range_end   INTEGER              -- 账单最晚日期
+);
+
+CREATE TABLE `analysis_transaction`
+(
+    id           TEXT PRIMARY KEY,
+    created_at   INTEGER                                    NOT NULL,
+    updated_at   INTEGER                                    NOT NULL,
+
+    session_id   TEXT                                       NOT NULL,
+    -- 交易时间
+    date         INTEGER                                    NOT NULL,
+    -- 交易商品
+    product      TEXT,
+    -- 交易对方
+    counterparty TEXT,
+    -- 分类
+    category     TEXT,
+    --  交易类型，支出还是收入
+    type         TEXT,
+    -- 金额
+    amount       INTEGER                                    NOT NULL,
+    remark       TEXT,
+    FOREIGN KEY (session_id) REFERENCES analysis_session (id) ON DELETE CASCADE
+);
+
+-- 1. 按会话快速定位（几乎所有查询都带 session_id）
+CREATE INDEX idx_transactions_session_id ON analysis_transaction (session_id);
+
+-- 2. 按会话+日期高效聚合（用于趋势图、日历视图）
+CREATE INDEX idx_transactions_session_date ON analysis_transaction (session_id, date);
+
+-- 3. 按会话+类型+类别高效分组（用于饼图、分类排行）
+CREATE INDEX idx_transactions_session_type_category
+    ON analysis_transaction (session_id, type, category);
+
+CREATE TABLE analysis_category
+(
+    id           TEXT PRIMARY KEY,
+    created_at   INTEGER                                    NOT NULL,
+
+    session_id   TEXT                                       NOT NULL,
+
+    name          TEXT    NOT NULL, -- 如 "餐饮", "交通"
+    display_order INTEGER NOT NULL        -- 控制前端显示顺序
+);
+
+create unique index analysis_category_session_id_name_uindex
+    on analysis_category (session_id, name);
+

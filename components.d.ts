@@ -71,6 +71,7 @@ declare module 'vue' {
     TTag: typeof import('tdesign-vue-next')['Tag']
     TTextarea: typeof import('tdesign-vue-next')['Textarea']
     TTooltip: typeof import('tdesign-vue-next')['Tooltip']
+    TUpload: typeof import('tdesign-vue-next')['Upload']
     UtoolsWebview: typeof import('./src/components/webview/UtoolsWebview.vue')['default']
     VerticalSplitPanel: typeof import('./src/components/common/VerticalSplitPanel.vue')['default']
   }
@@ -137,6 +138,7 @@ declare global {
   const TTag: typeof import('tdesign-vue-next')['Tag']
   const TTextarea: typeof import('tdesign-vue-next')['Textarea']
   const TTooltip: typeof import('tdesign-vue-next')['Tooltip']
+  const TUpload: typeof import('tdesign-vue-next')['Upload']
   const UtoolsWebview: typeof import('./src/components/webview/UtoolsWebview.vue')['default']
   const VerticalSplitPanel: typeof import('./src/components/common/VerticalSplitPanel.vue')['default']
 }

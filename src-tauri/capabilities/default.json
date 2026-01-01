@@ -57,6 +57,7 @@
     "fs:allow-resource-read-recursive",
     "fs:allow-write-file",
     "fs:allow-read-dir",
+    "fs:allow-read-file",
     "fs:allow-remove",
     {
       "identifier": "fs:allow-rename",

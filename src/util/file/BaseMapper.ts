@@ -96,7 +96,6 @@ export class BaseMapper<T extends TableLike> {
     const ids: Array<string> = [];
     const allValues: Array<any> = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const _param of params) {
       const id = useSnowflake().nextId();
       ids.push(id);
@@ -105,7 +104,7 @@ export class BaseMapper<T extends TableLike> {
       allValues.push(id);
       // 按键顺序添加其他值
       for (const key of keys) {
-        allValues.push((params as any)[key]);
+        allValues.push(_param[key]);
       }
     }
 
