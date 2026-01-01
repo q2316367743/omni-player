@@ -31,7 +31,9 @@ const collapsed = ref(false);
 
 const handleSelectSession = (sessionId: string | null) => {
   selectedSessionId.value = sessionId;
-  if (sessionId) collapsed.value = true;
+  nextTick(() => {
+    if (sessionId) collapsed.value = true;
+  })
 };
 </script>
 

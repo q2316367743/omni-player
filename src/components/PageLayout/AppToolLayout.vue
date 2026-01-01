@@ -59,7 +59,8 @@ const goBack = () => router.back();
     width: 100%;
     height: calc(100vh - 57px);
     transform: scale(1);
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 }
 </style>

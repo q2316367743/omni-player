@@ -13,116 +13,177 @@
         </div>
       </div>
 
-      <div class="profile-section">
-        <t-card title="消费画像">
-          <t-row :gutter="16">
-            <t-col :span="3">
-              <div class="profile-stat">
-                <div class="stat-label">总支出</div>
-                <div class="stat-value expense">{{ formatAmount(insightData.profile.totalExpense) }}</div>
-              </div>
-            </t-col>
-            <t-col :span="3">
-              <div class="profile-stat">
-                <div class="stat-label">总交易</div>
-                <div class="stat-value">{{ insightData.profile.totalTransactions }} 笔</div>
-              </div>
-            </t-col>
-            <t-col :span="3">
-              <div class="profile-stat">
-                <div class="stat-label">平均单笔</div>
-                <div class="stat-value">{{ formatAmount(insightData.profile.avgTransactionAmount) }}</div>
-              </div>
-            </t-col>
-            <t-col :span="3">
-              <div class="profile-stat highlight">
-                <div class="stat-label">主要消费</div>
-                <div class="stat-value">{{ insightData.profile.topCategory }}</div>
-                <div class="stat-desc">{{ insightData.profile.topCategoryPercentage.toFixed(1) }}%</div>
-              </div>
-            </t-col>
-          </t-row>
-        </t-card>
+      <div class="sankey-section">
+        <t-row :gutter="16">
+          <t-col :span="9">
+            <t-card title="资金流向">
+              <div ref="sankeyChartRef" class="chart-container sankey-chart"></div>
+            </t-card>
+          </t-col>
+          <t-col :span="3">
+            <t-card>
+              <h1>年度消费故事</h1>
+              <h2>点击开启您的时光之旅</h2>
+            </t-card>
+          </t-col>
+        </t-row>
       </div>
 
-      <div class="merchants-section">
-        <t-card title="最常光顾">
-          <div class="merchants-list">
-            <div v-for="(merchant, index) in insightData.merchants.slice(0, 5)" :key="merchant.name" class="merchant-item">
-              <div class="merchant-rank">{{ index + 1 }}</div>
-              <div class="merchant-info">
-                <div class="merchant-name">{{ merchant.name }}</div>
-                <div class="merchant-meta">{{ merchant.count }} 笔 · 平均 {{ formatAmount(merchant.avgAmount) }}</div>
+      <t-row :gutter="[16, 16]">
+        <t-col :span="6">
+          <div class="profile-section">
+            <t-card title="消费画像">
+              <div class="profile-items pb-18px">
+                <div class="profile-item">
+                  <div class="profile-item-icon">
+                    <time-icon/>
+                  </div>
+                  <div class="profile-item-content">
+                    <div class="profile-item-title">消费时间</div>
+                    <div class="profile-item-value">{{ insightData.profile.spendingTime }}</div>
+                  </div>
+                </div>
+                <div class="profile-item">
+                  <div class="profile-item-icon">
+                    <chart-icon/>
+                  </div>
+                  <div class="profile-item-content">
+                    <div class="profile-item-title">消费偏好</div>
+                    <div class="profile-item-value">{{ insightData.profile.spendingPreference }}</div>
+                  </div>
+                </div>
+                <div class="profile-item">
+                  <div class="profile-item-icon">
+                    <calendar-icon/>
+                  </div>
+                  <div class="profile-item-content">
+                    <div class="profile-item-title">消费规律</div>
+                    <div class="profile-item-value">{{ insightData.profile.spendingPattern }}</div>
+                  </div>
+                </div>
+                <div class="profile-item">
+                  <div class="profile-item-icon">
+                    <lightbulb-icon/>
+                  </div>
+                  <div class="profile-item-content">
+                    <div class="profile-item-title">消费能力</div>
+                    <div class="profile-item-value">{{ insightData.profile.spendingAbility }}</div>
+                  </div>
+                </div>
               </div>
-              <div class="merchant-amount">{{ formatAmount(merchant.totalAmount) }}</div>
-            </div>
+            </t-card>
           </div>
-        </t-card>
-      </div>
-
-      <div class="scenario-section">
-        <t-card title="消费场景">
-          <div class="scenario-tabs">
-            <t-radio-group v-model="scenarioType" variant="default-filled" size="small">
-              <t-radio-button value="channel">消费渠道</t-radio-button>
-              <t-radio-button value="time">时段分布</t-radio-button>
-              <t-radio-button value="amount">金额层级</t-radio-button>
-            </t-radio-group>
+        </t-col>
+        <t-col :span="6">
+          <div class="merchants-section">
+            <t-card title="最常光顾">
+              <div class="merchants-list">
+                <div v-for="(merchant, index) in insightData.merchants.slice(0, 5)" :key="merchant.name"
+                     class="merchant-item">
+                  <div class="merchant-rank">{{ index + 1 }}</div>
+                  <div class="merchant-info">
+                    <div class="merchant-name">{{ merchant.name }}</div>
+                    <div class="merchant-meta">{{ merchant.count }} 笔 · 平均 {{
+                        formatAmount(merchant.avgAmount)
+                      }}
+                    </div>
+                  </div>
+                  <div class="merchant-amount">{{ formatAmount(merchant.totalAmount) }}</div>
+                </div>
+              </div>
+            </t-card>
           </div>
-          <div ref="scenarioChartRef" class="chart-container"></div>
-        </t-card>
-      </div>
+        </t-col>
+        <t-col :span="6">
+          <div class="scenario-section">
+            <t-card title="消费场景">
+              <div class="scenario-tabs">
+                <t-radio-group v-model="scenarioType" variant="default-filled" size="small">
+                  <t-radio-button value="channel">消费渠道</t-radio-button>
+                  <t-radio-button value="time">时段分布</t-radio-button>
+                  <t-radio-button value="amount">金额层级</t-radio-button>
+                </t-radio-group>
+              </div>
+              <div ref="scenarioChartRef" class="chart-container"></div>
+            </t-card>
+          </div>
+        </t-col>
+        <t-col :span="6">
+          <div class="habits-section">
+            <t-card title="消费习惯">
+              <t-row :gutter="[16, 16]">
+                <t-col :span="6">
+                  <div class="habit-item">
+                    <div class="habit-icon">
+                      <calendar-icon/>
+                    </div>
+                    <div class="habit-content">
+                      <div class="habit-label">日均消费</div>
+                      <div class="habit-value">{{ formatAmount(insightData.habits.avgDailyExpense) }}</div>
+                    </div>
+                  </div>
+                </t-col>
+                <t-col :span="6">
+                  <div class="habit-item">
+                    <div class="habit-icon">
+                      <time-icon/>
+                    </div>
+                    <div class="habit-content">
+                      <div class="habit-label">周末消费占比</div>
+                      <div class="habit-value">{{ insightData.habits.weekendRatio.toFixed(1) }}%</div>
+                    </div>
+                  </div>
+                </t-col>
+                <t-col :span="6">
+                  <div class="habit-item">
+                    <div class="habit-icon">
+                      <chart-icon/>
+                    </div>
+                    <div class="habit-content">
+                      <div class="habit-label">固定支出占比</div>
+                      <div class="habit-value">{{ insightData.habits.fixedExpenseRatio.toFixed(1) }}%</div>
+                    </div>
+                  </div>
+                </t-col>
+                <t-col :span="6">
+                  <div class="habit-item">
+                    <div class="habit-icon">
+                      <time-icon/>
+                    </div>
+                    <div class="habit-content">
+                      <div class="habit-label">月初消费占比</div>
+                      <div class="habit-value">{{ insightData.habits.earlyMonthRatio.toFixed(1) }}%</div>
+                    </div>
+                  </div>
+                </t-col>
+                <t-col :span="6">
+                  <div class="habit-item">
+                    <div class="habit-icon">
+                      <calendar-icon/>
+                    </div>
+                    <div class="habit-content">
+                      <div class="habit-label">深夜剁手</div>
+                      <div class="habit-value">{{ insightData.habits.lateNightSpending.toFixed(1) }}%</div>
+                    </div>
+                  </div>
+                </t-col>
+                <t-col :span="6">
+                  <div class="habit-item">
+                    <div class="habit-icon">
+                      <chart-icon/>
+                    </div>
+                    <div class="habit-content">
+                      <div class="habit-label">恩格尔系数</div>
+                      <div class="habit-value">{{ insightData.habits.engelCoefficient.toFixed(1) }}%</div>
+                    </div>
+                  </div>
+                </t-col>
+              </t-row>
+            </t-card>
+          </div>
+        </t-col>
+      </t-row>
 
-      <div class="habits-section">
-        <t-card title="消费习惯">
-          <t-row :gutter="16">
-            <t-col :span="3">
-              <div class="habit-item">
-                <div class="habit-icon">
-                  <calendar-icon/>
-                </div>
-                <div class="habit-content">
-                  <div class="habit-label">日均支出</div>
-                  <div class="habit-value">{{ formatAmount(insightData.habits.avgDailyExpense) }}</div>
-                </div>
-              </div>
-            </t-col>
-            <t-col :span="3">
-              <div class="habit-item">
-                <div class="habit-icon">
-                  <time-icon/>
-                </div>
-                <div class="habit-content">
-                  <div class="habit-label">月均支出</div>
-                  <div class="habit-value">{{ formatAmount(insightData.habits.avgMonthlyExpense) }}</div>
-                </div>
-              </div>
-            </t-col>
-            <t-col :span="3">
-              <div class="habit-item">
-                <div class="habit-icon">
-                  <time-icon/>
-                </div>
-                <div class="habit-content">
-                  <div class="habit-label">高峰时段</div>
-                  <div class="habit-value">{{ insightData.habits.peakSpendingHour }}:00</div>
-                </div>
-              </div>
-            </t-col>
-            <t-col :span="3">
-              <div class="habit-item">
-                <div class="habit-icon">
-                  <chart-icon/>
-                </div>
-                <div class="habit-content">
-                  <div class="habit-label">活跃日</div>
-                  <div class="habit-value">{{ insightData.habits.peakSpendingDay }}</div>
-                </div>
-              </div>
-            </t-col>
-          </t-row>
-        </t-card>
-      </div>
 
       <div class="advanced-insights">
         <t-row :gutter="[16, 16]">
@@ -194,12 +255,6 @@
             </t-card>
           </t-col>
         </t-row>
-      </div>
-
-      <div class="sankey-section">
-        <t-card title="资金流向">
-          <div ref="sankeyChartRef" class="chart-container sankey-chart"></div>
-        </t-card>
       </div>
 
       <div class="advanced-viz-section">
@@ -483,9 +538,9 @@ const updateScenarioChart = () => {
         data: data.map(d => d.value),
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#83bff6' },
-            { offset: 0.5, color: '#188df0' },
-            { offset: 1, color: '#188df0' }
+            {offset: 0, color: '#83bff6'},
+            {offset: 0.5, color: '#188df0'},
+            {offset: 1, color: '#188df0'}
           ])
         },
         barWidth: '60%'
@@ -514,7 +569,7 @@ const initSankeyChart = () => {
 const updateSankeyChart = () => {
   if (!sankeyChart || !insightData.value) return;
 
-  const { nodes, links } = insightData.value.sankeyData;
+  const {nodes, links} = insightData.value.sankeyData;
 
   if (nodes.length === 0 || links.length === 0) {
     return;
@@ -539,7 +594,7 @@ const updateSankeyChart = () => {
         emphasis: {
           focus: 'adjacency'
         },
-        data: nodes.map(node => ({ name: node.name })),
+        data: nodes.map(node => ({name: node.name})),
         links: links.map(link => ({
           source: link.source,
           target: link.target,
@@ -587,7 +642,7 @@ const initThemeRiverChart = () => {
 const updateThemeRiverChart = () => {
   if (!themeRiverChart || !insightData.value) return;
 
-  const { dates, series } = insightData.value.themeRiverData;
+  const {dates, series} = insightData.value.themeRiverData;
 
   const option = {
     tooltip: {
@@ -659,7 +714,7 @@ const initHeatmapChart = () => {
 const updateHeatmapChart = () => {
   if (!heatmapChart || !insightData.value) return;
 
-  const { hours, days, data } = insightData.value.heatmapData;
+  const {hours, days, data} = insightData.value.heatmapData;
 
   const option = {
     tooltip: {
@@ -742,7 +797,7 @@ const initRadarChart = () => {
 const updateRadarChart = () => {
   if (!radarChart || !insightData.value) return;
 
-  const { indicators, series } = insightData.value.radarData;
+  const {indicators, series} = insightData.value.radarData;
 
   const option = {
     tooltip: {
@@ -791,7 +846,23 @@ const initQuadrantChart = () => {
 const updateQuadrantChart = () => {
   if (!quadrantChart || !insightData.value) return;
 
-  const { items } = insightData.value.quadrantData;
+  const {items} = insightData.value.quadrantData;
+
+  const counts = items.map(item => item.count);
+  const avgAmounts = items.map(item => item.avgAmount);
+
+  const medianCount = counts.sort((a, b) => a - b)[Math.floor(counts.length / 2)];
+  const medianAvgAmount = avgAmounts.sort((a, b) => a - b)[Math.floor(avgAmounts.length / 2)];
+
+  const categoryColorMap = new Map<string, string>();
+  const categories = [...new Set(items.map(item => item.name))];
+
+  categories.forEach(category => {
+    const hue = Math.floor(Math.random() * 360);
+    const saturation = 60 + Math.floor(Math.random() * 20);
+    const lightness = 50 + Math.floor(Math.random() * 10);
+    categoryColorMap.set(category, `hsl(${hue}, ${saturation}%, ${lightness}%)`);
+  });
 
   const option = {
     tooltip: {
@@ -828,16 +899,68 @@ const updateQuadrantChart = () => {
         }
       }
     },
+    graphic: [
+      {
+        type: 'text',
+        left: '15%',
+        top: '15%',
+        style: {
+          text: '低频高价\n(大额支出)',
+          textAlign: 'center',
+          fill: '#ff4d4f',
+          fontSize: 12,
+          fontWeight: 'bold'
+        }
+      },
+      {
+        type: 'text',
+        right: '15%',
+        top: '15%',
+        style: {
+          text: '高频高价\n(重点关注)',
+          textAlign: 'center',
+          fill: '#ff4d4f',
+          fontSize: 12,
+          fontWeight: 'bold'
+        }
+      },
+      {
+        type: 'text',
+        left: '15%',
+        bottom: '15%',
+        style: {
+          text: '低频低价\n(偶发消费)',
+          textAlign: 'center',
+          fill: '#52c41a',
+          fontSize: 12
+        }
+      },
+      {
+        type: 'text',
+        right: '15%',
+        bottom: '15%',
+        style: {
+          text: '高频低价\n(习惯性消费)',
+          textAlign: 'center',
+          fill: '#52c41a',
+          fontSize: 12
+        }
+      }
+    ],
     series: [{
       type: 'scatter',
       data: items.map(item => ({
         name: item.name,
         value: [item.count, item.avgAmount],
-        totalAmount: item.totalAmount
+        totalAmount: item.totalAmount,
+        count: item.count,
+        avgAmount: item.avgAmount
       })),
       symbolSize: (data: any) => Math.sqrt(data[2]) * 2,
       itemStyle: {
-        color: '#1890ff',
+        color: (params: any) => {
+          return categoryColorMap.get(params.data.name) || '#1890ff';
+        },
         opacity: 0.7
       },
       label: {
@@ -845,6 +968,29 @@ const updateQuadrantChart = () => {
         position: 'top',
         formatter: (params: any) => params.data.name,
         fontSize: 10
+      },
+      markLine: {
+        silent: true,
+        symbol: 'none',
+        lineStyle: {
+          color: '#999',
+          type: 'solid',
+          width: 1
+        },
+        data: [
+          {
+            xAxis: medianCount,
+            label: {
+              show: false
+            }
+          },
+          {
+            yAxis: medianAvgAmount,
+            label: {
+              show: false
+            }
+          }
+        ]
       }
     }]
   };
@@ -870,7 +1016,7 @@ const initChordChart = () => {
 const updateChordChart = () => {
   if (!chordChart || !insightData.value) return;
 
-  const { nodes, links } = insightData.value.chordData;
+  const {nodes, links} = insightData.value.chordData;
 
   const option = {
     tooltip: {
@@ -887,7 +1033,7 @@ const updateChordChart = () => {
     },
     series: [{
       type: 'chord',
-      data: nodes.map((name, i) => ({ name, id: i })),
+      data: nodes.map((name, i) => ({name, id: i})),
       links: links.map(link => ({
         source: link.source,
         target: link.target,
@@ -928,7 +1074,7 @@ const initFunnelChart = () => {
 const updateFunnelChart = () => {
   if (!funnelChart || !insightData.value) return;
 
-  const { data } = insightData.value.funnelData;
+  const {data} = insightData.value.funnelData;
 
   const option = {
     tooltip: {
@@ -995,7 +1141,13 @@ const initParetoChart = () => {
 const updateParetoChart = () => {
   if (!paretoChart || !insightData.value) return;
 
-  const { categories, amounts, cumulative } = insightData.value.paretoData;
+  const {categories, amounts, cumulative} = insightData.value.paretoData;
+
+  const categoryColors = [
+    '#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de',
+    '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#2f4554',
+    '#c23531', '#d48265', '#91c7ae', '#749f83', '#ca8622'
+  ];
 
   const option = {
     tooltip: {
@@ -1046,7 +1198,9 @@ const updateParetoChart = () => {
         type: 'bar',
         data: amounts,
         itemStyle: {
-          color: '#1890ff'
+          color: (params: any) => {
+            return categoryColors[params.dataIndex % categoryColors.length];
+          }
         }
       },
       {
@@ -1156,7 +1310,13 @@ const initBoxPlotChart = () => {
 const updateBoxPlotChart = () => {
   if (!boxPlotChart || !insightData.value) return;
 
-  const { categories, data } = insightData.value.boxPlotData;
+  const {categories, data} = insightData.value.boxPlotData;
+
+  const categoryColors = [
+    '#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de',
+    '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#2f4554',
+    '#c23531', '#d48265', '#91c7ae', '#749f83', '#ca8622'
+  ];
 
   const option = {
     tooltip: {
@@ -1213,7 +1373,9 @@ const updateBoxPlotChart = () => {
         }
       },
       itemStyle: {
-        borderColor: '#1890ff',
+        borderColor: (params: any) => {
+          return categoryColors[params.dataIndex % categoryColors.length];
+        },
         borderWidth: 1
       }
     }]
@@ -1226,7 +1388,7 @@ const updateBoxPlotChart = () => {
 <style scoped lang="less">
 .insight-tab {
   height: calc(100% - 16px);
-  overflow-y: auto;
+  width: calc(100% - 16px);
   padding: 8px;
 }
 
@@ -1264,52 +1426,56 @@ const updateBoxPlotChart = () => {
 }
 
 .profile-section {
-  .profile-stat {
-    text-align: center;
-    padding: var(--td-comp-paddingTB-m) var(--td-comp-paddingLR-s);
-    background: var(--td-bg-color-container-hover);
+  .profile-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--td-comp-margin-m);
+  }
+
+  .profile-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--td-comp-margin-m);
+    padding: var(--td-comp-paddingTB-m) var(--td-comp-paddingLR-m);
+    background: linear-gradient(135deg, var(--td-bg-color-container-hover) 0%, var(--td-bg-color-container) 100%);
     border-radius: var(--td-radius-medium);
     transition: all 0.3s ease;
 
     &:hover {
-      transform: translateY(-2px);
+      transform: translateX(4px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    &.highlight {
-      background: linear-gradient(135deg, var(--td-brand-color-1) 0%, var(--td-brand-color-2) 100%);
-      color: var(--td-text-color-white);
-
-      .stat-label {
-        color: var(--td-text-color-white);
-      }
-
-      .stat-value {
-        color: var(--td-text-color-white);
-      }
     }
   }
 
-  .stat-label {
-    font-size: var(--td-font-size-body-small);
+  .profile-item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--td-brand-color) 0%, var(--td-brand-color-light) 100%);
+    color: var(--td-text-color-white);
+    border-radius: var(--td-radius-medium);
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .profile-item-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .profile-item-title {
+    font-size: var(--td-font-size-body-medium);
+    font-weight: 600;
     color: var(--td-text-color-secondary);
     margin-bottom: var(--td-comp-margin-xs);
   }
 
-  .stat-value {
-    font-size: 20px;
-    font-weight: 700;
+  .profile-item-value {
+    font-size: var(--td-font-size-body-medium);
     color: var(--td-text-color-primary);
-    margin-bottom: var(--td-comp-margin-xs);
-
-    &.expense {
-      color: var(--td-error-color);
-    }
-  }
-
-  .stat-desc {
-    font-size: var(--td-font-size-body-small);
-    color: var(--td-text-color-placeholder);
+    line-height: 1.5;
   }
 }
 

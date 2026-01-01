@@ -34,6 +34,10 @@ export interface ProfileInsight {
   topCategoryPercentage: number;
   mostFrequentMerchant: string;
   mostFrequentMerchantCount: number;
+  spendingTime: string;
+  spendingPreference: string;
+  spendingPattern: string;
+  spendingAbility: string;
 }
 
 export interface MerchantInsight {
@@ -72,6 +76,11 @@ export interface HabitInsight {
   peakSpendingHour: number;
   peakSpendingDay: string;
   mostActiveMonth: string;
+  weekendRatio: number;
+  fixedExpenseRatio: number;
+  earlyMonthRatio: number;
+  lateNightSpending: number;
+  engelCoefficient: number;
 }
 
 export interface LatteFactorInsight {
@@ -215,7 +224,11 @@ function getEmptyInsights(): InsightData {
       topCategoryAmount: 0,
       topCategoryPercentage: 0,
       mostFrequentMerchant: '-',
-      mostFrequentMerchantCount: 0
+      mostFrequentMerchantCount: 0,
+      spendingTime: '-',
+      spendingPreference: '-',
+      spendingPattern: '-',
+      spendingAbility: '-'
     },
     merchants: [],
     scenario: {
@@ -228,7 +241,12 @@ function getEmptyInsights(): InsightData {
       avgMonthlyExpense: 0,
       peakSpendingHour: 0,
       peakSpendingDay: '-',
-      mostActiveMonth: '-'
+      mostActiveMonth: '-',
+      weekendRatio: 0,
+      fixedExpenseRatio: 0,
+      earlyMonthRatio: 0,
+      lateNightSpending: 0,
+      engelCoefficient: 0
     },
     latteFactor: {
       totalAmount: 0,
@@ -330,6 +348,11 @@ function analyzeProfile(expenseTransactions: AnalysisTransaction[], incomeTransa
     }
   }
 
+  const spendingTime = analyzeSpendingTime(expenseTransactions);
+  const spendingPreference = `${topCategory}(${topCategoryAmount > 0 && totalExpense > 0 ? (topCategoryAmount / totalExpense * 100).toFixed(1) : '0.0'}%)`;
+  const spendingPattern = analyzeSpendingPattern(expenseTransactions);
+  const spendingAbility = analyzeSpendingAbility(expenseTransactions);
+
   return {
     totalExpense,
     totalIncome,
@@ -339,8 +362,88 @@ function analyzeProfile(expenseTransactions: AnalysisTransaction[], incomeTransa
     topCategoryAmount,
     topCategoryPercentage: totalExpense > 0 ? (topCategoryAmount / totalExpense) * 100 : 0,
     mostFrequentMerchant,
-    mostFrequentMerchantCount
+    mostFrequentMerchantCount,
+    spendingTime,
+    spendingPreference,
+    spendingPattern,
+    spendingAbility
   };
+}
+
+function analyzeSpendingTime(transactions: AnalysisTransaction[]): string {
+  if (transactions.length === 0) return '-';
+
+  const hourMap = new Map<number, number>();
+  for (const tx of transactions) {
+    const date = new Date(tx.date);
+    const hour = date.getHours();
+    hourMap.set(hour, (hourMap.get(hour) || 0) + 1);
+  }
+
+  let dayCount = 0;
+  let nightCount = 0;
+  for (const [hour, count] of hourMap) {
+    if (hour >= 6 && hour < 18) {
+      dayCount += count;
+    } else {
+      nightCount += count;
+    }
+  }
+
+  const total = dayCount + nightCount;
+  if (total === 0) return '-';
+
+  const dayRatio = dayCount / total;
+  if (dayRatio > 0.7) {
+    return '您的消费时间比较规律，集中在日间';
+  } else if (dayRatio < 0.3) {
+    return '您的消费时间比较规律，集中在夜间';
+  } else {
+    return '您的消费时间比较分散';
+  }
+}
+
+function analyzeSpendingPattern(transactions: AnalysisTransaction[]): string {
+  if (transactions.length === 0) return '-';
+
+  const dateMap = new Map<string, number>();
+  for (const tx of transactions) {
+    const date = new Date(tx.date);
+    const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    dateMap.set(dateKey, (dateMap.get(dateKey) || 0) + 1);
+  }
+
+  const counts = Array.from(dateMap.values());
+  if (counts.length === 0) return '-';
+
+  const avgCount = counts.reduce((sum, c) => sum + c, 0) / counts.length;
+  const variance = counts.reduce((sum, c) => sum + Math.pow(c - avgCount, 2), 0) / counts.length;
+  const stdDev = Math.sqrt(variance);
+
+  if (stdDev < avgCount * 0.3) {
+    return '您的消费比较规律，有良好的预算管理';
+  } else if (stdDev > avgCount * 0.7) {
+    return '您的消费比较随性，可能需要更多预算管理';
+  } else {
+    return '您的消费规律一般';
+  }
+}
+
+function analyzeSpendingAbility(transactions: AnalysisTransaction[]): string {
+  if (transactions.length === 0) return '-';
+
+  const totalExpense = transactions.reduce((sum, t) => sum + t.amount, 0);
+  const dateRange = getDateRange(transactions);
+  const days = Math.max(1, (dateRange.end - dateRange.start) / (1000 * 60 * 60 * 24));
+  const avgDailyExpense = totalExpense / days;
+
+  if (avgDailyExpense > 500) {
+    return `日均消费${Math.round(avgDailyExpense)}元，属于高消费人群`;
+  } else if (avgDailyExpense > 200) {
+    return `日均消费${Math.round(avgDailyExpense)}元，属于中等消费人群`;
+  } else {
+    return `日均消费${Math.round(avgDailyExpense)}元，属于节俭型消费人群`;
+  }
 }
 
 function analyzeMerchants(transactions: AnalysisTransaction[]): MerchantInsight[] {
@@ -448,7 +551,12 @@ function analyzeHabits(transactions: AnalysisTransaction[]): HabitInsight {
       avgMonthlyExpense: 0,
       peakSpendingHour: 0,
       peakSpendingDay: '-',
-      mostActiveMonth: '-'
+      mostActiveMonth: '-',
+      weekendRatio: 0,
+      fixedExpenseRatio: 0,
+      earlyMonthRatio: 0,
+      lateNightSpending: 0,
+      engelCoefficient: 0
     };
   }
 
@@ -463,15 +571,40 @@ function analyzeHabits(transactions: AnalysisTransaction[]): HabitInsight {
   const dayMap = new Map<number, number>();
   const monthMap = new Map<string, number>();
 
+  let weekendAmount = 0;
+  let weekdayAmount = 0;
+  let earlyMonthAmount = 0;
+  let lateNightAmount = 0;
+  let foodExpense = 0;
+
   for (const tx of transactions) {
     const date = new Date(tx.date);
     const hour = date.getHours();
     const day = date.getDay();
     const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    const dayOfMonth = date.getDate();
 
     hourMap.set(hour, (hourMap.get(hour) || 0) + tx.amount);
     dayMap.set(day, (dayMap.get(day) || 0) + tx.amount);
     monthMap.set(month, (monthMap.get(month) || 0) + tx.amount);
+
+    if (day === 0 || day === 6) {
+      weekendAmount += tx.amount;
+    } else {
+      weekdayAmount += tx.amount;
+    }
+
+    if (dayOfMonth <= 10) {
+      earlyMonthAmount += tx.amount;
+    }
+
+    if (hour >= 22 || hour < 6) {
+      lateNightAmount += tx.amount;
+    }
+
+    if (tx.category && (tx.category.includes('餐饮') || tx.category.includes('食品') || tx.category.includes('饮食'))) {
+      foodExpense += tx.amount;
+    }
   }
 
   let peakSpendingHour = 0;
@@ -502,12 +635,27 @@ function analyzeHabits(transactions: AnalysisTransaction[]): HabitInsight {
     }
   }
 
+  const weekendRatio = (weekendAmount + weekdayAmount) > 0 ? (weekendAmount / (weekendAmount + weekdayAmount)) * 100 : 0;
+
+  const fixedExpenseRatio = totalExpense > 0 ? (earlyMonthAmount / totalExpense) * 100 : 0;
+
+  const earlyMonthRatio = totalExpense > 0 ? (earlyMonthAmount / totalExpense) * 100 : 0;
+
+  const lateNightSpending = totalExpense > 0 ? (lateNightAmount / totalExpense) * 100 : 0;
+
+  const engelCoefficient = totalExpense > 0 ? (foodExpense / totalExpense) * 100 : 0;
+
   return {
     avgDailyExpense,
     avgMonthlyExpense,
     peakSpendingHour,
     peakSpendingDay,
-    mostActiveMonth
+    mostActiveMonth,
+    weekendRatio,
+    fixedExpenseRatio,
+    earlyMonthRatio,
+    lateNightSpending,
+    engelCoefficient
   };
 }
 
@@ -971,15 +1119,15 @@ function analyzeChord(transactions: AnalysisTransaction[]): ChordData {
 
 function analyzeFunnel(transactions: AnalysisTransaction[]): FunnelData {
   const ranges = [
-    { name: '所有交易', min: 0, max: Infinity },
-    { name: '大于100元', min: 100, max: Infinity },
-    { name: '大于500元', min: 500, max: Infinity },
-    { name: '大于1000元', min: 1000, max: Infinity },
-    { name: '大于2000元', min: 2000, max: Infinity }
+    { name: '0-100元', min: 0, max: 100 },
+    { name: '100-500元', min: 100, max: 500 },
+    { name: '500-1000元', min: 500, max: 1000 },
+    { name: '1000-2000元', min: 1000, max: 2000 },
+    { name: '2000元以上', min: 2000, max: Infinity }
   ];
 
   const data = ranges.map(range => {
-    const count = transactions.filter(t => t.amount >= range.min).length;
+    const count = transactions.filter(t => t.amount >= range.min && t.amount < range.max).length;
     return { name: range.name, value: count };
   });
 
