@@ -28,8 +28,8 @@
         <t-tab-panel value="category" label="分类分析">
           <category-tab :session-id="sessionId"/>
         </t-tab-panel>
-        <t-tab-panel value="event" label="事件分析">
-          <event-tab :session-id="sessionId"/>
+        <t-tab-panel value="event" label="时间分析">
+          <time-tab :session-id="sessionId"/>
         </t-tab-panel>
         <t-tab-panel value="insight" label="消费洞察">
           <insight-tab :session-id="sessionId"/>
@@ -50,7 +50,7 @@ import HomeTab from "./tabs/HomeTab.vue";
 import YearlyTab from "./tabs/YearlyTab.vue";
 import MonthTab from "./tabs/MonthTab.vue";
 import CategoryTab from "./tabs/CategoryTab.vue";
-import EventTab from "./tabs/EventTab.vue";
+import TimeTab from "./tabs/TimeTab.vue";
 import InsightTab from "./tabs/InsightTab.vue";
 import TransactionTab from "./tabs/TransactionTab.vue";
 
