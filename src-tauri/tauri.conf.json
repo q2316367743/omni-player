@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "nor-regret",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "identifier": "nor-regret",
   "build": {
     "frontendDist": "../dist",
@@ -55,10 +55,15 @@
   },
   "plugins": {
     "updater": {
+      "dangerousInsecureTransportProtocol": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVEMDRDRkNEOTNENkVBNTYKUldSVzZ0YVR6YzhFN1FXemdoQ3daTWp1U3BNeHIyRlIrZTdaTXJxODNWeUFvZ2pLVzZGbkY2dzAK",
       "endpoints": [
-        "https://github.com/q2316367743/omni-player/releases/latest/download/latest.json"
-      ]
+        "https://github.com/q2316367743/omni-player/releases/latest/download/latest.json",
+        "https://api.upgrade.toolsetlink.com/v1/tauri/upgrade?tauriKey=QNvZIeOs3vczr-8gwyhlgg&versionName={{current_version}}&appointVersionName=&devModelKey=&devKey=&target={{target}}&arch={{arch}}"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
     }
   }
 }

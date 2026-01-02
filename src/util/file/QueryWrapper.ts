@@ -1,11 +1,11 @@
-import type Database from "@tauri-apps/plugin-sql";
 import {logDebug} from "@/lib/log";
 import {generatePlaceholders, stringifyJsonWithBigIntSupport} from "@/util";
 import type {PageResponse} from "@/global/PageResponse.ts";
+import {SqlWrapper} from "@/lib/sql.ts";
 
 
 export class QueryChain<T extends Record<string, any>, K extends keyof T = keyof T> {
-  private readonly db: Database;
+  private readonly db: SqlWrapper;
   private readonly tableName: string;
 
   private readonly fields = new Array<K>();
@@ -14,14 +14,14 @@ export class QueryChain<T extends Record<string, any>, K extends keyof T = keyof
   private readonly orders = new Array<string>();
   private readonly lastExpress = new Array<string>();
 
-  constructor(tableName: string, db: Database) {
+  constructor(tableName: string, db: SqlWrapper) {
     this.tableName = tableName;
     this.db = db;
   }
 
   public static from<T extends Record<string, any>>(
     tableName: string,
-    db: Database,
+    db: SqlWrapper,
     p?: Partial<T>
   ): QueryChain<T> {
     const qw = new QueryChain<T>(tableName, db);
@@ -138,7 +138,7 @@ export class QueryChain<T extends Record<string, any>, K extends keyof T = keyof
     return sql;
   }
 
-  async execQuery(db: Database) {
+  async execQuery(db: SqlWrapper) {
     const sql = this.getSql();
     logDebug("select sql\t\t:" + sql);
     logDebug("select values\t:" + this.values);

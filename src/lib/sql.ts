@@ -6,7 +6,7 @@ import {logError, logInfo} from "@/lib/log.ts";
 import {QueryChain} from "@/util/file/QueryWrapper.ts";
 import {BaseMapper, generatePlaceholders, type TableLike} from "@/util";
 
-class Sql {
+export class SqlWrapper {
 
   private db: Database | null = null;
 
@@ -28,11 +28,10 @@ class Sql {
     // 将新的 SQL 调用追加到 Promise 链尾部
     this.promiseChain = this.promiseChain
       .then(async () => {
-        const db = await this.getDb();
-        return db.execute(query, bindValues);
+        return await this.db!.execute(query, bindValues);
       })
       .catch((err) => {
-        logError('get store error:', err);
+        logError('execute error:', err);
         throw err; // 保证错误能被调用者捕获
       });
 
@@ -40,22 +39,20 @@ class Sql {
   }
 
   // 开启一个事务
-  async beginTransaction<T = any>(callback: (sql: Sql) => Promise<T>): Promise<T> {
-    const db = await this.getDb();
+  async beginTransaction<T = any>(callback: (sql: SqlWrapper) => Promise<T>): Promise<T> {
     try {
-      await db.execute(`BEGIN`);
+      await this.db!.execute(`BEGIN`);
       const r = await callback(this);
-      await db.execute(`COMMIT`);
+      await this.db!.execute(`COMMIT`);
       return r;
     } catch (e) {
-      await db.execute(`ROLLBACK`);
+      await this.db!.execute(`ROLLBACK`);
       throw e;
     }
   }
 
   async select<T>(query: string, bindValues?: unknown[]): Promise<T> {
-    const db = await this.getDb();
-    return db.select<T>(query, bindValues);
+    return this.db!.select<T>(query, bindValues);
   }
 
   async getLatestVersion() {
@@ -76,6 +73,8 @@ class Sql {
   }
 
   async migrate() {
+    // 获取 db
+    await this.getDb();
 // 1. 检查 schema_version 表是否存在
     logInfo("1. 检查 schema_version 表是否存在");
     const rows = await this.select<Array<{
@@ -118,17 +117,17 @@ class Sql {
     }
   }
 
-  async query<T extends TableLike>(tableName: string) {
-    return new QueryChain<T>(tableName, await this.getDb());
+  query<T extends TableLike>(tableName: string) {
+    return new QueryChain<T>(tableName, this);
   }
 
-  async mapper<T extends TableLike>(tableName: string) {
-    return new BaseMapper<T>(tableName, await this.getDb());
+  mapper<T extends TableLike>(tableName: string) {
+    return new BaseMapper<T>(tableName, this);
   }
 
 }
 
-const sql = new Sql();
+const sql = new SqlWrapper();
 
 export const useSql = () => {
   return sql;

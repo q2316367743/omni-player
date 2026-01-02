@@ -31,7 +31,6 @@ declare module 'vue' {
     TAlert: typeof import('tdesign-vue-next')['Alert']
     TAside: typeof import('tdesign-vue-next')['Aside']
     TauriWebview: typeof import('./src/components/webview/TauriWebview.vue')['default']
-    TauriWebView: typeof import('./src/components/webview/TauriWebView.vue')['default']
     TBackTop: typeof import('tdesign-vue-next')['BackTop']
     TButton: typeof import('tdesign-vue-next')['Button']
     TCard: typeof import('tdesign-vue-next')['Card']
@@ -75,7 +74,6 @@ declare module 'vue' {
     TTag: typeof import('tdesign-vue-next')['Tag']
     TTextarea: typeof import('tdesign-vue-next')['Textarea']
     TTooltip: typeof import('tdesign-vue-next')['Tooltip']
-    TUpload: typeof import('tdesign-vue-next')['Upload']
     UtoolsWebview: typeof import('./src/components/webview/UtoolsWebview.vue')['default']
     VerticalSplitPanel: typeof import('./src/components/common/VerticalSplitPanel.vue')['default']
   }
@@ -102,7 +100,6 @@ declare global {
   const TAlert: typeof import('tdesign-vue-next')['Alert']
   const TAside: typeof import('tdesign-vue-next')['Aside']
   const TauriWebview: typeof import('./src/components/webview/TauriWebview.vue')['default']
-  const TauriWebView: typeof import('./src/components/webview/TauriWebView.vue')['default']
   const TBackTop: typeof import('tdesign-vue-next')['BackTop']
   const TButton: typeof import('tdesign-vue-next')['Button']
   const TCard: typeof import('tdesign-vue-next')['Card']
@@ -146,7 +143,6 @@ declare global {
   const TTag: typeof import('tdesign-vue-next')['Tag']
   const TTextarea: typeof import('tdesign-vue-next')['Textarea']
   const TTooltip: typeof import('tdesign-vue-next')['Tooltip']
-  const TUpload: typeof import('tdesign-vue-next')['Upload']
   const UtoolsWebview: typeof import('./src/components/webview/UtoolsWebview.vue')['default']
   const VerticalSplitPanel: typeof import('./src/components/common/VerticalSplitPanel.vue')['default']
 }

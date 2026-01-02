@@ -114,4 +114,3 @@ CREATE TABLE analysis_category
 
 create unique index analysis_category_session_id_name_uindex
     on analysis_category (session_id, name);
-

@@ -35,6 +35,7 @@
           "url": "http://*:*/*"
         }
       ]
-    }
+    },
+    "updater:default"
   ]
 }

@@ -1,16 +1,16 @@
-import type Database from "@tauri-apps/plugin-sql";
 import {logDebug} from "@/lib/log";
 import {generatePlaceholders, useSnowflake} from "@/util";
+import {SqlWrapper} from "@/lib/sql.ts";
 
 export interface TableLike extends Record<string, any> {
   id: string;
 }
 
 export class BaseMapper<T extends TableLike> {
-  protected readonly db: Database;
+  protected readonly db: SqlWrapper;
   private readonly tableName: string;
 
-  constructor(tableName: string, db: Database) {
+  constructor(tableName: string, db: SqlWrapper) {
     this.db = db;
     this.tableName = tableName;
   }

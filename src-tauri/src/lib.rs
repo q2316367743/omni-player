@@ -42,6 +42,11 @@ pub fn run() {
             system_process_kill
         ])
         .setup(|app| {
+
+            // 注册更新插件
+            #[cfg(desktop)]
+            let _ = app.handle().plugin(tauri_plugin_updater::Builder::new().build());
+
             let show_i = MenuItem::with_id(app, "show", "显示", true, None::<&str>)?;
             let quit_i = MenuItem::with_id(app, "quit", "关闭", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&show_i, &quit_i])?;
