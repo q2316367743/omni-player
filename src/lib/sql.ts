@@ -10,7 +10,6 @@ export class SqlWrapper {
 
   private db: Database | null = null;
 
-
   private async getDb(): Promise<Database> {
     // 将新的 SQL 调用追加到 Promise 链尾部
     if (this.db) return this.db;
@@ -21,21 +20,26 @@ export class SqlWrapper {
     return this.db;
   }
 
-  private promiseChain: Promise<unknown> = Promise.resolve();
+  private executionChain: Promise<void> = Promise.resolve();
 
-  // sqlite不支持并发执行
+  /**
+   * 串行执行 SQL 命令，确保同一时间只有一个查询在运行
+   */
   async execute(query: string, bindValues?: unknown[]): Promise<QueryResult> {
-    // 将新的 SQL 调用追加到 Promise 链尾部
-    this.promiseChain = this.promiseChain
-      .then(async () => {
-        return await this.db!.execute(query, bindValues);
-      })
-      .catch((err) => {
-        logError('execute error:', err);
-        throw err; // 保证错误能被调用者捕获
-      });
+    // 封装当前操作为一个函数
+    const operation = () => this.db!.execute(query, bindValues);
 
-    return this.promiseChain as Promise<QueryResult>;
+    // 将操作加入执行链
+    const result = this.executionChain.then(() => operation());
+
+    // 更新执行链：下一个操作必须等这个完成
+    this.executionChain = result.then(
+      () => {}, // 成功时继续
+      () => {}  // 失败也继续（避免链断裂）
+    );
+
+    // 返回原始结果（带类型）
+    return result;
   }
 
   // 开启一个事务
