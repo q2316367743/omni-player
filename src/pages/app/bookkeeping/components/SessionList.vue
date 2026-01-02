@@ -16,8 +16,8 @@
         v-for="session in sessions"
         :key="session.id"
         class="session-item"
-        :class="{ active: selectedSessionId === session.id }"
-        @click="handleSelectSession(session.id)"
+        :class="{ active: selectedSession?.id === session.id }"
+        @click="handleSelectSession(session)"
         @contextmenu="handleSessionContextmenu(session, $event)"
       >
         <div class="session-icon" :class="session.source_type">
@@ -46,17 +46,17 @@
 
 <script lang="ts" setup>
 import {FileIcon, AddIcon, LogoWechatpayIcon, LogoAlipayIcon} from "tdesign-icons-vue-next";
-import type {AnalysisSession} from "@/entity/analysis/AnalysisSession.ts";
+import {type AnalysisSession, getSourceTypeName} from "@/entity/analysis/AnalysisSession.ts";
 import {openSessionContextmenu} from "@/pages/app/bookkeeping/func/SessionEdit.tsx";
 import {openAddSession} from "@/pages/app/bookkeeping/func/AddSession.tsx";
 import {useSql} from "@/lib/sql.ts";
 
 const emit = defineEmits<{
-  select: [sessionId: string | null]
+  select: [session: AnalysisSession | null]
 }>();
 
 const sessions = ref<AnalysisSession[]>([]);
-const selectedSessionId = ref<string | null>(null);
+const selectedSession = ref<AnalysisSession | null>(null);
 
 onMounted(async () => {
   await loadSessions();
@@ -68,29 +68,20 @@ const loadSessions = async () => {
   sessions.value = await query.orderByDesc('created_at').list();
 };
 
-const handleSelectSession = (id: string) => {
-  if (selectedSessionId.value === id) {
-    selectedSessionId.value = null;
+const handleSelectSession = (session: AnalysisSession) => {
+  if (selectedSession.value && selectedSession.value.id === session.id) {
+    selectedSession.value = null;
     emit('select', null)
     return;
   }
-  selectedSessionId.value = id;
-  emit('select', id);
+  selectedSession.value = session;
+  emit('select', session);
 };
 
 const getSourceIcon = (session: AnalysisSession) => {
   if (session.source_type === 'wechat') return LogoWechatpayIcon;
   if (session.source_type === 'alipay') return LogoAlipayIcon;
   return FileIcon;
-};
-
-const getSourceTypeName = (sourceType: 'wechat' | 'alipay') => {
-  switch (sourceType) {
-    case 'wechat':
-      return '微信';
-    case 'alipay':
-      return '支付宝';
-  }
 };
 
 const formatDateRange = (start: number, end: number) => {

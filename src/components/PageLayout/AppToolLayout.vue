@@ -9,6 +9,9 @@
       </t-button>
       <slot v-if="slot.title" name="title"/>
       <div v-else>{{ title }}</div>
+      <div class="ml-auto">
+        <slot name="action" />
+      </div>
     </div>
     <div class="app-layout-content">
       <slot/>
@@ -24,7 +27,8 @@ defineProps({
 })
 const slot = defineSlots<{
   default: () => JSX.Element,
-  title: () => JSX.Element
+  title: () => JSX.Element,
+  action: () => JSX.Element
 }>()
 
 const router = useRouter();

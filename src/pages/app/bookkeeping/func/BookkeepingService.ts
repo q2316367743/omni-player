@@ -1,12 +1,12 @@
 import {useSql} from "@/lib/sql.ts";
-import type {AnalysisSession} from "@/entity/analysis/AnalysisSession.ts";
+import type {AnalysisSession, AnalysisSessionSourceType} from "@/entity/analysis/AnalysisSession.ts";
 import type {AnalysisCategory} from "@/entity/analysis/AnalysisCategory.ts";
 import type {AnalysisTransaction, AnalysisTransactionCore} from "@/entity/analysis/AnalysisTransaction.ts";
 
 
 export async function saveTransactions(
   filename: string,
-  sourceType: 'alipay' | 'wechat',
+  sourceType: AnalysisSessionSourceType,
   transactions: AnalysisTransactionCore[]
 ) {
   const sql = useSql();
@@ -15,13 +15,14 @@ export async function saveTransactions(
 
   let dateRangeStart = Date.now();
   let dateRangeEnd = 0;
+  transactions.sort((a, b) => a.date - b.date);
 
   if (transactions.length > 0) {
     const lastTx = transactions[transactions.length - 1];
     const firstTx = transactions[0];
     if (lastTx && firstTx) {
-      dateRangeStart = lastTx.date;
-      dateRangeEnd = firstTx.date;
+      dateRangeStart = firstTx.date;
+      dateRangeEnd = lastTx.date;
     }
   }
 
@@ -69,36 +70,4 @@ export async function saveTransactions(
       remark: tx.remark
     });
   }
-}
-
-export function parseWechatCSV(text: string): AnalysisTransactionCore[] {
-  const lines = text.split('\n').filter((line: string) => line.trim());
-  const transactions: AnalysisTransactionCore[] = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i];
-    if (!line || !line.includes(',')) continue;
-
-    const parts = line.split(',');
-    if (parts.length < 5) continue;
-
-    const dateStr = parts[0];
-    if (!dateStr) continue;
-    const date = new Date(dateStr).getTime();
-
-    const type = parts[5] === '支出' ? 'expense' : 'income';
-    const amount = parts[4] ? parseFloat(String(parts[4])) : 0;
-
-    transactions.push({
-      date,
-      product: parts[2] || '',
-      counterparty: parts[3] || '',
-      category: parts[1] || '',
-      type,
-      amount,
-      remark: parts[6] || ''
-    });
-  }
-
-  return transactions;
 }

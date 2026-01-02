@@ -7,14 +7,6 @@
       <div class="empty-text">请选择一个账单记录</div>
     </div>
     <div v-else class="detail-content">
-      <div class="detail-header">
-        <h2 class="detail-title">{{ session?.filename }}</h2>
-        <div class="detail-meta">
-          <span class="meta-item">{{ getSourceTypeName(session?.source_type) }}</span>
-          <span class="meta-item">{{ session?.record_count }}条记录</span>
-          <span class="meta-item">{{ formatDateRange(session?.date_range_start, session?.date_range_end) }}</span>
-        </div>
-      </div>
       <t-tabs v-model="activeTab" placement="top" size="medium">
         <t-tab-panel value="home" label="首页">
           <home-tab :session-id="sessionId"/>
@@ -70,25 +62,6 @@ watch(() => props.sessionId, async (newId) => {
     session.value = null;
   }
 }, { immediate: true });
-
-const getSourceTypeName = (sourceType?: 'wechat' | 'alipay') => {
-  switch (sourceType) {
-    case 'wechat':
-      return '微信';
-    case 'alipay':
-      return '支付宝';
-    default:
-      return '';
-  }
-};
-
-const formatDateRange = (start?: number, end?: number) => {
-  if (!start || !end) return '';
-  const startDate = new Date(start);
-  const endDate = new Date(end);
-  const format = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-  return `${format(startDate)} ~ ${format(endDate)}`;
-};
 </script>
 
 <style scoped lang="less">
@@ -146,21 +119,6 @@ const formatDateRange = (start?: number, end?: number) => {
   line-height: 1.4;
 }
 
-.detail-meta {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
 
-.meta-item {
-  font-size: var(--td-font-size-body-small);
-  color: var(--td-text-color-secondary);
-  padding: 6px 14px;
-  background: var(--td-bg-color-container-hover);
-  border-radius: 8px;
-  border: 1px solid var(--td-component-border);
-  font-weight: 500;
-}
 
 </style>

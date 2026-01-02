@@ -199,17 +199,11 @@
             </t-card>
           </t-col>
           <t-col :span="4">
-            <t-card title="隐形订阅">
+            <t-card title="周末效应">
               <div class="insight-content">
-                <div v-if="insightData.subscriptions.length > 0" class="subscriptions-list">
-                  <div v-for="sub in insightData.subscriptions.slice(0, 3)" :key="sub.name" class="sub-item">
-                    <div class="sub-name">{{ sub.name }}</div>
-                    <div class="sub-amount">{{ formatAmount(sub.monthlyAmount) }}/月</div>
-                  </div>
-                </div>
-                <div v-else class="empty-sub">
-                  未发现明显订阅
-                </div>
+                <div class="insight-big">{{ insightData.weekendEffect.ratio.toFixed(2) }}x</div>
+                <div class="insight-desc">周末/周一消费比</div>
+                <div class="insight-meta">{{ insightData.weekendEffect.type }}</div>
               </div>
             </t-card>
           </t-col>
@@ -227,7 +221,7 @@
               </div>
             </t-card>
           </t-col>
-          <t-col :span="6">
+          <t-col :span="4">
             <t-card title="品牌忠诚">
               <div class="insight-content">
                 <div class="loyalty-row">
@@ -245,12 +239,18 @@
               </div>
             </t-card>
           </t-col>
-          <t-col :span="6">
-            <t-card title="周末效应">
+          <t-col :span="4">
+            <t-card title="隐形订阅">
               <div class="insight-content">
-                <div class="insight-big">{{ insightData.weekendEffect.ratio.toFixed(2) }}x</div>
-                <div class="insight-desc">周末/周一消费比</div>
-                <div class="insight-meta">{{ insightData.weekendEffect.type }}</div>
+                <div v-if="insightData.subscriptions.length > 0" class="subscriptions-list">
+                  <div v-for="sub in insightData.subscriptions.slice(0, 3)" :key="sub.name" class="sub-item">
+                    <div class="sub-name">{{ sub.name }}</div>
+                    <div class="sub-amount">{{ formatAmount(sub.monthlyAmount) }}/月</div>
+                  </div>
+                </div>
+                <div v-else class="empty-sub">
+                  未发现明显订阅
+                </div>
               </div>
             </t-card>
           </t-col>
@@ -720,8 +720,8 @@ const updateHeatmapChart = () => {
     tooltip: {
       position: 'top',
       formatter: (params: any) => {
-        const day = params.data[0];
-        const hour = params.data[1];
+        const hour = params.data[0];
+        const day = params.data[1];
         const amount = params.data[2];
         return `${days[day]} ${hour}:00<br/>¥${amount.toFixed(2)}`;
       }
@@ -762,7 +762,7 @@ const updateHeatmapChart = () => {
       name: '消费金额',
       type: 'heatmap',
       data: data.flatMap((row, day) =>
-        row.map((amount, hour) => [day, hour, amount])
+        row.map((amount, hour) => [hour, day, amount])
       ),
       label: {
         show: false

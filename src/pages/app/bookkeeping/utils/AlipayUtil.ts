@@ -1,5 +1,4 @@
-import type {AnalysisTransaction} from "@/entity/analysis/AnalysisTransaction.ts";
-import {useSnowflake} from "@/util/lang/Snowflake.ts";
+import type {AnalysisTransactionCore} from "@/entity/analysis/AnalysisTransaction.ts";
 import {readFile} from "@tauri-apps/plugin-fs";
 import GBK from "gbk.js";
 
@@ -8,8 +7,8 @@ export async function readAlipayCsv(path: string){
   return GBK.decode(Array.from(file));
 }
 
-export function parseAlipayToTransaction(csv: string): Array<AnalysisTransaction> {
-  const transactions: Array<AnalysisTransaction> = [];
+export function parseAlipayToTransaction(csv: string): Array<AnalysisTransactionCore> {
+  const transactions: Array<AnalysisTransactionCore> = [];
   const lines = csv.split('\n');
   
   let headerIndex = -1;
@@ -30,9 +29,7 @@ export function parseAlipayToTransaction(csv: string): Array<AnalysisTransaction
     return transactions;
   }
   
-  const now = Date.now();
-  const snowflake = useSnowflake();
-  
+
   for (let i = headerIndex + 1; i < lines.length; i++) {
     const line = lines[i];
     if (!line) {
@@ -78,10 +75,6 @@ export function parseAlipayToTransaction(csv: string): Array<AnalysisTransaction
     }
     
     transactions.push({
-      id: snowflake.nextId(),
-      created_at: now,
-      updated_at: now,
-      session_id: '',
       date,
       product,
       counterparty,

@@ -1,14 +1,24 @@
 import {DrawerPlugin, Button, Card} from "tdesign-vue-next";
 import {open} from '@tauri-apps/plugin-dialog';
-import {readTextFile} from '@tauri-apps/plugin-fs';
+import {basename} from '@tauri-apps/api/path';
 import MessageUtil from "@/util/model/MessageUtil.ts";
-import {parseWechatCSV, saveTransactions} from "./BookkeepingService.ts";
+import {saveTransactions} from "./BookkeepingService.ts";
 import {parseAlipayToTransaction, readAlipayCsv} from "@/pages/app/bookkeeping/utils/AlipayUtil.ts";
-import {LogoAlipayIcon, LogoWechatpayIcon} from "tdesign-icons-vue-next";
+import {LogoAlipayIcon, LogoWechatpayIcon, DeleteIcon} from "tdesign-icons-vue-next";
 import {useSql} from "@/lib/sql.ts";
+import type {AnalysisTransactionCore} from "@/entity/analysis/AnalysisTransaction.ts";
+import type {AnalysisSessionSourceType} from "@/entity/analysis/AnalysisSession.ts";
+import {parseWeChatPayToTransaction} from "@/pages/app/bookkeeping/utils/WechatPayUtil.ts";
+
+interface AddSessionItem {
+  name: string;
+  path: string;
+  type: 'alipay' | 'wechat';
+}
 
 export function openAddSession(onSuccess?: () => void) {
   const uploading = ref(false);
+  const items = ref(new Array<AddSessionItem>());
 
   const handleAlipaySelect = async () => {
     try {
@@ -24,17 +34,12 @@ export function openAddSession(onSuccess?: () => void) {
       });
       if (!path) return;
 
-      uploading.value = true;
-      const text = await readAlipayCsv(path);
-      const data = parseAlipayToTransaction(text);
-      const filename = path.split('/').pop() || 'alipay_record.csv';
-      await useSql().beginTransaction(async () => {
-        await saveTransactions(filename, 'alipay', data);
-      })
+      if (items.value.some(item => item.path === path)) {
+        return MessageUtil.warning("该文件已存在");
+      }
 
-      MessageUtil.success("账单上传成功");
-      plugin.destroy?.();
-      onSuccess?.();
+      items.value.push({path, type: 'alipay', name: await basename(path)});
+
     } catch (e) {
       MessageUtil.error("账单上传失败", e);
     } finally {
@@ -52,21 +57,16 @@ export function openAddSession(onSuccess?: () => void) {
             name: 'CSV/XLSX',
             extensions: ['csv', 'xlsx']
           }
-        ]
+        ],
       });
       if (!path) return;
 
-      uploading.value = true;
-      const text = await readTextFile(path);
-      const data = parseWechatCSV(text);
-      const filename = path.split('/').pop() || 'wechat_record.csv';
-      await useSql().beginTransaction(async () => {
-        await saveTransactions(filename, 'wechat', data);
-      });
+      if (items.value.some(item => item.path === path)) {
+        return MessageUtil.warning("该文件已存在");
+      }
 
-      MessageUtil.success("账单上传成功");
-      plugin.destroy?.();
-      onSuccess?.();
+      items.value.push({path, type: 'wechat', name: await basename(path)});
+
     } catch (e) {
       MessageUtil.error("账单上传失败", e);
     } finally {
@@ -74,10 +74,56 @@ export function openAddSession(onSuccess?: () => void) {
     }
   };
 
+  const handleDeleteItem = (index: number) => {
+    items.value.splice(index, 1);
+  };
+
+  const handleConfirm = async () => {
+    if (uploading.value) return MessageUtil.warning("正在上传中，请稍候");
+    if (items.value.length === 0) {
+      plugin.destroy?.();
+      return;
+    }
+    try {
+      uploading.value = true;
+      MessageUtil.info("开始导入")
+      let type: AnalysisSessionSourceType | undefined = undefined;
+      const tran = new Array<AnalysisTransactionCore>();
+      for (const item of items.value) {
+        if (item.type === 'wechat') {
+          if (!type) type = 'wechat';
+          else if (type === 'alipay') type = 'mixin';
+          const data = await parseWeChatPayToTransaction(item.path);
+          tran.push(...data);
+        } else if (item.type === 'alipay') {
+          if (!type) type = 'alipay';
+          else if (type === 'wechat') type = 'mixin';
+          const text = await readAlipayCsv(item.path);
+          const data = parseAlipayToTransaction(text);
+          tran.push(...data);
+        }
+      }
+      if (!type) type = 'mixin';
+      const filename = type === 'mixin' ? `mixin_record_${type}.csv` : `${type}_record.csv`;
+      await useSql().beginTransaction(async () => {
+        await saveTransactions(filename, type!, tran);
+      });
+      MessageUtil.success("账单上传成功");
+      onSuccess?.();
+      plugin.destroy?.();
+    } catch (e) {
+      MessageUtil.error("账单上传失败", e);
+      console.error(e);
+    } finally {
+      uploading.value = false;
+    }
+  }
+
   const plugin = DrawerPlugin({
     header: "新增账单",
-    footer: false,
     size: "900px",
+    confirmBtn: "导入",
+    onConfirm: handleConfirm,
     default: () => (
       <div class="p-4">
         <div class="grid grid-cols-2 gap-4">
@@ -105,21 +151,15 @@ export function openAddSession(onSuccess?: () => void) {
                   <span class="absolute left-0 top-2 w-1 h-1 rounded-full bg-[var(--td-text-color-placeholder)]"></span>
                   申请记录中找到解压密码 -&gt; 解压下载的文件，获取 CSV 文件
                 </div>
-                <div class="text-sm text-[var(--td-text-color-secondary)] leading-relaxed pl-3 relative">
-                  <span class="absolute left-0 top-2 w-1 h-1 rounded-full bg-[var(--td-text-color-placeholder)]"></span>
-                  按年份重命名为【alipay_record_2024.csv】格式
-                </div>
               </div>
             </div>
-            <div class="flex flex-col gap-2">
-              <Button
-                variant="outline"
-                disabled={uploading.value}
-                onClick={handleAlipaySelect}
-              >
-                {uploading.value ? '上传中...' : '选择 CSV 文件'}
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              disabled={uploading.value}
+              onClick={handleAlipaySelect}
+            >
+              {uploading.value ? '上传中...' : '选择 CSV 文件'}
+            </Button>
           </Card>
 
           <Card>
@@ -151,17 +191,44 @@ export function openAddSession(onSuccess?: () => void) {
                 </div>
               </div>
             </div>
-            <div class="flex flex-col gap-2">
-              <Button
-                variant="outline"
-                disabled={uploading.value}
-                onClick={handleWechatSelect}
-              >
-                {uploading.value ? '上传中...' : '选择 CSV/XLSX 文件'}
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              disabled={uploading.value}
+              onClick={handleWechatSelect}
+            >
+              {uploading.value ? '上传中...' : '选择 CSV/XLSX 文件'}
+            </Button>
           </Card>
         </div>
+
+        {items.value.length > 0 && (
+          <div class="mt-4">
+            <div class="text-base font-medium mb-3">已选择的文件</div>
+            <div class="flex flex-col gap-2">
+              {items.value.map((e, index) => (
+                <div
+                  class="flex items-center justify-between p-3 bg-[var(--td-bg-color-container)] rounded-lg hover:bg-[var(--td-bg-color-container-hover)] transition-colors">
+                  <div class="flex items-center gap-2 flex-1 min-w-0">
+                    {e.type === 'alipay' ? (
+                      <LogoAlipayIcon class="color-#1777FF flex-shrink-0"/>
+                    ) : (
+                      <LogoWechatpayIcon class="color-#07c160 flex-shrink-0"/>
+                    )}
+                    <span class="truncate text-sm">{e.name}</span>
+                  </div>
+                  <Button
+                    theme="danger"
+                    variant="text"
+                    size="small"
+                    icon={() => h(DeleteIcon)}
+                    onClick={() => handleDeleteItem(index)}
+                    class="flex-shrink-0"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     )
   });
