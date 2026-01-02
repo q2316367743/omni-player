@@ -33,7 +33,6 @@ export async function parseWeChatPayToTransaction(path: string): Promise<Array<A
   }
 
   const headerRow = jsonData[headerIndex];
-  console.log(headerRow)
   if (!headerRow) {
     return transactions;
   }
@@ -58,7 +57,6 @@ export async function parseWeChatPayToTransaction(path: string): Promise<Array<A
     const amountStr = row[columnIndexMap.get("金额(元)") ?? 0];
     const incomeExpense = row[columnIndexMap.get("收/支") ?? 0];
     const remark = row[columnIndexMap.get("备注") ?? 0] || "";
-    console.log(timeStr, transactionType, counterparty, product, amountStr, incomeExpense, remark)
 
     if (!timeStr || !transactionType || !counterparty || !product || !amountStr || !incomeExpense) {
       continue;
