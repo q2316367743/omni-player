@@ -1,10 +1,6 @@
 <template>
   <div class="abs-0 overflow-hidden">
-    <router-view v-slot="{ Component, route }">
-      <keep-alive :include="['NetworkAggregation']">
-        <component :is="Component" :key="route.fullPath"/>
-      </keep-alive>
-    </router-view>
+    <router-view />
   </div>
 </template>
 <script lang="ts" setup>

@@ -1,4 +1,5 @@
 const fs = require('node:fs/promises');
+const {existsSync} = require('node:fs');
 
 /**
  * 读取文件并返回 ArrayBuffer
@@ -28,13 +29,66 @@ async function readFileAsArrayBuffer(filePath) {
 module.exports = async (cmd, args, options) => {
   if (cmd === 'plugin:fs|read_text_file') {
     const {path} = args;
-    return await readFileAsArrayBuffer(path[0]);
-  } else if (cmd === 'plugin:fs|write_text_file') {
+    return await readFileAsArrayBuffer(Array.isArray(path) ? path[0] : path);
+  }
+  else if (cmd === 'plugin:fs|write_text_file') {
     return await fs.writeFile(
-      options.path,
+      decodeURIComponent(options.headers.path),
       Buffer.from(args instanceof Uint8Array ? args : new Uint8Array(args)),
       {
         encoding: 'utf-8'
       });
+  }
+  else if (cmd === 'plugin:fs|read_dir') {
+    const {path} = args;
+    const items = await fs.readdir(path);
+    const entries = [];
+    for (let item of items) {
+      const stats = await fs.stat(path + "/" + item);
+      entries.push({
+        name: item,
+        isDirectory: stats.isDirectory(),
+        isFile: stats.isFile(),
+        isSymlink: stats.isSymbolicLink()
+      })
+    }
+    return entries;
+  }
+  else if (cmd === 'plugin:fs|mkdir') {
+    const {path, options} = args;
+    return await fs.mkdir(path, {
+      recursive: options.recursive,
+      mode: options.mode
+    });
+  }
+  else if (cmd === 'plugin:fs|exists') {
+    const {path} = args;
+    return existsSync(path);
+  }
+  else if (cmd === 'plugin:fs|remove') {
+    const {path} = args;
+    await fs.unlink(path)
+  }
+  else if (cmd === 'plugin:fs|rename') {
+    const {oldPath, newPath} = args;
+    await fs.rename(oldPath, newPath);
+  }
+  else if (cmd === 'plugin:fs|write_file') {
+    const {headers} = options;
+    const {path, options} = headers;
+    const o = JSON.parse(options);
+    if (o.createNew) {
+      if (existsSync(path)) {
+        // 删除
+        await fs.unlink(path);
+      }
+    }
+    await fs.writeFile(
+      path,
+      Buffer.from(args instanceof Uint8Array ? args : new Uint8Array(args))
+      , {
+        mode: o.mode,
+        encoding: "binary",
+      })
   }
 }

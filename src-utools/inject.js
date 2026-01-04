@@ -83,24 +83,30 @@ module.exports = (label) => {
         else console.trace(msg);
       }
     },
-    metadata: {
-      currentWindow: {
-        label
-      }
-    },
     /**
      * 注册回调
      * @param callback {any} 回调函数
      * @param once {boolean} 是否只执行一次
      * @return {string} 事件 ID
      */
-    transformCallback: (callback, once) => {
+    transformCallback: (callback) => {
       const id = Math.random().toString(32).slice(2);
       eventMap.set(id, () => Promise.resolve(callback()));
       return id;
     },
     convertFileSrc(filePath) {
       return `file:///${filePath}`;
+    },
+    metadata: {
+      currentWindow: {
+        label
+      }
+    },
+    plugins: {
+      path: {
+        delimiter: require('node:path').delimiter,
+        sep: require('node:path').sep,
+      }
     }
   };
 }

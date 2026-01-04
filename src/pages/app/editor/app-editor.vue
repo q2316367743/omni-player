@@ -1,33 +1,35 @@
 <template>
   <t-layout class="note-editor-page">
     <t-aside class="note-sidebar shrink-0" :width="collapsed ? '0px' : '232px'">
-      <div class="sidebar-header">
-        <t-button theme="primary" variant="text" shape="square" @click="goBack">
-          <template #icon>
-            <chevron-left-icon/>
-          </template>
-        </t-button>
-        <span class="ml-4px">笔记</span>
-        <t-dropdown trigger="click">
-          <t-button class="ml-auto" theme="primary" variant="text">
+      <div class="note-side">
+        <div class="sidebar-header">
+          <t-button theme="primary" variant="text" shape="square" @click="goBack">
             <template #icon>
-              <add-icon/>
+              <chevron-left-icon/>
             </template>
-            新建
           </t-button>
-          <t-dropdown-menu>
-            <t-dropdown-item @click="handleNewArticle">新建笔记</t-dropdown-item>
-            <t-dropdown-item @click="handleNewFolder">新建文件夹</t-dropdown-item>
-          </t-dropdown-menu>
-        </t-dropdown>
-      </div>
-      <div class="sidebar-content">
-        <note-tree
-          :nodes="treeNodes"
-          :selected-path="selectedArticlePath"
-          @select="handleSelectArticle"
-          @contextmenu="handleContextMenu"
-        />
+          <span class="ml-4px">笔记</span>
+          <t-dropdown trigger="click">
+            <t-button class="ml-auto" theme="primary" variant="text">
+              <template #icon>
+                <add-icon/>
+              </template>
+              新建
+            </t-button>
+            <t-dropdown-menu>
+              <t-dropdown-item @click="handleNewArticle">新建笔记</t-dropdown-item>
+              <t-dropdown-item @click="handleNewFolder">新建文件夹</t-dropdown-item>
+            </t-dropdown-menu>
+          </t-dropdown>
+        </div>
+        <div class="sidebar-content">
+          <note-tree
+            :nodes="treeNodes"
+            :selected-path="selectedArticlePath"
+            @select="handleSelectArticle"
+            @contextmenu="handleContextMenu"
+          />
+        </div>
       </div>
     </t-aside>
     <t-content class="note-main">
@@ -239,6 +241,12 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     background: var(--td-bg-color-container);
+    overflow-x: hidden;
+
+    .note-side {
+      height: calc(100vh - 57px);
+      min-width: 232px;
+    }
 
     .sidebar-header {
       padding: 8px;

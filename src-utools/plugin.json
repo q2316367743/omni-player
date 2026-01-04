@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/utools-api-types/resource/utools.schema.json",
   "main": "dist/index.html",
-  "preload": "inject.js",
+  "preload": "index.js",
   "logo": "public/logo.png",
   "platform": [
     "win32",

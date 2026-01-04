@@ -7,6 +7,7 @@ import {useSnowflake} from "@/util";
 import {useMediaStronghold} from "@/lib/Stronghold.ts";
 import type {IMediaServer} from "@/modules/media/IMediaServer.ts";
 import {createMediaClient} from "@/modules/media/factory.ts";
+import {logInfo} from "@/lib/log.ts";
 
 export const fetchMediaClient =async (id: string) => {
   const servers = await useStore().list(LocalName.LIST_MEDIA_SERVER);
@@ -28,7 +29,7 @@ export const useMediaServerStore = defineStore('media-server', () => {
 
   useStore().list(LocalName.LIST_MEDIA_SERVER).then((res) => {
     servers.value = res;
-    console.log("初始化媒体服务器列表成功")
+    logInfo("初始化媒体服务器列表成功")
   }).catch((e) => MessageUtil.error("初始化媒体服务器列表失败", e));
 
   const addServer = async (res: MediaServerEdit) => {

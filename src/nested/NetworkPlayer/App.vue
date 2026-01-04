@@ -1,26 +1,20 @@
 <template>
-  <div class="main">
-    <player v-if="detail && plugin" :default-network="detail" :plugin="plugin"/>
-    <loading-result v-else title="正在加载中"/>
-  </div>
+  <NetworkPlayer v-if="item && serverId" :server-id="serverId" :item="item"/>
 </template>
 <script lang="ts" setup>
-import Player from "@/nested/NetworkPlayer/components/Player.vue";
-import type {NetworkDetail} from "@/modules/network/types/NetworkDetail.ts";
-import type {INetworkServer} from "@/modules/network/INetworkServer.ts";
 import {getAllWindows, getCurrentWindow} from "@tauri-apps/api/window";
-import {fetchNetworkClient} from "@/store";
 import type {WindowPayload} from "@/lib/windows.ts";
+import type {NetworkListItem} from "@/modules/network/types/NetworkListItem.ts";
+import NetworkPlayer from "@/nested/NetworkPlayer/NetworkPlayer.vue";
 
-const detail = shallowRef<NetworkDetail>();
-const plugin = shallowRef<INetworkServer>();
+const item = ref<NetworkListItem>();
+const serverId = ref<string>();
+
 
 onMounted(async () => {
   await getCurrentWindow().listen<WindowPayload>("init", async ({payload}) => {
-    const {serverId, item} = payload;
-    console.log("init", payload)
-    plugin.value = await fetchNetworkClient(serverId);
-    detail.value = await plugin.value.getDetail(item!);
+    item.value = payload.item;
+    serverId.value = payload.serverId;
   });
   const wins = await getAllWindows()
   for (let win of wins) {

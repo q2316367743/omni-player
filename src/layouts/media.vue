@@ -50,6 +50,9 @@ const menus = computed<Array<MenuItem>>(() => ([
 
 const to = (path: string) => router.push(path);
 
+onUnmounted(() => {
+  console.log("销毁组件")
+})
 </script>
 <style scoped lang="less">
 </style>

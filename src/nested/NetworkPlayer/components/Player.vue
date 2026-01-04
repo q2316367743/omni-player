@@ -51,7 +51,8 @@
               <t-tab-panel label="剧集列表" value="episodes">
                 <div class="space-y-2 mt-8px">
                   <t-tabs v-model="chapterTabId">
-                    <t-tab-panel v-for="chapter in video.chapters" :label="chapter.name" :value="chapter.id"
+                    <t-tab-panel v-for="chapter in video.chapters" :key="chapter.id" :label="chapter.name"
+                                 :value="chapter.id"
                                  class="mt-8px">
                       <div class="play-items">
                         <t-tooltip v-for="(episode, i) in chapter.items" :key="episode.url" :content="episode.name">
@@ -81,7 +82,7 @@
                       <h4 class="font-medium leading-tight m-0">{{ movie.title }}</h4>
                       <div class="text-sm text-muted-foreground">{{ movie.releaseDate }}</div>
                       <div class="flex items-center gap-3">
-                        <t-tag theme="primary" shape="round" size="small" v-for="t in movie.types">
+                        <t-tag v-for="t in movie.types" theme="primary" shape="round" size="small" :key="t">
                           {{ t }}
                         </t-tag>
                       </div>

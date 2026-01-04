@@ -2,9 +2,11 @@ import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import {getCurrentWindow} from "@tauri-apps/api/window";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import type {NetworkListItem} from "@/modules/network/types/NetworkListItem.ts";
+import {isTauri} from "@tauri-apps/api/core";
+import {createUtoolsWindows} from "@/components/windows";
 
 
-export type WindowLabel = "media" | "network" | "file";
+export type WindowLabel = "media" | "network";
 
 export interface WindowPayload {
   title: string;
@@ -16,6 +18,10 @@ export interface WindowPayload {
 
 
 export async function createWindows(label: WindowLabel, payload: WindowPayload) {
+  if (!isTauri()) {
+    await createUtoolsWindows(label, payload);
+    return ;
+  }
   try {
     const windowLabel = `player-${label}`;
 

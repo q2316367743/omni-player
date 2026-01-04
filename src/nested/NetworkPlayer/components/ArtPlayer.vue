@@ -12,7 +12,7 @@ const props = withDefaults(defineProps<{
   subtitleUrls?: string[];
   initialPositionMs?: number;
 }>(), {
-  type: undefined,
+  type: 'mp4',
   subtitleUrls: () => [],
   initialPositionMs: undefined,
 });

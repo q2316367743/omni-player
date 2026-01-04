@@ -19,7 +19,8 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build"
+    "tauri:build": "tauri build",
+    "utools:build": "vue-tsc -b && vite build --mode=utools"
   },
   "dependencies": {
     "@imengyu/vue3-context-menu": "^1.5.2",

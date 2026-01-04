@@ -1,4 +1,11 @@
-const {join} = require("path");
+const {
+  join,
+  basename,
+  extname,
+  isAbsolute,
+  normalize,
+  resolve
+} = require("path");
 
 
 /**
@@ -10,7 +17,8 @@ module.exports = async (cmd, args) => {
   if (cmd === 'plugin:path|join') {
     const {paths} = args;
     return join(...paths);
-  } else if (cmd === 'plugin:path|resolve_directory') {
+  }
+  else if (cmd === 'plugin:path|resolve_directory') {
     const {path, directory} = args;
     if (!path) {
       switch (directory) {
@@ -35,7 +43,7 @@ module.exports = async (cmd, args) => {
         case 10:
           return Promise.resolve(utools.getPath("videos"));
         case 11:
-          return Promise.resolve(utools.getPath("resource"));
+          return Promise.resolve(join(__dirname, '..', 'resource'));
         case 12:
           return Promise.resolve(utools.getPath("temp"));
         case 13:
@@ -65,5 +73,25 @@ module.exports = async (cmd, args) => {
       }
     }
     return join("/Users/esion/Documents/workspace/omni-player/src-tauri", path);
+  }
+  else if (cmd === 'plugin:path|basename') {
+    const {path} = args;
+    return basename(path)
+  }
+  else if (cmd === 'plugin:path|extname') {
+    const {path} = args;
+    return extname(path)
+  }
+  else if (cmd === 'plugin:path|is_absolute') {
+    const {path} = args;
+    return isAbsolute(path)
+  }
+  else if (cmd === 'plugin:path|normalize') {
+    const {path} = args;
+    return normalize(path)
+  }
+  else if (cmd === 'plugin:path|resolve') {
+    const {path} = args;
+    return resolve(path)
   }
 }

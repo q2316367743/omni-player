@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full h-full overflow-auto bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+  <div class="w-full person overflow-auto bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
     <div v-if="loading" class="flex items-center justify-center h-full">
       <t-loading size="large" text="加载中..."/>
     </div>
@@ -19,7 +19,7 @@
       <t-loading size="large" text="加载中..."/>
     </div>
 
-    <div v-else class="relative">
+    <div v-else class="relative h-full">
       <div class="absolute inset-0 overflow-hidden">
         <img
           v-if="details.imageUrl"
@@ -30,7 +30,8 @@
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"/>
       </div>
 
-      <div class="sticky top-0 z-20 border-b border-white/20 bg-white/55 backdrop-blur dark:border-white/10 dark:bg-black/25">
+      <div
+        class="sticky top-0 z-20 border-b border-white/20 bg-white/55 backdrop-blur dark:border-white/10 dark:bg-black/25">
         <div class="mx-auto max-w-7xl px-4 lg:px-8 py-3 flex items-center gap-3">
           <t-button theme="default" variant="outline" shape="circle" @click="router.back()">
             <template #icon>
@@ -55,7 +56,8 @@
               <div class="rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur">
                 <div class="flex items-center gap-4">
                   <div class="relative shrink-0">
-                    <div class="absolute -inset-1 rounded-full bg-gradient-to-br from-indigo-500/70 via-fuchsia-500/60 to-cyan-500/70 blur"/>
+                    <div
+                      class="absolute -inset-1 rounded-full bg-gradient-to-br from-indigo-500/70 via-fuchsia-500/60 to-cyan-500/70 blur"/>
                     <img
                       v-if="details.imageUrl"
                       :src="details.imageUrl"
@@ -75,7 +77,10 @@
                     <div class="mt-2 flex flex-wrap gap-2">
                       <t-tag theme="primary" variant="light" shape="round">{{ personTypeLabel }}</t-tag>
                       <t-tag v-if="birthText" theme="default" variant="light" shape="round">{{ birthText }}</t-tag>
-                      <t-tag v-if="worksCountText" theme="success" variant="light" shape="round">{{ worksCountText }}</t-tag>
+                      <t-tag v-if="worksCountText" theme="success" variant="light" shape="round">{{
+                          worksCountText
+                        }}
+                      </t-tag>
                     </div>
                   </div>
                 </div>
@@ -136,7 +141,8 @@
                 暂无匹配作品
               </div>
 
-              <div v-else class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              <div v-else
+                   class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 <MediaCard
                   v-for="item in filteredMedia"
                   :key="item.id"
@@ -274,3 +280,8 @@ const goToDetail = (item: MediaItem) => {
   router.push(`/media/${clientId.value}/detail/${item.id}`);
 };
 </script>
+<style lang="less">
+.person {
+  height: calc(100vh - 57px);
+}
+</style>

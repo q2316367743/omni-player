@@ -26,7 +26,7 @@ module.exports = async (cmd, args) => {
       await mkdir(dirname(path), {recursive: true});
     }
     const database = new Database(path, {
-      nativeBinding: join(__dirname, 'lib', `better-sqlite3-${platform}-${arch}.node`)
+      nativeBinding: join(__dirname, '..', 'lib', `better-sqlite3-${platform}-${arch}.node`)
     });
     map.set(path, database);
     return path;

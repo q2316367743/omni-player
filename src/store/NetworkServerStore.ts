@@ -6,6 +6,7 @@ import {useSnowflake} from "@/util";
 import type {NetworkServer, NetworkServerEdit} from "@/entity/NetworkServer.ts";
 import type {INetworkServer} from "@/modules/network/INetworkServer.ts";
 import {createNetworkServer} from "@/modules/network/factory.ts";
+import {logInfo} from "@/lib/log.ts";
 
 export const fetchNetworkClient = async (id: string) => {
   const servers = await useStore().list(LocalName.LIST_NETWORK_SERVER);
@@ -25,7 +26,7 @@ export const useNetworkServerStore = defineStore('network-server', () => {
 
   useStore().list(LocalName.LIST_NETWORK_SERVER).then((res) => {
     servers.value = res;
-    console.log("初始化媒体服务器列表成功")
+    logInfo("初始化媒体服务器列表成功")
   }).catch((e) => MessageUtil.error("初始化媒体服务器列表失败", e));
 
   const addServer = async (res: NetworkServerEdit) => {

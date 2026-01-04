@@ -32,7 +32,6 @@ module.exports = async (cmd, args, eventEmitter) => {
     const {rid, key} = args;
     const _id = `${rid}:${key}`;
     const old = await utools.db.promises.get(_id);
-    console.log([old?.value, !!old])
     return [old?.value, !!old];
   } else if (cmd === 'plugin:store|has') {
     const {rid, key} = args;

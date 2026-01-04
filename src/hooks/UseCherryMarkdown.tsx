@@ -30,6 +30,30 @@ export async function useCherryMarkdown(props: UseCherryMarkdownProps): Promise<
     value: content,
     theme: isDark.value ? 'dark' : 'default',
     autoScroll: true,
+    locale: 'zh_CN',
+    nameSpace: 'cherry',
+    themeSettings: {
+      // 主题列表，用于切换主题
+      themeList: [
+        { className: 'default', label: '默认' },
+        { className: 'dark', label: '黑' },
+        { className: 'light', label: '白' },
+        { className: 'green', label: '绿' },
+        { className: 'red', label: '粉' },
+        { className: 'violet', label: '紫' },
+        { className: 'blue', label: '蓝' },
+      ],
+      toolbarTheme: isDark.value ? 'dark' : 'light',
+      codeBlockTheme: isDark.value ? 'material-ocean' : 'default',
+      mainTheme: isDark.value ? 'dark' : 'light',
+      inlineCodeTheme: isDark.value ? 'black' : 'red',
+    },
+    editor: {
+      defaultModel: "edit&preview",
+      codemirror: {
+        theme: isDark.value ? 'material-ocean' : 'default',
+      },
+    },
     engine: {
       global: {
         htmlAttrWhiteList: 'part|slot',
@@ -126,7 +150,7 @@ export async function useCherryMarkdown(props: UseCherryMarkdownProps): Promise<
       file: true,
     },
     toolbars: {
-      theme: 'dark',
+      theme:  isDark.value ? 'dark' : 'default',
       toolbar: [
         'bold',
         'italic',
@@ -170,7 +194,7 @@ export async function useCherryMarkdown(props: UseCherryMarkdownProps): Promise<
         'shortcutKey'
       ],
       bubble: ['bold', 'italic', 'underline', 'strikethrough', 'sub', 'sup', 'quote', 'ruby', '|', 'size', 'color'], // array or false
-      sidebar: ['fullScreen', 'togglePreview',  'search', 'shortcutKey'],
+      sidebar: ['fullScreen', 'togglePreview',  'search'],
       toc: {
         // updateLocationHash: false, // 要不要更新URL的hash
         defaultModel: 'full', // pure: 精简模式/缩略模式，只有一排小点； full: 完整模式，会展示所有标题
@@ -208,9 +232,7 @@ export async function useCherryMarkdown(props: UseCherryMarkdownProps): Promise<
     codemirror: {
       placeholder: '输入文本或「/」开始编辑',
     },
-    themeSettings: {
-      mainTheme: 'default',
-    },
+
   });
 
   return {

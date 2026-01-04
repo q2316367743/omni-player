@@ -1,5 +1,5 @@
 <template>
-  <div class="media-detail-page min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+  <div class="media-detail-page bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
     <!-- 加载状态 -->
     <div v-if="!detail" class="flex items-center justify-center h-screen">
       <t-loading size="large" text="加载中..."/>
@@ -742,7 +742,7 @@ const seekToChapter = (seconds: number) => {
 /* 防止内容溢出 */
 .media-detail-page {
   width: 100vw;
-  height: calc(100vh - 33px);
+  height: calc(100vh - 57px);
   overflow: auto;
   max-width: 100%;
   box-sizing: border-box;
