@@ -9,7 +9,7 @@ import {logDebug} from "@/lib/log.ts";
 import {useSubscribeStore} from "@/store/SubscribeStore.ts";
 
 export async function listFeed(subscribeId: string, page: number, pageSize: number, keyword?: string): Promise<PageResponse<FeedItem>> {
-  const query = await useSql().query<FeedItem>(TableName.FEED_ITEM);
+  const query = useSql().query<FeedItem>(TableName.FEED_ITEM);
   let q = query.eq('subscribe_id', subscribeId).orderByDesc('pub_date');
   if (keyword && keyword.trim()) {
     const key = keyword.trim();
@@ -19,13 +19,13 @@ export async function listFeed(subscribeId: string, page: number, pageSize: numb
 }
 
 export async function refreshFeed(subscribeId: string) {
-  const feedQuery = await useSql().query<FeedItem>(TableName.FEED_ITEM)
+  const feedQuery = useSql().query<FeedItem>(TableName.FEED_ITEM)
   let update = false;
-  const subscribeQuery = await useSql().query<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
+  const subscribeQuery = useSql().query<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
   const subscribe = await subscribeQuery.eq('id', subscribeId).one();
   if (!subscribe) return Promise.reject(new Error("订阅不存在"));
   try {
-    const feedMapper = await useSql().mapper<FeedItem>(TableName.FEED_ITEM)
+    const feedMapper = useSql().mapper<FeedItem>(TableName.FEED_ITEM)
 
     const feedItems = await fetchFeedItems(subscribe);
     const hav = await feedQuery.in('signal', feedItems.map(e => e.signal)).select('signal', 'id').list();
@@ -38,7 +38,7 @@ export async function refreshFeed(subscribeId: string) {
       }
     }
   } finally {
-    const subscribeMapper = await useSql().mapper<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
+    const subscribeMapper = useSql().mapper<SubscribeItem>(TableName.SUBSCRIBE_ITEM)
     // 重新计算数量
     let count = subscribe.count;
     let unReadCount = subscribe.un_read_count;
@@ -63,14 +63,34 @@ export interface FeedWrapper extends FeedContent, FeedItem {
 
 }
 
+export async function getFeedContentDefault(feedId: string): Promise<FeedWrapper> {
+  const feedQuery = useSql().query<FeedItem>(TableName.FEED_ITEM)
+  const feed = await feedQuery.eq('id', feedId).one();
+  if (!feed) return Promise.reject(new Error(`feed item 「${feedId}」不存在`));
+
+  const feedMapper = useSql().mapper<FeedItem>(TableName.FEED_ITEM)
+  await feedMapper.updateById(feedId, {is_read: 1, content_fetched: 1})
+
+  return {
+    ...feed,
+    feed_id: feedId,
+    item_link: feed.link,
+    html_content: '',
+    parsed_title: '',
+    parsed_content: '',
+    fetch_time: '',
+    parse_success: 0
+  };
+}
+
 export async function getFeedContent(feedId: string): Promise<FeedWrapper> {
-  const feedQuery = await useSql().query<FeedItem>(TableName.FEED_ITEM)
+  const feedQuery = useSql().query<FeedItem>(TableName.FEED_ITEM)
   const feed = await feedQuery.eq('id', feedId).one();
   if (!feed) return Promise.reject(new Error(`feed item 「${feedId}」不存在`));
 
 
-  const feedContentQuery = await useSql().query<FeedContent>(TableName.FEED_CONTENT)
-  const feedContentMapper = await useSql().mapper<FeedContent>(TableName.FEED_CONTENT)
+  const feedContentQuery = useSql().query<FeedContent>(TableName.FEED_CONTENT)
+  const feedContentMapper = useSql().mapper<FeedContent>(TableName.FEED_CONTENT)
   const content = await feedContentQuery.eq('feed_id', feedId).one();
   if (content) return {...content, ...feed};
   const save = await fetchFeedContent(feed);
@@ -80,7 +100,7 @@ export async function getFeedContent(feedId: string): Promise<FeedWrapper> {
     subscribe_id: feed.subscribe_id
   });
 
-  const feedMapper = await useSql().mapper<FeedItem>(TableName.FEED_ITEM)
+  const feedMapper = useSql().mapper<FeedItem>(TableName.FEED_ITEM)
   await feedMapper.updateById(feedId, {is_read: 1, content_fetched: 1})
   return {...save, ...feed, feed_id: feedId};
 }

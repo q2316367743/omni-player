@@ -14,9 +14,6 @@ export default defineConfig([
     files: ["**/*.{js,mjs,cjs,ts,mts,cts,vue}"], plugins: {js}, extends: ["js/recommended"], languageOptions: {
       globals: {
         ...globals.browser,
-        ...globals.commonjs,
-        utools: true,
-        Buffer: true,
         ...autoImportGlobals.globals, // 👈 合并自动导入的全局变量
       }
     }
@@ -28,6 +25,27 @@ export default defineConfig([
   {
     rules: {
       "@typescript-eslint/no-explicit-any": "off"
+    }
+  },
+  // 👇 特别为 src-utools 目录放宽限制
+  {
+    files: ['src-utools/**/*.js'], // 注意：TypeScript 文件一般不用 require，所以只配 .js
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.commonjs,
+        utools: true,
+        Buffer: true,
+        require: 'readonly',
+        module: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        process: 'readonly'
+      }
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off', // 关闭 require 禁止
+      'no-undef': 'off' // 可选：避免 require/module 报未定义（如果没设 env）
     }
   }
 ]);

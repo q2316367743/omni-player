@@ -13,8 +13,8 @@
             <span class="ml-8px">{{ displayTitle }}</span>
           </div>
           <div class="subscribe-info__actions">
-            <t-radio-group v-model="viewMode" variant="default-filled">
-              <t-radio-button value="read">阅读视图</t-radio-button>
+            <t-radio-group v-model="viewMode" variant="default-filled" :disabled="disabledViewMode">
+              <t-radio-button value="read" :disabled="!content?.parse_success">阅读视图</t-radio-button>
               <t-radio-button value="web" :disabled="!content?.link">网页视图</t-radio-button>
             </t-radio-group>
             <t-tooltip content="在外部打开" placement="bottom-right">
@@ -41,7 +41,7 @@
     </div>
 
     <div class="subscribe-info__wrap" ref="scrollRef" @click="onContentClick">
-      <custome-webview v-if="viewMode === 'web' && content?.link" :url="content.link"/>
+      <custome-webview v-if="showViewMode === 'web' && content?.link" :url="content.link"/>
       <t-loading v-else :loading="loading" class="subscribe-info__scroll">
         <div class="subscribe-info__scroll-inner">
 
@@ -55,7 +55,7 @@
             </empty-result>
           </div>
 
-          <div v-else-if="viewMode === 'read'" class="subscribe-info__paper">
+          <div v-else-if="showViewMode === 'read'" class="subscribe-info__paper">
             <article class="rss-article" v-html="contentHtml"></article>
           </div>
         </div>
@@ -65,7 +65,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {type FeedWrapper, getFeedContent} from "@/services/FeedService.ts";
+import {type FeedWrapper, getFeedContent, getFeedContentDefault} from "@/services/FeedService.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {formatDate} from "@/util/lang/FormatUtil.ts";
 import EmptyResult from "@/components/Result/EmptyResult.vue";
@@ -73,6 +73,7 @@ import {openUrl} from "@tauri-apps/plugin-opener";
 import {previewImages} from "@/pages/subscribe/func/previewImages.tsx";
 import {MenuFoldIcon, ShareIcon, ViewListIcon} from "tdesign-icons-vue-next";
 import {LocalName} from "@/global/LocalName.ts";
+import {isTauri} from "@tauri-apps/api/core";
 
 const route = useRoute();
 
@@ -83,10 +84,16 @@ const scrollRef = ref<HTMLElement | null>(null);
 const viewMode = useLocalStorage<"read" | "web">(LocalName.PAGE_SUBSCRIBE_VIEW_MODE(route.params.subscribeId as string), "read");
 const isFullscreen = ref(false);
 
+const disabledViewMode = computed(() => !isTauri());
 const feedId = computed(() => route.params.feedId as string);
 const isNoneSelected = computed(() => feedId.value === "0");
 const displayTitle = computed(() => content.value?.parsed_title || content.value?.title || "");
 const contentHtml = computed(() => content.value?.parsed_content || "");
+const showViewMode = computed<"read" | "web">(() => {
+  if (disabledViewMode.value) return 'read';
+  if (!content.value?.parse_success) return 'web';
+  return viewMode.value;
+})
 
 function scrollToTop() {
   if (!scrollRef.value) return;
@@ -118,7 +125,8 @@ async function load(feedIdValue: string) {
     scrollToTop();
   } catch (e) {
     errorTip.value = "内容获取失败，请稍后重试";
-    MessageUtil.error("加载失败", e);
+    MessageUtil.warning("加载失败", e);
+    content.value = await getFeedContentDefault(feedIdValue);
     await nextTick();
     scrollToTop();
   } finally {
@@ -145,7 +153,6 @@ function toggleFullscreen() {
 }
 
 function onContentClick(e: MouseEvent) {
-  if (viewMode.value === "web") return;
 
   const target = e.target as HTMLElement | null;
   const img = target?.closest?.("img") as HTMLImageElement | null;

@@ -34,7 +34,7 @@ async function createWebview() {
     });
 
     webviewManager.startObserving(webviewRef.value, async (position) => {
-      await webviewManager.updatePosition({...position, height: position.height + 32});
+      await webviewManager.updatePosition({...position, y: position.y + 32});
     });
   } catch (e) {
     console.error('Failed to create webview:', e);

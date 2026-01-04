@@ -1,12 +1,12 @@
 const {basename} = require('node:path');
-const {ipcRenderer} = require('electron');
 
 /**
  * 执行指定命令
  * @param cmd {string} 命令
  * @param args {Record<string, any>} 参数
+ * @param eventEmitter {import("./core/TaskEventEmitter").TaskEventEmitter} 触发器
  */
-module.exports = async (cmd, args) => {
+module.exports = async (cmd, args, eventEmitter) => {
   if (cmd === 'plugin:store|load' || cmd === 'plugin:store|get_store') {
     const {path} = args;
     const prefix = basename(path);
@@ -20,6 +20,14 @@ module.exports = async (cmd, args) => {
       _rev: old?._rev,
       value
     })
+    eventEmitter.emit("store://change", {
+      payload: {
+        resourceId: rid,
+        key: key,
+        value: value,
+        exists: true
+      }
+    })
   } else if (cmd === 'plugin:store|get') {
     const {rid, key} = args;
     const _id = `${rid}:${key}`;
@@ -32,6 +40,13 @@ module.exports = async (cmd, args) => {
     return !!await utools.db.promises.get(_id);
   } else if (cmd === 'plugin:store|delete') {
     await utools.db.promises.remove(args.rid + ":" + args.key);
+    eventEmitter.emit("store://change", {
+      payload: {
+        resourceId: args.rid,
+        key: args.key,
+        exists: false
+      }
+    })
     return Promise.resolve(true);
   } else if (cmd === 'plugin:store|save') {
     return Promise.resolve();

@@ -144,14 +144,14 @@ export async function openNetworkDetail(clientId: string, item: NetworkListItem)
                     </div>
                     <div class="truncate text-lg font-semibold">{detail.value.title || '未命名'}</div>
                   </div>
-                  <Button theme="primary" class="shadow-lg" onClick={openPlayer}>
-                    <PlayIcon/>
-                    播放
-                  </Button>
-                  <Button theme="default" variant="outline" onClick={loadDetail}>
-                    <RefreshIcon/>
-                    刷新
-                  </Button>
+                  <Button theme="primary" class="shadow-lg" onClick={openPlayer}>{{
+                    icon: () => <PlayIcon/>,
+                    default: () => <span>播放</span>
+                  }}</Button>
+                  <Button theme="default" variant="outline" onClick={loadDetail}>{{
+                    icon: () => <RefreshIcon/>,
+                    default: () => <span>刷新</span>
+                  }}</Button>
                 </div>
               </div>
 
@@ -240,14 +240,15 @@ export async function openNetworkDetail(clientId: string, item: NetworkListItem)
                               <div class="mt-1 text-sm text-white/70">{detail.value.subtitle}</div>
                             ) : null}
                             <div class="mt-4 grid grid-cols-2 gap-3">
-                              <Button theme="primary" block class="shadow-lg" onClick={openPlayer}>
-                                <PlayIcon/>
-                                播放
+                              <Button theme="primary" block class="shadow-lg" onClick={openPlayer}>{{
+                                icon: () => <PlayIcon/>,
+                                default: () => <span>播放</span>
+                              }}
                               </Button>
-                              <Button theme="default" variant="outline" block onClick={loadDetail}>
-                                <RefreshIcon/>
-                                刷新
-                              </Button>
+                              <Button theme="default" variant="outline" block onClick={loadDetail}>{{
+                                icon: () => <RefreshIcon/>,
+                                default: () => <span>刷新</span>
+                              }}</Button>
                             </div>
                           </div>
                       </div>
