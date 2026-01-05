@@ -51,7 +51,7 @@ export interface NetworkServer extends NetworkServerEdit {
 
 export function buildNetworkServerEdit(): NetworkServerEdit {
   return {
-    group: "默认",
+    group: "",
     sequence: 0,
     name: "",
     type: "mc10",
