@@ -159,9 +159,6 @@ importers:
       globals:
         specifier: ^16.5.0
         version: 16.5.0
-      jiti:
-        specifier: ^2.6.1
-        version: 2.6.1
       less-loader:
         specifier: ^12.3.0
         version: 12.3.0(less@4.5.1)

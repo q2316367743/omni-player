@@ -75,7 +75,6 @@
     "eslint": "^9.39.2",
     "eslint-plugin-vue": "^10.6.2",
     "globals": "^16.5.0",
-    "jiti": "^2.6.1",
     "less-loader": "^12.3.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.50.0",
