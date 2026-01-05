@@ -83,13 +83,22 @@ export const router = createRouter({
     redirect: '/app/tool/home',
     component: () => import('@/pages/app/index.vue'),
     children: [{
-      name: 'AppRegex',
-      path: 'regex',
-      component: () => import('@/pages/app/regex/app-regex.vue')
-    }, {
-      name: 'AppHttp',
-      path: 'http',
-      component: () => import('@/pages/app/http/app-http.vue')
+      name: 'AppProgrammer',
+      path: 'programmer',
+      component: () => import('@/pages/app/programmer/index.vue'),
+      children: [{
+        name: 'AppProgrammerRegex',
+        path: 'regex',
+        component: () => import('@/pages/app/programmer/regex/app-regex.vue')
+      }, {
+        name: 'AppProgrammerHttp',
+        path: 'http',
+        component: () => import('@/pages/app/programmer/http/app-http.vue')
+      }, {
+        name: 'AppProgrammerNginx',
+        path: 'nginx',
+        component: () => import('@/pages/app/programmer/nginx/app-nginx.vue')
+      }]
     }, {
       name: 'AppFanyi',
       path: 'fanyi',

@@ -33,9 +33,9 @@
       </div>
     </div>
     <div class="tools-group">
-      <div class="group-title">本地工具</div>
+      <div class="group-title">程序员套件</div>
       <div class="tools-grid">
-        <div class="tool-card" @click="jumpTool('regex')">
+        <div class="tool-card" @click="jumpTool('programmer/regex')">
           <div class="tool-icon regex">
             <code-icon/>
           </div>
@@ -44,13 +44,22 @@
             <div class="tool-desc">测试和调试正则表达式</div>
           </div>
         </div>
-        <div class="tool-card" @click="jumpTool('http')">
+        <div class="tool-card" @click="jumpTool('programmer/http')">
           <div class="tool-icon http">
             <internet-icon/>
           </div>
           <div class="tool-info">
             <div class="tool-name">简单请求</div>
             <div class="tool-desc">快速发送 HTTP 请求</div>
+          </div>
+        </div>
+        <div class="tool-card" @click="jumpTool('programmer/nginx')">
+          <div class="tool-icon regex">
+            <internet-icon/>
+          </div>
+          <div class="tool-info">
+            <div class="tool-name">nginx</div>
+            <div class="tool-desc">可视化 nginx 配置</div>
           </div>
         </div>
       </div>

@@ -76,7 +76,6 @@ const formatDateRange = (start?: number, end?: number) => {
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-  margin-right: 24px;
 
   .meta-item {
     font-size: var(--td-font-size-body-small);

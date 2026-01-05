@@ -8,7 +8,7 @@ import {isDark} from "@/global/Constants.ts"
 
 interface Props {
   modelValue: string;
-  language: 'plaintext' | 'json' | 'html' | 'javascript' | 'xml' | 'css' | 'markdown';
+  language: 'plaintext' | 'json' | 'html' | 'javascript' | 'xml' | 'css' | 'markdown' | 'nginx';
   readonly?: boolean;
   height?: string;
 }

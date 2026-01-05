@@ -315,7 +315,7 @@
 
 <script setup lang="ts">
 import {ref} from 'vue';
-import {requestAction, type RequestConfig} from '@/lib/http';
+import {requestAction, type RequestConfig} from '@/lib/http.ts';
 import {AddIcon, DeleteIcon} from 'tdesign-icons-vue-next';
 import HorizontalSplitPanel from '@/components/common/HorizontalSplitPanel.vue';
 import MonacoEditor from '@/components/common/MonacoEditor.vue';

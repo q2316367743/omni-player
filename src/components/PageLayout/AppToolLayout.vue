@@ -9,7 +9,7 @@
       </t-button>
       <slot v-if="slot.title" name="title"/>
       <div v-else>{{ title }}</div>
-      <div class="ml-auto">
+      <div class="ml-auto mr-32px">
         <slot name="action" />
       </div>
     </div>
