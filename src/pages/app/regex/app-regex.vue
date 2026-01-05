@@ -7,7 +7,7 @@
             <t-input
               v-model="regexPattern"
               placeholder="请输入正则表达式"
-              size="large"
+             
               clearable
               @input="handleRegexChange"
             />
@@ -64,7 +64,7 @@
                   </div>
                 </div>
               </template>
-              <t-button variant="text" size="large" shape="square" theme="primary">
+              <t-button variant="text" shape="square" theme="primary">
                 <template #icon>
                   <help-circle-icon/>
                 </template>

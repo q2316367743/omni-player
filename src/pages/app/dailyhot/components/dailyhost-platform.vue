@@ -5,7 +5,6 @@
         v-model="searchKeyword"
         placeholder="搜索平台"
         clearable
-        size="small"
       >
         <template #prefix-icon>
           <search-icon/>
@@ -13,7 +12,8 @@
       </t-input>
       <t-button
         variant="text"
-        size="small"
+        shape="square"
+        class="w-32px min-w-32px"
         :loading="refreshingPlatforms"
         @click="refreshPlatforms"
       >
@@ -103,27 +103,66 @@ onMounted(() => fetchPlatforms());
 </script>
 <style scoped lang="less">
 .platform-sidebar {
-  width: 200px;
-  min-width: 200px;
-  border-right: 1px solid var(--td-border-level-1-color);
+  width: 240px;
+  min-width: 240px;
+  border-right: 1px solid var(--fluent-sidebar-border);
   display: flex;
   flex-direction: column;
-  background-color: var(--td-bg-color-secondarycontainer);
+  background: var(--fluent-sidebar-bg);
+  backdrop-filter: var(--fluent-acrylic-blur);
   height: calc(100vh - 57px);
-  overflow: auto;
+  overflow: hidden;
 
   .sidebar-header {
     position: sticky;
     left: 0;
     top: 0;
-    padding: 12px;
-    border-bottom: 1px solid var(--td-border-level-1-color);
+    padding: 14px;
+    border-bottom: 1px solid var(--fluent-sidebar-border);
     display: flex;
     gap: 8px;
     flex-shrink: 0;
+    background: var(--fluent-sidebar-bg);
+    backdrop-filter: var(--fluent-acrylic-blur);
+    z-index: 1;
 
     .t-input {
       flex: 1;
+
+      :deep(.t-input__inner) {
+        border-radius: var(--fluent-radius-smooth);
+        border: 1px solid var(--fluent-border-subtle);
+        background: var(--fluent-card-bg);
+        transition: all var(--fluent-transition-normal);
+
+        &:hover {
+          background: var(--fluent-card-bg-hover);
+          border-color: var(--fluent-border-subtle-dark);
+        }
+
+        &:focus {
+          outline: none;
+          box-shadow: var(--fluent-focus-ring);
+        }
+      }
+    }
+
+    .t-button {
+      border-radius: var(--fluent-radius-smooth);
+      background: var(--fluent-card-bg);
+      border: 1px solid var(--fluent-border-subtle);
+      transition: all var(--fluent-transition-normal);
+
+      &:hover {
+        background: var(--fluent-item-hover);
+        transform: translateY(-1px);
+        box-shadow: var(--fluent-elevation-1);
+      }
+
+      &:active {
+        transform: translateY(0);
+        background: var(--fluent-item-active);
+      }
     }
   }
 
@@ -131,28 +170,81 @@ onMounted(() => fetchPlatforms());
     flex: 1;
     overflow-y: auto;
     padding: 8px 0;
+    scroll-behavior: smooth;
 
-    .platform-item {
-      padding: 10px 16px;
-      cursor: pointer;
-      transition: all 0.2s;
-      border-left: 3px solid transparent;
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--td-scrollbar-color);
+      border-radius: 4px;
+      transition: background var(--fluent-transition-fast);
 
       &:hover {
-        background-color: var(--td-bg-color-component-hover);
+        background: var(--td-scrollbar-hover-color);
+      }
+    }
+
+    .platform-item {
+      position: relative;
+      padding: 12px 20px;
+      margin: 2px 8px;
+      cursor: pointer;
+      transition: all var(--fluent-transition-normal);
+      border-radius: var(--fluent-radius-smooth);
+      border-left: 3px solid transparent;
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: var(--fluent-reveal-bg);
+        opacity: 0;
+        transition: opacity var(--fluent-transition-fast);
+        pointer-events: none;
+      }
+
+      &:hover {
+        background: var(--fluent-item-hover);
+        transform: translateX(2px);
+
+        &::before {
+          opacity: 1;
+        }
+      }
+
+      &:active {
+        background: var(--fluent-item-active);
+        transform: translateX(0);
       }
 
       &.active {
-        background-color: var(--td-brand-color-1);
-        border-left-color: var(--td-brand-color);
-        color: var(--td-brand-color);
+        background: var(--fluent-item-selected);
+        border-left-color: var(--fluent-item-selected-border);
+        color: var(--fluent-accent-color);
+        font-weight: 600;
+        box-shadow: var(--fluent-elevation-1);
+
+        &::before {
+          opacity: 1;
+          background: var(--fluent-item-selected);
+        }
       }
 
       .platform-name {
+        position: relative;
         font-size: 14px;
+        font-weight: 400;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        letter-spacing: 0.01em;
       }
     }
   }

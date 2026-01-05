@@ -95,7 +95,7 @@ watch(() => props.selectedPlatform, async (platform) => {
 <style scoped lang="less">
 .hot-content {
   height: calc(100vh - 57px);
-  overflow: auto;
+  overflow: hidden;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -105,91 +105,157 @@ watch(() => props.selectedPlatform, async (platform) => {
     position: sticky;
     top: 0;
     left: 0;
-    padding: 12px 16px 11px;
-    border-bottom: 1px solid var(--td-border-level-1-color);
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--fluent-border-subtle);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--td-bg-color-container);
+    background: var(--fluent-card-bg);
+    backdrop-filter: var(--fluent-acrylic-blur);
+    z-index: 1;
+    transition: all var(--fluent-transition-normal);
 
     .platform-title {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 600;
       color: var(--td-text-color-primary);
+      letter-spacing: -0.01em;
     }
 
     .update-time {
       display: flex;
       align-items: center;
-      gap: 4px;
-      font-size: 12px;
-      color: var(--td-text-color-secondary);
+      gap: 6px;
+      font-size: 13px;
+      color: var(--td-text-color-placeholder);
+      padding: 4px 12px;
+      background: var(--fluent-card-bg);
+      border-radius: var(--fluent-radius-smooth);
+      border: 1px solid var(--fluent-border-subtle);
+      transition: all var(--fluent-transition-normal);
+
+      &:hover {
+        background: var(--fluent-card-bg-hover);
+        border-color: var(--fluent-border-subtle-dark);
+      }
     }
   }
 
   .hot-list {
     flex: 1;
     overflow-y: auto;
-    padding: 12px 20px 20px;
+    padding: 16px 24px 24px;
+    scroll-behavior: smooth;
 
-    .hot-item {
-      display: flex;
-      gap: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-      background-color: var(--td-bg-color-component);
-      border: 1px solid var(--td-border-level-1-color);
-      border-radius: var(--td-radius-default);
-      cursor: pointer;
-      transition: all 0.2s;
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--td-scrollbar-color);
+      border-radius: 4px;
+      transition: background var(--fluent-transition-fast);
 
       &:hover {
-        border-color: var(--td-brand-color);
-        box-shadow: 0 2px 8px var(--td-shadow-1);
-        transform: translateY(-2px);
+        background: var(--td-scrollbar-hover-color);
+      }
+    }
+
+    .hot-item {
+      position: relative;
+      display: flex;
+      gap: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      background: var(--fluent-card-bg);
+      border: 1px solid var(--fluent-card-border);
+      border-radius: var(--fluent-radius-card);
+      cursor: pointer;
+      transition: all var(--fluent-transition-normal);
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: var(--fluent-reveal-bg);
+        opacity: 0;
+        transition: opacity var(--fluent-transition-fast);
+        pointer-events: none;
+      }
+
+      &:hover {
+        border-color: var(--fluent-accent-color);
+        box-shadow: var(--fluent-card-shadow-hover);
+        transform: translateY(-2px) scale(1.01);
+
+        &::before {
+          opacity: 1;
+        }
+      }
+
+      &:active {
+        transform: translateY(0) scale(1);
+        box-shadow: var(--fluent-card-shadow);
       }
 
       .hot-index {
-        width: 28px;
-        height: 28px;
-        min-width: 28px;
+        position: relative;
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 14px;
-        font-weight: 600;
-        background-color: var(--td-bg-color-secondarycontainer);
+        font-size: 16px;
+        font-weight: 700;
+        background: var(--fluent-card-bg-hover);
         color: var(--td-text-color-secondary);
-        border-radius: 50%;
+        border-radius: var(--fluent-radius-smooth);
+        border: 1px solid var(--fluent-border-subtle);
+        transition: all var(--fluent-transition-normal);
 
         &.top-three {
-          background: linear-gradient(135deg, var(--td-brand-color), var(--td-brand-color-7));
+          background: var(--fluent-gradient-primary);
           color: var(--td-text-color-anti);
+          border: none;
+          box-shadow: var(--fluent-elevation-2);
         }
       }
 
       .hot-info {
+        position: relative;
         flex: 1;
         min-width: 0;
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 8px;
 
         .hot-title {
-          font-size: 15px;
-          font-weight: 500;
+          font-size: 16px;
+          font-weight: 600;
           color: var(--td-text-color-primary);
           line-height: 1.5;
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+          letter-spacing: -0.01em;
+          transition: color var(--fluent-transition-fast);
+
+          &:hover {
+            color: var(--fluent-accent-color);
+          }
         }
 
         .hot-desc {
-          font-size: 13px;
+          font-size: 14px;
           color: var(--td-text-color-secondary);
-          line-height: 1.5;
+          line-height: 1.6;
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
@@ -198,35 +264,60 @@ watch(() => props.selectedPlatform, async (platform) => {
 
         .hot-meta {
           display: flex;
-          gap: 16px;
+          gap: 20px;
           align-items: center;
+          margin-top: auto;
 
           .hot-value,
           .hot-time {
             display: flex;
             align-items: center;
-            gap: 4px;
-            font-size: 12px;
+            gap: 6px;
+            font-size: 13px;
             color: var(--td-text-color-placeholder);
+            padding: 4px 10px;
+            background: var(--fluent-card-bg-hover);
+            border-radius: var(--fluent-radius-smooth);
+            border: 1px solid var(--fluent-border-subtle);
+            transition: all var(--fluent-transition-normal);
           }
 
           .hot-value {
             color: var(--td-error-color);
+            background: rgba(232, 17, 35, 0.08);
+            border-color: rgba(232, 17, 35, 0.2);
+            font-weight: 500;
           }
         }
       }
 
       .hot-cover {
-        width: 80px;
-        height: 60px;
-        min-width: 80px;
-        border-radius: var(--td-radius-small);
+        position: relative;
+        width: 96px;
+        height: 72px;
+        min-width: 96px;
+        border-radius: var(--fluent-radius-smooth);
         overflow: hidden;
-        background-color: var(--td-bg-color-secondarycontainer);
+        background: var(--fluent-card-bg-hover);
+        border: 1px solid var(--fluent-border-subtle);
+        transition: all var(--fluent-transition-normal);
+
+        &:hover {
+          box-shadow: var(--fluent-elevation-1);
+        }
 
         :deep(.t-image) {
           width: 100%;
           height: 100%;
+          transition: transform var(--fluent-transition-slow);
+
+          img {
+            transition: transform var(--fluent-transition-slow);
+          }
+
+          &:hover img {
+            transform: scale(1.05);
+          }
         }
       }
     }
@@ -237,6 +328,10 @@ watch(() => props.selectedPlatform, async (platform) => {
     display: flex;
     align-items: center;
     justify-content: center;
+    background: var(--fluent-card-bg);
+    border-radius: var(--fluent-radius-card);
+    margin: 16px 24px;
+    border: 1px dashed var(--fluent-border-subtle);
   }
 }
 </style>

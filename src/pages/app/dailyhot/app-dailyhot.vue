@@ -25,14 +25,18 @@ const selectPlatform = (platform: string) => {
 .dailyhot {
   position: relative;
   width: 100%;
-  height: 100%;
-  background-color: var(--td-bg-color-container);
+  height: calc(100% - 32px);
+  background: var(--td-bg-color-page);
 
   .dailyhot-container {
     display: flex;
     height: 100%;
     overflow: hidden;
+    background: var(--fluent-card-bg);
+    border-radius: var(--fluent-radius-large);
+    margin: 16px;
+    box-shadow: var(--fluent-elevation-2);
+    border: 1px solid var(--fluent-border-subtle);
   }
-
 }
 </style>
