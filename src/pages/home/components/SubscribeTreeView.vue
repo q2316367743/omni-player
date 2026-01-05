@@ -13,7 +13,7 @@
           'subscribe-item': node.type === 'item'
         }"
         @click="handleClick(node)"
-        @contextmenu="handleContextMenu(node, $event)"
+        @contextmenu.stop="handleContextMenu(node, $event)"
       >
         <div class="item-content">
           <template v-if="node.type === 'folder'">
@@ -83,7 +83,7 @@ const handleClick = (node: TreeNode) => {
 
 const handleContextMenu = (node: TreeNode, e: PointerEvent) => {
   if (node.type === 'item' && node.data) {
-    emit('contextmenu', node.data, e);
+    emit('contextmenu', {data: node.data, e: e});
   }
 };
 </script>

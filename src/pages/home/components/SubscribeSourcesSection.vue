@@ -65,10 +65,11 @@ const subscribeTree = computed(() => subscribeStore.subscribeTree);
 
 const jumpSubscribe = (id: string) => router.push(`/subscribe/${id}/0`);
 
-const handleSubscribeContextmenu = (subscribe: SubscribeItem, e: PointerEvent) => {
+const handleSubscribeContextmenu = (props: {data: SubscribeItem, e: PointerEvent}) => {
+  const {data, e} = props;
   e.preventDefault();
   e.stopPropagation();
-  openSubscribeContextmenu(subscribeStore.refresh, subscribe, e);
+  openSubscribeContextmenu(subscribeStore.refresh, data, e);
 };
 
 const openSubscribeEditWrap = () => openSubscribeEdit(subscribeStore.refresh);
