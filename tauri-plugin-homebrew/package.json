@@ -1,5 +1,5 @@
 {
-  "name": "tauri-plugin-homebrew-api",
+  "name": "@tauri-apps/plugin-homebrew",
   "version": "0.1.0",
   "author": "esion",
   "description": "",

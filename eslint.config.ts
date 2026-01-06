@@ -9,7 +9,7 @@ import {defineConfig} from "eslint/config";
 import autoImportGlobals from "./.eslintrc-auto-import.json";
 
 export default defineConfig([
-  {ignores: ["dist/**", "src-tauri/**", "node_modules/**"]},
+  {ignores: ["dist/**", "**/dist-js/**", "src-tauri/**", "node_modules/**"]},
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts,vue}"], plugins: {js}, extends: ["js/recommended"], languageOptions: {
       globals: {

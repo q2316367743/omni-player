@@ -19,7 +19,7 @@
               v-model="searchKeyword"
               placeholder="搜索软件包..."
               clearable
-              @input="handleSearch"
+              @input="handleSearchInput"
               @clear="handleClearSearch"
             >
               <template #prefix-icon>
@@ -49,16 +49,23 @@
 
             <div class="menu-divider"></div>
 
-            <div class="menu-section-title">分类</div>
+            <div class="menu-section-title">智能分类</div>
             <div
-              v-for="category in categories"
-              :key="category"
+              v-for="category in categoryDefs"
+              :key="category.key"
               class="menu-item"
-              :class="{ active: activeCategory === category && !isSearching }"
-              @click="handleCategoryClick(category)"
+              :class="{ active: activeCategory === category.label && !isSearching }"
+              @click="handleCategoryClick(category.label)"
             >
               <app-icon size="20px" />
-              <span class="menu-label">{{ category }}</span>
+              <span class="menu-label">{{ category.label }}</span>
+              <t-badge
+                v-if="getCategoryInstalledCount(category.label) > 0"
+                :count="getCategoryInstalledCount(category.label)"
+                :max-count="99"
+                theme="primary"
+                size="small"
+              />
             </div>
           </div>
         </t-aside>
@@ -67,7 +74,7 @@
           <div v-if="showEmpty" class="content-empty">
             <empty-result
               title="探索 Homebrew 软件包"
-              tip="搜索或选择分类以查看软件包"
+              tip="搜索或选择智能分类以查看软件包"
             />
           </div>
 
@@ -79,104 +86,167 @@
                   ({{ filteredPackages.length }})
                 </span>
               </div>
+              <div class="list-actions">
+                <t-space size="small" align="center">
+                  <t-radio-group v-model="typeFilter" variant="default-filled" size="small">
+                    <t-radio-button value="all">全部</t-radio-button>
+                    <t-radio-button value="Formula">Formula</t-radio-button>
+                    <t-radio-button value="Cask">Cask</t-radio-button>
+                  </t-radio-group>
+                  <t-radio-group
+                    v-if="activeCategory && !isSearching"
+                    v-model="categoryMode"
+                    variant="default-filled"
+                    size="small"
+                    @change="handleCategoryModeChange"
+                  >
+                    <t-radio-button value="discover">发现</t-radio-button>
+                    <t-radio-button value="installed">已安装</t-radio-button>
+                  </t-radio-group>
+                </t-space>
+              </div>
             </div>
 
-            <div v-if="loading" class="list-loading">
-              <t-loading size="large" text="加载中..." />
-            </div>
+            <div class="list-body">
+              <div v-if="loading" class="list-loading">
+                <t-loading size="large" text="加载中..." />
+              </div>
 
-            <div v-else-if="filteredPackages.length === 0" class="list-empty">
-              <empty-result
-                title="未找到软件包"
-                tip="尝试搜索其他关键字或选择其他分类"
-              />
-            </div>
+              <div v-else-if="filteredPackages.length === 0" class="list-empty">
+                <empty-result
+                  title="未找到软件包"
+                  tip="尝试搜索其他关键字或选择其他分类"
+                />
+              </div>
 
-            <div v-else class="package-grid">
-              <div
-                v-for="pkg in filteredPackages"
-                :key="pkg.name"
-                class="package-card"
-              >
-                <div class="package-header">
-                  <div class="package-name">{{ pkg.name }}</div>
-                  <t-tag
-                    :theme="pkg.type === 'Cask' ? 'warning' : 'primary'"
-                    size="small"
-                  >
-                    {{ pkg.type }}
-                  </t-tag>
-                </div>
+              <div v-else class="package-grid">
+                <div
+                  v-for="pkg in filteredPackages"
+                  :key="pkg.name"
+                  class="package-card"
+                >
+                  <div class="package-header">
+                    <div class="package-name">{{ pkg.name }}</div>
+                    <t-tag
+                      :theme="pkg.type === 'Cask' ? 'warning' : 'primary'"
+                      size="small"
+                    >
+                      {{ pkg.type }}
+                    </t-tag>
+                  </div>
 
-                <div class="package-description">{{ pkg.description }}</div>
+                  <div class="package-description">{{ pkg.description }}</div>
 
-                <div class="package-info">
-                  <span class="package-version">版本: {{ pkg.version }}</span>
-                </div>
+                  <div class="package-info">
+                    <span class="package-version">版本: {{ pkg.version }}</span>
+                  </div>
 
-                <div class="package-status">
-                  <t-tag
-                    v-if="isInstalled(pkg.name)"
-                    theme="success"
-                    size="small"
-                  >
-                    已安装
-                  </t-tag>
-                  <t-tag
-                    v-else-if="hasUpdate(pkg.name)"
-                    theme="warning"
-                    size="small"
-                  >
-                    可更新
-                  </t-tag>
-                </div>
-
-                <div class="package-actions">
-                  <t-button
-                    v-if="!isInstalled(pkg.name)"
-                    theme="primary"
-                    size="small"
-                    :loading="installingPackages.includes(pkg.name)"
-                    @click="handleInstall(pkg)"
-                  >
-                    安装
-                  </t-button>
-                  <t-space v-else>
-                    <t-button
+                  <div class="package-status">
+                    <t-tag
+                      v-if="installingPackages.includes(pkg.name)"
+                      theme="primary"
+                      variant="light"
+                      size="small"
+                    >
+                      安装中
+                    </t-tag>
+                    <t-tag
+                      v-if="isInstalled(pkg.name)"
+                      theme="success"
+                      size="small"
+                    >
+                      已安装
+                    </t-tag>
+                    <t-tag
                       v-if="hasUpdate(pkg.name)"
                       theme="warning"
                       size="small"
-                      :loading="upgradingPackages.includes(pkg.name)"
-                      @click="handleUpgrade(pkg)"
                     >
-                      升级
-                    </t-button>
+                      可更新
+                    </t-tag>
+                  </div>
+
+                  <div class="package-actions">
                     <t-button
-                      theme="danger"
-                      variant="outline"
+                      v-if="!isInstalled(pkg.name)"
+                      theme="primary"
                       size="small"
-                      :loading="uninstallingPackages.includes(pkg.name)"
-                      @click="handleUninstall(pkg)"
+                      :loading="installingPackages.includes(pkg.name)"
+                      @click="handleInstall(pkg)"
                     >
-                      卸载
+                      安装
                     </t-button>
-                  </t-space>
+                    <t-space v-else>
+                      <t-button
+                        v-if="hasUpdate(pkg.name)"
+                        theme="warning"
+                        size="small"
+                        :loading="upgradingPackages.includes(pkg.name)"
+                        @click="handleUpgrade(pkg)"
+                      >
+                        升级
+                      </t-button>
+                      <t-button
+                        theme="danger"
+                        variant="outline"
+                        size="small"
+                        :loading="uninstallingPackages.includes(pkg.name)"
+                        @click="handleUninstall(pkg)"
+                      >
+                        卸载
+                      </t-button>
+                    </t-space>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </t-content>
       </t-layout>
+
+      <t-dialog
+        v-model:visible="progressVisible"
+        :header="progressTitle"
+        :close-btn="false"
+        :close-on-overlay-click="false"
+        width="720px"
+        placement="center"
+      >
+        <div class="brew-progress">
+          <t-loading size="large" :text="progressHint" />
+          <div class="brew-progress__log" ref="progressLogRef">
+            <pre class="brew-progress__pre">{{ progressLogs.join('\n') }}</pre>
+          </div>
+        </div>
+        <template #footer>
+          <t-space size="small">
+            <t-button
+              theme="danger"
+              variant="outline"
+              :loading="progressCancelling"
+              :disabled="!progressOpId"
+              @click="cancelCurrentOperation"
+            >
+              中断
+            </t-button>
+          </t-space>
+        </template>
+      </t-dialog>
     </div>
   </app-tool-layout>
 </template>
 
 <script lang="ts" setup>
-import { MessagePlugin } from 'tdesign-vue-next'
 import { SearchIcon, DownloadIcon, RefreshIcon, CheckIcon, AppIcon } from 'tdesign-icons-vue-next'
 import EmptyResult from '@/components/Result/EmptyResult.vue'
-import * as homebrew from 'tauri-plugin-homebrew-api'
-import type { HomebrewItem, HomebrewOutdatedItem } from '@/plugins/homebrew'
+import * as homebrew from '@tauri-apps/plugin-homebrew'
+import type { HomebrewItem, HomebrewOutdatedItem } from '@tauri-apps/plugin-homebrew'
+import MessageUtil from "@/util/model/MessageUtil.ts";
+import { listen } from '@tauri-apps/api/event'
+import { isTauri } from '@tauri-apps/api/core'
+
+type TypeFilter = 'all' | 'Formula' | 'Cask'
+type CategoryMode = 'discover' | 'installed'
 
 const isHomebrewAvailable = ref(false)
 const loading = ref(false)
@@ -184,26 +254,82 @@ const searchKeyword = ref('')
 const activeMenu = ref('')
 const activeCategory = ref('')
 const isSearching = ref(false)
+const typeFilter = ref<TypeFilter>('all')
+const categoryMode = ref<CategoryMode>('discover')
 
 const installedPackages = ref<HomebrewItem[]>([])
 const outdatedPackages = ref<HomebrewOutdatedItem[]>([])
 const searchResults = ref<HomebrewItem[]>([])
+const categoryDiscoverCache = ref<Record<string, HomebrewItem[]>>({})
 
 const installingPackages = ref<string[]>([])
 const upgradingPackages = ref<string[]>([])
 const uninstallingPackages = ref<string[]>([])
+const installingPackageItems = ref<Record<string, HomebrewItem>>({})
 
-const categories = [
-  '开发工具',
-  '数据库',
-  '网络工具',
-  '文本编辑器',
-  '图形工具',
-  '系统工具',
-  '媒体工具',
-  '办公软件',
-  '游戏',
-  '其他'
+const searchDebounceTimer = ref<number | null>(null)
+
+const progressVisible = ref(false)
+const progressTitle = ref('')
+const progressOpId = ref<string>('')
+const progressLogs = ref<string[]>([])
+const progressCancelling = ref(false)
+const progressCancelled = ref(false)
+const progressLogRef = ref<HTMLElement | null>(null)
+const unlistenProgress = ref<(() => void) | null>(null)
+
+const progressHint = computed(() => {
+  if (progressCancelling.value) return '正在中断...'
+  return progressLogs.value[progressLogs.value.length - 1] || '正在执行...'
+})
+
+function newOpId() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID()
+  return `op-${Date.now()}-${Math.random().toString(16).slice(2)}`
+}
+
+function openProgress(title: string, opId: string) {
+  progressTitle.value = title
+  progressOpId.value = opId
+  progressLogs.value = []
+  progressCancelling.value = false
+  progressCancelled.value = false
+  progressVisible.value = true
+}
+
+function closeProgress() {
+  progressVisible.value = false
+  progressTitle.value = ''
+  progressOpId.value = ''
+  progressCancelling.value = false
+  progressCancelled.value = false
+  progressLogs.value = []
+}
+
+async function cancelCurrentOperation() {
+  if (!progressOpId.value) return
+  progressCancelling.value = true
+  progressCancelled.value = true
+  try {
+    await homebrew.cancelOperation(progressOpId.value)
+  } catch (e) {
+    console.error('取消失败:', e)
+  } finally {
+    progressCancelling.value = false
+  }
+}
+
+const categoryDefs = [
+  { key: 'dev', label: '开发工具', keywords: ['git', 'node', 'python', 'go', 'rust', 'java', 'docker', 'cmake'] },
+  { key: 'db', label: '数据库', keywords: ['mysql', 'postgres', 'postgresql', 'redis', 'mongodb', 'sqlite'] },
+  { key: 'net', label: '网络工具', keywords: ['curl', 'wget', 'http', 'dns', 'proxy', 'ssh', 'tcp', 'nginx'] },
+  { key: 'editor', label: '文本编辑器', keywords: ['vim', 'neovim', 'emacs', 'nano', 'code', 'sublime'] },
+  { key: 'graphic', label: '图形工具', keywords: ['imagemagick', 'graphics', 'svg', 'inkscape', 'gimp'] },
+  { key: 'system', label: '系统工具', keywords: ['htop', 'tmux', 'zsh', 'fish', 'openssl', 'coreutils', 'launchctl'] },
+  { key: 'media', label: '媒体工具', keywords: ['ffmpeg', 'video', 'audio', 'youtube', 'vlc', 'mpv'] },
+  { key: 'office', label: '办公软件', keywords: ['libreoffice', 'office', 'pdf', 'pandoc', 'markdown'] },
+  { key: 'game', label: '游戏', keywords: ['steam', 'game', 'emulator', 'rom'] },
+  { key: 'other', label: '其他', keywords: [] }
 ]
 
 const menuItems = computed(() => [
@@ -237,33 +363,73 @@ const currentTitle = computed(() => {
     const item = menuItems.value.find(m => m.key === activeMenu.value)
     return item?.label || ''
   }
-  if (activeCategory.value) return activeCategory.value
+  if (activeCategory.value) {
+    const modeLabel = categoryMode.value === 'discover' ? '发现' : '已安装'
+    return `${activeCategory.value} · ${modeLabel}`
+  }
   return ''
 })
 
+const normalizePackageText = (pkg: HomebrewItem): string => {
+  return `${pkg.name ?? ''} ${pkg.description ?? ''}`.toLowerCase()
+}
+
+const getPackageCategory = (pkg: HomebrewItem): string => {
+  const text = normalizePackageText(pkg)
+  for (const def of categoryDefs) {
+    if (def.label === '其他') continue
+    if (def.keywords.some(k => text.includes(k))) return def.label
+  }
+  return '其他'
+}
+
+const installedByCategory = computed<Record<string, HomebrewItem[]>>(() => {
+  const result: Record<string, HomebrewItem[]> = {}
+  for (const def of categoryDefs) result[def.label] = []
+  for (const pkg of installedPackages.value) {
+    const label = getPackageCategory(pkg)
+    result[label] = result[label] ?? []
+    result[label].push(pkg)
+  }
+  for (const label of Object.keys(result)) {
+    result[label]?.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+  }
+  return result
+})
+
+const getCategoryInstalledCount = (label: string): number => {
+  return installedByCategory.value[label]?.length ?? 0
+}
+
+const applyTypeFilter = (list: HomebrewItem[]): HomebrewItem[] => {
+  if (typeFilter.value === 'all') return list
+  return list.filter(pkg => pkg.type === typeFilter.value)
+}
+
 const filteredPackages = computed(() => {
   if (isSearching.value) {
-    return searchResults.value
+    return applyTypeFilter(searchResults.value)
   }
   
   if (activeMenu.value === 'installed') {
-    return installedPackages.value
+    return applyTypeFilter(installedPackages.value)
   }
   
   if (activeMenu.value === 'updatable') {
-    return installedPackages.value.filter(pkg =>
+    return applyTypeFilter(installedPackages.value.filter(pkg =>
       outdatedPackages.value.some(op => op.name === pkg.name)
-    )
+    ))
   }
   
   if (activeMenu.value === 'downloading') {
-    return []
+    return applyTypeFilter(Object.values(installingPackageItems.value))
   }
   
   if (activeCategory.value) {
-    return installedPackages.value.filter(pkg => {
-      return pkg.description.toLowerCase().includes(activeCategory.value.toLowerCase())
-    })
+    if (categoryMode.value === 'installed') {
+      return applyTypeFilter(installedByCategory.value[activeCategory.value] ?? [])
+    }
+    return applyTypeFilter(categoryDiscoverCache.value[activeCategory.value] ?? [])
   }
   
   return []
@@ -296,7 +462,7 @@ const loadInstalledPackages = async () => {
     installedPackages.value = await homebrew.listInstalled()
   } catch (error) {
     console.error('加载已安装软件包失败:', error)
-    MessagePlugin.error('加载已安装软件包失败')
+    MessageUtil.error('加载已安装软件包失败')
   } finally {
     loading.value = false
   }
@@ -308,6 +474,13 @@ const loadOutdatedPackages = async () => {
   } catch (error) {
     console.error('加载可更新软件包失败:', error)
   }
+}
+
+const handleSearchInput = () => {
+  if (searchDebounceTimer.value) window.clearTimeout(searchDebounceTimer.value)
+  searchDebounceTimer.value = window.setTimeout(() => {
+    handleSearch()
+  }, 350)
 }
 
 const handleSearch = async () => {
@@ -325,7 +498,7 @@ const handleSearch = async () => {
     searchResults.value = await homebrew.search(searchKeyword.value)
   } catch (error) {
     console.error('搜索失败:', error)
-    MessagePlugin.error('搜索失败')
+    MessageUtil.error('搜索失败')
   } finally {
     loading.value = false
   }
@@ -347,20 +520,76 @@ const handleCategoryClick = (category: string) => {
   activeCategory.value = category
   activeMenu.value = ''
   isSearching.value = false
+  categoryMode.value = 'discover'
+  void loadCategoryDiscoverPackages(category)
+}
+
+const handleCategoryModeChange = () => {
+  if (!activeCategory.value) return
+  if (categoryMode.value === 'discover') {
+    void loadCategoryDiscoverPackages(activeCategory.value)
+  }
+}
+
+const loadCategoryDiscoverPackages = async (categoryLabel: string) => {
+  if (categoryDiscoverCache.value[categoryLabel]?.length) return
+  const def = categoryDefs.find(d => d.label === categoryLabel)
+  const keywords = def?.keywords?.slice(0, 4) ?? []
+  if (keywords.length === 0) {
+    categoryDiscoverCache.value = { ...categoryDiscoverCache.value, [categoryLabel]: [] }
+    return
+  }
+
+  const merged = new Map<string, HomebrewItem>()
+  try {
+    loading.value = true
+    for (const kw of keywords) {
+      const list = await homebrew.search(kw)
+      for (const item of list) {
+        if (!item?.name) continue
+        merged.set(item.name, item)
+      }
+      if (merged.size >= 160) break
+    }
+    const arr = [...merged.values()]
+    arr.sort((a, b) => {
+      const ai = isInstalled(a.name) ? 0 : 1
+      const bi = isInstalled(b.name) ? 0 : 1
+      if (ai !== bi) return ai - bi
+      return (a.name || '').localeCompare(b.name || '')
+    })
+    categoryDiscoverCache.value = { ...categoryDiscoverCache.value, [categoryLabel]: arr }
+  } catch (error) {
+    console.error('加载分类失败:', error)
+    MessageUtil.error('加载分类失败')
+  } finally {
+    loading.value = false
+  }
 }
 
 const handleInstall = async (pkg: HomebrewItem) => {
   try {
     installingPackages.value = [...installingPackages.value, pkg.name]
-    await homebrew.install(pkg.name, { cask: pkg.type === 'Cask' })
-    MessagePlugin.success(`${pkg.name} 安装成功`)
+    installingPackageItems.value = { ...installingPackageItems.value, [pkg.name]: pkg }
+    const opId = newOpId()
+    openProgress(`安装 ${pkg.name}`, opId)
+    await homebrew.install(pkg.name, { cask: pkg.type === 'Cask' }, opId)
+    MessageUtil.success(`${pkg.name} 安装成功`)
     await loadInstalledPackages()
     await loadOutdatedPackages()
   } catch (error) {
     console.error('安装失败:', error)
-    MessagePlugin.error(`${pkg.name} 安装失败`)
+    if (progressCancelled.value) {
+      MessageUtil.error(`${pkg.name} 已中断`)
+    } else {
+      MessageUtil.error(`${pkg.name} 安装失败`)
+    }
   } finally {
     installingPackages.value = installingPackages.value.filter(n => n !== pkg.name)
+    const next = { ...installingPackageItems.value }
+    delete next[pkg.name]
+    installingPackageItems.value = next
+    closeProgress()
   }
 }
 
@@ -368,12 +597,12 @@ const handleUninstall = async (pkg: HomebrewItem) => {
   try {
     uninstallingPackages.value = [...uninstallingPackages.value, pkg.name]
     await homebrew.uninstall(pkg.name)
-    MessagePlugin.success(`${pkg.name} 卸载成功`)
+    MessageUtil.success(`${pkg.name} 卸载成功`)
     await loadInstalledPackages()
     await loadOutdatedPackages()
   } catch (error) {
     console.error('卸载失败:', error)
-    MessagePlugin.error(`${pkg.name} 卸载失败`)
+    MessageUtil.error(`${pkg.name} 卸载失败`)
   } finally {
     uninstallingPackages.value = uninstallingPackages.value.filter(n => n !== pkg.name)
   }
@@ -382,15 +611,22 @@ const handleUninstall = async (pkg: HomebrewItem) => {
 const handleUpgrade = async (pkg: HomebrewItem) => {
   try {
     upgradingPackages.value = [...upgradingPackages.value, pkg.name]
-    await homebrew.upgrade(pkg.name)
-    MessagePlugin.success(`${pkg.name} 升级成功`)
+    const opId = newOpId()
+    openProgress(`升级 ${pkg.name}`, opId)
+    await homebrew.upgrade(pkg.name, opId)
+    MessageUtil.success(`${pkg.name} 升级成功`)
     await loadInstalledPackages()
     await loadOutdatedPackages()
   } catch (error) {
     console.error('升级失败:', error)
-    MessagePlugin.error(`${pkg.name} 升级失败`)
+    if (progressCancelled.value) {
+      MessageUtil.error(`${pkg.name} 已中断`)
+    } else {
+      MessageUtil.error(`${pkg.name} 升级失败`)
+    }
   } finally {
     upgradingPackages.value = upgradingPackages.value.filter(n => n !== pkg.name)
+    closeProgress()
   }
 }
 
@@ -400,6 +636,29 @@ const openHomebrewInstallGuide = () => {
 
 onMounted(() => {
   checkHomebrewAvailable()
+
+  if (isTauri()) {
+    listen<{ opId: string; stream: 'stdout' | 'stderr'; line: string }>(homebrew.HOMEBREW_PROGRESS_EVENT, ({ payload }) => {
+      if (!payload?.opId) return
+      if (payload.opId !== progressOpId.value) return
+      const prefix = payload.stream === 'stderr' ? '[err] ' : ''
+      const next = [...progressLogs.value, `${prefix}${payload.line}`]
+      progressLogs.value = next.slice(-240)
+      nextTick(() => {
+        if (!progressLogRef.value) return
+        progressLogRef.value.scrollTop = progressLogRef.value.scrollHeight
+      })
+    }).then((unlisten) => {
+      unlistenProgress.value = unlisten
+    }).catch(() => {})
+  }
+})
+
+onUnmounted(() => {
+  if (unlistenProgress.value) {
+    unlistenProgress.value()
+    unlistenProgress.value = null
+  }
 })
 </script>
 
@@ -407,7 +666,6 @@ onMounted(() => {
 .homebrew-container {
   width: 100%;
   height: calc(100% - 32px);
-  background: var(--td-bg-color-page);
 }
 
 .homebrew-not-available {
@@ -519,12 +777,22 @@ onMounted(() => {
 .homebrew-content {
   flex: 1;
   padding: var(--td-size-6);
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   background: var(--td-bg-color-page);
 }
 
+.content-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .content-empty {
-  height: 100%;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -532,6 +800,17 @@ onMounted(() => {
 
 .list-header {
   margin-bottom: var(--td-size-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--td-size-4);
+  flex-wrap: wrap;
+}
+
+.list-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
 }
 
 .list-title {
@@ -540,6 +819,11 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: var(--td-size-2);
+}
+
+.list-actions {
+  display: flex;
+  align-items: center;
 }
 
 .list-count {
@@ -628,6 +912,29 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: var(--td-size-2);
+}
+
+.brew-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.brew-progress__log {
+  height: 300px;
+  overflow: auto;
+  border: 1px solid var(--fluent-border-subtle);
+  border-radius: var(--fluent-radius-smooth);
+  padding: 8px 10px;
+  background: var(--td-bg-color-container);
+}
+
+.brew-progress__pre {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .package-actions {

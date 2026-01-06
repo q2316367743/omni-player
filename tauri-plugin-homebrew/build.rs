@@ -5,12 +5,12 @@ const COMMANDS: &[&str] = &[
     "uninstall",
     "list_installed",
     "list_outdated",
-    "upgrade"
+    "upgrade",
 ];
 
 fn main() {
-  tauri_plugin::Builder::new(COMMANDS)
-    .android_path("android")
-    .ios_path("ios")
-    .build();
+    tauri_plugin::Builder::new(COMMANDS)
+        .android_path("android")
+        .ios_path("ios")
+        .build();
 }

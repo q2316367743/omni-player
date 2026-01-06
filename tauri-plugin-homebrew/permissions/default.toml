@@ -7,5 +7,6 @@ permissions = [
     "allow-uninstall",
     "allow-list-installed",
     "allow-list-outdated",
-    "allow-upgrade"
+    "allow-upgrade",
+    "allow-cancel-operation"
 ]

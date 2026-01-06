@@ -159,7 +159,7 @@ function handleExport() {
 }
 
 watch(() => nginxConfig.http.servers, (servers) => {
-  servers.forEach((server, index) => {
+  servers.forEach((server) => {
     if (server.access_log.custom_format) {
       previewLogFormat(server)
     }

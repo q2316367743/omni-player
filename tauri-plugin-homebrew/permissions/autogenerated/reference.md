@@ -11,6 +11,7 @@ Default permissions for the plugin
 - `allow-list-installed`
 - `allow-list-outdated`
 - `allow-upgrade`
+- `allow-cancel-operation`
 
 ## Permission Table
 
@@ -20,6 +21,32 @@ Default permissions for the plugin
 <th>Description</th>
 </tr>
 
+
+<tr>
+<td>
+
+`homebrew:allow-cancel-operation`
+
+</td>
+<td>
+
+Enables the cancel_operation command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`homebrew:deny-cancel-operation`
+
+</td>
+<td>
+
+Denies the cancel_operation command without any pre-configured scope.
+
+</td>
+</tr>
 
 <tr>
 <td>

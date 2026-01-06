@@ -1,5 +1,8 @@
 import {invoke} from '@tauri-apps/api/core'
 
+export const HOMEBREW_PROGRESS_EVENT = 'homebrew://progress'
+export const HOMEBREW_COMPLETE_EVENT = 'homebrew://complete'
+
 /**
  * 是否安装 brew
  */
@@ -32,9 +35,10 @@ export interface HomebrewInstallOption {
  * 安装软件包
  * @param name 软件包名
  * @param opts 安装选项
+ * @param opId 操作 ID（用于进度事件过滤）
  */
-export function install(name: string, opts?: HomebrewInstallOption): Promise<void> {
-  return invoke("plugin:homebrew|install", { name, opts });
+export function install(name: string, opts?: HomebrewInstallOption, opId?: string): Promise<void> {
+  return invoke("plugin:homebrew|install", { name, opts, op_id: opId });
 }
 
 /**
@@ -66,7 +70,16 @@ export function listOutdated(): Promise<Array<HomebrewOutdatedItem>> {
 /**
  * 升级软件包
  * @param name 软件包名
+ * @param opId 操作 ID（用于进度事件过滤）
  */
-export function upgrade(name: string): Promise<string | undefined> {
-  return invoke("plugin:homebrew|upgrade", {name});
+export function upgrade(name: string, opId?: string): Promise<void> {
+  return invoke("plugin:homebrew|upgrade", {name, op_id: opId});
+}
+
+/**
+ * 取消安装/升级
+ * @param opId 操作 ID
+ */
+export function cancelOperation(opId: string): Promise<void> {
+  return invoke("plugin:homebrew|cancel_operation", {op_id: opId});
 }

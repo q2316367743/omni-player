@@ -1,14 +1,14 @@
+use crate::commands::*;
 use tauri::{
     plugin::{Builder, TauriPlugin},
-    Runtime,
+    Wry,
 };
-use crate::commands::*;
 
 pub mod commands;
 pub mod models;
 pub mod utils;
 
-pub fn init<R: Runtime>() -> TauriPlugin<R> {
+pub fn init() -> TauriPlugin<Wry> {
     Builder::new("homebrew")
         .invoke_handler(tauri::generate_handler![
             // 是否安装 brew
@@ -24,8 +24,9 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             // 列出已更新软件包
             list_outdated,
             // 升级软件包
-            upgrade
-            // 可添加 services_start, list, upgrade 等
+            upgrade,
+            // 取消安装/升级
+            cancel_operation // 可添加 services_start, list, upgrade 等
         ])
         .build()
 }
