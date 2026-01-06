@@ -5,6 +5,7 @@ use tauri::{
 };
 use tauri_plugin_log::{Target, TargetKind};
 mod commands;
+// 👇 导入插件（注意包名要和 Cargo.toml 中的 name 一致）
 
 use commands::{system_port_list, system_process_detail, system_process_kill};
 
@@ -23,6 +24,7 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_homebrew::init())
         .plugin(
             tauri_plugin_log::Builder::new()
                 .targets([

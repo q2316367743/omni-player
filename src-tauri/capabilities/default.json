@@ -89,6 +89,7 @@
       "allow": [{ "path": "$APPDATA/**/*" }]
     },
     "dialog:allow-open",
-    "dialog:allow-save"
+    "dialog:allow-save",
+    "homebrew:default"
   ]
 }

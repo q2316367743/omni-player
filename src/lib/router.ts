@@ -131,6 +131,10 @@ export const router = createRouter({
         name: "AppSystemPort",
         path: "port",
         component: () => import('@/pages/app/system/port/app-system-port.vue')
+      },{
+        name: "AppSystemHomebrew",
+        path: "homebrew",
+        component: () => import("@/pages/app/system/homebrew/app-system-homebrew.vue")
       }]
     }]
   }]

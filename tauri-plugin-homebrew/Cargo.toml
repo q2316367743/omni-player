@@ -1,0 +1,19 @@
+[package]
+name = "tauri-plugin-homebrew"
+version = "0.1.0"
+authors = [ "You" ]
+description = ""
+edition = "2021"
+rust-version = "1.77.2"
+exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules"]
+links = "tauri-plugin-homebrew"
+
+[dependencies]
+tauri = { version = "2.9.5" }
+thiserror = "2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.145"
+once_cell = "1.19"
+
+[build-dependencies]
+tauri-plugin = { version = "2.5.2", features = ["build"] }

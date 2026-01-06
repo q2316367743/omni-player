@@ -1,0 +1,11 @@
+[default]
+description = "Default permissions for the plugin"
+permissions = [
+    "allow-is-available",
+    "allow-search",
+    "allow-install",
+    "allow-uninstall",
+    "allow-list-installed",
+    "allow-list-outdated",
+    "allow-upgrade"
+]

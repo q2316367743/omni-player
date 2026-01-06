@@ -107,6 +107,9 @@ importers:
       pinia:
         specifier: ^3.0.4
         version: 3.0.4(typescript@5.9.3)(vue@3.5.25(typescript@5.9.3))
+      tauri-plugin-homebrew-api:
+        specifier: workspace:./tauri-plugin-homebrew
+        version: link:tauri-plugin-homebrew
       tdesign-icons-vue-next:
         specifier: ^0.4.1
         version: 0.4.1(vue@3.5.25(typescript@5.9.3))
