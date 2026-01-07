@@ -1,6 +1,6 @@
 <template>
   <div class="tool-card" @click="jumpTool()">
-    <div :class="['tool-icon', cate]">
+    <div :class="['tool-icon', tone]">
       <slot name="icon"/>
     </div>
     <div class="tool-info">
@@ -10,12 +10,14 @@
   </div>
 </template>
 <script lang="ts" setup>
-const props = defineProps({
-  label: String,
-  value: String,
-  desc: String,
-  cate: String
-});
+type ToolCardTone = 'todo' | 'editor' | 'regex' | 'http' | 'online' | 'media';
+
+const props = defineProps<{
+  label: string;
+  value: string;
+  desc: string;
+  tone: ToolCardTone;
+}>();
 
 const router = useRouter();
 
