@@ -98,6 +98,10 @@ export const router = createRouter({
         name: 'AppProgrammerNginx',
         path: 'nginx',
         component: () => import('@/pages/app/programmer/nginx/app-nginx.vue')
+      }, {
+        name: 'AppProgrammerCommand',
+        path: 'command',
+        component: () => import('@/pages/app/programmer/command/app-command.vue')
       }]
     }, {
       name: 'AppFanyi',

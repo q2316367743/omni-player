@@ -1,25 +1,6 @@
 <template>
   <div class="tools-container">
-    <div class="tools-group">
-      <div class="group-title">程序员三件套</div>
-      <div class="tools-grid">
-        <tool-card value="todo" label="待办" desc="井井有条" tone="todo">
-          <template #icon>
-            <check-rectangle-icon />
-          </template>
-        </tool-card>
-        <tool-card value="editor" label="笔记" desc="妙笔生花" tone="todo">
-          <template #icon>
-            <edit1-icon />
-          </template>
-        </tool-card>
-        <tool-card value="bookkeeping" label="记账" desc="精打细算" tone="todo">
-          <template #icon>
-            <money-icon />
-          </template>
-        </tool-card>
-      </div>
-    </div>
+
     <div class="tools-group">
       <div class="group-title">程序员套件</div>
       <div class="tools-grid mini-tools-grid">
@@ -39,6 +20,32 @@
             <internet-icon/>
           </template>
         </mini-tool-card>
+        <mini-tool-card value="programmer/command" label="命令助手" tone="regex">
+          <template #icon>
+            <command-icon />
+          </template>
+        </mini-tool-card>
+      </div>
+    </div>
+
+    <div class="tools-group">
+      <div class="group-title">程序员三件套</div>
+      <div class="tools-grid">
+        <tool-card value="todo" label="待办" desc="井井有条" tone="todo">
+          <template #icon>
+            <check-rectangle-icon />
+          </template>
+        </tool-card>
+        <tool-card value="editor" label="笔记" desc="妙笔生花" tone="todo">
+          <template #icon>
+            <edit1-icon />
+          </template>
+        </tool-card>
+        <tool-card value="bookkeeping" label="记账" desc="精打细算" tone="todo">
+          <template #icon>
+            <money-icon />
+          </template>
+        </tool-card>
       </div>
     </div>
 
@@ -92,7 +99,7 @@
 import {
   ArticleIcon,
   CheckRectangleIcon,
-  CodeIcon, Edit1Icon,
+  CodeIcon, CommandIcon, Edit1Icon,
   InternetIcon, MoneyIcon, PortraitIcon,
   TranslateIcon,
   VideoIcon

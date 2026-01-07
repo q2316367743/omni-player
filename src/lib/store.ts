@@ -66,3 +66,7 @@ export const useStore = () => instance;
 const todoStore = new StoreWrapper("todo");
 
 export const useTodoStore = () => todoStore;
+
+const commandStore = new StoreWrapper("command");
+
+export const useCommandStore = () => commandStore;
