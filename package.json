@@ -36,7 +36,7 @@
     "@tauri-apps/plugin-sql": "^2.3.1",
     "@tauri-apps/plugin-store": "~2.4.1",
     "@tauri-apps/plugin-updater": "~2",
-    "@tauri-apps/plugin-homebrew": "workspace:./tauri-plugin-homebrew",
+    "@tauri-apps/plugin-homebrew": "workspace:*",
     "@vueuse/core": "^14.1.0",
     "@vueuse/integrations": "^14.1.0",
     "artplayer": "^5.3.0",
@@ -91,5 +91,6 @@
       "esbuild",
       "less"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.27.0+sha512.72d699da16b1179c14ba9e64dc71c9a40988cbdc65c264cb0e489db7de917f20dcf4d64d8723625f2969ba52d4b7e2a1170682d9ac2a5dcaeaab732b7e16f04a"
 }
