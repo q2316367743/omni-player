@@ -17,7 +17,7 @@
             :options="languageOptions"
             @change="handleLanguageChange"
           />
-          <t-dropdown>
+          <t-dropdown trigger="click">
             <t-button size="small" variant="text">
               <template #icon>
                 <more-icon />
@@ -184,7 +184,7 @@ defineExpose({
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 8px;
   border-bottom: 1px solid var(--fluent-border-subtle);
   background: var(--fluent-card-bg);
 }

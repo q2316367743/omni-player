@@ -49,12 +49,13 @@ const initEditor = async () => {
     emit('update:modelValue', value);
   });
 
+  watch(isDark, value => {
+    editor?.updateOptions({
+      theme: value ? 'vs-dark' : 'vs'
+    })
+  });
+
 };
-const unWatch = watch(isDark, value => {
-  editor?.updateOptions({
-    theme: value ? 'vs-dark' : 'vs'
-  })
-});
 
 onMounted(() => {
   initEditor();
@@ -62,7 +63,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   editor?.dispose();
-  unWatch();
 });
 
 watch(

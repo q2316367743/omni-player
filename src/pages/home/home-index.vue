@@ -29,6 +29,14 @@
 
       <t-card size="small">
         <t-tabs v-model="activeKey">
+          <template #action>
+            <t-button theme="primary" shape="square" class="!mt-8px"
+                      @click="toSetting">
+              <template #icon>
+                <setting-icon />
+              </template>
+            </t-button>
+          </template>
           <t-tab-panel label="工" value="tool" draggable>
             <tools-section/>
           </t-tab-panel>
@@ -57,7 +65,9 @@ import ToolsSection from "./components/ToolsSection.vue";
 import SubscribeSourcesSection from "./components/SubscribeSourcesSection.vue";
 import ShiCi from "@/pages/home/components/ShiCi.vue";
 import VideoSection from "@/pages/home/components/VideoSection.vue";
+import {SettingIcon} from "tdesign-icons-vue-next";
 
+const router = useRouter();
 const activeKey = useLocalStorage(LocalName.PAGE_HOME_ACTIVE, 'book');
 
 const mediaCount = computed(() => useMediaServerStore().servers.length);
@@ -65,7 +75,9 @@ const networkCount = computed(() => useNetworkServerStore().servers.length);
 const {data: subscriptions} = useRequest(listSubscribe, {defaultValue: []});
 const subscribeCount = computed(() => subscriptions.value.length);
 
-
+const toSetting = () => {
+  router.push('/admin/global-setting');
+}
 </script>
 
 <style scoped lang="less">
