@@ -7,9 +7,9 @@ import {createPinia} from "pinia";
 import {router} from "@/lib/router.ts";
 import {useSql} from "@/lib/sql.ts";
 import {logError, logInfo} from "@/lib/log.ts";
-import { registerNginxLanguage } from '@/modules/monaco/nginx';
+import { registerMonacoLanguages } from '@/modules/monaco';
 
-registerNginxLanguage();
+registerMonacoLanguages();
 
 // 👇 必须在 import monaco 之前设置！
 self.MonacoEnvironment = {

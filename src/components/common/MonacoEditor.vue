@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import * as monaco from 'monaco-editor';
 import {isDark} from "@/global/Constants.ts"
-import type {MonacoLanguage} from "@/util/monaco-languages.ts"
+import type {MonacoLanguage} from "@/modules/monaco"
 
 interface Props {
   modelValue: string;

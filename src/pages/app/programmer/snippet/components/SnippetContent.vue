@@ -70,7 +70,7 @@ import MessageUtil from '@/util/model/MessageUtil';
 import MessageBoxUtil from '@/util/model/MessageBoxUtil';
 import {debounce} from 'es-toolkit';
 import {openTagEdit} from '@/pages/app/programmer/snippet/func/SnippetEdit';
-import {MONACO_LANGUAGES} from '@/util/monaco-languages.ts';
+import {MONACO_LANGUAGES} from '@/modules/monaco';
 
 const LANGUAGE_OPTIONS = MONACO_LANGUAGES.map(lang => ({
   label: lang.charAt(0).toUpperCase() + lang.slice(1).replace(/([A-Z])/g, ' $1').trim(),

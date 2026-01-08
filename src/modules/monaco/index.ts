@@ -1,4 +1,8 @@
+// 导出语言列表与语言支持
 import * as monaco from 'monaco-editor';
+import { registerBatLanguage } from '@/modules/monaco/bat';
+import { registerNginxLanguage } from '@/modules/monaco/nginx';
+import { registerPowerShellLanguage } from '@/modules/monaco/ps1';
 
 export type MonacoLanguage = string;
 
@@ -31,6 +35,7 @@ export const MONACO_LANGUAGES: MonacoLanguage[] = [
   'toml',
   'ini',
   'dockerfile',
+  'bat',
   'bash',
   'powershell',
   'nginx',
@@ -41,3 +46,9 @@ export const MONACO_LANGUAGES: MonacoLanguage[] = [
   'scala',
   'swift'
 ];
+
+export function registerMonacoLanguages() {
+  registerBatLanguage();
+  registerNginxLanguage();
+  registerPowerShellLanguage();
+}

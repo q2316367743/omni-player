@@ -19,7 +19,10 @@ export default defineConfig([
     }
   },
   tseslint.configs.recommended,
-  pluginVue.configs["flat/essential"],
+  ...pluginVue.configs["flat/essential"].map(config => ({
+    ...config,
+    files: ["**/*.vue"]
+  })),
   {files: ["**/*.vue"], languageOptions: {parserOptions: {parser: tseslint.parser}}},
   {files: ["**/*.css"], plugins: {css}, language: "css/css", extends: ["css/recommended"]},
   {
