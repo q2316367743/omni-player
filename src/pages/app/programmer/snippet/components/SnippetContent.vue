@@ -84,6 +84,7 @@ const snippet = ref<Snippet>();
 const emit = defineEmits<{
   deleted: []
   renamed: [name: string]
+  tagsUpdated: [id: string]
 }>();
 
 const loadSnippet = async (id: string | undefined) => {
@@ -119,7 +120,12 @@ const handleEditTags = () => {
   if (!snippet.value) return;
 
   openTagEdit(snippet.value, async () => {
-    snippet.value = await getSnippetContent(snippet.value!.id);
+    try {
+      snippet.value = await getSnippetContent(snippet.value!.id);
+      emit('tagsUpdated', snippet.value!.id);
+    } catch {
+      MessageUtil.error('加载代码片段内容失败');
+    }
   });
 };
 

@@ -6,7 +6,7 @@ import {generatePlaceholders, group, map} from "@/util";
 import type {SnippetContent} from "@/entity/snippet/SnippetContent.ts";
 import type {SnippetTags} from "@/entity/snippet/SnippetTags.ts";
 
-export type { SnippetMetaWithTag };
+export type {SnippetMetaWithTag};
 
 async function fillTag(metas: Array<SnippetMeta>): Promise<Array<SnippetMetaWithTag>> {
   // 查询关联表
@@ -41,24 +41,26 @@ async function fillTag(metas: Array<SnippetMeta>): Promise<Array<SnippetMetaWith
  */
 export async function pageSnippet(keyword: string, page: number, pageSize: number): Promise<PageResponse<SnippetMetaWithTag>> {
   if (keyword.startsWith("#")) {
+    const name = `%${keyword.substring(1)}%`;
     // 搜索标签
     const totalWrap = await useSql().select<Array<{ total: number }>>(
-      `select count(*)
+      `select count(*) as \`total\`
        from snippet_meta sm
                 left join snippet_tags sts on sm.id = sts.snippet_id
                 left join snippet_tag st on st.id = sts.tag_id
-       where st.name like '%${generatePlaceholders(1)}%'`);
+       where st.name like ${generatePlaceholders(1)}`, [name]);
     const total = totalWrap[0]?.total || 0;
     if (total === 0) return {total, records: [], pageNum: page, pageSize};
     const list = await useSql().select<Array<SnippetMeta>>(
-      `select *
+      `select sm.*
        from snippet_meta sm
                 left join snippet_tags sts on sm.id = sts.snippet_id
                 left join snippet_tag st on st.id = sts.tag_id
-       where st.name like '%${generatePlaceholders(1)}%'
+       where st.name like ${generatePlaceholders(1)}
        LIMIT ${generatePlaceholders(1, 1)} OFFSET ${generatePlaceholders(1, 2)}`,
-      [keyword, pageSize, (page - 1) * pageSize]);
-    return {total, records: await fillTag(list), pageNum: page, pageSize};
+      [name, pageSize, (page - 1) * pageSize]);
+    const records = await fillTag(list);
+    return {total, records, pageNum: page, pageSize};
   }
   // 普通查询
   const list = await useSql().query<SnippetMeta>('snippet_meta').like('name', keyword).page(page, pageSize);
@@ -104,7 +106,7 @@ export async function setSnippetTag(id: string, tagNames: Array<string>) {
   await useSql().query<SnippetTags>('snippet_tags').eq('snippet_id', id).delete();
   // 插入新的标签
   const tags = await useSql().query<SnippetTag>('snippet_tag').in('name', tagNames).list();
-  const tagMap = map(tags, 'id');
+  const tagMap = map(tags, 'name');
   const now = Date.now();
   for (const tagName of tagNames) {
     const tag = tagMap.get(tagName);
@@ -114,7 +116,7 @@ export async function setSnippetTag(id: string, tagNames: Array<string>) {
         tag_id: tag.id,
         created_at: now
       })
-    }else {
+    } else {
       // 创建新的标签
       const newTag = await useSql().mapper<SnippetTag>('snippet_tag').insert({
         name: tagName,
@@ -148,11 +150,13 @@ export async function deleteSnippet(id: string) {
 /**
  * 新增代码片段
  * @param name 名称
+ * @param content 内容
+ * @param language 语言
  */
-export async function addSnippet(name: string) {
+export async function addSnippet(name: string, content?: string, language = 'javascript') {
   await useSql().beginTransaction(async (sql) => {
     // 新增代码片段元数据
-    const newMeta =  await sql.mapper<SnippetMeta>('snippet_meta').insert({
+    const newMeta = await sql.mapper<SnippetMeta>('snippet_meta').insert({
       name,
       created_at: Date.now(),
       updated_at: Date.now()
@@ -160,8 +164,8 @@ export async function addSnippet(name: string) {
     // 新增代码片段内容
     await sql.mapper<SnippetContent>('snippet_content').insertSelf({
       id: newMeta.id,
-      language: 'javascript',
-      content: '',
+      language: language,
+      content: content || '',
     })
   })
 }
@@ -175,8 +179,8 @@ export async function addSnippet(name: string) {
 export async function updateSnippetContent(id: string, content: string, language: string) {
   await useSql().beginTransaction(async (sql) => {
     // 更新内容
-    await sql.mapper<SnippetContent>('snippet_content').updateById(id, { content, language });
+    await sql.mapper<SnippetContent>('snippet_content').updateById(id, {content, language});
     // 更新元数据时间
-    await sql.mapper<SnippetMeta>('snippet_meta').updateById(id, { updated_at: Date.now() });
+    await sql.mapper<SnippetMeta>('snippet_meta').updateById(id, {updated_at: Date.now()});
   });
 }

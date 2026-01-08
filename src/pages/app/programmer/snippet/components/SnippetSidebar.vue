@@ -2,17 +2,20 @@
   <t-aside class="snippet-aside">
     <div class="aside-header">
       <app-tool-back variant="outline" size="small"/>
-      <t-button theme="primary" size="small" class="!ml-auto" @click="handleAddSnippet">
+      <t-button theme="primary" size="small" shape="square" class="!ml-auto" @click="handleAddSnippet">
         <template #icon>
           <add-icon />
         </template>
-        新增
       </t-button>
-      <t-button size="small" variant="text" class="ml-8px" @click="showSearch = !showSearch">
+      <t-button theme="default" size="small" shape="square" class="ml-8px" @click="handleOpenUpload">
+        <template #icon>
+          <upload-icon />
+        </template>
+      </t-button>
+      <t-button size="small" variant="text" shape="square" class="ml-8px" @click="showSearch = !showSearch">
         <template #icon>
           <search-icon />
         </template>
-        搜索
       </t-button>
     </div>
     
@@ -71,13 +74,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { AddIcon, SearchIcon } from 'tdesign-icons-vue-next';
+import { AddIcon, SearchIcon, UploadIcon } from 'tdesign-icons-vue-next';
 import { pageSnippet } from '@/services/SnippetService';
 import type { SnippetMetaWithTag } from '@/services/SnippetService';
 import MessageUtil from '@/util/model/MessageUtil';
 import dayjs from 'dayjs';
-import { openSnippetEdit, openSnippetContextmenu } from '../func/SnippetEdit';
+import { openSnippetEdit, openSnippetContextmenu, openSnippetUploadImport } from '../func/SnippetEdit';
 
 defineProps<{
   currentSnippetId?: string;
@@ -115,6 +117,8 @@ const loadSnippets = async (reset = false) => {
       currentPage.value,
       pageSize
     );
+
+    console.log(result)
     
     if (reset) {
       snippetList.value = result.records;
@@ -154,6 +158,10 @@ const handleAddSnippet = () => {
 
 const handleContextMenu = (item: SnippetMetaWithTag, e: PointerEvent) => {
   openSnippetContextmenu(item, e, refresh);
+};
+
+const handleOpenUpload = () => {
+  openSnippetUploadImport(refresh);
 };
 
 const refresh = () => {

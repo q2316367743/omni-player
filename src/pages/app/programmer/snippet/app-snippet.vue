@@ -10,6 +10,7 @@
       ref="contentRef"
       @deleted="handleSnippetDeleted"
       @renamed="handleSnippetRenamed"
+      @tags-updated="handleSnippetTagsUpdated"
     />
   </t-layout>
 </template>
@@ -25,7 +26,7 @@ type SidebarInstance = InstanceType<typeof SnippetSidebar> & {
 };
 
 type ContentInstance = InstanceType<typeof SnippetContent> & {
-  loadSnippet: (id: string) => void;
+  loadSnippet: (id: string | undefined) => void;
 };
 
 const sidebarRef = ref<SidebarInstance>();
@@ -52,6 +53,11 @@ const handleSnippetRenamed = (name: string) => {
   if (currentSnippet.value) {
     currentSnippet.value.name = name;
   }
+  sidebarRef.value?.refresh();
+};
+
+const handleSnippetTagsUpdated = () => {
+  sidebarRef.value?.refresh();
 };
 </script>
 
