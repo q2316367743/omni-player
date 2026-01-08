@@ -67,6 +67,11 @@
             <video-icon/>
           </template>
         </tool-card>
+        <tool-card value="online/image" label="随机图片" desc="随机图片" tone="online">
+          <template #icon>
+            <image-icon />
+          </template>
+        </tool-card>
       </div>
     </div>
 
@@ -99,7 +104,7 @@
 import {
   ArticleIcon,
   CheckRectangleIcon,
-  CodeIcon, CommandIcon, Edit1Icon,
+  CodeIcon, CommandIcon, Edit1Icon, ImageIcon,
   InternetIcon, MoneyIcon, PortraitIcon,
   TranslateIcon,
   VideoIcon

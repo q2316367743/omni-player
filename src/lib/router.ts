@@ -140,6 +140,15 @@ export const router = createRouter({
         path: "homebrew",
         component: () => import("@/pages/app/system/homebrew/app-system-homebrew.vue")
       }]
+    }, {
+      name: "AppOnline",
+      path: "online",
+      component: () => import('@/pages/app/online/index.vue'),
+      children: [{
+        name: "AppOnlineImage",
+        path: "image",
+        component: () => import('@/pages/app/online/image/app-online-image.vue')
+      }]
     }]
   }]
 });
