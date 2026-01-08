@@ -23,6 +23,9 @@ export const SUPPORT_MOVIE = /mp4|mkv|flv/i
 export const DB_MIGRATE_FILES = [{
   file: 'lib/migrate/0000_init.sql',
   version: 0
+}, {
+  file: 'lib/migrate/0001.sql',
+  version: 1
 }];
 
 export const [collapsed, toggleCollapsed] = useBoolState( false);

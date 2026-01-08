@@ -1,12 +1,7 @@
 <template>
   <div class="app-layout">
     <div class="app-layout-header">
-      <t-button theme="primary" variant="text" shape="square"
-                @click="goBack()">
-        <template #icon>
-          <chevron-left-icon/>
-        </template>
-      </t-button>
+      <app-tool-back />
       <slot v-if="slot.title" name="title"/>
       <div v-else>{{ title }}</div>
       <div class="ml-auto mr-32px">
@@ -19,7 +14,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {ChevronLeftIcon} from "tdesign-icons-vue-next";
 import type { JSX } from "vue/jsx-runtime";
 
 defineProps({
@@ -30,9 +24,6 @@ const slot = defineSlots<{
   title: () => JSX.Element,
   action: () => JSX.Element
 }>()
-
-const router = useRouter();
-const goBack = () => router.back();
 </script>
 <style scoped lang="less">
 .app-layout {

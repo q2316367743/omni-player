@@ -12,6 +12,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AppToolBack: typeof import('./src/components/PageLayout/AppToolBack.vue')['default']
     AppToolLayout: typeof import('./src/components/PageLayout/AppToolLayout.vue')['default']
     ArtPlayer: typeof import('./src/components/VideoPlayer/ArtPlayer.vue')['default']
     CustomeWebview: typeof import('./src/components/webview/CustomeWebview.vue')['default']
@@ -77,6 +78,7 @@ declare module 'vue' {
     TTabPanel: typeof import('tdesign-vue-next')['TabPanel']
     TTabs: typeof import('tdesign-vue-next')['Tabs']
     TTag: typeof import('tdesign-vue-next')['Tag']
+    TTagInput: typeof import('tdesign-vue-next')['TagInput']
     TTextarea: typeof import('tdesign-vue-next')['Textarea']
     TTooltip: typeof import('tdesign-vue-next')['Tooltip']
     UtoolsWebview: typeof import('./src/components/webview/UtoolsWebview.vue')['default']
@@ -86,6 +88,7 @@ declare module 'vue' {
 
 // For TSX support
 declare global {
+  const AppToolBack: typeof import('./src/components/PageLayout/AppToolBack.vue')['default']
   const AppToolLayout: typeof import('./src/components/PageLayout/AppToolLayout.vue')['default']
   const ArtPlayer: typeof import('./src/components/VideoPlayer/ArtPlayer.vue')['default']
   const CustomeWebview: typeof import('./src/components/webview/CustomeWebview.vue')['default']
@@ -151,6 +154,7 @@ declare global {
   const TTabPanel: typeof import('tdesign-vue-next')['TabPanel']
   const TTabs: typeof import('tdesign-vue-next')['Tabs']
   const TTag: typeof import('tdesign-vue-next')['Tag']
+  const TTagInput: typeof import('tdesign-vue-next')['TagInput']
   const TTextarea: typeof import('tdesign-vue-next')['Textarea']
   const TTooltip: typeof import('tdesign-vue-next')['Tooltip']
   const UtoolsWebview: typeof import('./src/components/webview/UtoolsWebview.vue')['default']

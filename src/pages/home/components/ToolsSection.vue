@@ -20,6 +20,11 @@
             <internet-icon/>
           </template>
         </mini-tool-card>
+        <mini-tool-card value="programmer/snippet" label="代码片段" tone="regex">
+          <template #icon>
+            <code1-icon />
+          </template>
+        </mini-tool-card>
         <mini-tool-card value="programmer/command" label="命令助手" tone="regex">
           <template #icon>
             <command-icon />
@@ -51,27 +56,27 @@
 
     <div class="tools-group">
       <div class="group-title">在线工具</div>
-      <div class="tools-grid">
-        <tool-card value="fanyi" label="在线翻译" desc="在线双向翻译" tone="online">
+      <div class="tools-grid mini-tools-grid">
+        <mini-tool-card value="fanyi" label="在线翻译" desc="在线双向翻译" tone="online">
           <template #icon>
             <translate-icon/>
           </template>
-        </tool-card>
-        <tool-card value="dailyhot" label="今日热搜" desc="查看各大榜单的今日热榜排行" tone="online">
+        </mini-tool-card>
+        <mini-tool-card value="dailyhot" label="今日热搜" desc="查看各大榜单的今日热榜排行" tone="online">
           <template #icon>
             <article-icon/>
           </template>
-        </tool-card>
-        <tool-card value="qushuiyin" label="去水印" desc="视频图片水印去除" tone="online">
+        </mini-tool-card>
+        <mini-tool-card value="qushuiyin" label="去水印" desc="视频图片水印去除" tone="online">
           <template #icon>
             <video-icon/>
           </template>
-        </tool-card>
-        <tool-card value="online/image" label="随机图片" desc="随机图片" tone="online">
+        </mini-tool-card>
+        <mini-tool-card value="online/image" label="随机图片" desc="随机图片" tone="online">
           <template #icon>
             <image-icon />
           </template>
-        </tool-card>
+        </mini-tool-card>
       </div>
     </div>
 
@@ -103,7 +108,7 @@
 <script lang="ts" setup>
 import {
   ArticleIcon,
-  CheckRectangleIcon,
+  CheckRectangleIcon, Code1Icon,
   CodeIcon, CommandIcon, Edit1Icon, ImageIcon,
   InternetIcon, MoneyIcon, PortraitIcon,
   TranslateIcon,
