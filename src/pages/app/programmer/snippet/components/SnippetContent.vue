@@ -44,7 +44,7 @@
       <div class="editor-wrapper">
         <monaco-editor
           v-model="snippet.content"
-          :language="snippet.language as any"
+          :language="snippet.language"
           height="100%"
         />
       </div>
@@ -70,18 +70,12 @@ import MessageUtil from '@/util/model/MessageUtil';
 import MessageBoxUtil from '@/util/model/MessageBoxUtil';
 import {debounce} from 'es-toolkit';
 import {openTagEdit} from '@/pages/app/programmer/snippet/func/SnippetEdit';
+import {MONACO_LANGUAGES} from '@/util/monaco-languages.ts';
 
-const LANGUAGE_OPTIONS = [
-  { label: 'JavaScript', value: 'js' as const },
-  { label: 'TypeScript', value: 'ts' as const },
-  { label: 'HTML', value: 'html' as const },
-  { label: 'CSS', value: 'css' as const },
-  { label: 'JSON', value: 'json' as const },
-  { label: 'XML', value: 'xml' as const },
-  { label: 'Markdown', value: 'markdown' as const },
-  { label: 'Nginx', value: 'nginx' as const },
-  { label: 'Plain Text', value: 'plaintext' as const }
-];
+const LANGUAGE_OPTIONS = MONACO_LANGUAGES.map(lang => ({
+  label: lang.charAt(0).toUpperCase() + lang.slice(1).replace(/([A-Z])/g, ' $1').trim(),
+  value: lang
+}));
 
 const languageOptions = LANGUAGE_OPTIONS;
 

@@ -5,10 +5,11 @@
 <script setup lang="ts">
 import * as monaco from 'monaco-editor';
 import {isDark} from "@/global/Constants.ts"
+import type {MonacoLanguage} from "@/util/monaco-languages.ts"
 
 interface Props {
   modelValue: string;
-  language: 'plaintext' | 'json' | 'html' | 'javascript' | 'xml' | 'css' | 'markdown' | 'nginx';
+  language: MonacoLanguage;
   readonly?: boolean;
   height?: string;
 }
