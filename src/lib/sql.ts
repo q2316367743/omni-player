@@ -6,6 +6,13 @@ import {logError, logInfo} from "@/lib/log.ts";
 import {QueryChain} from "@/util/file/QueryWrapper.ts";
 import {BaseMapper, generatePlaceholders, type TableLike} from "@/util";
 
+export type TableName =
+  | 'analysis_session'
+  | 'analysis_transaction'
+  | 'subscribe_item'
+  | 'feed_item'
+  | 'feed_content';
+
 export class SqlWrapper {
 
   private db: Database | null = null;
@@ -34,8 +41,10 @@ export class SqlWrapper {
 
     // 更新执行链：下一个操作必须等这个完成
     this.executionChain = result.then(
-      () => {}, // 成功时继续
-      () => {}  // 失败也继续（避免链断裂）
+      () => {
+      }, // 成功时继续
+      () => {
+      }  // 失败也继续（避免链断裂）
     );
 
     // 返回原始结果（带类型）
@@ -121,11 +130,11 @@ export class SqlWrapper {
     }
   }
 
-  query<T extends TableLike>(tableName: string) {
+  query<T extends TableLike>(tableName: TableName) {
     return new QueryChain<T>(tableName, this);
   }
 
-  mapper<T extends TableLike>(tableName: string) {
+  mapper<T extends TableLike>(tableName: TableName) {
     return new BaseMapper<T>(tableName, this);
   }
 

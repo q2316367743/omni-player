@@ -3,7 +3,6 @@ import type {SubscribeItem} from "@/entity/subscribe";
 import {listSubscribe} from "@/services";
 import {LocalName} from "@/global/LocalName.ts";
 import {useSql} from "@/lib/sql.ts";
-import {TableName} from "@/global/TableName.ts";
 
 export interface TreeNode {
   id: string;
@@ -126,7 +125,7 @@ export const useSubscribeStore = defineStore('subscribe', () => {
   });
 
   const read = async (id: string) => {
-    const mapper = await useSql().mapper<SubscribeItem>(TableName.SUBSCRIBE_ITEM);
+    const mapper = useSql().mapper<SubscribeItem>("subscribe_item");
     await mapper.updateById(id, {
       un_read_count: 0
     });

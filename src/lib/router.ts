@@ -103,6 +103,10 @@ export const router = createRouter({
         path: 'snippet',
         component: () => import('@/pages/app/programmer/snippet/app-snippet.vue')
       }, {
+        name: 'AppProgrammerRelease',
+        path: 'release',
+        component: () => import('@/pages/app/programmer/release/app-release.vue')
+      }, {
         name: 'AppProgrammerCommand',
         path: 'command',
         component: () => import('@/pages/app/programmer/command/app-command.vue')

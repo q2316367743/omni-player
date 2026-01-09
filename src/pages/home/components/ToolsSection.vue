@@ -6,17 +6,17 @@
       <div class="tools-grid">
         <tool-card value="todo" label="待办" desc="井井有条" tone="media">
           <template #icon>
-            <check-rectangle-icon />
+            <check-rectangle-icon/>
           </template>
         </tool-card>
         <tool-card value="editor" label="笔记" desc="妙笔生花" tone="media">
           <template #icon>
-            <edit1-icon />
+            <edit1-icon/>
           </template>
         </tool-card>
         <tool-card value="bookkeeping" label="记账" desc="精打细算" tone="media">
           <template #icon>
-            <money-icon />
+            <money-icon/>
           </template>
         </tool-card>
       </div>
@@ -30,7 +30,7 @@
             <code-icon/>
           </template>
         </mini-tool-card>
-        <mini-tool-card value="programmer/http" label="简单请求记账" tone="regex">
+        <mini-tool-card value="programmer/http" label="简单请求" tone="regex">
           <template #icon>
             <internet-icon/>
           </template>
@@ -42,12 +42,17 @@
         </mini-tool-card>
         <mini-tool-card value="programmer/snippet" label="代码片段" tone="regex">
           <template #icon>
-            <code1-icon />
+            <code1-icon/>
           </template>
         </mini-tool-card>
         <mini-tool-card value="programmer/command" label="命令助手" tone="regex">
           <template #icon>
-            <command-icon />
+            <command-icon/>
+          </template>
+        </mini-tool-card>
+        <mini-tool-card value="programmer/release" label="发版助手" tone="regex">
+          <template #icon>
+            <git-merge-icon/>
           </template>
         </mini-tool-card>
       </div>
@@ -73,7 +78,7 @@
         </mini-tool-card>
         <mini-tool-card value="online/image" label="随机图片" desc="随机图片" tone="online">
           <template #icon>
-            <image-icon />
+            <image-icon/>
           </template>
         </mini-tool-card>
       </div>
@@ -85,12 +90,12 @@
       <div class="tools-grid mini-tools-grid">
         <mini-tool-card label="端口扫描" value="system/port" tone="todo">
           <template #icon>
-            <portrait-icon />
+            <portrait-icon/>
           </template>
         </mini-tool-card>
         <mini-tool-card v-if="showHomebrew" label="Homebrew" value="system/homebrew" tone="todo">
           <template #icon>
-            <HomebrewIcon />
+            <HomebrewIcon/>
           </template>
         </mini-tool-card>
       </div>
@@ -108,7 +113,7 @@
 import {
   ArticleIcon,
   CheckRectangleIcon, Code1Icon,
-  CodeIcon, CommandIcon, Edit1Icon, ImageIcon,
+  CodeIcon, CommandIcon, Edit1Icon, GitMergeIcon, ImageIcon,
   InternetIcon, MoneyIcon, PortraitIcon,
   TranslateIcon,
   VideoIcon
