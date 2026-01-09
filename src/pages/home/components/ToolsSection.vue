@@ -2,9 +2,29 @@
   <div class="tools-container">
 
     <div class="tools-group">
+      <div class="group-title">程序员三件套</div>
+      <div class="tools-grid">
+        <tool-card value="todo" label="待办" desc="井井有条" tone="media">
+          <template #icon>
+            <check-rectangle-icon />
+          </template>
+        </tool-card>
+        <tool-card value="editor" label="笔记" desc="妙笔生花" tone="media">
+          <template #icon>
+            <edit1-icon />
+          </template>
+        </tool-card>
+        <tool-card value="bookkeeping" label="记账" desc="精打细算" tone="media">
+          <template #icon>
+            <money-icon />
+          </template>
+        </tool-card>
+      </div>
+    </div>
+
+    <div class="tools-group">
       <div class="group-title">程序员套件</div>
       <div class="tools-grid mini-tools-grid">
-
         <mini-tool-card value="programmer/regex" label="正则表达式" tone="regex">
           <template #icon>
             <code-icon/>
@@ -30,27 +50,6 @@
             <command-icon />
           </template>
         </mini-tool-card>
-      </div>
-    </div>
-
-    <div class="tools-group">
-      <div class="group-title">程序员三件套</div>
-      <div class="tools-grid">
-        <tool-card value="todo" label="待办" desc="井井有条" tone="todo">
-          <template #icon>
-            <check-rectangle-icon />
-          </template>
-        </tool-card>
-        <tool-card value="editor" label="笔记" desc="妙笔生花" tone="todo">
-          <template #icon>
-            <edit1-icon />
-          </template>
-        </tool-card>
-        <tool-card value="bookkeeping" label="记账" desc="精打细算" tone="todo">
-          <template #icon>
-            <money-icon />
-          </template>
-        </tool-card>
       </div>
     </div>
 
@@ -83,17 +82,17 @@
 
     <div class="tools-group">
       <div class="group-title">系统工具</div>
-      <div class="tools-grid">
-        <tool-card label="端口扫描" value="system/port" desc="看看哪个端口在占用" tone="media">
+      <div class="tools-grid mini-tools-grid">
+        <mini-tool-card label="端口扫描" value="system/port" tone="todo">
           <template #icon>
             <portrait-icon />
           </template>
-        </tool-card>
-        <tool-card v-if="showHomebrew" label="Homebrew" value="system/homebrew" desc="Homebrew 可视化" tone="media">
+        </mini-tool-card>
+        <mini-tool-card v-if="showHomebrew" label="Homebrew" value="system/homebrew" tone="todo">
           <template #icon>
             <HomebrewIcon />
           </template>
-        </tool-card>
+        </mini-tool-card>
       </div>
     </div>
 
