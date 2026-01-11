@@ -283,6 +283,7 @@ const handleDelete = async () => {
     editorContent.value = '';
     items.value = items.value.filter(e => e.id !== selectedAsset.value?.id);
     MessageUtil.success("删除成功");
+    await loadAssets();
   } catch (error) {
     MessageUtil.error("删除失败", error);
   }

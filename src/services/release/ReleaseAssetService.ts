@@ -25,23 +25,23 @@ export async function listReleaseAssetMeta(projectId: string, scope: ReleaseAsse
  */
 export async function addReleaseAsset(projectId: string, scope: ReleaseAssetMetaScope, scopeId: string, meta: ReleaseAssetMetaCore) {
   // await useSql().beginTransaction(async sql => {
-    const now = Date.now();
-    const {id} = await useSql().mapper<ReleaseAssetMeta>('release_asset_meta').insert({
-      project_id: projectId,
-      scope: scope,
-      scope_id: scopeId,
-      created_at: now,
-      updated_at: now,
-      ...meta
-    });
-    await useSql().mapper<ReleaseAssetContent>('release_asset_content').insertSelf({
-      id,
-      created_at: now,
-      updated_at: now,
-      content: '',
-      project_id: projectId,
-      language: meta.file_type === 'sql' ? 'sql' : (meta.file_type === 'document' ? 'markdown' : 'plaintext')
-    })
+  const now = Date.now();
+  const {id} = await useSql().mapper<ReleaseAssetMeta>('release_asset_meta').insert({
+    project_id: projectId,
+    scope: scope,
+    scope_id: scopeId,
+    created_at: now,
+    updated_at: now,
+    ...meta
+  });
+  await useSql().mapper<ReleaseAssetContent>('release_asset_content').insertSelf({
+    id,
+    created_at: now,
+    updated_at: now,
+    content: '',
+    project_id: projectId,
+    language: meta.file_type === 'sql' ? 'sql' : (meta.file_type === 'document' ? 'markdown' : 'plaintext')
+  })
   // })
 }
 
@@ -85,8 +85,6 @@ export async function getReleaseAssetContent(id: string) {
  * @param id 附件 ID
  */
 export async function deleteReleaseAsset(id: string) {
-  await useSql().beginTransaction(async sql => {
-    await sql.mapper<ReleaseAssetMeta>('release_asset_meta').deleteById(id);
-    await sql.mapper<ReleaseAssetContent>('release_asset_content').deleteById(id);
-  })
+  await useSql().mapper<ReleaseAssetMeta>('release_asset_meta').deleteById(id);
+  await useSql().mapper<ReleaseAssetContent>('release_asset_content').deleteById(id);
 }

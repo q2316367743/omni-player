@@ -1,6 +1,6 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 
-export interface ReleaseDeploy extends BaseEntity {
+export interface ReleaseDeployCore {
 
   /**
    * 所属项目
@@ -16,4 +16,7 @@ export interface ReleaseDeploy extends BaseEntity {
    * 发版实例
    */
   instance_id: string;
+}
+
+export interface ReleaseDeploy extends BaseEntity, ReleaseDeployCore {
 }
