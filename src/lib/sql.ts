@@ -2,16 +2,28 @@ import Database, {type QueryResult} from '@tauri-apps/plugin-sql';
 import {resolveResource} from '@tauri-apps/api/path';
 import {readTextFile} from '@tauri-apps/plugin-fs';
 import {APP_DATA_DB_PATH, DB_MIGRATE_FILES} from "@/global/Constants.ts";
-import {logError, logInfo} from "@/lib/log.ts";
+import {logDebug, logError, logInfo} from "@/lib/log.ts";
 import {QueryChain} from "@/util/file/QueryWrapper.ts";
 import {BaseMapper, generatePlaceholders, type TableLike} from "@/util";
 
 export type TableName =
+  | 'analysis_category'
   | 'analysis_session'
   | 'analysis_transaction'
   | 'subscribe_item'
   | 'feed_item'
-  | 'feed_content';
+  | 'feed_content'
+  | 'snippet_meta'
+  | 'snippet_tag'
+  | 'snippet_tags'
+  | 'snippet_content'
+  | 'release_project'
+  | 'release_version'
+  | 'release_version_log'
+  | 'release_instance'
+  | 'release_deploy'
+  | 'release_asset_meta'
+  | 'release_asset_content';
 
 export class SqlWrapper {
 
@@ -54,11 +66,14 @@ export class SqlWrapper {
   // 开启一个事务
   async beginTransaction<T = any>(callback: (sql: SqlWrapper) => Promise<T>): Promise<T> {
     try {
+      logDebug("begin transaction")
       await this.db!.execute(`BEGIN`);
       const r = await callback(this);
+      logDebug("commit transaction")
       await this.db!.execute(`COMMIT`);
       return r;
     } catch (e) {
+      logError("rollback transaction")
       await this.db!.execute(`ROLLBACK`);
       throw e;
     }

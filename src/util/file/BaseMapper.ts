@@ -74,7 +74,7 @@ export class BaseMapper<T extends TableLike> {
     const id = useSnowflake().nextId();
     values.unshift(id)
     logDebug("insert sql:\t\t" + sql);
-    logDebug("insert values:\t" + values);
+    logDebug("insert values:\t" + JSON.stringify(values));
     const r = await this.db.execute(sql, values);
     logDebug("insert result:\t" + r.rowsAffected);
     return {
@@ -119,7 +119,7 @@ export class BaseMapper<T extends TableLike> {
                  values ${valuePlaceholders}`;
 
     logDebug("insertBatch sql:\t" + sql);
-    logDebug("insertBatch values:\t" + allValues);
+    logDebug("insertBatch values:\t" + JSON.stringify(allValues));
 
     const r = await this.db.execute(sql, allValues);
     logDebug("insertBatch result:\t" + r.rowsAffected);
@@ -139,7 +139,7 @@ export class BaseMapper<T extends TableLike> {
     )})
                  values (${generatePlaceholders(query.length)})`;
     logDebug("insert sql:\t\t" + sql);
-    logDebug("insert values:\t" + values);
+    logDebug("insert values:\t" + JSON.stringify(values));
     const r = await this.db.execute(sql, values);
     logDebug("insert result:\t" + r.rowsAffected);
   }
