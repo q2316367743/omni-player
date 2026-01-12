@@ -56,14 +56,14 @@ CREATE UNIQUE INDEX idx_release_project_name_uindex ON release_project (name);
 -- 版本表（ReleaseVersion）
 CREATE TABLE release_version
 (
-    id          TEXT PRIMARY KEY,
-    created_at  INTEGER NOT NULL,
-    updated_at  INTEGER NOT NULL,
+    id           TEXT PRIMARY KEY,
+    created_at   INTEGER NOT NULL,
+    updated_at   INTEGER NOT NULL,
 
-    project_id  TEXT    NOT NULL,
-    version     TEXT    NOT NULL,
-    deploy_time INTEGER NOT NULL,
-    deploy_user TEXT    NOT NULL,
+    project_id   TEXT    NOT NULL,
+    version      TEXT    NOT NULL,
+    publish_time INTEGER NOT NULL,
+    publish_user TEXT    NOT NULL,
     FOREIGN KEY (project_id) REFERENCES release_project (id) ON DELETE CASCADE
 );
 
@@ -111,6 +111,10 @@ CREATE TABLE release_deploy
     project_id  TEXT    NOT NULL,
     version_id  TEXT    NOT NULL,
     instance_id TEXT    NOT NULL,
+
+    deploy_time INTEGER NOT NULL,
+    deploy_user TEXT    NOT NULL,
+
     FOREIGN KEY (project_id) REFERENCES release_project (id) ON DELETE CASCADE,
     FOREIGN KEY (version_id) REFERENCES release_version (id) ON DELETE CASCADE,
     FOREIGN KEY (instance_id) REFERENCES release_instance (id) ON DELETE CASCADE

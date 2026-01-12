@@ -22,7 +22,7 @@ export async function openReleaseVersionInfo(projectId: string, versionId: strin
     footer: false,
     placement: "center",
     width: '80vw',
-    dialogClassName: "release-instance-info",
+    dialogClassName: "release-version-info",
     default: () => (<Tabs defaultValue={1}>
       <TabPanel label={'基本信息'} value={1}>
         <Descriptions column={1} layout={'vertical'}>
@@ -30,10 +30,10 @@ export async function openReleaseVersionInfo(projectId: string, versionId: strin
             <div class={'info-item-value'}>{version.value?.version}</div>
           </DescriptionsItem>
           <DescriptionsItem label={'部署人'}>
-            <div class={'info-item-value'}>{version.value?.deploy_user}</div>
+            <div class={'info-item-value'}>{version.value?.publish_user}</div>
           </DescriptionsItem>
           <DescriptionsItem label={'部署时间'}>
-            <div class={'info-item-value'}>{version.value?.deploy_time ? new Date(version.value.deploy_time).toLocaleString() : ''}</div>
+            <div class={'info-item-value'}>{version.value?.publish_time ? new Date(version.value.publish_time).toLocaleString() : ''}</div>
           </DescriptionsItem>
         </Descriptions>
       </TabPanel>

@@ -51,12 +51,12 @@ export class MapWrapper<K, V> extends Map<K, V> {
  */
 export function map<T extends Record<string, any>, K extends T[A], A extends keyof T>(
   arr: T[],
-  attrName: A,
+  attrName: A | ((a: T) => string),
   merge?: (item1: T, item2: T) => T
 ): MapWrapper<K, T> {
   const result = new MapWrapper<K, T>();
   for (const item of arr) {
-    const key = item[attrName];
+    const key = (typeof attrName ==='function' ? attrName(item) : item[attrName]) as any;
     const old = result.get(key);
     if (old) {
       if (merge) {

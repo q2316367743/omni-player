@@ -17,6 +17,21 @@ export async function listReleaseAssetMeta(projectId: string, scope: ReleaseAsse
 }
 
 /**
+ * 获取附件列表
+ * @param projectId 项目 ID
+ * @param scope 作用域
+ * @param scopeIds 作用域 IDs
+ */
+export async function listReleaseAssetMetas(projectId: string, scope: ReleaseAssetMetaScope, scopeIds: Array<string>) {
+  return useSql().query<ReleaseAssetMeta>('release_asset_meta')
+    .eq('project_id', projectId)
+    .eq('scope', scope)
+    .in('scope_id', scopeIds)
+    .list()
+}
+
+
+/**
  * 添加附件
  * @param projectId 项目 ID
  * @param scope 作用域

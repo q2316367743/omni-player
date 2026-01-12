@@ -15,8 +15,8 @@ import {cloneDeep} from "es-toolkit";
 export function openReleaseVersionAdd(projectId: string, onUpdate: () => void) {
   const data = ref<ReleaseVersionCore>({
     version: '',
-    deploy_time: Date.now(),
-    deploy_user: ''
+    publish_time: Date.now(),
+    publish_user: ''
   });
   const dp = DialogPlugin({
     header: '新增版本',
@@ -26,10 +26,10 @@ export function openReleaseVersionAdd(projectId: string, onUpdate: () => void) {
         <Input placeholder={'请输入版本号'} v-model={data.value.version}/>
       </FormItem>
       <FormItem label={'部署人'} labelAlign={'top'}>
-        <Input placeholder={'请输入部署人'} v-model={data.value.deploy_user}/>
+        <Input placeholder={'请输入部署人'} v-model={data.value.publish_user}/>
       </FormItem>
       <FormItem label={'部署时间'} labelAlign={'top'}>
-        <DatePicker placeholder={'请选择部署时间'} v-model={data.value.deploy_time}/>
+        <DatePicker placeholder={'请选择部署时间'} v-model={data.value.publish_time}/>
       </FormItem>
     </Form>),
     onConfirm() {
@@ -56,10 +56,10 @@ export function openReleaseVersionUpdate(version: ReleaseVersion, onUpdate: () =
         <Input placeholder={'请输入版本号'} v-model={data.value.version}/>
       </FormItem>
       <FormItem label={'部署人'} labelAlign={'top'}>
-        <Input placeholder={'请输入部署人'} v-model={data.value.deploy_user}/>
+        <Input placeholder={'请输入部署人'} v-model={data.value.publish_user}/>
       </FormItem>
       <FormItem label={'部署时间'} labelAlign={'top'}>
-        <t-date-picker placeholder={'请选择部署时间'} v-model={data.value.deploy_time}/>
+        <t-date-picker placeholder={'请选择部署时间'} v-model={data.value.publish_time}/>
       </FormItem>
     </Form>),
     onConfirm() {

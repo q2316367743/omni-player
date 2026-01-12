@@ -2,7 +2,10 @@ import type {ReleaseVersion, ReleaseVersionCore} from "@/entity/release/ReleaseV
 import {useSql} from "@/lib/sql.ts";
 
 export async function listReleaseVersionService(projectId: string) {
-  return useSql().query<ReleaseVersion>('release_version').eq('project_id', projectId).list();
+  return useSql().query<ReleaseVersion>('release_version')
+    .eq('project_id', projectId)
+    .orderByAsc('publish_time')
+    .list();
 }
 
 export async function getReleaseVersionService(id: string, projectId: string) {
@@ -21,12 +24,28 @@ export async function addReleaseVersionService(projectId: string, version: Parti
 export async function updateReleaseVersionService(id: string, version: Partial<ReleaseVersionCore>) {
   return useSql().mapper<ReleaseVersion>('release_version').updateById(id, {
     version: version.version,
-    deploy_time: version.deploy_time,
-    deploy_user: version.deploy_user,
+    publish_time: version.publish_time,
+    publish_user: version.publish_user,
     updated_at: Date.now()
   });
 }
 
 export async function deleteReleaseVersionService(id: string) {
   return useSql().mapper<ReleaseVersion>('release_version').deleteById(id);
+}
+
+interface ReleaseVersionDeployProp {
+  projectId: string;
+  deployTimeStart: number;
+  deployTimeEnd: number;
+
+}
+
+export async function listReleaseVersionDeploy(props: ReleaseVersionDeployProp) {
+  return useSql().query<ReleaseVersion>('release_version')
+    .eq('project_id', props.projectId)
+    .ge('publish_time', props.deployTimeStart)
+    .le('publish_time', props.deployTimeEnd)
+    .orderByAsc('publish_time')
+    .list();
 }

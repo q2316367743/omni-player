@@ -2,8 +2,8 @@ import type {BaseEntity} from "@/entity/BaseEntity.ts";
 
 export interface ReleaseVersionCore {
   version: string;
-  deploy_time: number;
-  deploy_user: string;
+  publish_time: number;
+  publish_user: string;
 }
 
 /**
