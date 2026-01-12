@@ -32,11 +32,13 @@ export async function openReleaseDeployInfo(prop: ReleaseDeployInfoProp) {
     MessageUtil.error("无法获取版本发布时间");
     return;
   }
-  const versionSet = new Set(deployItems.filter(e => e.instance_id === deploy.instance_id).map(e => e.version_id));
+  const versionSet = new Set(deployItems
+    .filter(e => e.instance_id === deploy.instance_id && e.id !== deploy.id)
+    .map(e => e.version_id));
   for (let i = versions.length - 1; i >= 0; i--) {
     const v = versions[i];
     if (!v) continue;
-    if (versionSet.has(v.id!)) {
+    if (versionSet.has(v.id)) {
       startTime = v.publish_time;
       break;
     }
