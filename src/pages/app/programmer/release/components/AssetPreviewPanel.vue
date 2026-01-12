@@ -3,6 +3,7 @@
     <div class="asset-sidebar">
       <AssetTree
         :assets="assets"
+        :version-assets="versionAssets"
         :selected-id="selectedId"
         @update:selected-id="onSelect"
       />
@@ -21,9 +22,12 @@ import type {ReleaseAssetMeta} from "@/entity/release/ReleaseAssetMeta.ts";
 import AssetTree from "@/pages/app/programmer/release/components/AssetTree.vue";
 import AssetPreview from "@/pages/app/programmer/release/components/AssetPreview.vue";
 
-defineProps<{
+interface Props {
   assets: Array<ReleaseAssetMeta>;
-}>();
+  versionAssets?: Map<string, { version: string; assets: Array<ReleaseAssetMeta> }>;
+}
+
+defineProps<Props>();
 
 const selectedId = ref('');
 

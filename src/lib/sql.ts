@@ -69,11 +69,12 @@ export class SqlWrapper {
       logDebug("begin transaction")
       await this.db!.execute(`BEGIN`);
       const r = await callback(this);
-      logDebug("auto commit transaction")
-      // await this.db!.execute(`COMMIT`);
+      logDebug("commit transaction")
+      await this.db!.execute(`COMMIT`);
       return r;
     } catch (e) {
       logError("rollback transaction")
+      console.error(e)
       await this.db!.execute(`ROLLBACK`);
       throw e;
     }

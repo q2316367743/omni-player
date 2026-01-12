@@ -83,12 +83,18 @@ export async function openReleaseDeployInfo(prop: ReleaseDeployInfoProp) {
             <TabPanel label={'更新日志'} value={1}>
               <VersionTimeline versions={allVersions} logMap={versionLogMap.value}/>
             </TabPanel>
-            <TabPanel label={'更新物料'} value={2}>
+            <TabPanel label={'更新物料'} value={2} destroyOnHide>
               <AssetPreviewPanel
                 assets={Array.from(assetMetaVersionMap.value.values()).flat()}
+                versionAssets={new Map(
+                  Array.from(assetMetaVersionMap.value.entries()).map(([versionId, assets]) => [
+                    versionId,
+                    { version: versionMap.get(versionId)?.version ?? versionId, assets }
+                  ])
+                )}
               />
             </TabPanel>
-            <TabPanel label={'实例物料'} value={3}>
+            <TabPanel label={'实例物料'} value={3} destroyOnHide>
               <AssetPreviewPanel
                 assets={assetMetaInstances.value}
               />

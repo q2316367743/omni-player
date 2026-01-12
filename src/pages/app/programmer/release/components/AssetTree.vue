@@ -12,10 +12,10 @@
       >
         <template #label="{ node }">
           <div class="tree-node-label">
-            <t-icon v-if="node.data.type === 'document'" name="file-word" size="16px"/>
-            <t-icon v-else-if="node.data.type === 'sql'" name="file-code" size="16px"/>
-            <t-icon v-else-if="node.data.type === 'other'" name="file" size="16px"/>
-            <t-icon v-else name="folder" size="16px"/>
+            <file-word-icon v-if="node.data.type === 'document'"/>
+            <file-code-icon v-else-if="node.data.type === 'sql'"/>
+            <file-icon v-else-if="node.data.type === 'other'"/>
+            <folder-icon v-else/>
             <span>{{ node.label }}</span>
           </div>
         </template>
@@ -26,10 +26,12 @@
 
 <script lang="ts" setup>
 import type {ReleaseAssetMeta} from "@/entity/release/ReleaseAssetMeta.ts";
+import {FileCodeIcon, FileIcon, FileWordIcon, FolderIcon} from "tdesign-icons-vue-next";
 
 interface Props {
   assets: Array<ReleaseAssetMeta>;
   selectedId: string;
+  versionAssets?: Map<string, { version: string; assets: Array<ReleaseAssetMeta> }>;
 }
 
 const props = defineProps<Props>();
@@ -41,11 +43,34 @@ const emit = defineEmits<{
 interface TreeNode {
   label: string;
   value: string;
-  type?: 'document' | 'sql' | 'other' | 'folder';
+  type?: 'document' | 'sql' | 'other' | 'folder' | 'version';
   children?: TreeNode[];
 }
 
-const buildTree = (assets: Array<ReleaseAssetMeta>): TreeNode[] => {
+const buildTree = (assets: Array<ReleaseAssetMeta>, versionAssets?: Map<string, {
+  version: string;
+  assets: Array<ReleaseAssetMeta>
+}>): TreeNode[] => {
+  if (versionAssets && versionAssets.size > 0) {
+    const tree: TreeNode[] = [];
+
+    versionAssets.forEach((data, versionId) => {
+      const versionNode: TreeNode = {
+        label: data.version,
+        value: `version-${versionId}`,
+        type: 'version',
+        children: buildAssetTree(data.assets)
+      };
+      tree.push(versionNode);
+    });
+
+    return tree;
+  }
+
+  return buildAssetTree(assets);
+};
+
+const buildAssetTree = (assets: Array<ReleaseAssetMeta>): TreeNode[] => {
   const tree: TreeNode[] = [];
   const nodeMap = new Map<string, TreeNode>();
 
@@ -97,7 +122,7 @@ const buildTree = (assets: Array<ReleaseAssetMeta>): TreeNode[] => {
   return tree;
 };
 
-const treeData = computed(() => buildTree(props.assets));
+const treeData = computed(() => buildTree(props.assets, props.versionAssets));
 
 const onSelect = (value: Array<string | number>) => {
   if (value.length > 0) {

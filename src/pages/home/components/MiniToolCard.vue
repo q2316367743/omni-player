@@ -67,6 +67,12 @@ const jumpTool = () => router.push(`/app/tool/${props.value}`);
     box-shadow: var(--fluent-elevation-1);
   }
 
+  &.disabled {
+    background: var(--td-bg-color-component);
+    color: var(--td-text-color-placeholder);
+    box-shadow: var(--fluent-elevation-1);
+  }
+
   &.media {
     background: linear-gradient(135deg, var(--td-warning-color-4) 0%, var(--td-warning-color-5) 100%);
     color: var(--td-text-color-anti);

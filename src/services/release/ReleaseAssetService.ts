@@ -39,17 +39,17 @@ export async function listReleaseAssetMetas(projectId: string, scope: ReleaseAss
  * @param meta 元数据
  */
 export async function addReleaseAsset(projectId: string, scope: ReleaseAssetMetaScope, scopeId: string, meta: ReleaseAssetMetaCore) {
-  await useSql().beginTransaction(async sql => {
-    const now = Date.now();
-    const {id} = await sql.mapper<ReleaseAssetMeta>('release_asset_meta').insert({
-      project_id: projectId,
-      scope: scope,
-      scope_id: scopeId,
-      created_at: now,
-      updated_at: now,
-      ...meta
-    });
-    await sql.mapper<ReleaseAssetContent>('release_asset_content').insertSelf({
+  const now = Date.now();
+  const {id} = await useSql().mapper<ReleaseAssetMeta>('release_asset_meta').insert({
+    project_id: projectId,
+    scope: scope,
+    scope_id: scopeId,
+    created_at: now,
+    updated_at: now,
+    ...meta
+  });
+  try {
+    await useSql().mapper<ReleaseAssetContent>('release_asset_content').insertSelf({
       id,
       created_at: now,
       updated_at: now,
@@ -57,7 +57,11 @@ export async function addReleaseAsset(projectId: string, scope: ReleaseAssetMeta
       project_id: projectId,
       language: meta.file_type === 'sql' ? 'sql' : (meta.file_type === 'document' ? 'markdown' : 'plaintext')
     })
-  })
+  } catch (e) {
+    // 删除
+    await deleteReleaseAsset(id);
+    throw e
+  }
 }
 
 /**

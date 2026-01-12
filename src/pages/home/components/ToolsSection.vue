@@ -40,19 +40,19 @@
             <internet-icon/>
           </template>
         </mini-tool-card>
+        <mini-tool-card value="programmer/release" label="发版助手" tone="regex">
+          <template #icon>
+            <git-merge-icon/>
+          </template>
+        </mini-tool-card>
         <mini-tool-card value="programmer/snippet" label="代码片段" tone="regex">
           <template #icon>
             <code1-icon/>
           </template>
         </mini-tool-card>
-        <mini-tool-card value="programmer/command" label="命令助手" tone="regex">
+        <mini-tool-card value="programmer/command" label="命令助手" tone="disabled">
           <template #icon>
             <command-icon/>
-          </template>
-        </mini-tool-card>
-        <mini-tool-card value="programmer/release" label="发版助手" tone="regex">
-          <template #icon>
-            <git-merge-icon/>
           </template>
         </mini-tool-card>
       </div>
