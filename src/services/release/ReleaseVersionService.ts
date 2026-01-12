@@ -1,5 +1,6 @@
 import type {ReleaseVersion, ReleaseVersionCore} from "@/entity/release/ReleaseVersion.ts";
 import {useSql} from "@/lib/sql.ts";
+import type {ReleaseVersionLog} from "@/entity/release/ReleaseVersionLog.ts";
 
 export async function listReleaseVersionService(projectId: string) {
   return useSql().query<ReleaseVersion>('release_version')
@@ -13,12 +14,17 @@ export async function getReleaseVersionService(id: string, projectId: string) {
 }
 
 export async function addReleaseVersionService(projectId: string, version: Partial<ReleaseVersionCore>) {
-  return useSql().mapper<ReleaseVersion>('release_version').insert({
+  const {id} = await useSql().mapper<ReleaseVersion>('release_version').insert({
     ...version,
     project_id: projectId,
     created_at: Date.now(),
     updated_at: Date.now()
   });
+  await useSql().mapper<ReleaseVersionLog>('release_version_log').insertSelf({
+    project_id: projectId,
+    id,
+    content: '',
+  })
 }
 
 export async function updateReleaseVersionService(id: string, version: Partial<ReleaseVersionCore>) {

@@ -1,6 +1,14 @@
 import {useSql} from "@/lib/sql.ts";
-import type {ReleaseProject, ReleaseProjectCore} from "@/entity/release/ReleaseProject.ts";
-import type {ReleaseVersion} from "@/entity/release/ReleaseVersion.ts";
+import type {
+  ReleaseProject,
+  ReleaseProjectCore,
+  ReleaseVersion,
+  ReleaseInstance,
+  ReleaseDeploy,
+  ReleaseVersionLog,
+  ReleaseAssetContent,
+  ReleaseAssetMeta
+} from "@/entity/release";
 
 export async function listReleaseProject() {
   const query = useSql().query<ReleaseProject>('release_project');
@@ -19,7 +27,8 @@ export async function addReleaseProject(project: ReleaseProjectCore) {
 export async function updateReleaseProject(id: string, project: Partial<ReleaseProject>) {
   const mapper = useSql().mapper<ReleaseProject>('release_project');
   return mapper.updateById(id, {
-    ...project,
+    name: project.name,
+    desc: project.desc,
     updated_at: Date.now()
   });
 }
@@ -30,10 +39,10 @@ export async function deleteReleaseProject(id: string) {
     // 删除基础信息
     await mapper.deleteById(id);
     await sql.query<ReleaseVersion>('release_version').eq('project_id', id).delete();
-    await sql.query<ReleaseVersion>('release_instance').eq('project_id', id).delete();
-    await sql.query<ReleaseVersion>('release_deploy').eq('project_id', id).delete();
-    await sql.query<ReleaseVersion>('release_version_log').eq('project_id', id).delete();
-    await sql.query<ReleaseVersion>('release_asset_content').eq('project_id', id).delete();
-    await sql.query<ReleaseVersion>('release_asset_meta').eq('project_id', id).delete();
+    await sql.query<ReleaseInstance>('release_instance').eq('project_id', id).delete();
+    await sql.query<ReleaseDeploy>('release_deploy').eq('project_id', id).delete();
+    await sql.query<ReleaseVersionLog>('release_version_log').eq('project_id', id).delete();
+    await sql.query<ReleaseAssetContent>('release_asset_content').eq('project_id', id).delete();
+    await sql.query<ReleaseAssetMeta>('release_asset_meta').eq('project_id', id).delete();
   })
 }

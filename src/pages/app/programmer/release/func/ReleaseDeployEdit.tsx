@@ -3,7 +3,11 @@ import {DatePicker, DialogPlugin, Form, FormItem, Input} from "tdesign-vue-next"
 import {addReleaseDeployService} from "@/services/release";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 
-export function openReleaseDeployAdd(prop: ReleaseDeployBase) {
+interface ReleaseDeployAddProp extends ReleaseDeployBase {
+  onUpdate: () => void
+}
+
+export function openReleaseDeployAdd(prop: ReleaseDeployAddProp) {
   const data = ref<ReleaseDeployCore>({
     ...prop,
     deploy_time: Date.now(),
@@ -25,6 +29,7 @@ export function openReleaseDeployAdd(prop: ReleaseDeployBase) {
         .then(() => {
           MessageUtil.success("发布成功");
           dp.destroy();
+          prop.onUpdate();
         })
         .catch(e => {
           MessageUtil.error("发布失败", e);

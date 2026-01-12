@@ -46,13 +46,13 @@
       z-index: 10;
 
       tr {
-        border-bottom: 1px solid var(--fluent-border-subtle);
         backdrop-filter: var(--fluent-acrylic-blur);
 
         th {
           padding: 12px 16px;
           text-align: center;
           border-right: 1px solid var(--fluent-border-subtle);
+          border-bottom: 1px solid var(--fluent-border-subtle);
           font-weight: 600;
 
           &:last-child {
@@ -110,7 +110,6 @@
 
     tbody {
       tr {
-        border-bottom: 1px solid var(--fluent-border-subtle);
         transition: background var(--fluent-transition-fast);
 
         &:hover {
@@ -121,14 +120,11 @@
           background: var(--fluent-item-hover);
         }
 
-        &:last-child {
-          border-bottom: none;
-        }
-
         td {
           padding: 12px 16px;
           text-align: center;
           border-right: 1px solid var(--fluent-border-subtle);
+          border-bottom: 1px solid var(--fluent-border-subtle);
 
           &:last-child {
             border-right: none;
@@ -156,9 +152,19 @@
               gap: 4px;
 
               .version-number {
-                font-size: 14px;
-                font-weight: 600;
                 color: var(--td-text-color-primary);
+                display: flex;
+                align-items: center;
+                width: 100%;
+
+                .version-title {
+                  font-size: 14px;
+                  font-weight: 600;
+                }
+
+                .version-user {
+                  margin-left: auto;
+                }
               }
 
               .version-meta {
@@ -173,11 +179,6 @@
                   gap: 4px;
                 }
 
-                .version-user {
-                  display: flex;
-                  align-items: center;
-                  gap: 4px;
-                }
               }
             }
           }
@@ -237,8 +238,6 @@
 
     tfoot {
       tr {
-        border-top: 1px solid var(--fluent-border-subtle);
-
         td {
           padding: 8px 12px;
           border-right: 1px solid var(--fluent-border-subtle);

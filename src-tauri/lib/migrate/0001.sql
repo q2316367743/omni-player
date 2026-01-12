@@ -69,7 +69,7 @@ CREATE TABLE release_version
 
 CREATE INDEX idx_release_version_project_id ON release_version (project_id);
 CREATE UNIQUE INDEX idx_release_version_project_id_version_uindex ON release_version (project_id, version);
-CREATE INDEX idx_release_version_project_id_deploy_time ON release_version (project_id, deploy_time);
+CREATE INDEX idx_release_version_project_id_deploy_time ON release_version (project_id, publish_time);
 
 -- 版本日志（ReleaseVersionLog）
 CREATE TABLE release_version_log

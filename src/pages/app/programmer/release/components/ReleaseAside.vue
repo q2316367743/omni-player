@@ -1,7 +1,7 @@
 <template>
   <div class="w-full h-full">
     <div class="header">
-      <t-button @click="openReleaseProjectDialog(handleList)">
+      <t-button block @click="openReleaseProjectDialog(handleList)">
         <template #icon>
           <add-icon/>
         </template>
@@ -14,6 +14,7 @@
         :key="item.id"
         :class="{'list-item': true, active: selectProjectId === item.id}"
         @click="handleSelect(item)"
+        @contextmenu="openReleaseProjectCxt($event, item, onUpdate)"
       >
         <div class="name">{{ item.name }}</div>
         <div class="desc">{{ item.desc }}</div>
@@ -24,7 +25,10 @@
 <script lang="ts" setup>
 import type {ReleaseProject} from "@/entity/release/ReleaseProject.ts";
 import {listReleaseProject} from "@/services/release";
-import {openReleaseProjectDialog} from "@/pages/app/programmer/release/func/ReleaseProjectEdit.tsx";
+import {
+  openReleaseProjectCxt,
+  openReleaseProjectDialog
+} from "@/pages/app/programmer/release/func/ReleaseProjectEdit.tsx";
 import {AddIcon} from "tdesign-icons-vue-next";
 
 defineProps({
@@ -43,6 +47,10 @@ const handleSelect = (item: ReleaseProject) => {
   emit('select', item);
 }
 
+const onUpdate = () => {
+  handleList();
+  emit('select');
+}
 
 tryOnMounted(handleList)
 </script>

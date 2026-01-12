@@ -31,10 +31,12 @@
             @click="openReleaseVersionInfo(version.project_id, version.id)"
             @contextmenu="openReleaseVersionContextmenu(version, listVersion, $event)">
           <div class="version-info">
-            <div class="version-number">{{ version.version }}</div>
+            <div class="version-number">
+              <span class="version-title">{{ version.version }}</span>
+              <t-tag v-if="version.publish_user" variant="outline" theme="primary" class="version-user">{{ version.publish_user }}</t-tag>
+            </div>
             <div class="version-meta">
               <span class="version-time">{{ formatDate(version.publish_time) }}</span>
-              <span class="version-user">{{ version.publish_user }}</span>
             </div>
           </div>
         </td>
@@ -108,7 +110,8 @@ const addDeploy = (instanceId: string, versionId: string) => {
   openReleaseDeployAdd({
     instance_id: instanceId,
     version_id: versionId,
-    project_id: props.select.id
+    project_id: props.select.id,
+    onUpdate: listDeploy
   })
 }
 

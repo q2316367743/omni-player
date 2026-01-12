@@ -6,3 +6,12 @@ export function listReleaseVersionLog(ids: Array<string>) {
     .in('id', ids)
     .list();
 }
+
+export async function getReleaseVersionLog(id: string): Promise<ReleaseVersionLog> {
+  const one = await useSql().query<ReleaseVersionLog>('release_version_log').eq('id', id).one();
+  return one!;
+}
+
+export function saveReleaseVersionLog(id: string, content: string) {
+  return useSql().mapper<ReleaseVersionLog>('release_version_log').updateById(id, {content});
+}

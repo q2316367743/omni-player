@@ -5,10 +5,14 @@ import type {ReleaseAssetMeta} from "@/entity/release/ReleaseAssetMeta.ts";
 import {listReleaseAssetMeta} from "@/services/release/ReleaseAssetService.ts";
 import {Descriptions, DescriptionsItem, DialogPlugin, TabPanel, Tabs} from "tdesign-vue-next";
 import ReleaseAsset from "@/pages/app/programmer/release/components/ReleaseAsset.vue";
+import {getReleaseVersionLog, saveReleaseVersionLog} from "@/services/release";
+import MarkdownEditor from "@/components/common/MarkdownEditor.vue";
+import {logDebug} from "@/lib/log.ts";
 
 export async function openReleaseVersionInfo(projectId: string, versionId: string) {
   const version = ref<ReleaseVersion | null>();
   const metas = ref(new Array<ReleaseAssetMeta>());
+  const content = ref('');
 
   getReleaseVersionService(versionId, projectId)
     .then(res => version.value = res)
@@ -16,6 +20,17 @@ export async function openReleaseVersionInfo(projectId: string, versionId: strin
   listReleaseAssetMeta(projectId, 'version', versionId)
     .then(res => metas.value = res)
     .catch(e => MessageUtil.error("获取附件错误", e));
+  // 获取更新日志
+  getReleaseVersionLog(versionId)
+    .then(res => {
+      content.value = res.content;
+      watch(content, (value) => {
+        saveReleaseVersionLog(versionId, value)
+          .then(() => logDebug("保存成功"))
+          .catch(e => MessageUtil.error("保存更新日志失败", e));
+      })
+    })
+    .catch(e => MessageUtil.error("获取版本错误", e));
 
   DialogPlugin({
     header: false,
@@ -33,11 +48,15 @@ export async function openReleaseVersionInfo(projectId: string, versionId: strin
             <div class={'info-item-value'}>{version.value?.publish_user}</div>
           </DescriptionsItem>
           <DescriptionsItem label={'部署时间'}>
-            <div class={'info-item-value'}>{version.value?.publish_time ? new Date(version.value.publish_time).toLocaleString() : ''}</div>
+            <div
+              class={'info-item-value'}>{version.value?.publish_time ? new Date(version.value.publish_time).toLocaleString() : ''}</div>
           </DescriptionsItem>
         </Descriptions>
       </TabPanel>
-      <TabPanel label={'物料'}>
+      <TabPanel label={'日志'} value={2}>
+        <MarkdownEditor v-model={content.value}/>
+      </TabPanel>
+      <TabPanel label={'物料'} value={3}>
         <ReleaseAsset projectId={projectId} scope={'version'} scopeId={versionId}/>
       </TabPanel>
     </Tabs>)
