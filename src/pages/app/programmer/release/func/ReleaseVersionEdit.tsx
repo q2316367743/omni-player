@@ -1,4 +1,4 @@
-import type {ReleaseVersion, ReleaseVersionCore} from "@/entity/release/ReleaseVersion.ts";
+import type {ReleaseVersion, ReleaseVersionCore} from "@/entity/app/release";
 import {DatePicker, DialogPlugin, Form, FormItem, Input} from "tdesign-vue-next";
 import {
   addReleaseVersionService,

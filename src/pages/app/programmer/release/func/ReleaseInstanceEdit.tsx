@@ -1,4 +1,4 @@
-import type {ReleaseInstance, ReleaseInstanceCore} from "@/entity/release/ReleaseInstance.ts";
+import type {ReleaseInstance, ReleaseInstanceCore} from "@/entity/app/release";
 import {DialogPlugin, Form, FormItem, Input, Textarea} from "tdesign-vue-next";
 import {
   addReleaseInstanceService,

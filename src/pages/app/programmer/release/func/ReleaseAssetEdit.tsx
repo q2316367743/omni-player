@@ -2,7 +2,7 @@ import type {
   ReleaseAssetMetaCore,
   ReleaseAssetMetaFileType,
   ReleaseAssetMetaScope
-} from "@/entity/release/ReleaseAssetMeta.ts";
+} from "@/entity/app/release";
 import {DialogPlugin, Form, FormItem, Input} from "tdesign-vue-next";
 import {addReleaseAsset} from "@/services/release";
 

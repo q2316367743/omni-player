@@ -23,8 +23,8 @@
 </template>
 
 <script lang="ts" setup>
-import type {ReleaseAssetMeta} from "@/entity/release/ReleaseAssetMeta.ts";
-import {getReleaseAssetContent} from "@/services/release/ReleaseAssetService.ts";
+import type {ReleaseAssetMeta} from "@/entity/app/release";
+import {getReleaseAssetContent} from "@/services/release";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import MonacoEditor from "@/components/common/MonacoEditor.vue";
 import MarkdownPreview from "@/components/common/MarkdownPreview.vue";

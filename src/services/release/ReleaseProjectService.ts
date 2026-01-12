@@ -8,7 +8,7 @@ import type {
   ReleaseVersionLog,
   ReleaseAssetContent,
   ReleaseAssetMeta
-} from "@/entity/release";
+} from "@/entity/app/release";
 
 export async function listReleaseProject() {
   const query = useSql().query<ReleaseProject>('release_project');

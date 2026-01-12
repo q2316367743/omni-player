@@ -19,8 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import type {ReleaseVersion} from "@/entity/release/ReleaseVersion.ts";
-import type {ReleaseVersionLog} from "@/entity/release/ReleaseVersionLog.ts";
+import type {ReleaseVersion,ReleaseVersionLog} from "@/entity/app/release";
 import MarkdownPreview from "@/components/common/MarkdownPreview.vue";
 
 interface Props {

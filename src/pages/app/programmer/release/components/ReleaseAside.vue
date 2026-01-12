@@ -23,7 +23,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import type {ReleaseProject} from "@/entity/release/ReleaseProject.ts";
+import type {ReleaseProject} from "@/entity/app/release";
 import {listReleaseProject} from "@/services/release";
 import {
   openReleaseProjectCxt,

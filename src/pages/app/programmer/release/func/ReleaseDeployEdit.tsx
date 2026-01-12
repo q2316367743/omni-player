@@ -1,4 +1,4 @@
-import type {ReleaseDeployBase, ReleaseDeployCore} from "@/entity/release/ReleaseDeploy.ts";
+import type {ReleaseDeployBase, ReleaseDeployCore} from "@/entity/app/release";
 import {DatePicker, DialogPlugin, Form, FormItem, Input} from "tdesign-vue-next";
 import {addReleaseDeployService} from "@/services/release";
 import MessageUtil from "@/util/model/MessageUtil.ts";

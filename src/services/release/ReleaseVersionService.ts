@@ -1,6 +1,5 @@
-import type {ReleaseVersion, ReleaseVersionCore} from "@/entity/release/ReleaseVersion.ts";
+import type {ReleaseVersion, ReleaseVersionCore, ReleaseVersionLog} from "@/entity/app/release";
 import {useSql} from "@/lib/sql.ts";
-import type {ReleaseVersionLog} from "@/entity/release/ReleaseVersionLog.ts";
 
 export async function listReleaseVersionService(projectId: string) {
   return useSql().query<ReleaseVersion>('release_version')

@@ -1,5 +1,4 @@
-import type {ReleaseDeploy} from "@/entity/release/ReleaseDeploy.ts";
-import type {ReleaseVersion} from "@/entity/release/ReleaseVersion.ts";
+import type {ReleaseDeploy, ReleaseVersion, ReleaseVersionLog, ReleaseAssetMeta, ReleaseInstance} from "@/entity/app/release";
 import {group, map} from "@/util";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {
@@ -8,9 +7,6 @@ import {
   listReleaseVersionDeploy,
   listReleaseVersionLog
 } from "@/services/release";
-import type {ReleaseVersionLog} from "@/entity/release/ReleaseVersionLog.ts";
-import type {ReleaseAssetMeta} from "@/entity/release/ReleaseAssetMeta.ts";
-import type {ReleaseInstance} from "@/entity/release/ReleaseInstance.ts";
 import {DialogPlugin, TabPanel, Tabs} from "tdesign-vue-next";
 import VersionTimeline from "@/pages/app/programmer/release/components/VersionTimeline.vue";
 import AssetPreviewPanel from "@/pages/app/programmer/release/components/AssetPreviewPanel.vue";

@@ -1,5 +1,5 @@
 import {useSql} from "@/lib/sql.ts";
-import type {ReleaseInstance, ReleaseInstanceCore} from "@/entity/release/ReleaseInstance.ts";
+import type {ReleaseInstance, ReleaseInstanceCore} from "@/entity/app/release";
 
 export async function listReleaseInstanceService(projectId: string) {
   return useSql().query<ReleaseInstance>('release_instance').eq('project_id', projectId).list();

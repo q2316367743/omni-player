@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts" setup>
-import type {ReleaseAssetMeta} from "@/entity/release/ReleaseAssetMeta.ts";
+import type {ReleaseAssetMeta} from "@/entity/app/release";
 import AssetTree from "@/pages/app/programmer/release/components/AssetTree.vue";
 import AssetPreview from "@/pages/app/programmer/release/components/AssetPreview.vue";
 

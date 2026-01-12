@@ -1,5 +1,5 @@
 import {useSql} from "@/lib/sql.ts";
-import type {ReleaseDeploy, ReleaseDeployCore} from "@/entity/release/ReleaseDeploy.ts";
+import type {ReleaseDeploy, ReleaseDeployCore} from "@/entity/app/release";
 
 /**
  * 获取发版列表

@@ -1,5 +1,5 @@
 import {DialogPlugin, Form, FormItem, Input, Textarea} from "tdesign-vue-next";
-import type {ReleaseProject, ReleaseProjectCore} from "@/entity/release/ReleaseProject.ts";
+import type {ReleaseProject, ReleaseProjectCore} from "@/entity/app/release";
 import {addReleaseProject, deleteReleaseProject, updateReleaseProject} from "@/services/release";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import Cxt from "@imengyu/vue3-context-menu";

@@ -1,6 +1,11 @@
-import type {ReleaseAssetMeta, ReleaseAssetMetaCore, ReleaseAssetMetaScope} from "@/entity/release/ReleaseAssetMeta.ts";
+import type {
+  ReleaseAssetMeta,
+  ReleaseAssetMetaCore,
+  ReleaseAssetMetaScope,
+  ReleaseAssetContent,
+  ReleaseAssetContentCore
+} from "@/entity/app/release";
 import {useSql} from "@/lib/sql.ts";
-import type {ReleaseAssetContent, ReleaseAssetContentCore} from "@/entity/release/ReleaseAssetContent.ts";
 
 /**
  * 获取附件列表

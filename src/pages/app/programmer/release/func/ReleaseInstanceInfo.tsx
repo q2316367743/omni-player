@@ -1,7 +1,6 @@
 import {getReleaseInstanceService} from "@/services/release";
-import type {ReleaseInstance} from "@/entity/release/ReleaseInstance.ts";
+import type {ReleaseInstance, ReleaseAssetMeta} from "@/entity/app/release";
 import MessageUtil from "@/util/model/MessageUtil.ts";
-import type {ReleaseAssetMeta} from "@/entity/release/ReleaseAssetMeta.ts";
 import {listReleaseAssetMeta} from "@/services/release/ReleaseAssetService.ts";
 import {Descriptions, DescriptionsItem, DialogPlugin, TabPanel, Tabs} from "tdesign-vue-next";
 import ReleaseAsset from "@/pages/app/programmer/release/components/ReleaseAsset.vue";

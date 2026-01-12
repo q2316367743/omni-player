@@ -96,7 +96,7 @@
   </t-layout>
 </template>
 <script lang="ts" setup>
-import type {ReleaseAssetMeta, ReleaseAssetMetaScope} from "@/entity/release/ReleaseAssetMeta.ts";
+import type {ReleaseAssetMeta, ReleaseAssetMetaScope} from "@/entity/app/release";
 import {
   deleteReleaseAsset,
   getReleaseAssetContent,

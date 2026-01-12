@@ -23,7 +23,7 @@
 </template>
 <script lang="ts" setup>
 import {ViewListIcon} from "tdesign-icons-vue-next";
-import type {ReleaseProject} from "@/entity/release/ReleaseProject.ts";
+import type {ReleaseProject} from "@/entity/app/release";
 import ReleaseAside from "@/pages/app/programmer/release/components/ReleaseAside.vue";
 import ReleaseContent from "@/pages/app/programmer/release/components/ReleaseContent.vue";
 

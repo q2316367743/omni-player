@@ -1,6 +1,6 @@
 import {EditIcon, DeleteIcon, InfoCircleIcon} from "tdesign-icons-vue-next";
 import {isDark} from "@/global/Constants.ts";
-import type {ReleaseAssetMeta} from "@/entity/release/ReleaseAssetMeta.ts";
+import type {ReleaseAssetMeta} from "@/entity/app/release";
 import MessageBoxUtil from "@/util/model/MessageBoxUtil.tsx";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {deleteReleaseAsset, updateReleaseAsset} from "@/services/release/ReleaseAssetService.ts";

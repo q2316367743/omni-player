@@ -33,7 +33,9 @@
           <div class="version-info">
             <div class="version-number">
               <span class="version-title">{{ version.version }}</span>
-              <t-tag v-if="version.publish_user" variant="outline" theme="primary" class="version-user">{{ version.publish_user }}</t-tag>
+              <t-tag v-if="version.publish_user" variant="outline" theme="primary" class="version-user">
+                {{ version.publish_user }}
+              </t-tag>
             </div>
             <div class="version-meta">
               <span class="version-time">{{ formatDate(version.publish_time) }}</span>
@@ -69,10 +71,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import type {ReleaseProject} from "@/entity/release/ReleaseProject.ts";
-import type {ReleaseInstance} from "@/entity/release/ReleaseInstance.ts";
-import type {ReleaseVersion} from "@/entity/release/ReleaseVersion.ts";
-import type {ReleaseDeploy} from "@/entity/release/ReleaseDeploy.ts";
+import type {ReleaseProject, ReleaseInstance, ReleaseVersion, ReleaseDeploy} from "@/entity/app/release";
 import {openReleaseInstanceInfo} from "@/pages/app/programmer/release/func/ReleaseInstanceInfo.tsx";
 import {openReleaseVersionInfo} from "@/pages/app/programmer/release/func/ReleaseVersionInfo.tsx";
 import {

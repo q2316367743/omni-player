@@ -1,5 +1,5 @@
 import {useSql} from "@/lib/sql.ts";
-import type {ReleaseVersionLog} from "@/entity/release/ReleaseVersionLog.ts";
+import type {ReleaseVersionLog} from "@/entity/app/release";
 
 export function listReleaseVersionLog(ids: Array<string>) {
   return useSql().query<ReleaseVersionLog>('release_version_log')

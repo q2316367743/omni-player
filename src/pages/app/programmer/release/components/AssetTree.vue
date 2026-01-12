@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts" setup>
-import type {ReleaseAssetMeta} from "@/entity/release/ReleaseAssetMeta.ts";
+import type {ReleaseAssetMeta} from "@/entity/app/release";
 import {FileCodeIcon, FileIcon, FileWordIcon, FolderIcon} from "tdesign-icons-vue-next";
 
 interface Props {
