@@ -71,12 +71,12 @@
             <article-icon/>
           </template>
         </mini-tool-card>
-        <mini-tool-card value="qushuiyin" label="去水印" desc="视频图片水印去除" tone="online">
+        <mini-tool-card value="qushuiyin" label="去水印" desc="视频图片水印去除" tone="disabled">
           <template #icon>
             <video-icon/>
           </template>
         </mini-tool-card>
-        <mini-tool-card value="online/image" label="随机图片" desc="随机图片" tone="online">
+        <mini-tool-card value="online/image" label="随机图片" desc="随机图片" tone="disabled">
           <template #icon>
             <image-icon/>
           </template>
@@ -104,7 +104,7 @@
     <div class="tools-group">
       <div class="group-title">AI 工具</div>
       <div class="tools-grid mini-tools-grid">
-        <mini-tool-card label="讨论组" value="ai/discussion" tone="ai">
+        <mini-tool-card label="圆桌会" value="ai/roundtable" tone="ai">
           <template #icon>
             <usergroup-icon />
           </template>

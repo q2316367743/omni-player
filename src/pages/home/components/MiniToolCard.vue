@@ -3,7 +3,7 @@
     <div :class="['mini-tool-icon', tone]">
       <slot name="icon"/>
     </div>
-    <div class="mini-tool-title">{{ label }}</div>
+    <div :class="{'mini-tool-title': true, 'disabled' : tone === 'disabled'}">{{ label }}</div>
   </div>
 </template>
 <script lang="ts" setup>
@@ -84,6 +84,10 @@ const jumpTool = () => router.push(`/app/tool/${props.value}`);
   font-size: 14px;
   font-weight: 500;
   color: var(--td-text-color-primary);
+
+  &.disabled {
+    color: var(--td-text-color-placeholder);
+  }
 }
 </style>
 
