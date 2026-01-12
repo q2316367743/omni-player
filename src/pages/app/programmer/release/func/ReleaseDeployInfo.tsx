@@ -13,8 +13,7 @@ import type {ReleaseAssetMeta} from "@/entity/release/ReleaseAssetMeta.ts";
 import type {ReleaseInstance} from "@/entity/release/ReleaseInstance.ts";
 import {DialogPlugin, TabPanel, Tabs} from "tdesign-vue-next";
 import VersionTimeline from "@/pages/app/programmer/release/components/VersionTimeline.vue";
-import AssetTree from "@/pages/app/programmer/release/components/AssetTree.vue";
-import AssetPreview from "@/pages/app/programmer/release/components/AssetPreview.vue";
+import AssetPreviewPanel from "@/pages/app/programmer/release/components/AssetPreviewPanel.vue";
 
 interface ReleaseDeployInfoProp {
   deploy: ReleaseDeploy;
@@ -60,9 +59,6 @@ export async function openReleaseDeployInfo(prop: ReleaseDeployInfoProp) {
 
   assetMetaInstances.value = await listReleaseAssetMeta(deploy.project_id, 'instance', instance.id);
 
-  const selectedVersionAssetId = ref('');
-  const selectedInstanceAssetId = ref('');
-
   DialogPlugin({
     header: false,
     footer: false,
@@ -88,38 +84,14 @@ export async function openReleaseDeployInfo(prop: ReleaseDeployInfoProp) {
               <VersionTimeline versions={allVersions} logMap={versionLogMap.value}/>
             </TabPanel>
             <TabPanel label={'更新物料'} value={2}>
-              <div class="asset-section">
-                <div class="asset-sidebar">
-                  <AssetTree
-                    assets={Array.from(assetMetaVersionMap.value.values()).flat()}
-                    selectedId={selectedVersionAssetId.value}
-                    onUpdate:selectedId={(id: string) => selectedVersionAssetId.value = id}
-                  />
-                </div>
-                <div class="asset-main">
-                  <AssetPreview
-                    assets={Array.from(assetMetaVersionMap.value.values()).flat()}
-                    selectedId={selectedVersionAssetId.value}
-                  />
-                </div>
-              </div>
+              <AssetPreviewPanel
+                assets={Array.from(assetMetaVersionMap.value.values()).flat()}
+              />
             </TabPanel>
             <TabPanel label={'实例物料'} value={3}>
-              <div class="asset-section">
-                <div class="asset-sidebar">
-                  <AssetTree
-                    assets={assetMetaInstances.value}
-                    selectedId={selectedInstanceAssetId.value}
-                    onUpdate:selectedId={(id: string) => selectedInstanceAssetId.value = id}
-                  />
-                </div>
-                <div class="asset-main">
-                  <AssetPreview
-                    assets={assetMetaInstances.value}
-                    selectedId={selectedInstanceAssetId.value}
-                  />
-                </div>
-              </div>
+              <AssetPreviewPanel
+                assets={assetMetaInstances.value}
+              />
             </TabPanel>
           </Tabs>
         </div>

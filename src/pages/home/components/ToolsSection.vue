@@ -103,7 +103,17 @@
 
     <div class="tools-group">
       <div class="group-title">AI 工具</div>
-      <div class="tools-grid">
+      <div class="tools-grid mini-tools-grid">
+        <mini-tool-card label="讨论组" value="ai/discussion" tone="ai">
+          <template #icon>
+            <usergroup-icon />
+          </template>
+        </mini-tool-card>
+        <mini-tool-card label="小说创作" value="ai/fiction" tone="ai">
+          <template #icon>
+            <article-icon />
+          </template>
+        </mini-tool-card>
       </div>
     </div>
   </div>
@@ -115,7 +125,7 @@ import {
   CheckRectangleIcon, Code1Icon,
   CodeIcon, CommandIcon, Edit1Icon, GitMergeIcon, ImageIcon,
   InternetIcon, MoneyIcon, PortraitIcon,
-  TranslateIcon,
+  TranslateIcon, UsergroupIcon,
   VideoIcon
 } from "tdesign-icons-vue-next";
 import ToolCard from "@/pages/home/components/ToolCard.vue";

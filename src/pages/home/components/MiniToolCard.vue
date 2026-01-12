@@ -7,12 +7,11 @@
   </div>
 </template>
 <script lang="ts" setup>
-type ToolCardTone = 'todo' | 'editor' | 'regex' | 'http' | 'online' | 'media';
 
 const props = defineProps<{
   label: string;
   value: string;
-  tone: ToolCardTone;
+  tone: string;
 }>();
 
 const router = useRouter();

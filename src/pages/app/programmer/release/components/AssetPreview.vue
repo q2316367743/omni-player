@@ -1,15 +1,6 @@
 <template>
   <div class="asset-preview-container">
     <div v-if="selectedAsset" class="asset-content">
-      <div class="asset-header">
-        <div class="header-left">
-          <t-icon v-if="selectedAsset.file_type === 'document'" name="file-word" size="20px"/>
-          <t-icon v-else-if="selectedAsset.file_type === 'sql'" name="file-code" size="20px"/>
-          <t-icon v-else name="file" size="20px"/>
-          <span class="file-name">{{ selectedAsset.file_name }}</span>
-          <span v-if="selectedAsset.relative_path" class="file-path">{{ selectedAsset.relative_path }}</span>
-        </div>
-      </div>
       <div class="asset-editor">
         <markdown-preview
           v-if="selectedAsset.file_type === 'document'"
@@ -81,34 +72,6 @@ watch(() => props.selectedId, async (newId) => {
     display: flex;
     flex-direction: column;
     height: 100%;
-
-    .asset-header {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--td-border-level-1-color);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--td-bg-color-container);
-      backdrop-filter: var(--fluent-acrylic-blur);
-
-      .header-left {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex: 1;
-
-        .file-name {
-          font-size: 14px;
-          font-weight: 600;
-          color: var(--td-text-color-primary);
-        }
-
-        .file-path {
-          font-size: 12px;
-          color: var(--td-text-color-secondary);
-        }
-      }
-    }
 
     .asset-editor {
       flex: 1;

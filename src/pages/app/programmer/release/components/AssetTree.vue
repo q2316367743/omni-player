@@ -1,15 +1,13 @@
 <template>
   <div class="asset-tree-container">
-    <div class="tree-header">
-      <span class="tree-title">文件列表</span>
-    </div>
     <div class="tree-content">
       <t-tree
         :data="treeData"
         :active-multiple="false"
         :expand-all="true"
+        :activable="true"
         hover
-        :active="selectedId"
+        :actived="selectedId ? [selectedId] : []"
         @active="onSelect"
       >
         <template #label="{ node }">
@@ -73,7 +71,7 @@ const buildTree = (assets: Array<ReleaseAssetMeta>): TreeNode[] => {
           nodeMap.set(currentPath, node);
 
           if (parent) {
-            parent.children!.push(node);
+            (parent as TreeNode & { children: TreeNode[] }).children.push(node);
           } else {
             tree.push(node);
           }
@@ -90,7 +88,7 @@ const buildTree = (assets: Array<ReleaseAssetMeta>): TreeNode[] => {
     };
 
     if (parent) {
-      parent.children!.push(fileNode);
+      (parent as TreeNode & { children: TreeNode[] }).children.push(fileNode);
     } else {
       tree.push(fileNode);
     }
@@ -116,17 +114,6 @@ const onSelect = (value: Array<string | number>) => {
   flex-direction: column;
   overflow: hidden;
   background: var(--td-bg-color-container);
-
-  .tree-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--td-border-level-1-color);
-
-    .tree-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--td-text-color-primary);
-    }
-  }
 
   .tree-content {
     flex: 1;
