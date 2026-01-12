@@ -22,9 +22,13 @@ export const router = createRouter({
     redirect: '/admin/global-setting',
     component: () => import('@/layouts/admin.vue'),
     children: [{
-      name: '管理后台-全局设置',
+      name: '全局设置',
       path: 'global-setting',
       component: () => import('@/pages/admin/global-setting/index.vue')
+    }, {
+      name: 'AI 设置',
+      path: 'ai-setting',
+      component: () => import('@/pages/admin/ai-setting/ai-setting.vue')
     }]
   }, {
     name: "媒体中心",
@@ -143,7 +147,7 @@ export const router = createRouter({
         name: "AppSystemPort",
         path: "port",
         component: () => import('@/pages/app/system/port/app-system-port.vue')
-      },{
+      }, {
         name: "AppSystemHomebrew",
         path: "homebrew",
         component: () => import("@/pages/app/system/homebrew/app-system-homebrew.vue")

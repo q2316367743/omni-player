@@ -17,6 +17,9 @@ export const LocalName = {
   // 全局设置
   KEY_SETTING_GLOBAL: "/key/setting/global",
 
+  // AI设置
+  KEY_SETTING_AI: '/key/setting/ai',
+
   // 订阅收起
   STORE_SUBSCRIBE_COLLAPSED: '/store/subscribe/collapsed',
 

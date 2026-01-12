@@ -7,7 +7,8 @@
       <t-layout class="h-full">
         <t-aside>
           <t-menu v-model="value" class="h-full" @change="onChange">
-            <t-menu-item :value="globalSettingPath">全局设置</t-menu-item>
+            <t-menu-item value="/admin/global-setting">全局设置</t-menu-item>
+            <t-menu-item value="/admin/ai-setting">AI 设置</t-menu-item>
           </t-menu>
         </t-aside>
         <t-content>
@@ -21,8 +22,7 @@
 const route = useRoute();
 const router = useRouter();
 
-const globalSettingPath = '/admin/global-setting';
-const value = ref(globalSettingPath);
+const value = ref('/admin/global-setting');
 
 watch(
   () => route.path,

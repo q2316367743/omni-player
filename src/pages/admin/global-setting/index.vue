@@ -19,9 +19,9 @@
 </template>
 <script lang="ts" setup>
 import {storeToRefs} from "pinia";
-import {useGlobalSettingStore} from "@/store/GlobalSettingStore.ts";
+import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 import {colorMode} from "@/global/Constants.ts";
 
-const {globalSetting} = storeToRefs(useGlobalSettingStore());
+const {globalSetting} = storeToRefs(useSettingStore());
 </script>
 <style scoped lang="less"></style>
