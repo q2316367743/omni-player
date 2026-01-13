@@ -20,59 +20,72 @@
         </t-dropdown-menu>
       </t-dropdown>
     </div>
-    <t-chat-list
-      ref="chatRef"
-      :data="data"
-      :clear-history="false"
-      :text-loading="loading"
-      :is-stream-load="isStreamLoad"
-      class="home-chat-content"
-      @scroll="handleChatScroll"
-    >
-      <template #content="{ item, index }">
-        <t-chat-reasoning v-if="item.thinking && item.thinking.length > 0 && item.role !== 'system'"
-                          expand-icon-placement="right">
-          <template #header>
-            <t-chat-loading v-if="isStreamLoad && index === 0" text="思考中..."/>
-            <div v-else style="display: flex; align-items: center">
-              <CheckCircleIcon style="color: var(--td-success-color-5); font-size: 20px; margin-right: 8px"/>
-              <span>已深度思考</span>
+    <div class="home-chat-content">
+      <div class="chat-list" ref="chatContentRef" @scroll="handleChatScroll">
+        <div v-for="(item, index) in messages" :key="item.id" class="chat-item" :class="[item.role]">
+          <div v-if="item.role === 'system'" class="system-message">
+            <div class="system-content">{{ item.content }}</div>
+          </div>
+          <div v-else-if="item.role === 'assistant'" class="assistant-message">
+            <div class="message-avatar assistant-avatar">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+              </svg>
             </div>
-          </template>
-          <t-chat-content :content="item.thinking" class="reason"/>
-        </t-chat-reasoning>
-        <t-chat-content v-if="item.content.length > 0 && item.role !== 'system'" :content="item.content[0].data"
-                        :class="[item.role]" class="typo"/>
-      </template>
-      <template #actions="{ item, index }">
-        <t-space size="small" class="mt-8px" v-if="item.role === 'assistant'">
-          <t-tooltip content="复制">
-            <t-button theme="primary" variant="text" shape="square" size="small"
-                      @click="handleOperator('copy', item, index)">
-              <template #icon>
-                <copy-icon/>
-              </template>
-            </t-button>
-          </t-tooltip>
-          <t-popconfirm content="是否删除此对话，删除后无法恢复" confirm-btn="删除"
-                        @confirm="handleOperator('delete', item, index)">
-            <t-button theme="danger" variant="text" shape="square" size="small">
-              <template #icon>
-                <delete-icon/>
-              </template>
-            </t-button>
-          </t-popconfirm>
-          <t-tooltip content="分享">
-            <t-button theme="primary" variant="text" shape="square" size="small"
-                      @click="handleOperator('share', item, index)" disabled>
-              <template #icon>
-                <share-icon/>
-              </template>
-            </t-button>
-          </t-tooltip>
-        </t-space>
-      </template>
-      <template #footer>
+            <div class="message-body">
+              <div v-if="item.thinking && item.thinking.length > 0" class="thinking-section">
+                <div class="thinking-header">
+                  <check-circle-icon v-if="!isStreamLoad || index !== messages.length - 1" class="thinking-icon"/>
+                  <div v-else class="thinking-loading">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                  </div>
+                  <span class="thinking-text">{{ isStreamLoad && index === messages.length - 1 ? '思考中...' : '已深度思考' }}</span>
+                </div>
+                <div class="thinking-content">{{ item.thinking }}</div>
+              </div>
+              <div v-if="item.content" class="message-content" v-html="item.content"></div>
+              <div class="message-footer">
+                <span class="message-info">tokens used: {{ calculateTokens(item.content) }}, model: {{ item.model }}</span>
+                <div class="message-actions">
+                  <t-tooltip content="复制">
+                    <t-button theme="primary" variant="text" shape="square" size="small" @click="handleOperator('copy', item, index)">
+                      <template #icon>
+                        <copy-icon/>
+                      </template>
+                    </t-button>
+                  </t-tooltip>
+                  <t-popconfirm content="是否删除此对话，删除后无法恢复" confirm-btn="删除" @confirm="handleOperator('delete', item, index)">
+                    <t-button theme="danger" variant="text" shape="square" size="small">
+                      <template #icon>
+                        <delete-icon/>
+                      </template>
+                    </t-button>
+                  </t-popconfirm>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-else-if="item.role === 'user'" class="user-message">
+            <div class="message-body">
+              <div class="message-content">{{ item.content }}</div>
+            </div>
+            <div class="message-avatar user-avatar">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
+            </div>
+          </div>
+          <div v-else-if="item.role === 'model-change'" class="model-change-message">
+            <div class="model-change-content" v-html="item.content"></div>
+          </div>
+          <div v-else-if="item.role === 'error'" class="error-message">
+            <div class="error-content">{{ item.content }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="chat-sender-wrapper">
         <t-chat-sender
           v-model="text"
           class="chat-sender"
@@ -99,8 +112,8 @@
             <home-assistant-select v-model="model"/>
           </template>
         </t-chat-sender>
-      </template>
-    </t-chat-list>
+      </div>
+    </div>
     <t-button v-if="isShowToBottom" variant="text" class="bottomBtn" @click="backBottom">
       <arrow-down-icon/>
     </t-button>
@@ -108,7 +121,6 @@
 </template>
 <script lang="ts" setup>
 import {writeText} from '@tauri-apps/plugin-clipboard-manager';
-import {type ChatInstanceFunctions,} from '@tdesign-vue-next/chat';
 import {
   ArrowDownIcon,
   CheckCircleIcon,
@@ -116,7 +128,6 @@ import {
   CopyIcon,
   DeleteIcon,
   MenuFoldIcon,
-  ShareIcon,
   StopIcon
 } from "tdesign-icons-vue-next";
 import {activeKey, collapsed, toggleCollapsed} from "@/pages/app/ai/chat/model.ts";
@@ -126,8 +137,7 @@ import {
   type AiChatItem,
   type AiChatMessage,
   type AiChatMessageCore,
-  transferAiChatItemToChatMessageParam,
-  transferItemToTDesign
+  transferAiChatItemToChatMessageParam
 } from "@/entity/app/ai/chat";
 import {askToOpenAi, type AskToOpenAiAbort} from "@/util/lang/ChatUtil";
 import {
@@ -152,7 +162,7 @@ const groupId = ref('');
 const text = ref('');
 const model = ref('');
 
-const chatRef = ref<ChatInstanceFunctions>();
+const chatContentRef = ref<HTMLDivElement>();
 const abort = shallowRef<AskToOpenAiAbort>();
 
 const loading = ref(false);
@@ -160,7 +170,9 @@ const isStreamLoad = ref(false);
 const isShowToBottom = ref(false);
 const isAsked = ref(false);
 
-const data = computed(() => transferItemToTDesign(messages.value));
+const calculateTokens = (content: string): number => {
+  return Math.ceil(content.length / 4);
+};
 
 tryOnMounted(async () => {
 
@@ -294,16 +306,21 @@ async function onAsk() {
 }
 
 // 是否显示回到底部按钮
-const handleChatScroll = function (context: any) {
-  const {e} = context;
-  const scrollTop = (e.target as HTMLDivElement)?.scrollTop || 0;
-  isShowToBottom.value = scrollTop < 0;
+const handleChatScroll = function (e: Event) {
+  const target = e.target as HTMLDivElement;
+  const scrollTop = target.scrollTop;
+  const scrollHeight = target.scrollHeight;
+  const clientHeight = target.clientHeight;
+  isShowToBottom.value = scrollHeight - scrollTop - clientHeight > 100;
 };
 // 滚动到底部
 const backBottom = () => {
-  chatRef.value?.scrollToBottom?.({
-    behavior: 'smooth',
-  });
+  if (chatContentRef.value) {
+    chatContentRef.value.scrollTo({
+      top: chatContentRef.value.scrollHeight,
+      behavior: 'smooth',
+    });
+  }
 };
 // 复制
 const handleOperator = (op: string, item: AiChatMessage, index: number) => {
@@ -353,77 +370,387 @@ const handleDeleteChat = (index: number) => {
 <style scoped lang="less">
 .home-chat {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--td-bg-color-container);
 
   .home-chat-collapse {
     display: flex;
     align-items: center;
-    height: 32px;
-    border-bottom: 1px solid var(--td-border-level-2-color);
-    padding: 4px;
+    height: 40px;
+    padding: 0 12px;
+    background: var(--fluent-acrylic-bg);
+    backdrop-filter: var(--fluent-acrylic-blur);
+    border-bottom: 1px solid var(--fluent-border-subtle);
+    box-shadow: var(--fluent-elevation-1);
+    transition: all var(--fluent-transition-normal);
 
     .divider {
       margin: 0 8px;
+      color: var(--td-text-color-placeholder);
     }
 
     .breadcrumb {
       user-select: none;
       cursor: pointer;
-      border-radius: var(--td-radius-default);
-      transition: background-color 0.3s ease-in-out;
-      padding: 4px 8px;
+      border-radius: var(--fluent-radius-smooth);
+      transition: all var(--fluent-transition-fast);
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
 
       &:hover {
-        background-color: var(--td-bg-color-container-hover);
+        background: var(--fluent-item-hover);
+        transform: translateY(-1px);
       }
 
       &:active {
-        background-color: var(--td-bg-color-container-active);
+        background: var(--fluent-item-active);
+        transform: translateY(0);
       }
 
       &.group {
         color: var(--td-text-color-secondary);
+        font-weight: 500;
+      }
+
+      .text {
+        font-weight: 500;
       }
 
       .icon {
-        margin-left: 4px;
+        transition: transform var(--fluent-transition-fast);
+        color: var(--td-text-color-placeholder);
+      }
+
+      &:hover .icon {
+        transform: rotate(180deg);
       }
     }
   }
 
   .home-chat-content {
-    height: calc(100vh - 41px);
+    flex: 1;
     overflow: hidden;
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 8px;
+    padding: 24px 16px;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
 
-    :deep(.t-chat__inner) {
-      width: 100%;
-      max-width: 800px;
-      margin: 0 auto var(--td-comp-margin-l);
+    .chat-list {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 8px;
+
+      .chat-item {
+        max-width: 900px;
+        margin: 0 auto 24px;
+        transition: all var(--fluent-transition-normal);
+
+        &.system {
+          .system-message {
+            padding: 12px 16px;
+            background: transparent;
+            border: 1px solid var(--td-text-color-disabled);
+            border-radius: var(--fluent-radius-card);
+            color: var(--td-text-color-disabled);
+            font-size: 13px;
+            line-height: 1.5;
+            max-width: 800px;
+            margin: 0 auto;
+
+            .system-content {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+            }
+          }
+        }
+
+        &.assistant {
+          .assistant-message {
+            display: flex;
+            gap: 12px;
+            max-width: 800px;
+            margin: 0 auto;
+
+            .message-avatar {
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              background: var(--fluent-gradient-primary);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-shrink: 0;
+              color: white;
+              box-shadow: var(--fluent-elevation-2);
+
+              svg {
+                width: 24px;
+                height: 24px;
+              }
+            }
+
+            .message-body {
+              flex: 1;
+              min-width: 0;
+
+              .thinking-section {
+                margin-bottom: 12px;
+                background: var(--fluent-card-bg);
+                backdrop-filter: blur(10px);
+                border: 1px solid var(--fluent-card-border);
+                border-radius: var(--fluent-radius-card);
+                box-shadow: var(--fluent-elevation-1);
+                overflow: hidden;
+                transition: all var(--fluent-transition-normal);
+
+                &:hover {
+                  box-shadow: var(--fluent-elevation-2);
+                }
+
+                .thinking-header {
+                  padding: 12px 16px;
+                  background: var(--fluent-item-hover);
+                  border-bottom: 1px solid var(--fluent-border-subtle);
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  font-weight: 500;
+
+                  .thinking-icon {
+                    color: var(--td-success-color-5);
+                    font-size: 20px;
+                  }
+
+                  .thinking-loading {
+                    display: flex;
+                    gap: 4px;
+
+                    .dot {
+                      width: 6px;
+                      height: 6px;
+                      border-radius: 50%;
+                      background: var(--fluent-accent-color);
+                      animation: bounce 1.4s infinite ease-in-out both;
+
+                      &:nth-child(1) {
+                        animation-delay: -0.32s;
+                      }
+
+                      &:nth-child(2) {
+                        animation-delay: -0.16s;
+                      }
+                    }
+                  }
+
+                  @keyframes bounce {
+                    0%, 80%, 100% {
+                      transform: scale(0);
+                    }
+                    40% {
+                      transform: scale(1);
+                    }
+                  }
+
+                  .thinking-text {
+                    font-size: 14px;
+                  }
+                }
+
+                .thinking-content {
+                  padding: 16px;
+                  font-size: 14px;
+                  line-height: 1.6;
+                  color: var(--td-text-color-secondary);
+                }
+              }
+
+              .message-content {
+                padding: 16px 20px;
+                background: var(--td-bg-color-container);
+                border: 1px solid var(--fluent-card-border);
+                border-radius: var(--fluent-radius-card);
+                font-size: 15px;
+                line-height: 1.7;
+                color: var(--td-text-color-primary);
+                word-wrap: break-word;
+                white-space: pre-wrap;
+              }
+
+              .message-footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 8px 0;
+
+                .message-info {
+                  font-size: 12px;
+                  color: var(--td-text-color-placeholder);
+                  font-family: var(--td-font-family);
+                }
+
+                .message-actions {
+                  display: flex;
+                  gap: 4px;
+                }
+              }
+            }
+          }
+        }
+
+        &.user {
+          .user-message {
+            display: flex;
+            gap: 12px;
+            max-width: 800px;
+            margin: 0 auto;
+            flex-direction: row-reverse;
+
+            .message-avatar {
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              background: var(--fluent-gradient-secondary);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-shrink: 0;
+              color: white;
+              box-shadow: var(--fluent-elevation-2);
+
+              svg {
+                width: 24px;
+                height: 24px;
+              }
+            }
+
+            .message-body {
+              flex: 1;
+              min-width: 0;
+
+              .message-content {
+                padding: 16px 20px;
+                background: var(--td-bg-color-secondarycontainer);
+                backdrop-filter: blur(10px);
+                border: 1px solid var(--fluent-card-border);
+                border-radius: var(--fluent-radius-card);
+                box-shadow: var(--fluent-card-shadow);
+                font-size: 15px;
+                line-height: 1.7;
+                color: var(--td-text-color-primary);
+                word-wrap: break-word;
+                white-space: pre-wrap;
+                transition: all var(--fluent-transition-normal);
+
+                &:hover {
+                  box-shadow: var(--fluent-card-shadow-hover);
+                }
+              }
+            }
+          }
+        }
+
+        &.model-change {
+          .model-change-message {
+            padding: 12px 16px;
+            background: var(--fluent-accent-light);
+            border: 1px solid var(--fluent-accent-color);
+            border-radius: var(--fluent-radius-card);
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 14px;
+            color: var(--td-text-color-primary);
+
+            .model-change-content {
+              :deep(span) {
+                font-weight: 600;
+                color: var(--fluent-accent-color);
+              }
+            }
+          }
+        }
+
+        &.error {
+          .error-message {
+            padding: 16px 20px;
+            background: var(--td-error-color-1);
+            border: 1px solid var(--td-error-color-3);
+            border-radius: var(--fluent-radius-card);
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 14px;
+            color: var(--td-error-color-6);
+          }
+        }
+      }
     }
 
-    :deep(.t-chat__footer) {
-      width: 100%;
+    .chat-sender-wrapper {
+      margin-top: 16px;
       max-width: 800px;
-      margin: 0 auto;
-    }
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
 
+      .chat-sender {
+        background: var(--fluent-card-bg);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--fluent-card-border);
+        border-radius: var(--fluent-radius-large);
+        box-shadow: var(--fluent-elevation-3);
+        padding: 16px;
+        transition: all var(--fluent-transition-normal);
+
+        &:hover {
+          box-shadow: var(--fluent-elevation-4);
+        }
+      }
+    }
   }
 
   .bottomBtn {
     position: absolute;
     left: 50%;
-    margin-left: -20px;
-    bottom: 160px;
+    transform: translateX(-50%);
+    bottom: 180px;
     padding: 0;
-    border: 0;
-    width: 40px;
-    height: 40px;
+    border: none;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    box-shadow: 0 8px 10px -5px rgba(0, 0, 0, 0.08), 0px 16px 24px 2px rgba(0, 0, 0, 0.04),
-    0px 6px 30px 5px rgba(0, 0, 0, 0.05);
-    background-color: var(--td-bg-color-container);
+    background: var(--fluent-card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--fluent-card-border);
+    box-shadow: var(--fluent-elevation-4);
+    transition: all var(--fluent-transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+
+    &:hover {
+      transform: translateX(-50%) translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      background: var(--fluent-card-bg-hover);
+    }
+
+    &:active {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    svg {
+      width: 24px;
+      height: 24px;
+      color: var(--fluent-accent-color);
+    }
   }
 
 }
