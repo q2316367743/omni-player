@@ -196,6 +196,9 @@ tryOnMounted(async () => {
     // 立即提问
     onAsk();
   }
+  await nextTick();
+  // UI 渲染完成，滚动到底部
+  backBottom();
   chatItem.value = await getAiChatItemService(chatId.value) || undefined;
 });
 
