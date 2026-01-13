@@ -172,6 +172,7 @@ const loading = ref(false);
 const isStreamLoad = ref(false);
 const isShowToBottom = ref(false);
 const isAsked = ref(false);
+const isAtBottom = ref(true);
 
 const calculateTokens = (content: string): number => {
   return Math.ceil(content.length / 4);
@@ -284,7 +285,11 @@ async function onAsk() {
           messages.value[messages.value.length - 1]!.content += data;
           isStreamLoad.value = false;
         }
-        // 更新
+        if (isAtBottom.value) {
+          nextTick(() => {
+            backBottom();
+          });
+        }
         onUpdateMessage(messages.value[messages.value.length - 1]!);
       },
       onAborted: (a) => {
@@ -315,6 +320,7 @@ const handleChatScroll = function (e: Event) {
   const scrollHeight = target.scrollHeight;
   const clientHeight = target.clientHeight;
   isShowToBottom.value = scrollHeight - scrollTop - clientHeight > 100;
+  isAtBottom.value = scrollHeight - scrollTop - clientHeight < 50;
 };
 // 滚动到底部
 const backBottom = () => {
@@ -330,6 +336,8 @@ const handleOperator = (op: string, item: AiChatMessage, index: number) => {
   switch (op) {
     case 'copy':
       return writeText(item.content)
+        .then(() => MessageUtil.success("已复制"))
+        .catch(e => MessageUtil.error("复制失败", e));
     case 'delete':
       handleDeleteChat(index);
       break;
