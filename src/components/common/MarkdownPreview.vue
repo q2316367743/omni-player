@@ -8,6 +8,7 @@ import {isDark} from "@/global/Constants.ts";
 
 interface Props {
   content: string;
+  stream?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -46,7 +47,8 @@ const initCherry = () => {
     engine: {
       global: {
         htmlAttrWhiteList: 'part|slot',
-        flowSessionContext: false,
+        flowSessionContext: props.stream,
+        flowSessionCursor: ''
       },
       syntax: {
         autoLink: {
@@ -104,6 +106,7 @@ const initCherry = () => {
     },
     previewer: {
       floatWhenClosePreviewer: false,
+      enablePreviewerBubble: false
     },
   });
 };
@@ -135,9 +138,15 @@ onBeforeUnmount(() => {
   overflow: auto;
 
   :deep(.cherry) {
+    background-color: transparent !important;
     .cherry-toolbar {
       display: none;
     }
+  }
+
+  :deep(.cherry-previewer) {
+    border: none !important;
+    background-color: transparent !important;
   }
 }
 </style>

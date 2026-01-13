@@ -90,6 +90,7 @@
     },
     "dialog:allow-open",
     "dialog:allow-save",
-    "homebrew:default"
+    "homebrew:default",
+    "clipboard-manager:allow-write-text"
   ]
 }

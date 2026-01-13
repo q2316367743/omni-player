@@ -43,9 +43,12 @@
                   </div>
                   <span class="thinking-text">{{ isStreamLoad && index === messages.length - 1 ? '思考中...' : '已深度思考' }}</span>
                 </div>
-                <div class="thinking-content">{{ item.thinking }}</div>
+                <div class="thinking-content">
+                  <markdown-preview :content="item.thinking"/></div>
               </div>
-              <div v-if="item.content" class="message-content" v-html="item.content"></div>
+              <div v-if="item.content" class="message-content">
+                <markdown-preview :content="item.content"/>
+              </div>
               <div class="message-footer">
                 <span class="message-info">tokens used: {{ calculateTokens(item.content) }}, model: {{ item.model }}</span>
                 <div class="message-actions">
