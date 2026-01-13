@@ -16,7 +16,9 @@ function success(message: any, callback?: () => void): void {
     closeBtn: true,
     content: typeof message === "string" ? message : stringifyJsonWithBigIntSupport(message)
   });
-  callback && callback();
+  if (callback) {
+    callback()
+  }
 }
 
 function warning(message: string, e?: any): void {
@@ -36,7 +38,9 @@ function error(message: string, e?: any, callback?: () => void): void {
     content: render(message, e)
   });
   console.error(message, e);
-  callback && callback();
+  if (callback) {
+    callback()
+  }
 }
 
 export default {

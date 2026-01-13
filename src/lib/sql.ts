@@ -23,7 +23,10 @@ export type TableName =
   | 'release_instance'
   | 'release_deploy'
   | 'release_asset_meta'
-  | 'release_asset_content';
+  | 'release_asset_content'
+  | 'ai_chat_group'
+  | 'ai_chat_item'
+  | 'ai_chat_message';
 
 export class SqlWrapper {
 
@@ -59,6 +62,9 @@ export class SqlWrapper {
       }  // 失败也继续（避免链断裂）
     );
 
+    // 延迟 50 ms
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
     // 返回原始结果（带类型）
     return result;
   }
@@ -75,7 +81,12 @@ export class SqlWrapper {
     } catch (e) {
       logError("rollback transaction")
       console.error(e)
-      await this.db!.execute(`ROLLBACK`);
+      try {
+        await this.db!.execute(`ROLLBACK`);
+      } catch (err) {
+        logError("回滚失败");
+        console.error(err)
+      }
       throw e;
     }
   }

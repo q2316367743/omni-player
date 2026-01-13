@@ -11,7 +11,7 @@
             <t-menu-item value="/admin/ai-setting">AI 设置</t-menu-item>
           </t-menu>
         </t-aside>
-        <t-content>
+        <t-content class="overflow-auto">
           <router-view/>
         </t-content>
       </t-layout>

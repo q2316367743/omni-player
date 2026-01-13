@@ -26,7 +26,7 @@ const selectPlatform = (platform: string) => {
   position: relative;
   width: 100%;
   height: calc(100% - 32px);
-  background: var(--td-bg-color-page);
+  background: var(--td-bg-color-container);
 
   .dailyhot-container {
     display: flex;

@@ -82,12 +82,14 @@ export default {
       inputErrorMessage?: string;
       inputValue?: string;
       onClose?: () => void;
+      maxlength?: number;
     }
   ): Promise<string> {
     const {
       inputValue = "",
       confirmButtonText = "确认",
       cancelButtonText = "取消",
+      maxlength,
       onClose
     } = config || {};
     return new Promise<string>((resolve, reject) => {
@@ -103,6 +105,7 @@ export default {
           <div>
             <Paragraph>{content}</Paragraph>
             <Input
+              maxlength={maxlength}
               autofocus={true}
               v-model={value.value}
               clearable={true}

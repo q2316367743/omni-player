@@ -104,6 +104,11 @@
     <div class="tools-group">
       <div class="group-title">AI 工具</div>
       <div class="tools-grid mini-tools-grid">
+        <mini-tool-card label="聊天" value="ai/chat" tone="ai">
+          <template #icon>
+            <chat-icon />
+          </template>
+        </mini-tool-card>
         <mini-tool-card label="圆桌会" value="ai/roundtable" tone="ai">
           <template #icon>
             <usergroup-icon />
@@ -121,7 +126,7 @@
 
 <script lang="ts" setup>
 import {
-  ArticleIcon,
+  ArticleIcon, ChatIcon,
   CheckRectangleIcon, Code1Icon,
   CodeIcon, CommandIcon, Edit1Icon, GitMergeIcon, ImageIcon,
   InternetIcon, MoneyIcon, PortraitIcon,

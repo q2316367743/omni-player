@@ -12,9 +12,17 @@ export const useSettingStore = defineStore("setting", () => {
     return Math.max(15, globalSetting.value.rssRefreshInterval);
   })
 
+  const modelOptions = computed(() => {
+    return aiSetting.value.model.map(m => ({
+      label: m,
+      value: m
+    }))
+  })
+
   return {
     globalSetting,
     aiSetting,
-    rssRefreshInterval
+    rssRefreshInterval,
+    modelOptions
   }
 })

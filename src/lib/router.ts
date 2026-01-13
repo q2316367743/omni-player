@@ -83,8 +83,8 @@ export const router = createRouter({
     }]
   }, {
     name: "app",
-    path: "/app/tool",
-    redirect: '/app/tool/home',
+    path: "/app",
+    redirect: '/app/home',
     component: () => import('@/pages/app/index.vue'),
     children: [{
       name: 'AppProgrammer',
@@ -160,6 +160,15 @@ export const router = createRouter({
         name: "AppOnlineImage",
         path: "image",
         component: () => import('@/pages/app/online/image/app-online-image.vue')
+      }]
+    }, {
+      name: "AppAi",
+      path: "ai",
+      component: () => import('@/pages/app/ai/index.vue'),
+      children: [{
+        name: "AppAiChat",
+        path: "chat",
+        component: () => import('@/pages/app/ai/chat/ai-chat.vue')
       }]
     }]
   }]

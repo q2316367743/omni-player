@@ -36,7 +36,7 @@ export interface AiSetting {
   key: string;
 
   /**
-   * 模型名称
+   * 启用的模型
    */
   model: Array<string>;
 
@@ -50,6 +50,21 @@ export interface AiSetting {
    */
   timeout: number;
 
+  /**
+   * 默认对话模型
+   */
+  defaultChatModel: string;
+
+  /**
+   * 默认话题命名模型
+   */
+  defaultTopicModel: string;
+
+  /**
+   * 搜索词构建模型
+   */
+  defaultSearchModel: string;
+
 }
 
 export function buildAiSetting(): AiSetting {
@@ -57,6 +72,9 @@ export function buildAiSetting(): AiSetting {
     url: "https://api.openai.com/v1",
     key: '',
     model: ["gpt-3.5-turbo"],
+    defaultChatModel: "gpt-3.5-turbo",
+    defaultTopicModel: '',
+    defaultSearchModel: '',
     timeout: 15000,
     models: [
       {

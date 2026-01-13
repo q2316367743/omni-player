@@ -1,5 +1,5 @@
 <template>
-  <div class="p-8px">
+  <div class="p-8px overflow-auto" style="height: calc(100% - 40px)">
     <t-card>
       <t-form :data="aiSetting">
         <t-form-item label="模型服务地址" label-align="top">
@@ -20,6 +20,15 @@
             </t-button>
           </div>
         </t-form-item>
+        <t-form-item label="默认聊天模型" label-align="top">
+          <t-select v-model="aiSetting.defaultChatModel" :options="modelOptions"/>
+        </t-form-item>
+        <t-form-item label="默认话题命名模型" label-align="top">
+          <t-select v-model="aiSetting.defaultTopicModel" :options="modelOptions"/>
+        </t-form-item>
+        <t-form-item label="搜索词构建模型" label-align="top">
+          <t-select v-model="aiSetting.defaultSearchModel" :options="modelOptions"/>
+        </t-form-item>
       </t-form>
     </t-card>
   </div>
@@ -31,8 +40,9 @@ import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 import {RefreshIcon} from "tdesign-icons-vue-next";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 
-const {aiSetting} = storeToRefs(useSettingStore());
+const {aiSetting, modelOptions} = storeToRefs(useSettingStore());
 const loading = ref(false);
+
 
 const handleRefresh = async () => {
   if (loading.value) return;

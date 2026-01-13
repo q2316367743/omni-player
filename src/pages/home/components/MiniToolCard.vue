@@ -16,7 +16,7 @@ const props = defineProps<{
 
 const router = useRouter();
 
-const jumpTool = () => router.push(`/app/tool/${props.value}`);
+const jumpTool = () => router.push(`/app/${props.value}`);
 </script>
 <style scoped lang="less">
 .mini-tool-card {

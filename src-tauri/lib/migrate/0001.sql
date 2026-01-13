@@ -161,3 +161,55 @@ CREATE TABLE release_asset_content
 
 CREATE INDEX idx_release_asset_content_project_id ON release_asset_content (project_id);
 CREATE INDEX idx_release_asset_content_project_id_language ON release_asset_content (project_id, language);
+
+-- AI 聊天分组（AiChatGroup）
+CREATE TABLE ai_chat_group
+(
+    id         TEXT PRIMARY KEY,
+    created_at INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL DEFAULT 0,
+
+    name       TEXT    NOT NULL,
+    prompt     TEXT    NOT NULL,
+    model      TEXT    NOT NULL,
+    sort       INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX idx_ai_chat_group_sort ON ai_chat_group (sort);
+
+-- AI 聊天项（AiChatItem）
+CREATE TABLE ai_chat_item
+(
+    id         TEXT PRIMARY KEY,
+    created_at INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL DEFAULT 0,
+
+    group_id   TEXT    NOT NULL DEFAULT '',
+    name       TEXT    NOT NULL,
+    top        INTEGER NOT NULL DEFAULT 0,
+    sort       INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX idx_ai_chat_item_group_id ON ai_chat_item (group_id);
+CREATE INDEX idx_ai_chat_item_top ON ai_chat_item (top);
+CREATE INDEX idx_ai_chat_item_sort ON ai_chat_item (sort);
+
+-- AI 聊天消息（AiChatMessage）
+CREATE TABLE ai_chat_message
+(
+    id         TEXT PRIMARY KEY,
+    created_at INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL DEFAULT 0,
+
+    `index`    INTEGER NOT NULL,
+    chat_id    TEXT    NOT NULL,
+    role       TEXT    NOT NULL CHECK ( role IN ('system', 'user', 'assistant', 'model-change', 'error') ),
+    thinking   TEXT    NOT NULL DEFAULT '',
+    content    TEXT    NOT NULL,
+    model      TEXT    NOT NULL,
+    FOREIGN KEY (chat_id) REFERENCES ai_chat_item (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_ai_chat_message_chat_id ON ai_chat_message (chat_id);
+CREATE INDEX idx_ai_chat_message_chat_id_index ON ai_chat_message (chat_id, `index`);
+CREATE INDEX idx_ai_chat_message_role ON ai_chat_message (role);
