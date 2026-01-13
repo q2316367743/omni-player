@@ -20,9 +20,9 @@
         </t-dropdown-menu>
       </t-dropdown>
     </div>
-    <chat
+    <t-chat-list
       ref="chatRef"
-      :data="messages"
+      :data="data"
       :clear-history="false"
       :text-loading="loading"
       :is-stream-load="isStreamLoad"
@@ -30,35 +30,27 @@
       @scroll="handleChatScroll"
     >
       <template #content="{ item, index }">
-        <chat-reasoning v-if="item.thinking && item.thinking.length > 0 && item.role !== 'system'"
-                        expand-icon-placement="right">
+        <t-chat-reasoning v-if="item.thinking && item.thinking.length > 0 && item.role !== 'system'"
+                          expand-icon-placement="right">
           <template #header>
-            <chat-loading v-if="isStreamLoad && index === 0" text="思考中..."/>
+            <t-chat-loading v-if="isStreamLoad && index === 0" text="思考中..."/>
             <div v-else style="display: flex; align-items: center">
               <CheckCircleIcon style="color: var(--td-success-color-5); font-size: 20px; margin-right: 8px"/>
               <span>已深度思考</span>
             </div>
           </template>
-          <chat-content :content="item.thinking" class="reason"/>
-        </chat-reasoning>
-        <chat-content v-if="item.content.length > 0 && item.role !== 'system'" :content="item.content"
-                      :class="[item.role]" class="typo"/>
+          <t-chat-content :content="item.thinking" class="reason"/>
+        </t-chat-reasoning>
+        <t-chat-content v-if="item.content.length > 0 && item.role !== 'system'" :content="item.content[0].data"
+                        :class="[item.role]" class="typo"/>
       </template>
       <template #actions="{ item, index }">
-        <t-space size="small" class="mt-8px">
+        <t-space size="small" class="mt-8px" v-if="item.role === 'assistant'">
           <t-tooltip content="复制">
             <t-button theme="primary" variant="text" shape="square" size="small"
                       @click="handleOperator('copy', item, index)">
               <template #icon>
                 <copy-icon/>
-              </template>
-            </t-button>
-          </t-tooltip>
-          <t-tooltip content="收藏">
-            <t-button theme="primary" variant="text" shape="square" size="small"
-                      @click="handleOperator('coll', item, index)">
-              <template #icon>
-                <collection-icon/>
               </template>
             </t-button>
           </t-tooltip>
@@ -81,7 +73,7 @@
         </t-space>
       </template>
       <template #footer>
-        <chat-sender
+        <t-chat-sender
           v-model="text"
           class="chat-sender"
           :textarea-props="{placeholder: '请输入消息...',disabled: isAsked}"
@@ -103,32 +95,24 @@
               <t-button shape="round" :disabled @click="onSend">发送</t-button>
             </t-space>
           </template>
-          <template #prefix>
+          <template #footer-prefix>
             <home-assistant-select v-model="model"/>
           </template>
-        </chat-sender>
+        </t-chat-sender>
       </template>
-    </chat>
+    </t-chat-list>
     <t-button v-if="isShowToBottom" variant="text" class="bottomBtn" @click="backBottom">
       <arrow-down-icon/>
     </t-button>
   </div>
 </template>
 <script lang="ts" setup>
-import { writeText } from '@tauri-apps/plugin-clipboard-manager';
-import {
-  Chat,
-  ChatContent,
-  type ChatInstanceFunctions,
-  ChatLoading,
-  ChatReasoning,
-  ChatSender
-} from '@tdesign-vue-next/chat';
+import {writeText} from '@tauri-apps/plugin-clipboard-manager';
+import {type ChatInstanceFunctions,} from '@tdesign-vue-next/chat';
 import {
   ArrowDownIcon,
   CheckCircleIcon,
   ChevronDownIcon,
-  CollectionIcon,
   CopyIcon,
   DeleteIcon,
   MenuFoldIcon,
@@ -138,19 +122,24 @@ import {
 import {activeKey, collapsed, toggleCollapsed} from "@/pages/app/ai/chat/model.ts";
 import HomeAssistantSelect from "@/pages/app/ai/chat/components/HomeAssistantSelect.vue";
 import {
-  type AiChatGroup, type AiChatItem, type AiChatMessage, type AiChatMessageCore,
-  transferAiChatItemToChatMessageParam
+  type AiChatGroup,
+  type AiChatItem,
+  type AiChatMessage,
+  type AiChatMessageCore,
+  transferAiChatItemToChatMessageParam,
+  transferItemToTDesign
 } from "@/entity/app/ai/chat";
 import {askToOpenAi, type AskToOpenAiAbort} from "@/util/lang/ChatUtil";
 import {
   addAiChatMessageService,
-  getAiChatGroupService,
+  getAiChatGroupService, getAiChatItemService,
   listAiChatMessageService,
   updateAiChatMessageService
 } from "@/services/app/chat";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {debounce} from "es-toolkit";
 import {onRemoveChat, onRenameChat} from "@/pages/app/ai/chat/components/HomeContext.tsx";
+import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 
 const group = ref<AiChatGroup>();
 const chatItem = ref<AiChatItem>();
@@ -171,34 +160,40 @@ const isStreamLoad = ref(false);
 const isShowToBottom = ref(false);
 const isAsked = ref(false);
 
+const data = computed(() => transferItemToTDesign(messages.value));
+
 tryOnMounted(async () => {
 
-  const url = new URL(activeKey.value);
+  const url = new URL(`https://example.com${activeKey.value}`);
   const mode = url.searchParams.get('mode');
   let path = url.pathname.split("/");
   chatId.value = path.pop()!;
   groupId.value = path.pop()!;
-  // 先获取聊天消息
-  messages.value = await listAiChatMessageService(chatId.value);
-  if (mode === 'create') {
-    // 立即提问
-    onAsk();
-  }
   // 获取聊天分组
   if (groupId.value) {
     group.value = await getAiChatGroupService(groupId.value) || undefined;
   }
+  // 先获取聊天消息
+  messages.value = await listAiChatMessageService(chatId.value);
+  model.value = messages.value[messages.value.length - 1]?.model || group.value?.model || useSettingStore().aiSetting.defaultChatModel;
+  if (mode === 'create') {
+    // 立即提问
+    onAsk();
+  }
+  chatItem.value = await getAiChatItemService(chatId.value) || undefined;
 });
 
 const disabled = computed(() => text.value.trim() === '');
 
-const onSaveContent = async (res?: Array<AiChatMessageCore>) => {
-  if (res && res.length > 0) {
+const onSaveContent = async (res?: AiChatMessageCore) => {
+  let result: string | undefined = undefined;
+  if (res) {
     // 保存内容
-    await addAiChatMessageService(chatId.value, res);
+    result = await addAiChatMessageService(chatId.value, res);
   }
   // 并刷新列表
   messages.value = await listAiChatMessageService(chatId.value);
+  return result;
 };
 
 // 模拟消息发送
@@ -206,20 +201,19 @@ const inputEnter = async (inputValue: string) => {
   // 清空问题
   text.value = '';
   try {
+    // 上一次聊天项
+    const old = messages.value[messages.value.length - 2];
     const message: AiChatMessageCore = {
       role: 'user',
       content: inputValue,
       model: model.value,
       thinking: '',
     };
-    const pedMessages = [message];
-    // 上一次聊天项
-    const old = messages.value[1];
+    await onSaveContent(message)
     if (old) {
       if (old.model !== message.model) {
-        // 服务是否变化
         // 模型发生变化
-        pedMessages.push({
+        await onSaveContent({
           role: 'model-change',
           content: `模型由<span>${old.model}</span>变为<span>${message.model}</span>`,
           model: model.value,
@@ -227,8 +221,6 @@ const inputEnter = async (inputValue: string) => {
         });
       }
     }
-    // 保存内容
-    await onSaveContent(pedMessages);
     // 提问
     await onAsk();
   } catch (e) {
@@ -246,16 +238,20 @@ const onSend = () => {
 
 async function onAsk() {
   abort.value = undefined;
-  const model = messages.value[0]!.model;
+  const model = messages.value[messages.value.length - 1]!.model;
   try {
     loading.value = true;
     isStreamLoad.value = true;
     isAsked.value = true;
-    let messageId = '';
+    // 插入回答
+    const messageId = await onSaveContent({
+      role: 'assistant',
+      content: '',
+      model: model,
+      thinking: ''
+    })
     const onUpdateMessage = debounce(async (data: AiChatMessageCore) => {
-      if (messageId) {
-        await updateAiChatMessageService(messageId, data);
-      }
+      await updateAiChatMessageService(messageId!, {thinking: data.thinking, content: data.content});
     }, 300);
     await askToOpenAi({
       messages: transferAiChatItemToChatMessageParam(messages.value),
@@ -263,25 +259,18 @@ async function onAsk() {
         model
       },
       onStart: () => {
-        onSaveContent([{
-          role: 'assistant',
-          content: '',
-          model: model,
-          thinking: ''
-        }])
-        messageId = messages.value[0]!.id;
       },
       onAppend: (data, t) => {
         loading.value = false;
         if (!data) return;
         if (t) {
-          messages.value[0]!.thinking += data;
+          messages.value[messages.value.length - 1]!.thinking += data;
         } else {
-          messages.value[0]!.content += data;
+          messages.value[messages.value.length - 1]!.content += data;
           isStreamLoad.value = false;
         }
         // 更新
-        onUpdateMessage(messages.value[0]!);
+        onUpdateMessage(messages.value[messages.value.length - 1]!);
       },
       onAborted: (a) => {
         abort.value = a;
@@ -289,18 +278,18 @@ async function onAsk() {
     });
   } catch (e) {
     MessageUtil.error("聊天失败", e);
-    await onSaveContent([{
+    await onSaveContent({
       role: 'error',
       content: '请求出错！原因：' + (e instanceof Error ? e.message : `${e}`),
       thinking: '',
       model: model,
-    }]);
+    });
   } finally {
     loading.value = false;
     isStreamLoad.value = false;
     isAsked.value = false;
     // 保存
-    await onSaveContent();
+    // await onSaveContent();
   }
 }
 
@@ -404,7 +393,9 @@ const handleDeleteChat = (index: number) => {
   .home-chat-content {
     height: calc(100vh - 41px);
     overflow: hidden;
-    padding: 8px 0;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 8px;
 
     :deep(.t-chat__inner) {
       width: 100%;

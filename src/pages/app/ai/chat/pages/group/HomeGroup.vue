@@ -28,7 +28,7 @@
             <t-button shape="round" :disabled @click="onSend">发送</t-button>
           </t-space>
         </template>
-        <template #prefix>
+        <template #footer-prefix>
           <home-assistant-select v-model="model"/>
         </template>
       </chat-sender>

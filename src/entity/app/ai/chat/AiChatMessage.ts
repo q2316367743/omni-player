@@ -1,5 +1,7 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {ChatMessageParam} from "@/util/lang/ChatUtil.ts";
+import type {TdChatItemMeta} from "@tdesign-vue-next/chat";
+import {formatDate} from "@/util/lang/FormatUtil.ts";
 
 
 export interface AiChatMessageCore {
@@ -36,4 +38,18 @@ export function transferAiChatItemToChatMessageParam(items: Array<AiChatMessageC
     }
   });
   return r;
+}
+
+export function transferItemToTDesign(items: Array<AiChatMessage>): Array<TdChatItemMeta> {
+  return items.map(m => {
+    return {
+      role: m.role,
+      datetime: formatDate(m.created_at),
+      name: m.role === 'user' ? '自己' : m.role === 'assistant' ? 'AI' : m.role === 'system' ? '系统' : undefined,
+      content: [{
+        type: 'text',
+        data: m.content
+      }]
+    } as any
+  });
 }

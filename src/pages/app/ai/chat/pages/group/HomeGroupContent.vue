@@ -155,6 +155,8 @@ function onChatClick(data: AiChatItem) {
 }
 
 async function onChatContextMenuClick(data: AiChatItem, e: MouseEvent) {
+  e.preventDefault();
+  e.stopPropagation()
   const g: Array<MenuItem> = (await listAiChatGroupService())
     .filter(e => e.id !== props.groupId).map(e => ({
       label: e.name,
@@ -182,7 +184,7 @@ async function onChatContextMenuClick(data: AiChatItem, e: MouseEvent) {
         }, {
           label: '新建分组',
           icon: () => h(PlusIcon),
-          onClick: () => openAddAiChatGroupDialog()
+          onClick: () => openAddAiChatGroupDialog(() => {})
         }]
     }, {
       label: '编辑名称',
@@ -197,6 +199,7 @@ async function onChatContextMenuClick(data: AiChatItem, e: MouseEvent) {
         style: {
           color: 'var(--td-error-color)'
         },
+        class: 'label'
       }, "删除"),
       onClick() {
         onRemoveChat(props.groupId, data.id, () => {
@@ -235,40 +238,63 @@ function onMove(chat: AiChatItem, targetGroupId: string) {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
 
     .home-group-content-title-left {
       display: flex;
       align-items: center;
 
+      .home-group-content-title-left-icon {
+        border-radius: var(--fluent-radius-smooth);
+        padding: 8px;
+      }
+
       .home-group-content-title-left-name {
         font-size: var(--td-font-size-title-large);
-        margin-left: 8px;
+        margin-left: 12px;
+        font-weight: 600;
+        color: var(--td-text-color-primary);
       }
     }
   }
 
   .home-group-content-prompt {
-    padding: 12px 16px;
-    background-color: var(--kb-bg-color-component);
-    border-radius: var(--td-radius-medium);
+    padding: 20px;
+    background: var(--fluent-acrylic-bg);
+    backdrop-filter: var(--fluent-acrylic-blur);
+    -webkit-backdrop-filter: var(--fluent-acrylic-blur);
+    border-radius: var(--fluent-radius-card);
     cursor: pointer;
-    transition: all .2s;
+    transition: all var(--fluent-transition-normal);
     display: flex;
+    border: 1px solid var(--fluent-border-subtle);
+    box-shadow: var(--fluent-card-shadow);
 
     &:hover {
-      background-color: var(--kb-bg-color-component-hover);
+      background: var(--fluent-card-bg-hover);
+      box-shadow: var(--fluent-card-shadow-hover);
+      transform: translateY(-2px);
+      border-color: var(--fluent-item-hover);
     }
 
     &:active {
-      background-color: var(--kb-bg-color-component-active);
+      background: var(--fluent-item-active);
+      transform: translateY(0);
     }
 
     &.center {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 74px;
+      height: 80px;
+      background: var(--fluent-gradient-primary);
+      color: #ffffff;
+      font-weight: 600;
+      border: none;
+
+      &:hover {
+        box-shadow: var(--fluent-elevation-3);
+      }
     }
 
     .main {
@@ -278,16 +304,34 @@ function onMove(chat: AiChatItem, targetGroupId: string) {
     .icon {
       width: 32px;
       margin-left: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--td-text-color-placeholder);
+      transition: all var(--fluent-transition-fast);
     }
 
+    &:hover .icon {
+      color: var(--fluent-accent-color);
+      transform: translateX(4px);
+    }
 
     .home-group-content-prompt__title {
       font-size: var(--td-font-size-body-large);
+      font-weight: 600;
+      color: var(--td-text-color-primary);
+      margin-bottom: 8px;
     }
 
     .home-group-content-prompt__content {
       font-size: var(--td-font-size-body-medium);
-      margin-top: 6px;
+      color: var(--td-text-color-secondary);
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .home-group-content-prompt__placeholder {
@@ -300,52 +344,65 @@ function onMove(chat: AiChatItem, targetGroupId: string) {
   .chat-title {
     color: var(--td-text-color-placeholder);
     font-size: var(--td-font-size-title-small);
-    margin-top: 24px;
-    margin-left: 12px;
+    margin-top: 32px;
+    margin-left: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 
     .number {
-      font-weight: bold;
+      font-weight: 700;
+      color: var(--fluent-accent-color);
     }
   }
 
   .chat-list {
-    margin-top: 8px;
+    margin-top: 12px;
     display: flex;
     flex-direction: column-reverse;
+    gap: 8px;
 
     .chat-item {
-      padding: 12px 16px;
-      background-color: var(--kb-bg-color-container);
-      border-radius: var(--td-radius-medium);
-      transition: background-color 0.3s ease-in-out;
+      padding: 16px 20px;
+      background: var(--fluent-card-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: var(--fluent-radius-card);
+      transition: all var(--fluent-transition-normal);
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
-
-      &:first-child {
-        margin-bottom: 0;
-      }
+      border: 1px solid var(--fluent-card-border);
+      box-shadow: var(--fluent-elevation-1);
 
       &:hover {
-        background-color: var(--kb-bg-color-container-hover);
+        background: var(--fluent-card-bg-hover);
+        box-shadow: var(--fluent-elevation-2);
+        transform: translateY(-2px);
+        border-color: var(--fluent-item-hover);
       }
 
       &:active {
-        background-color: var(--kb-bg-color-container-active);
+        background: var(--fluent-item-active);
+        transform: translateY(0);
       }
 
       .left {
         display: flex;
         align-items: center;
+        color: var(--fluent-accent-color);
 
         .title {
-          font-weight: bold;
-          margin-left: 8px;
+          font-weight: 600;
+          margin-left: 12px;
+          color: var(--td-text-color-primary);
         }
       }
 
+      .right {
+        color: var(--td-text-color-placeholder);
+        font-size: var(--td-font-size-body-small);
+      }
     }
   }
 

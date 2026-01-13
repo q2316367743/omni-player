@@ -30,6 +30,8 @@ export default defineConfig(({mode}) => {
       AutoImport({
         resolvers: [TDesignResolver({
           library: 'vue-next'
+        }), TDesignResolver({
+          library: 'chat'
         })],
         imports: ['vue', '@vueuse/core', 'vue-router'],
         eslintrc: {
@@ -39,6 +41,8 @@ export default defineConfig(({mode}) => {
       Components({
         resolvers: [TDesignResolver({
           library: 'vue-next'
+        }), TDesignResolver({
+          library: 'chat'
         })],
       }), UnoCSS()],
     // prevent vite from obscuring rust errors

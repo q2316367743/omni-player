@@ -9,6 +9,10 @@ export async function listAiChatItemService(groupId = "") {
     .list();
 }
 
+export async function getAiChatItemService(id: string) {
+  return useSql().query<AiChatItem>('ai_chat_item').eq('id', id).one();
+}
+
 export async function moveAiChatItemService(id: string, groupId: string) {
   await useSql().mapper<AiChatItem>('ai_chat_item').updateById(id, {
     group_id: groupId,
@@ -41,44 +45,47 @@ export async function removeAiChatItemService(id: string) {
  * @param model 模型
  * @returns 聊天项ID
  */
-export function createAiChatItemService(groupId: string, message: string, model: string) {
-  return useSql().beginTransaction(async sql => {
-    const now = Date.now();
-    // 创建聊天记录
-    const chat = await sql.mapper<AiChatItem>('ai_chat_item').insert({
-      group_id: groupId,
-      name: message.substring(0, 10),
-      top: 0,
-      sort: now,
-      created_at: now,
-      updated_at: now
-    })
-    if (groupId) {
-      //获取分组
-      const group = await sql.query<AiChatGroup>('ai_chat_group')
-        .eq('id', groupId).one();
-      if (group) {
-        // 插入提示词
-        await sql.mapper<AiChatMessage>('ai_chat_message').insert({
-          chat_id: chat.id,
-          role: 'system',
-          model: model,
-          content: group.prompt,
-          created_at: now,
-          updated_at: now,
-        });
-      }
-    }
-    // 插入问题
-    await sql.mapper<AiChatMessage>('ai_chat_message').insert({
-      chat_id: chat.id,
-      role: 'user',
-      content: message,
-      model: model,
-      created_at: now,
-      updated_at: now,
-    });
-    // 返回 ID
-    return chat.id;
+export async function createAiChatItemService(groupId: string, message: string, model: string) {
+  const sql = useSql();
+  const now = Date.now();
+  // 创建聊天记录
+  const chat = await sql.mapper<AiChatItem>('ai_chat_item').insert({
+    group_id: groupId,
+    name: message.substring(0, 10),
+    top: 0,
+    sort: now,
+    created_at: now,
+    updated_at: now
   })
+  let idx = 0;
+  if (groupId) {
+    //获取分组
+    const group = await sql.query<AiChatGroup>('ai_chat_group')
+      .eq('id', groupId).one();
+    if (group) {
+      // 插入提示词
+      await sql.mapper<AiChatMessage>('ai_chat_message').insert({
+        chat_id: chat.id,
+        role: 'system',
+        model: model,
+        content: group.prompt,
+        created_at: now,
+        updated_at: now,
+        index: 0
+      });
+      idx = 1;
+    }
+  }
+  // 插入问题
+  await sql.mapper<AiChatMessage>('ai_chat_message').insert({
+    chat_id: chat.id,
+    role: 'user',
+    content: message,
+    model: model,
+    created_at: now,
+    updated_at: now,
+    index: idx
+  });
+  // 返回 ID
+  return chat.id;
 }

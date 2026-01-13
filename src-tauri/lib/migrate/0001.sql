@@ -169,9 +169,9 @@ CREATE TABLE ai_chat_group
     created_at INTEGER NOT NULL DEFAULT 0,
     updated_at INTEGER NOT NULL DEFAULT 0,
 
-    name       TEXT    NOT NULL,
-    prompt     TEXT    NOT NULL,
-    model      TEXT    NOT NULL,
+    name       TEXT    NOT NULL DEFAULT '',
+    prompt     TEXT    NOT NULL DEFAULT '',
+    model      TEXT    NOT NULL DEFAULT '',
     sort       INTEGER NOT NULL DEFAULT 0
 );
 
@@ -185,7 +185,7 @@ CREATE TABLE ai_chat_item
     updated_at INTEGER NOT NULL DEFAULT 0,
 
     group_id   TEXT    NOT NULL DEFAULT '',
-    name       TEXT    NOT NULL,
+    name       TEXT    NOT NULL DEFAULT '',
     top        INTEGER NOT NULL DEFAULT 0,
     sort       INTEGER NOT NULL DEFAULT 0
 );
@@ -201,12 +201,12 @@ CREATE TABLE ai_chat_message
     created_at INTEGER NOT NULL DEFAULT 0,
     updated_at INTEGER NOT NULL DEFAULT 0,
 
-    `index`    INTEGER NOT NULL,
-    chat_id    TEXT    NOT NULL,
+    `index`    INTEGER NOT NULL DEFAULT 0,
+    chat_id    TEXT    NOT NULL DEFAULT '',
     role       TEXT    NOT NULL CHECK ( role IN ('system', 'user', 'assistant', 'model-change', 'error') ),
     thinking   TEXT    NOT NULL DEFAULT '',
-    content    TEXT    NOT NULL,
-    model      TEXT    NOT NULL,
+    content    TEXT    NOT NULL DEFAULT '',
+    model      TEXT    NOT NULL DEFAULT '',
     FOREIGN KEY (chat_id) REFERENCES ai_chat_item (id) ON DELETE CASCADE
 );
 
