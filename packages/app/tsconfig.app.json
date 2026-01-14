@@ -1,0 +1,34 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "types": [
+      "vite/client"
+    ],
+    "jsx": "preserve",
+    "jsxImportSource": "vue",
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "baseUrl": "./"
+  },
+  "include": [
+    "packages/app/src/**/*.ts",
+    "packages/app/src/**/*.d.ts",
+    "packages/app/src/**/*.tsx",
+    "packages/app/src/**/*.vue",
+    "src/vite-env.d.ts",
+    "packages/app/auto-imports.d.ts",
+    "packages/app/components.d.ts",
+    "packages/app/vite.config.ts"
+  ]
+}
