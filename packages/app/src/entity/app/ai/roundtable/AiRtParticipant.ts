@@ -1,7 +1,8 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
-import type {AiRtRoleAdd} from "@/entity/app/ai/roundtable/AiRtRole.ts";
+import type {AiRtRoleAdd, AiRtRoleType} from "@/entity/app/ai/roundtable/AiRtRole.ts";
 import type {YesOrNo} from "@/global/YesOrNo.ts";
 import type {AiRtMeeting} from "@/entity/app/ai/roundtable";
+import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 
 /**
  * 圆桌会议 - 角色关联场景
@@ -10,7 +11,7 @@ import type {AiRtMeeting} from "@/entity/app/ai/roundtable";
  */
 export type AiRtRelatedRoleScope = 'meeting' | 'group';
 
-export interface AiRtParticipantCore extends AiRtRoleAdd{
+export interface AiRtParticipantCore extends AiRtRoleAdd {
 
   /**
    * 角色关联场景
@@ -50,6 +51,27 @@ export interface AiRtParticipantCore extends AiRtRoleAdd{
  */
 export interface AiRtParticipant extends BaseEntity, AiRtParticipantCore {
 
+}
+
+export function buildAiRtParticipantCore(type: AiRtRoleType): AiRtParticipantCore {
+  return {
+    scope: 'meeting',
+    scope_id: '',
+    scene_prompt: '',
+    join_order: 0,
+    stance: '',
+    is_active: 1,
+    prompt: "",
+    type,
+    model: useSettingStore().aiSetting.defaultChatModel,
+    name: "",
+    min_response_length: 50,
+    max_response_length: 800,
+    temperature: type === 'admin' ? 0.3 : 0.7,
+    enable_fact_checking: 1,
+    allow_cross_talk: 0,
+    timeout_per_turn: 30
+  };
 }
 
 export function buildAiRtParticipantPrompt(participant: AiRtParticipantCore, meeting: AiRtMeeting): string {

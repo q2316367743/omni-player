@@ -8,16 +8,22 @@ import {
   Textarea,
   Collapse,
   CollapsePanel,
-  Input,
   InputNumber,
   Slider,
   Space,
-  Checkbox,
+  Checkbox, Select, Input,
 } from "tdesign-vue-next";
+import "./participant-config.less"
+import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 
-export function openParticipantConfig(participant: AiRtParticipantCore, onUpdate: (res: AiRtParticipantCore) => void) {
+export function openParticipantConfig(
+  participant: AiRtParticipantCore,
+  onUpdate: (res: AiRtParticipantCore) => void,
+  presets: boolean
+) {
   const data = ref(cloneDeep(participant));
   const advancedExpanded = ref([]);
+  const options = computed(() => useSettingStore().modelOptions);
   const dp = DialogPlugin({
     header: '配置参与者',
     placement: 'center',
@@ -31,11 +37,18 @@ export function openParticipantConfig(participant: AiRtParticipantCore, onUpdate
           </Tag>
         </div>
       </div>
-      <div class="config-section">
+      {presets && <div class="config-section">
         <div class="config-label">角色提示词</div>
         <div class="config-prompt">{data.value.prompt || '暂无提示词'}</div>
-      </div>
+      </div>}
       <Form>
+        {!presets && <FormItem labelAlign="top" label="角色名称" class="config-form-item">
+          <Input v-model={data.value.name} />
+        </FormItem>}
+        {!presets && <FormItem labelAlign="top" label="角色提示词" class="config-form-item">
+          <Textarea v-model={data.value.scene_prompt} placeholder="请输入场景提示词，描述具体的身份信息/行为信息"
+                    autosize={{minRows: 3, maxRows: 6}}/>
+        </FormItem>}
         <FormItem labelAlign="top" label="场景提示词" class="config-form-item">
           <Textarea v-model={data.value.scene_prompt} placeholder="请输入场景提示词，描述具体的身份信息/行为信息"
                     autosize={{minRows: 3, maxRows: 6}}/>
@@ -49,7 +62,7 @@ export function openParticipantConfig(participant: AiRtParticipantCore, onUpdate
         <CollapsePanel header="高级参数" value="advanced">
           <Form labelAlign="top">
             <FormItem label="使用的模型">
-              <Input v-model={data.value.model}/>
+              <Select v-model={data.value.model} options={options.value} filterable={true} clearable={true}/>
             </FormItem>
             <FormItem label="最小响应字数">
               <InputNumber v-model={data.value.min_response_length} min={-1}/>

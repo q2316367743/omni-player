@@ -6,8 +6,8 @@
     <t-content class="h-full overflow-hidden overflow-x-hidden">
       <roundtable-role v-show="activeKey === '/role'"/>
       <roundtable-group v-if="activeKey.startsWith('/group')"/>
-      <roundtable-meeting v-else-if="activeKey.startsWith('/meeting')"/>
-      <roundtable-create v-else-if="activeKey.startsWith('/create')" />
+      <roundtable-meeting v-else-if="activeKey.startsWith('/meeting')" v-model="activeKey"/>
+      <roundtable-create v-else-if="activeKey.startsWith('/create')" v-model="activeKey" />
       <empty-result v-else-if="activeKey !== '/role'" title="AI 圆桌派" tip="让 AI 与你一起头脑风暴"/>
     </t-content>
   </t-layout>
