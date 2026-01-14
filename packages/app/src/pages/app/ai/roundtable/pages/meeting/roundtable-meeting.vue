@@ -29,12 +29,17 @@ const participants = ref<Array<AiRtParticipant>>([]);
 const page = ref('1');
 
 tryOnMounted(async () => {
-  const item = activeKey.value.split("/");
+  const url = new URL(`https://example.com${activeKey.value}`)
+  const item = url.pathname.split("/");
   meetingId.value = item.pop()!;
   groupId.value = item.pop()!;
   meeting.value = await getAiRtMeetingService(meetingId.value) || undefined;
   messages.value = await listAiRtMessageService(meetingId.value);
   participants.value = await listAiRtParticipantService('meeting', meetingId.value)
+  const mode = url.searchParams.get('mode');
+  if (mode === 'create'){
+    //代表新创建，立即开始对话
+  }
 })
 </script>
 <style scoped lang="less">

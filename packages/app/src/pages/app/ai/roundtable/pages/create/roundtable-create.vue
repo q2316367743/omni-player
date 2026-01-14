@@ -252,7 +252,7 @@ const submitMeeting = async () => {
   try {
     const id = await addAiRtMeetingService(meeting.value);
     MessageUtil.success('圆桌会议创建成功');
-    activeKey.value = `/meeting/${groupId.value}/${id}`;
+    activeKey.value = `/meeting/${groupId.value}/${id}?mode=create`;
   } catch (error) {
     MessageUtil.error('创建失败', error);
   }
