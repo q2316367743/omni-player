@@ -26,7 +26,12 @@ export type TableName =
   | 'release_asset_content'
   | 'ai_chat_group'
   | 'ai_chat_item'
-  | 'ai_chat_message';
+  | 'ai_chat_message'
+  | 'ai_rt_group'
+  | 'ai_rt_meeting'
+  | 'ai_rt_message'
+  | 'ai_rt_participant'
+  | 'ai_rt_role';
 
 export class SqlWrapper {
 

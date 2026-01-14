@@ -169,6 +169,10 @@ export const router = createRouter({
         name: "AppAiChat",
         path: "chat",
         component: () => import('@/pages/app/ai/chat/ai-chat.vue')
+      }, {
+        name: "AppAiRoundtable",
+        path: "roundtable",
+        component: () => import('@/pages/app/ai/roundtable/app-ai-roundtable.vue')
       }]
     }]
   }]

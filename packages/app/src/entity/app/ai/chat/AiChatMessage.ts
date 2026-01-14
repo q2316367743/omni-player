@@ -2,11 +2,12 @@ import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {ChatMessageParam} from "@/util/lang/ChatUtil.ts";
 import type {TdChatItemMeta} from "@tdesign-vue-next/chat";
 import {formatDate} from "@/util/lang/FormatUtil.ts";
+import type {AiChatRole} from "@/global/CommonType.ts";
 
 
 export interface AiChatMessageCore {
   // 角色
-  role: "system" | "user" | "assistant" | "model-change" | "error";
+  role: AiChatRole;
   // 思考
   thinking: string;
   // 内容
@@ -30,7 +31,6 @@ export function transferAiChatItemToChatMessageParam(items: Array<AiChatMessageC
     return {
       role: item.role,
       content: item.content,
-      model: item.model,
     }
   }).forEach(e => {
     if (e.role !== 'model-change' && e.role !== 'error') {

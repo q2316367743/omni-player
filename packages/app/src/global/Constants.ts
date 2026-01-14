@@ -26,6 +26,9 @@ export const DB_MIGRATE_FILES = [{
 }, {
   file: 'lib/migrate/0001.sql',
   version: 1
+}, {
+  file: 'lib/migrate/0002.sql',
+  version: 2
 }];
 
 export const [collapsed, toggleCollapsed] = useBoolState( false);

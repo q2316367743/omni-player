@@ -10,8 +10,6 @@ export interface ChatMessageParam {
   role: "system" | "user" | "assistant";
   // 内容
   content: string;
-  // 使用的模型
-  model: string;
 }
 
 interface Assistant {
@@ -70,6 +68,7 @@ export async function askToOpenAi(props: AskToOpenAiProps): Promise<void> {
  * 向Ollama进行提问
  * @param props 参数
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function askToOllama(props: AskToOpenAiProps): Promise<void> {
   const {messages, assistant, onStart, onAppend, onAborted} = props;
   const {aiSetting} = useSettingStore();
