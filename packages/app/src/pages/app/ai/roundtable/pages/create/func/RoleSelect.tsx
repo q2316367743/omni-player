@@ -8,6 +8,7 @@ export function openRoleSelect(type: AiRtRoleType, onUpdate: (role?: AiRtRole) =
   const loadingRoles = ref(true);
   
   listAiRtRoleService(type).then(e => {
+    console.log(e)
     availableRoles.value = e;
   }).finally(() => {
     loadingRoles.value = false;

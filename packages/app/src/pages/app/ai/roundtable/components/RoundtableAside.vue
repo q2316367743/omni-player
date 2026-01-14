@@ -79,7 +79,7 @@ const onAddGroup = () => {
 const onAddMeeting = () => {
   // 创建临时圆桌会议
   modelValue.value = '';
-  modelValue.value = `/create/0`;
+  modelValue.value = `/create/`;
 }
 
 const onGroupMenuClick = (group: AiRtGroup, e: MouseEvent) => {
@@ -131,16 +131,23 @@ const onMeetingMenuClick = (meeting: AiRtMeeting, e: MouseEvent) => {
     }]
   });
 }
+
+defineExpose({
+  refreshMeeting: async () => {
+    meetings.value = await listAiRtMeetingService("");
+  }
+})
 </script>
 <style scoped lang="less">
 .roundtable-aside {
-  width: 232px;
+  width: 231px;
   height: 100vh;
   overflow: hidden;
   background: var(--td-bg-color-container);
   backdrop-filter: var(--fluent-acrylic-blur);
   border-right: 1px solid var(--fluent-sidebar-border);
   transition: var(--fluent-transition-normal);
+  border-right: 1px solid var(--td-border-level-1-color);
 
   .header {
     padding: 8px;

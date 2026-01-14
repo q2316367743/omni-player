@@ -103,7 +103,7 @@ export class BaseMapper<T extends TableLike> {
 
     // 构建SQL语句
     const valuePlaceholders = params
-      .map((_v, index) => `(${generatePlaceholders(keys.length + 1, keys.length * index)})`)
+      .map((_v, index) => `(${generatePlaceholders(keys.length + 1, index > 0 ? (keys.length * index + index) : 0)})`)
       .join(", ");
 
     const sql = `insert into ${this.tableName} (id, ${columnNames.join(

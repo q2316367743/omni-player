@@ -145,6 +145,7 @@ const activeKey = defineModel({
   type: String,
   default: '/create/0'
 })
+const emit = defineEmits(['refresh']);
 
 const current = ref(0);
 const groupId = ref('');
@@ -253,6 +254,7 @@ const submitMeeting = async () => {
     const id = await addAiRtMeetingService(meeting.value);
     MessageUtil.success('圆桌会议创建成功');
     activeKey.value = `/meeting/${groupId.value}/${id}?mode=create`;
+    emit('refresh');
   } catch (error) {
     MessageUtil.error('创建失败', error);
   }

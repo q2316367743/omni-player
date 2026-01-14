@@ -5,35 +5,26 @@ import {type AiRtParticipant, buildAiRtParticipantPrompt} from "@/entity/app/ai/
 import type {ChatMessageParam} from "@/util/lang/ChatUtil.ts";
 import type {AiRtMeeting} from "@/entity/app/ai/roundtable/AiRtMeeting.ts";
 
+export interface AiRtMessageCore {
+  role: AiChatRole;
+  thinking: string;
+  content: string;
+  participant_id: string;
+  is_summary: YesOrNo;
+  is_interrupted: YesOrNo;
+  parent_message_id: string;
+}
+
 /**
  * 圆桌会议 - 聊天消息
  */
-export interface AiRtMessage extends BaseEntity {
+export interface AiRtMessage extends BaseEntity, AiRtMessageCore {
 
   /* ----------------------- 关联信息 ----------------------- */
   /**
    * 会议 ID
    */
   meeting_id: string;
-  /**
-   * 发言者，为空代表是用户
-   */
-  participant_id: string;
-
-  /* ----------------------- 消息信息 ----------------------- */
-
-  /**
-   * 消息角色
-   */
-  role: AiChatRole;
-  /**
-   * 深度思考内容
-   */
-  thinking: string;
-  /**
-   * 内容
-   */
-  content: string;
 
   /* ----------------------- 更多信息 ----------------------- */
 
@@ -41,21 +32,6 @@ export interface AiRtMessage extends BaseEntity {
    * 本轮中的顺序
    */
   turn_order: number;
-
-  /**
-   * 是否为总结消息，上帝 AI 发出
-   */
-  is_summary: YesOrNo;
-
-  /**
-   * 是否被用户打断，用于续说逻辑
-   */
-  is_interrupted: YesOrNo;
-
-  /**
-   * 若为续说，指向被打断的原消息
-   */
-  parent_message_id: string;
 
 }
 

@@ -1,5 +1,5 @@
 import {useSql} from "@/lib/sql.ts";
-import type {AiRtMeeting, AiRtMeetingAdd, AiRtParticipant} from "@/entity/app/ai/roundtable";
+import type {AiRtMeeting, AiRtMeetingAdd, AiRtMeetingCore, AiRtParticipant} from "@/entity/app/ai/roundtable";
 
 export async function listAiRtMeetingService(groupId: string) {
   return useSql().query<AiRtMeeting>('ai_rt_meeting')
@@ -9,6 +9,13 @@ export async function listAiRtMeetingService(groupId: string) {
 
 export function getAiRtMeetingService(id: string) {
   return useSql().query<AiRtMeeting>('ai_rt_meeting').eq('id', id).one();
+}
+
+export function updateAiRtMeetingService(id: string, meeting: Partial<AiRtMeetingCore>) {
+  return useSql().mapper<AiRtMeeting>('ai_rt_meeting').updateById(id, {
+    ...meeting,
+    updated_at: Date.now()
+  })
 }
 
 export async function addAiRtMeetingService(meeting: AiRtMeetingAdd) {
