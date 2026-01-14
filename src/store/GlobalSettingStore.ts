@@ -12,6 +12,11 @@ export const useSettingStore = defineStore("setting", () => {
     return Math.max(15, globalSetting.value.rssRefreshInterval);
   })
 
+  // AI 功能是否可用
+  const aiEnabled = computed(() => {
+    return aiSetting.value.url && aiSetting.value.key
+  })
+
   const modelOptions = computed(() => {
     return aiSetting.value.model.map(m => ({
       label: m,
@@ -23,6 +28,7 @@ export const useSettingStore = defineStore("setting", () => {
     globalSetting,
     aiSetting,
     rssRefreshInterval,
-    modelOptions
+    modelOptions,
+    aiEnabled
   }
 })
