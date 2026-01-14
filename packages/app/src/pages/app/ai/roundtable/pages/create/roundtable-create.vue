@@ -210,6 +210,7 @@ import type {AiRtParticipantCore} from "@/entity/app/ai/roundtable";
 import Sortable from 'sortablejs';
 import {AddIcon} from 'tdesign-icons-vue-next';
 import MessageUtil from '@/util/model/MessageUtil.ts';
+import {openParticipantConfig} from "@/pages/app/ai/roundtable/pages/create/func/ParticipantConfig.tsx";
 
 const props = defineProps({
   activeKey: {
@@ -224,7 +225,7 @@ const meeting = ref(buildAiRtMeetingAdd(groupId.value));
 const roleSelectVisible = ref(false);
 const participantConfigVisible = ref(false);
 const availableRoles = ref<AiRtRole[]>([]);
-const selectedRole = ref<AiRtRole | null>(null);
+const selectedRole = ref<AiRtRole>();
 const tempParticipant = ref<Partial<AiRtParticipantCore>>({});
 const loadingRoles = ref(false);
 const editingIndex = ref(-1);
@@ -328,24 +329,14 @@ const selectRole = (role: AiRtRole) => {
 const editParticipant = (participant: AiRtParticipantCore) => {
   const index = meeting.value.participants.findIndex(p => p === participant);
   if (index !== -1) {
-    editingIndex.value = index;
-    selectedRole.value = {
-      id: '',
-      name: participant.name,
-      prompt: participant.prompt,
-      type: participant.type,
-      model: participant.model,
-      min_response_length: participant.min_response_length,
-      max_response_length: participant.max_response_length,
-      temperature: participant.temperature,
-      enable_fact_checking: participant.enable_fact_checking,
-      allow_cross_talk: participant.allow_cross_talk,
-      timeout_per_turn: participant.timeout_per_turn,
-      created_at: 0,
-      updated_at: 0
-    };
-    tempParticipant.value = { ...participant };
-    participantConfigVisible.value = true;
+    openParticipantConfig(participant, (res) => {
+      if (index >= 0) {
+        meeting.value.participants[index] = res;
+      } else {
+        meeting.value.participants.push(res);
+      }
+
+    })
   }
 };
 
