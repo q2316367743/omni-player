@@ -27,58 +27,58 @@ export class QueryChain<T extends Record<string, any>, K extends keyof T = keyof
     const qw = new QueryChain<T>(tableName, db);
     if (typeof p !== "undefined") {
       Object.entries(p).forEach(([k, v]) => {
-        qw.simpleWhere(k, v, "=");
+        qw.simpleWhere(k, "=", v);
       });
     }
     return qw;
   }
 
-  private simpleWhere(k: K, v: T[K], op: string) {
+  private simpleWhere(k: K, op: string, v?: T[K]) {
     if (typeof v === "undefined" || v === null) return this;
     this.params.push(`\`${String(k)}\` ${op} ${generatePlaceholders(1, this.values.length)}`);
     this.values.push(v);
     return this;
   }
 
-  eq(k: K, v: T[K]) {
-    return this.simpleWhere(k, v, "=");
+  eq(k: K, v?: T[K]) {
+    return this.simpleWhere(k, "=", v);
   }
 
   ne(k: K, v: T[K]) {
-    return this.simpleWhere(k, v, "!=");
+    return this.simpleWhere(k, "!=", v);
   }
 
   ge(k: K, v: T[K]) {
-    return this.simpleWhere(k, v, ">=");
+    return this.simpleWhere(k, ">=", v);  
   }
 
   le(k: K, v: T[K]) {
-    return this.simpleWhere(k, v, "<=");
+    return this.simpleWhere(k, "<=", v);
   }
 
   gt(k: K, v: T[K]) {
-    return this.simpleWhere(k, v, ">");
+    return this.simpleWhere(k, ">", v);
   }
 
   lt(k: K, v: T[K]) {
-    return this.simpleWhere(k, v, "<");
+    return this.simpleWhere(k, "<", v);
   }
 
-  like(k: K, v: T[K]) {
+  like(k: K, v?: T[K]) {
     if (typeof v === "undefined" || v === null) return this;
     this.params.push(`\`${String(k)}\` like CONCAT('%', ${generatePlaceholders(1, this.values.length)}, '%')`);
     this.values.push(v);
     return this;
   }
 
-  likeLeft(k: K, v: T[K]) {
+  likeLeft(k: K, v?: T[K]) {
     if (typeof v === "undefined" || v === null) return this;
     this.params.push(`\`${String(k)}\` like CONCAT('%', ${generatePlaceholders(1, this.values.length)})`);
     this.values.push(v);
     return this;
   }
 
-  likeRight(k: K, v: T[K]) {
+  likeRight(k: K, v?: T[K]) {
     if (typeof v === "undefined" || v === null) return this;
     this.params.push(`\`${String(k)}\` like CONCAT(${generatePlaceholders(1, this.values.length)}, '%')`);
     this.values.push(v);

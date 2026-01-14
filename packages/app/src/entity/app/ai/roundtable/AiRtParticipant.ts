@@ -1,5 +1,5 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
-import type {AiRtRole} from "@/entity/app/ai/roundtable/AiRtRole.ts";
+import type {AiRtRoleAdd} from "@/entity/app/ai/roundtable/AiRtRole.ts";
 import type {YesOrNo} from "@/global/YesOrNo.ts";
 import type {AiRtMeeting} from "@/entity/app/ai/roundtable";
 
@@ -10,10 +10,7 @@ import type {AiRtMeeting} from "@/entity/app/ai/roundtable";
  */
 export type AiRtRelatedRoleScope = 'meeting' | 'group';
 
-/**
- * 圆桌会议 - 参与者
- */
-export interface AiRtParticipant extends BaseEntity, AiRtRole {
+export interface AiRtParticipantCore extends AiRtRoleAdd{
 
   /**
    * 角色关联场景
@@ -46,10 +43,16 @@ export interface AiRtParticipant extends BaseEntity, AiRtRole {
    * 是否参与本轮，支持中途禁言
    */
   is_active: YesOrNo;
+}
+
+/**
+ * 圆桌会议 - 参与者
+ */
+export interface AiRtParticipant extends BaseEntity, AiRtParticipantCore {
 
 }
 
-export function buildAiRtParticipantPrompt(participant: AiRtParticipant, meeting: AiRtMeeting): string {
+export function buildAiRtParticipantPrompt(participant: AiRtParticipantCore, meeting: AiRtMeeting): string {
   return [
     `你是【${participant.name}】，${participant.prompt}`,
     `本次会议主题：${meeting.topic}`,

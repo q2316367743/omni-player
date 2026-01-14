@@ -1,8 +1,9 @@
 import {useSql} from "@/lib/sql.ts";
-import type {AiRtRole, AiRtRoleAdd, AiRtRoleUpdate} from "@/entity/app/ai/roundtable";
+import type {AiRtRole, AiRtRoleAdd, AiRtRoleType, AiRtRoleUpdate} from "@/entity/app/ai/roundtable";
 
-export function listAiRtRoleService() {
-  return useSql().query<AiRtRole>('ai_rt_role').list()
+export function listAiRtRoleService(type?: AiRtRoleType) {
+  return useSql().query<AiRtRole>('ai_rt_role')
+  .eq('type', type).list()
 }
 
 export function addAiRtRoleService(prop: AiRtRoleAdd) {

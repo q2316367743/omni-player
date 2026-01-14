@@ -1,12 +1,10 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {YesOrNo} from "@/global/YesOrNo.ts";
+import type {AiRtParticipantCore} from "@/entity/app/ai/roundtable/AiRtParticipant.ts";
 
 export type AiRtMeetingStatus = 'active' | 'paused' | 'ended' | 'archived';
 
-/**
- * 圆桌会议
- */
-export interface AiRtMeeting extends BaseEntity {
+export interface AiRtMeetingCore {
 
   /**
    * 所属讨论组，可以为空
@@ -50,5 +48,30 @@ export interface AiRtMeeting extends BaseEntity {
    * 是否允许用户随时插话打断
    */
   allow_user_interruption: YesOrNo;
+}
 
+/**
+ * 圆桌会议
+ */
+export interface AiRtMeeting extends BaseEntity, AiRtMeetingCore {
+
+
+}
+
+export interface AiRtMeetingAdd extends AiRtMeetingCore {
+  participants: Array<AiRtParticipantCore>
+}
+
+export function buildAiRtMeetingAdd(groupId: string):AiRtMeetingAdd {
+  return {
+    participants: [],
+    group_id: groupId,
+    status: 'active',
+    max_rounds: 0,
+    summary_interval: 1,
+    auto_summary_on_end: 0,
+    allow_user_interruption: 1,
+    topic: "",
+    content: "",
+  }
 }
