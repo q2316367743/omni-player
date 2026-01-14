@@ -22,13 +22,13 @@
     "baseUrl": "./"
   },
   "include": [
-    "packages/app/src/**/*.ts",
-    "packages/app/src/**/*.d.ts",
-    "packages/app/src/**/*.tsx",
-    "packages/app/src/**/*.vue",
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
     "src/vite-env.d.ts",
-    "packages/app/auto-imports.d.ts",
-    "packages/app/components.d.ts",
-    "packages/app/vite.config.ts"
+    "auto-imports.d.ts",
+    "components.d.ts",
+    "vite.config.ts"
   ]
 }

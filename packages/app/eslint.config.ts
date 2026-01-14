@@ -6,7 +6,7 @@ import css from "@eslint/css";
 import {defineConfig} from "eslint/config";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import autoImportGlobals from ".eslintrc-auto-import.json";
+import autoImportGlobals from "./.eslintrc-auto-import.json";
 
 export default defineConfig([
   {ignores: ["dist/**", "**/dist-js/**", "src-tauri/**", "node_modules/**"]},
