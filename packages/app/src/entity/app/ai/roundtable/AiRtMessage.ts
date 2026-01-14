@@ -1,8 +1,9 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {AiChatRole} from "@/global/CommonType.ts";
 import type {YesOrNo} from "@/global/YesOrNo.ts";
-import type {AiRtParticipant} from "@/entity/app/ai/roundtable/AiRtParticipant.ts";
+import {type AiRtParticipant, buildAiRtParticipantPrompt} from "@/entity/app/ai/roundtable/AiRtParticipant.ts";
 import type {ChatMessageParam} from "@/util/lang/ChatUtil.ts";
+import type {AiRtMeeting} from "@/entity/app/ai/roundtable/AiRtMeeting.ts";
 
 /**
  * 圆桌会议 - 聊天消息
@@ -58,8 +59,12 @@ export interface AiRtMessage extends BaseEntity {
 
 }
 
-export function transferRtMessageTo(messages: Array<AiRtMessage>, participant:AiRtParticipant, participantMap: Map<string, AiRtParticipant>): Array<ChatMessageParam> {
+export function transferRtMessageTo(messages: Array<AiRtMessage>, meeting: AiRtMeeting, participant:AiRtParticipant, participantMap: Map<string, AiRtParticipant>): Array<ChatMessageParam> {
   const results = new Array<ChatMessageParam>();
+  results.push({
+    role: 'system',
+    content: buildAiRtParticipantPrompt(participant, meeting)
+  })
   for (const message of messages.sort((a, b) => a.turn_order - b.turn_order)) {
     switch (message.role) {
       case "assistant": {

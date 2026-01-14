@@ -13,6 +13,7 @@
 <script lang="ts" setup>
 import type {AiRtMeeting, AiRtMessage, AiRtParticipant} from "@/entity/app/ai/roundtable";
 import {getAiRtMeetingService, listAiRtMessageService, listAiRtParticipantService} from "@/services/app/roundtable";
+import {map} from "@/util";
 
 const activeKey = defineModel({
   type: String,
@@ -25,6 +26,7 @@ const groupId = ref('');
 const meeting = ref<AiRtMeeting>();
 const messages = ref<Array<AiRtMessage>>([]);
 const participants = ref<Array<AiRtParticipant>>([]);
+const participantMap = ref(new Map<string, AiRtParticipant>());
 
 const page = ref('1');
 
@@ -36,6 +38,7 @@ tryOnMounted(async () => {
   meeting.value = await getAiRtMeetingService(meetingId.value) || undefined;
   messages.value = await listAiRtMessageService(meetingId.value);
   participants.value = await listAiRtParticipantService('meeting', meetingId.value)
+  participantMap.value = map(participants.value, 'id');
   const mode = url.searchParams.get('mode');
   if (mode === 'create'){
     //代表新创建，立即开始对话
