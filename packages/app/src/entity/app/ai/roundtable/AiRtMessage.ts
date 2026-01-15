@@ -9,8 +9,9 @@ export interface AiRtMessageCore {
   /**
    * - private-assistant：私聊 - 助手
    * - private-user：私聊 - 用户
+   * - summary：总结
    */
-  role: AiChatRole | 'private-assistant' | 'private-user';
+  role: AiChatRole | 'private-assistant' | 'private-user' | 'summary';
   thinking: string;
   content: string;
   /**

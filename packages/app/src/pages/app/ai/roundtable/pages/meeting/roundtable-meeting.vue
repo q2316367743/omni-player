@@ -94,7 +94,6 @@ import {
 } from "@/services/app/roundtable/AiRtMessageService";
 import {askToOpenAi, type AskToOpenAiAbort} from "@/util/lang/ChatUtil";
 import {transferRtMessageTo} from "@/entity/app/ai/roundtable/AiRtMessage.ts";
-import {debounce} from "es-toolkit";
 import {map} from "@/util";
 import MeetingParticipant from "@/pages/app/ai/roundtable/pages/meeting/comp/MeetingParticipant.vue";
 import MeetingMessage from "@/pages/app/ai/roundtable/pages/meeting/comp/MeetingMessage.vue";
@@ -199,7 +198,7 @@ const triggerAdminSummary = async () => {
     isStreamLoad.value = true;
 
     const messageId = await addAiRtMessageService(meetingId.value, {
-      role: 'assistant',
+      role: 'summary',
       thinking: '',
       content: '',
       participant_id: admin.id,
@@ -209,9 +208,7 @@ const triggerAdminSummary = async () => {
     });
     await fetchMessage();
 
-    const onUpdateMessage = debounce(async (data: { thinking?: string; content?: string }) => {
-      await updateAiRtMessageService(messageId!, data);
-    }, 300);
+    let lastSavePromise = Promise.resolve();
 
     await askToOpenAi({
       messages: transferRtMessageTo(messages.value, meeting.value!, admin, participantMap.value),
@@ -224,10 +221,11 @@ const triggerAdminSummary = async () => {
       },
       onAppend: (data, t) => {
         if (!data) return;
+        const lastMessage = messages.value[messages.value.length - 1];
         if (t) {
-          messages.value[messages.value.length - 1]!.thinking += data;
+          lastMessage!.thinking += data;
         } else {
-          messages.value[messages.value.length - 1]!.content += data;
+          lastMessage!.content += data;
           isStreamLoad.value = false;
         }
         if (isAtBottom.value) {
@@ -235,16 +233,18 @@ const triggerAdminSummary = async () => {
             backBottom();
           });
         }
-        onUpdateMessage(messages.value[messages.value.length - 1]!);
+        lastSavePromise = updateAiRtMessageService(messageId!, {
+          thinking: lastMessage!.thinking,
+          content: lastMessage!.content
+        });
       },
       onAborted: (a) => {
         abort.value = a;
       }
     });
 
-    setTimeout(() => {
-      fetchMessage()
-    }, 310);
+    await lastSavePromise;
+    await fetchMessage();
 
   } catch (e) {
     console.error('管理员AI总结失败', e);
@@ -303,9 +303,7 @@ const askParticipant = async (participant: AiRtParticipant) => {
     });
     await fetchMessage();
 
-    const onUpdateMessage = debounce(async (data: { thinking?: string; content?: string }) => {
-      await updateAiRtMessageService(messageId!, data);
-    }, 300);
+    let lastSavePromise = Promise.resolve();
 
     await askToOpenAi({
       messages: transferRtMessageTo(messages.value, meeting.value!, participant, participantMap.value),
@@ -318,10 +316,11 @@ const askParticipant = async (participant: AiRtParticipant) => {
       },
       onAppend: (data, t) => {
         if (!data) return;
+        const lastMessage = messages.value[messages.value.length - 1];
         if (t) {
-          messages.value[messages.value.length - 1]!.thinking += data;
+          lastMessage!.thinking += data;
         } else {
-          messages.value[messages.value.length - 1]!.content += data;
+          lastMessage!.content += data;
           isStreamLoad.value = false;
         }
         if (isAtBottom.value) {
@@ -329,12 +328,17 @@ const askParticipant = async (participant: AiRtParticipant) => {
             backBottom();
           });
         }
-        onUpdateMessage(messages.value[messages.value.length - 1]!);
+        lastSavePromise = updateAiRtMessageService(messageId!, {
+          thinking: lastMessage!.thinking,
+          content: lastMessage!.content
+        });
       },
       onAborted: (a) => {
         abort.value = a;
       }
     });
+
+    await lastSavePromise;
     await fetchMessage();
 
     const active = activeParticipants.value;
@@ -347,6 +351,7 @@ const askParticipant = async (participant: AiRtParticipant) => {
     const currentRound = getCurrentRound();
     const summaryInterval = meeting.value?.summary_interval || 0;
 
+    // 触发管理员总结
     if (summaryInterval > 0 && currentRound % summaryInterval === 0) {
       await triggerAdminSummary();
     }

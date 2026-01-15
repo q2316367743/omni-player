@@ -18,6 +18,6 @@ export function useCacheRecordStorage(key: string) {
         trigger()
         cacheRecord.value[label] = value;
       }
-    }))
+    })) as Ref<T>
   }
 }

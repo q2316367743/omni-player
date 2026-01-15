@@ -4,6 +4,15 @@
       <div v-if="item.role === 'system'" class="system-message">
         <div class="system-content">{{ item.content }}</div>
       </div>
+      <div v-else-if="item.role === 'summary'" class="summary-message">
+        <div class="summary-header">
+          <file-icon class="summary-icon"/>
+          <span class="summary-title">会议总结</span>
+        </div>
+        <div class="summary-content">
+          <markdown-preview :content="item.content"/>
+        </div>
+      </div>
       <div v-else-if="item.role === 'assistant'" class="assistant-message">
         <div class="message-avatar assistant-avatar">
           <internet-icon/>
@@ -44,7 +53,7 @@
 </template>
 <script lang="ts" setup>
 import type {AiRtMessage, AiRtParticipant} from "@/entity/app/ai/roundtable";
-import {CheckCircleIcon, InternetIcon, UserIcon} from "tdesign-icons-vue-next";
+import {CheckCircleIcon, FileIcon, InternetIcon, UserIcon} from "tdesign-icons-vue-next";
 
 const props = defineProps({
   messages: {
@@ -104,6 +113,86 @@ defineExpose({
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
+        }
+      }
+    }
+
+    &.summary {
+      .summary-message {
+        max-width: 900px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, rgba(82, 196, 26, 0.05) 0%, rgba(82, 196, 26, 0.02) 100%);
+        border: 1px solid rgba(82, 196, 26, 0.2);
+        border-radius: var(--fluent-radius-card);
+        padding: 20px 24px;
+        box-shadow: var(--fluent-elevation-1);
+        transition: all var(--fluent-transition-normal);
+
+        &:hover {
+          box-shadow: var(--fluent-elevation-2);
+          border-color: rgba(82, 196, 26, 0.3);
+        }
+
+        .summary-header {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 16px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid rgba(82, 196, 26, 0.15);
+
+          .summary-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--td-success-color-5);
+          }
+
+          .summary-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--td-success-color-6);
+            letter-spacing: 0.5px;
+          }
+        }
+
+        .summary-content {
+          font-size: 15px;
+          line-height: 1.7;
+          color: var(--td-text-color-primary);
+
+          :deep(.markdown-preview) {
+            p {
+              margin-bottom: 12px;
+
+              &:last-child {
+                margin-bottom: 0;
+              }
+            }
+
+            ul, ol {
+              padding-left: 20px;
+              margin-bottom: 12px;
+
+              li {
+                margin-bottom: 8px;
+              }
+            }
+
+            strong {
+              color: var(--td-success-color-7);
+              font-weight: 600;
+            }
+
+            h1, h2, h3 {
+              color: var(--td-success-color-7);
+              margin: 16px 0 8px;
+              font-weight: 600;
+
+              &:first-child {
+                margin-top: 0;
+              }
+            }
+          }
         }
       }
     }
