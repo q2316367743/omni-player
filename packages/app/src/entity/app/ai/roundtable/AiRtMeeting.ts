@@ -2,6 +2,13 @@ import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {YesOrNo} from "@/global/YesOrNo.ts";
 import type {AiRtParticipantCore} from "@/entity/app/ai/roundtable/AiRtParticipant.ts";
 
+/**
+ * 圆桌会议状态
+ * - active: 激活中
+ * - paused: 暂停中
+ * - ended: 已结束
+ * - archived: 已归档
+ */
 export type AiRtMeetingStatus = 'active' | 'paused' | 'ended' | 'archived';
 
 export interface AiRtMeetingCore {

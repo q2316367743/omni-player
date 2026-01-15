@@ -5,7 +5,7 @@
         <div class="participant-avatar">{{ participant.name.charAt(0) }}</div>
         <div class="participant-info">
           <div class="participant-name">{{ participant.name }}</div>
-          <div class="participant-type">{{ participant.type }}</div>
+          <div class="participant-type">{{ participant.type === 'admin' ? '上帝' : '成员' }}</div>
         </div>
         <t-tag v-if="currentParticipantId === participant.id" theme="success" size="small">发言中</t-tag>
         <t-tag v-else-if="participant.is_active === 0" theme="default" size="small">已禁言</t-tag>
