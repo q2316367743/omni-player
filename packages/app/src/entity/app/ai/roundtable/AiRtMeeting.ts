@@ -52,9 +52,9 @@ export interface AiRtMeetingCore {
   auto_summary_on_end: YesOrNo;
 
   /**
-   * 是否允许用户随时插话打断
+   * 用户角色
    */
-  allow_user_interruption: YesOrNo;
+  user_role: string;
 }
 
 /**
@@ -77,8 +77,8 @@ export function buildAiRtMeetingAdd(groupId: string):AiRtMeetingAdd {
     max_rounds: 0,
     summary_interval: 1,
     auto_summary_on_end: 0,
-    allow_user_interruption: 1,
     topic: "",
     content: "",
+    user_role: "用户"
   }
 }

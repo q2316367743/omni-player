@@ -1,5 +1,11 @@
 import {useSql} from "@/lib/sql.ts";
-import type {AiRtMeeting, AiRtMeetingAdd, AiRtMeetingCore, AiRtParticipant} from "@/entity/app/ai/roundtable";
+import type {
+  AiRtMeeting,
+  AiRtMeetingAdd,
+  AiRtMeetingCore,
+  AiRtMessage,
+  AiRtParticipant
+} from "@/entity/app/ai/roundtable";
 
 export async function listAiRtMeetingService(groupId: string) {
   return useSql().query<AiRtMeeting>('ai_rt_meeting')
@@ -18,24 +24,33 @@ export function updateAiRtMeetingService(id: string, meeting: Partial<AiRtMeetin
   })
 }
 
+export async function deleteAiRtMeetingService(id: string) {
+  // 删除自身
+  await useSql().mapper<AiRtMeeting>('ai_rt_meeting').deleteById(id);
+  // 删除参与者
+  await useSql().query<AiRtParticipant>('ai_rt_participant').eq('scope', 'meeting').eq('scope_id', id).delete();
+  // 删除聊天消息
+  await useSql().query<AiRtMessage>('ai_rt_message').eq('meeting_id', id).delete();
+}
+
 export async function addAiRtMeetingService(meeting: AiRtMeetingAdd) {
   const now = Date.now();
   // 创建 会议
-  return useSql().beginTransaction(async sql => {
-    const {id} = await sql.mapper<AiRtMeeting>('ai_rt_meeting').insert({
-      group_id: meeting.group_id,
-      topic: meeting.topic,
-      content: meeting.content,
-      status: 'active',
-      allow_user_interruption: meeting.allow_user_interruption,
-      auto_summary_on_end: meeting.auto_summary_on_end,
-      max_rounds: meeting.max_rounds,
-      summary_interval: meeting.summary_interval,
-      created_at: now,
-      updated_at: now
-    });
-    // 创建 会议 参与者
-    await sql.mapper<AiRtParticipant>('ai_rt_participant').insertBatch(
+  const {id} = await useSql().mapper<AiRtMeeting>('ai_rt_meeting').insert({
+    group_id: meeting.group_id,
+    topic: meeting.topic,
+    content: meeting.content,
+    status: 'active',
+    auto_summary_on_end: meeting.auto_summary_on_end,
+    max_rounds: meeting.max_rounds,
+    summary_interval: meeting.summary_interval,
+    user_role: meeting.user_role,
+    created_at: now,
+    updated_at: now
+  });
+  // 创建 会议 参与者
+  try {
+    await useSql().mapper<AiRtParticipant>('ai_rt_participant').insertBatch(
       meeting.participants.map((participant, i) => ({
         ...participant,
         join_order: i + 1,
@@ -44,6 +59,9 @@ export async function addAiRtMeetingService(meeting: AiRtMeetingAdd) {
         created_at: now,
         updated_at: now
       })));
-    return id;
-  })
+  } catch (e) {
+    await useSql().mapper<AiRtMeeting>('ai_rt_meeting').deleteById(id);
+    throw e;
+  }
+  return id;
 }

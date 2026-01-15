@@ -22,7 +22,7 @@ export function openRoleSelect(type: AiRtRoleType, onUpdate: (role?: AiRtRole) =
     default: () => (<div class="role-select-content">
       <div class="action-buttons">
         <button class="action-button" onClick={() => { onUpdate(undefined); dp.hide(); }}>
-          从空开始{type === 'admin' ? '上帝 AI' : '成员 AI'}
+          从空开始{type === 'admin' ? '管理员 AI' : '成员 AI'}
         </button>
       </div>
       {loadingRoles.value ? (

@@ -3,7 +3,7 @@
     <div class="page-header">
       <div class="header-content">
         <h1 class="page-title">角色管理</h1>
-        <p class="page-description">管理圆桌会议的 AI 角色，包括上帝角色和普通角色</p>
+        <p class="page-description">管理圆桌会议的 AI 角色，包括管理员角色和参与者角色</p>
         <t-alert
           theme="info"
           message="提示：此处的提示词是角色本身的提示词，不要写行为/立场等提示词"
@@ -19,9 +19,9 @@
           <div class="section-title-group">
             <h2 class="section-title">
               <setting-icon class="title-icon"/>
-              上帝角色
+              管理员角色
             </h2>
-            <t-tooltip content="上帝角色是讨论组的管理员，负责总结各个 AI 的发言，引导讨论方向">
+            <t-tooltip content="管理员角色是讨论组的管理员，负责总结各个 AI 的发言，引导讨论方向">
               <info-circle-icon class="info-icon"/>
             </t-tooltip>
           </div>
@@ -38,9 +38,9 @@
 
         <div v-if="adminRoles.length === 0" class="empty-state">
           <usergroup-icon class="empty-icon"/>
-          <p class="empty-text">暂无上帝角色</p>
+          <p class="empty-text">暂无管理员角色</p>
           <t-button theme="default" variant="outline" @click="handleAddRole('admin')">
-            新增上帝角色
+            新增管理员角色
           </t-button>
         </div>
 
@@ -65,7 +65,7 @@
                 </div>
                 <div class="role-info">
                   <h3 class="role-name">{{ role.name }}</h3>
-                  <t-tag size="small" theme="primary">上帝角色</t-tag>
+                  <t-tag size="small" theme="primary">管理员角色</t-tag>
                 </div>
               </div>
             </div>
@@ -78,9 +78,9 @@
           <div class="section-title-group">
             <h2 class="section-title">
               <user-icon class="title-icon"/>
-              普通角色
+              参与者角色
             </h2>
-            <t-tooltip content="普通角色是参与讨论的 AI 成员，根据角色设定进行发言">
+            <t-tooltip content="参与者角色是参与讨论的 AI 成员，根据角色设定进行发言">
               <info-circle-icon class="info-icon"/>
             </t-tooltip>
           </div>
@@ -97,9 +97,9 @@
 
         <div v-if="memberRoles.length === 0" class="empty-state">
           <user-icon class="empty-icon"/>
-          <p class="empty-text">暂无普通角色</p>
+          <p class="empty-text">暂无参与者角色</p>
           <t-button theme="default" variant="outline" @click="handleAddRole('member')">
-            新增普通角色
+            新增参与者角色
           </t-button>
         </div>
 
@@ -124,7 +124,7 @@
                 </div>
                 <div class="role-info">
                   <h3 class="role-name">{{ role.name }}</h3>
-                  <t-tag size="small" theme="default">普通角色</t-tag>
+                  <t-tag size="small" theme="default">参与者角色</t-tag>
                 </div>
               </div>
             </div>

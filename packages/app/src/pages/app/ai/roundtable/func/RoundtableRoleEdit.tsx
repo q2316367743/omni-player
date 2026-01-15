@@ -20,7 +20,7 @@ export function openRoundtableRoleAdd(type: AiRtRoleType, onUpdate: () => void) 
   const options = computed(() => useSettingStore().modelOptions);
 
   const dp = DrawerPlugin({
-    header: `新增${type === 'admin' ? '上帝' : '普通'}角色`,
+    header: `新增${type === 'admin' ? '管理员' : '参与者'}角色`,
     confirmBtn: '新增',
     size: "800px",
     onConfirm: async () => {
@@ -50,7 +50,7 @@ export function openRoundtableRoleAdd(type: AiRtRoleType, onUpdate: () => void) 
       <FormItem label="最大响应字数" labelAlign={'top'} name="max_response_length" help="-1 代表无限制">
         <InputNumber v-model={data.value.max_response_length} placeholder="请输入最大响应字数"/>
       </FormItem>
-      <FormItem label="生成随机性" labelAlign={'top'} name="temperature" help="默认 0.7，上帝 AI 可设为 0.3 更稳">
+      <FormItem label="生成随机性" labelAlign={'top'} name="temperature" help="默认 0.7，管理员 AI 可设为 0.3 更稳">
         <InputNumber v-model={data.value.temperature} placeholder="请输入生成随机性" step={0.1} min={0} max={2}/>
       </FormItem>
       <FormItem label="是否启用事实核查" labelAlign={'top'} name="enable_fact_checking">
@@ -78,7 +78,7 @@ export function openRoundtableRoleUpdate(source: AiRtRole, onUpdate: () => void)
   const options = computed(() => useSettingStore().modelOptions);
 
   const dp = DrawerPlugin({
-    header: `修改${source.type === 'admin' ? '上帝' : '普通'}角色`,
+    header: `修改${source.type === 'admin' ? '管理员' : '参与者'}角色`,
     confirmBtn: '修改',
     size: "800px",
     onConfirm: async () => {
@@ -108,7 +108,7 @@ export function openRoundtableRoleUpdate(source: AiRtRole, onUpdate: () => void)
       <FormItem label="最大响应字数" labelAlign={'top'} name="max_response_length" help="-1 代表无限制">
         <InputNumber v-model={data.value.max_response_length} placeholder="请输入最大响应字数"/>
       </FormItem>
-      <FormItem label="生成随机性" labelAlign={'top'} name="temperature" help="默认 0.7，上帝 AI 可设为 0.3 更稳">
+      <FormItem label="生成随机性" labelAlign={'top'} name="temperature" help="默认 0.7，管理员 AI 可设为 0.3 更稳">
         <InputNumber v-model={data.value.temperature} placeholder="请输入生成随机性" step={0.1} min={0} max={2}/>
       </FormItem>
       <FormItem label="是否启用事实核查" labelAlign={'top'} name="enable_fact_checking">

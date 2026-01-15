@@ -66,7 +66,7 @@ export function transferRtMessageTo(messages: Array<AiRtMessage>, meeting: AiRtM
       case 'user': {
         results.push({
           role: "user",
-          content: `[用户] ${message.content}`,
+          content: `[${meeting.user_role || "用户"}] ${message.content}`,
         });
         break;
       }

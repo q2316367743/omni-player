@@ -23,7 +23,7 @@
       </div>
       <t-empty v-if="groups.length === 0" description="暂无讨论组" size="small"/>
       <div class="item" v-for="group in groups" :key="group.id" :class="{active: modelValue === `/group/${group.id}`}"
-           @click="modelValue = `/group/${group.id}`" @contextmenu="onGroupMenuClick(group, $event)">
+           @click="onClickGroup(group)" @contextmenu="onGroupMenuClick(group, $event, fetchGroup)">
         <div class="text ellipsis">{{ group.name }}</div>
       </div>
       <div class="group">
@@ -38,8 +38,8 @@
       </div>
       <t-empty v-if="meetings.length === 0" description="暂无临时会议" size="small"/>
       <div class="item" v-for="meeting in meetings" :key="meeting.id"
-           :class="{active: modelValue === `/meeting/0/${meeting.id}`}"
-           @click="modelValue = `/meeting/0/${meeting.id}`" @contextmenu="onMeetingMenuClick(meeting, $event)">
+           :class="{active: modelValue.startsWith(`/meeting/0/${meeting.id}`)}"
+           @click="onClickMeeting(meeting)" @contextmenu="onMeetingMenuClick(meeting, $event, fetchMeeting)">
         <div class="text ellipsis">{{ meeting.topic }}</div>
       </div>
     </div>
@@ -47,21 +47,28 @@
 </template>
 <script lang="ts" setup>
 import {PlusIcon} from "tdesign-icons-vue-next";
-import ContextMenu from '@imengyu/vue3-context-menu';
-import {isDark} from "@/global/Constants.ts";
 import type {AiRtGroup, AiRtMeeting} from "@/entity/app/ai/roundtable";
 import {listAiRtGroupService, listAiRtMeetingService} from "@/services/app/roundtable";
+import {onGroupMenuClick, onMeetingMenuClick} from "@/pages/app/ai/roundtable/func/RoundtableMeetingEdit.tsx";
 
 const modelValue = defineModel({
-  type: String
+  type: String,
+  default: ''
 });
 
 const groups = ref<Array<AiRtGroup>>([]);
 const meetings = ref<Array<AiRtMeeting>>([]);
 
-tryOnMounted(async () => {
+const fetchGroup = async () => {
   groups.value = await listAiRtGroupService();
+}
+const fetchMeeting = async () => {
   meetings.value = await listAiRtMeetingService("");
+}
+
+tryOnMounted(() => {
+  fetchGroup();
+  fetchMeeting();
 })
 
 const toggleRole = () => {
@@ -81,55 +88,18 @@ const onAddMeeting = () => {
   modelValue.value = '';
   modelValue.value = `/create/`;
 }
-
-const onGroupMenuClick = (group: AiRtGroup, e: MouseEvent) => {
-  e.preventDefault();
-  ContextMenu.showContextMenu({
-    x: e.x,
-    y: e.y,
-    theme: isDark.value ? 'mac dark' : 'mac',
-    items: [{
-      label: '编辑',
-      onClick: () => {
-        console.log('编辑讨论组', group);
-      },
-    }, {
-      label: () => h('span', {
-        style: {
-          color: 'var(--td-error-color)'
-        },
-        class: 'label'
-      }, '删除'),
-      onClick: () => {
-        console.log('删除讨论组', group.id);
-      }
-    }]
-  });
+const onClickGroup = (group: AiRtGroup) => {
+  modelValue.value = '';
+  nextTick(() => {
+    modelValue.value = `/group/${group.id}`;
+  })
 }
 
-const onMeetingMenuClick = (meeting: AiRtMeeting, e: MouseEvent) => {
-  e.preventDefault();
-  ContextMenu.showContextMenu({
-    x: e.x,
-    y: e.y,
-    theme: isDark.value ? 'mac dark' : 'mac',
-    items: [{
-      label: '编辑',
-      onClick: () => {
-        console.log('编辑会议', meeting);
-      },
-    }, {
-      label: () => h('span', {
-        style: {
-          color: 'var(--td-error-color)'
-        },
-        class: 'label'
-      }, '删除'),
-      onClick: () => {
-        console.log('删除会议', meeting.id);
-      }
-    }]
-  });
+const onClickMeeting = (meeting: AiRtMeeting) => {
+  modelValue.value = '';
+  nextTick(() => {
+    modelValue.value = `/meeting/0/${meeting.id}`;
+  })
 }
 
 defineExpose({

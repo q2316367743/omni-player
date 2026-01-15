@@ -2,7 +2,7 @@
   <div class="role-detail-popup">
     <div class="detail-header">
       <h4 class="detail-name">{{ role.name }}</h4>
-      <t-tag size="small" theme="default">普通角色</t-tag>
+      <t-tag size="small" theme="default">参与者角色</t-tag>
     </div>
     <div class="detail-section">
       <div class="detail-label">提示词</div>

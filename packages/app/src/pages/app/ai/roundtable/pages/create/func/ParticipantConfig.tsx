@@ -1,7 +1,6 @@
 import type {AiRtParticipantCore} from "@/entity/app/ai/roundtable";
 import {cloneDeep} from "es-toolkit";
 import {
-  DialogPlugin,
   Form,
   FormItem,
   Tag,
@@ -10,7 +9,7 @@ import {
   CollapsePanel,
   InputNumber,
   Slider,
-  Select, Input, Switch,
+  Select, Input, Switch, DrawerPlugin,
 } from "tdesign-vue-next";
 import "./participant-config.less"
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
@@ -23,19 +22,17 @@ export function openParticipantConfig(
   const data = ref(cloneDeep(participant));
   const advancedExpanded = ref([]);
   const options = computed(() => useSettingStore().modelOptions);
-  const dp = DialogPlugin({
-    header: '配置参与者',
-    placement: 'center',
-    width: '700px',
-    default: () => (<div class="participant-config">
-      <div class="config-header">
-        <div class="config-role-info">
-          <h4 class="config-role-name">{data.value.name}</h4>
-          <Tag size="small" theme={data.value.type === 'admin' ? 'warning' : 'default'}>
-            {data.value.type === 'admin' ? '管理员' : '成员'}
-          </Tag>
-        </div>
+  const dp = DrawerPlugin({
+    header: () => (<div class="config-header">
+      <div class="config-role-info">
+        <h4 class="config-role-name">{data.value.name}</h4>
+        <Tag size="small" theme={data.value.type === 'admin' ? 'warning' : 'default'}>
+          {data.value.type === 'admin' ? '管理员' : '参与者'}
+        </Tag>
       </div>
+    </div>),
+    size: '700px',
+    default: () => (<div class="participant-config">
       {presets && <div class="config-section">
         <div class="config-label">角色提示词</div>
         <div class="config-prompt">{data.value.prompt || '暂无提示词'}</div>
@@ -60,6 +57,9 @@ export function openParticipantConfig(
       <Collapse v-model={advancedExpanded.value} class="!mt-20px">
         <CollapsePanel header="高级参数" value="advanced">
           <Form labelAlign="top">
+            <FormItem label="角色名称">
+              <Input v-model={data.value.name} clearable={true}/>
+            </FormItem>
             <FormItem label="使用的模型">
               <Select v-model={data.value.model} options={options.value} filterable={true} clearable={true}/>
             </FormItem>
@@ -87,7 +87,7 @@ export function openParticipantConfig(
     </div>),
     onConfirm: () => {
       onUpdate(data.value);
-      dp.hide();
+      dp.destroy?.();
     }
   })
 }

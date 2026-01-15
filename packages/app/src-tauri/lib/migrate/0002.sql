@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS ai_rt_group
     max_rounds              INTEGER NOT NULL DEFAULT 0,
     summary_interval        INTEGER NOT NULL DEFAULT 3,
     auto_summary_on_end     INTEGER NOT NULL DEFAULT 1 CHECK (auto_summary_on_end IN (0, 1)),
-    allow_user_interruption INTEGER NOT NULL DEFAULT 1 CHECK (allow_user_interruption IN (0, 1))
+    user_role               TEXT    NOT NULL DEFAULT '用户'
 );
 
 -- 圆桌会议 - 会议表
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS ai_rt_meeting
     max_rounds              INTEGER NOT NULL DEFAULT 0,
     summary_interval        INTEGER NOT NULL DEFAULT 3,
     auto_summary_on_end     INTEGER NOT NULL DEFAULT 1 CHECK (auto_summary_on_end IN (0, 1)),
-    allow_user_interruption INTEGER NOT NULL DEFAULT 1 CHECK (allow_user_interruption IN (0, 1))
+    user_role               TEXT    NOT NULL DEFAULT '用户'
 
 );
 

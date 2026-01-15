@@ -28,8 +28,8 @@ export interface AiRtGroup extends BaseEntity {
   auto_summary_on_end: YesOrNo;
 
   /**
-   * 是否允许用户随时插话打断
+   * 用户角色
    */
-  allow_user_interruption: YesOrNo;
+  user_role: string;
 
 }

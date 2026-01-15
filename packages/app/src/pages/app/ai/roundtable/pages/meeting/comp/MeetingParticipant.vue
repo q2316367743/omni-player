@@ -5,7 +5,7 @@
         <div class="participant-avatar">{{ participant.name.charAt(0) }}</div>
         <div class="participant-info">
           <div class="participant-name">{{ participant.name }}</div>
-          <div class="participant-type">{{ participant.type === 'admin' ? '上帝' : '成员' }}</div>
+          <div class="participant-type">{{ participant.type === 'admin' ? '管理员' : '成员' }}</div>
         </div>
         <div class="flex items-center">
           <div class="mr-8px">

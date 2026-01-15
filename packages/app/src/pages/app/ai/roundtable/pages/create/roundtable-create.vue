@@ -24,7 +24,7 @@
       <t-card v-else-if="current === 1">
         <div class="participant-section">
           <div class="section-header">
-            <h4 class="section-title">上帝 AI</h4>
+            <h4 class="section-title">管理员 AI</h4>
             <t-button v-if="!hasAdmin" size="small" theme="primary" variant="outline"
                       @click="openRoleSelectDialog('admin')">
               <template #icon>
@@ -38,7 +38,7 @@
               <div class="participant-info">
                 <div class="participant-name">{{ participant.name }}</div>
                 <div class="participant-meta">
-                  <t-tag size="small" theme="warning">上帝AI</t-tag>
+                  <t-tag size="small" theme="warning">管理员 AI</t-tag>
                   <span class="participant-stance">{{ participant.stance || '未设置立场' }}</span>
                 </div>
               </div>
@@ -52,14 +52,14 @@
               </div>
             </div>
             <div v-if="!hasAdmin" class="empty-state">
-              <p>暂无上帝 AI，点击上方按钮添加</p>
+              <p>暂无管理员 AI，点击上方按钮添加</p>
             </div>
           </div>
         </div>
 
         <div class="participant-section">
           <div class="section-header">
-            <h4 class="section-title">成员 AI</h4>
+            <h4 class="section-title">参与者 AI</h4>
             <t-button size="small" theme="primary" variant="outline" @click="openRoleSelectDialog('member')">
               <template #icon>
                 <add-icon/>
@@ -111,11 +111,17 @@
           <t-form-item label-align="top" label="最大发言轮数" help="0 表示无限制">
             <t-input-number v-model="meeting.max_rounds" :min="0" placeholder="0 表示无限制"/>
           </t-form-item>
-          <t-form-item label-align="top" label="总结间隔" help="每 N 轮后触发上帝AI总结">
+          <t-form-item label-align="top" label="总结间隔" help="每 N 轮后触发管理员AI总结">
             <t-input-number v-model="meeting.summary_interval" :min="1" placeholder="每 N 轮后总结"/>
+          </t-form-item>
+          <t-form-item label-align="top" label="用户角色" help="发送给 AI 时，用户的身份">
+            <t-input v-model="meeting.user_role" placeholder="用户角色"/>
           </t-form-item>
           <t-form-item label-align="top" label="自动总结" help="会议结束时是否自动触发最终总结">
             <t-switch v-model="meeting.auto_summary_on_end" :custom-value="[0, 1]"/>
+          </t-form-item>
+          <t-form-item label-align="top" label="会议是否自动开始">
+            <t-switch v-model="autoStart"/>
           </t-form-item>
         </t-form>
         <div class="step-actions">
@@ -148,6 +154,7 @@ const current = ref(0);
 const groupId = ref('');
 const meeting = ref(buildAiRtMeetingAdd(groupId.value));
 const selectRoleType = ref<AiRtRoleType | null>(null);
+const autoStart = ref(true);
 
 const hasAdmin = computed(() => {
   return meeting.value.participants.some(p => p.type === 'admin');
@@ -200,7 +207,7 @@ const openRoleSelectDialog = async (type: AiRtRoleType) => {
   selectRoleType.value = type;
   openRoleSelect(type, (role) => {
     if (role?.type === 'admin' && adminCount.value >= 1) {
-      MessageUtil.warning('上帝AI（管理员角色）最多只能设置一个');
+      MessageUtil.warning('管理员AI（管理员角色）最多只能设置一个');
       return;
     }
     openParticipantConfig(role ? {
@@ -250,7 +257,7 @@ const submitMeeting = async () => {
   try {
     const id = await addAiRtMeetingService(meeting.value);
     MessageUtil.success('圆桌会议创建成功');
-    activeKey.value = `/meeting/${groupId.value}/${id}?mode=create`;
+    activeKey.value = `/meeting/${groupId.value}/${id}${autoStart.value ? '?mode=create' : ''}`;
     emit('refresh');
   } catch (error) {
     MessageUtil.error('创建失败', error);
