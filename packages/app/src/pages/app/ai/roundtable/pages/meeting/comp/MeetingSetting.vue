@@ -11,7 +11,10 @@
         <t-switch v-model="data.auto_summary_on_end" :custom-value="[0, 1]"/>
       </t-form-item>
       <t-form-item label-align="top">
-        <t-button theme="primary" @click="handleSave">保存</t-button>
+        <t-space>
+          <t-button theme="primary" @click="handleSave">保存</t-button>
+          <t-button theme="danger" @click="handleEndMeeting">终止会议</t-button>
+        </t-space>
       </t-form-item>
     </t-form>
   </div>
@@ -35,6 +38,12 @@ const handleSave = async () => {
   await updateAiRtMeetingService(props.meeting.id, data.value)
   emit('change');
   MessageUtil.success("已更新");
+}
+
+const handleEndMeeting = async () => {
+  await updateAiRtMeetingService(props.meeting.id, {status: 'ended'})
+  emit('change');
+  MessageUtil.success("会议已终止");
 }
 </script>
 <style scoped lang="less">

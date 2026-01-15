@@ -14,7 +14,7 @@
       <div v-if="page === '1'" class="rm-messages">
         <meeting-message :is-stream-load="isStreamLoad" :messages="messages" :participant-map="participantMap"
                          ref="chatContentRef" @scroll="handleChatScroll"/>
-        <div class="chat-sender-wrapper">
+        <div v-if="meeting?.status !== 'ended'" class="chat-sender-wrapper">
           <div class="chat-sender">
             <t-chat-sender v-model="text" placeholder="输入消息...">
               <template #footer-prefix>
@@ -122,6 +122,7 @@ const isShowToBottom = ref(false);
 const isAtBottom = ref(true);
 const isPauseWaiting = ref(false);
 const interruptedParticipantId = ref('');
+const roundsSinceLastInterrupt = ref(0);
 
 const currentParticipantIndex = ref(0);
 const currentParticipantId = ref('');
@@ -132,7 +133,14 @@ const fetchParticipant = async () => {
 }
 
 const fetchMeeting = async () => {
+  const oldStatus = meeting.value?.status;
   meeting.value = await getAiRtMeetingService(meetingId.value) || undefined;
+  
+  if (oldStatus !== 'ended' && meeting.value?.status === 'ended') {
+    if (meeting.value.auto_summary_on_end === 1) {
+      await triggerAdminSummary();
+    }
+  }
 }
 
 tryOnMounted(async () => {
@@ -158,8 +166,80 @@ tryOnMounted(async () => {
 });
 
 const activeParticipants = computed(() => {
-  return participants.value.filter(p => p.is_active === 1);
+  return participants.value.filter(p => p.is_active === 1 && p.type === 'member');
 });
+
+const adminParticipants = computed(() => {
+  return participants.value.filter(p => p.type === 'admin');
+});
+
+const getCurrentRound = () => {
+  return roundsSinceLastInterrupt.value;
+};
+
+const triggerAdminSummary = async () => {
+  const admins = adminParticipants.value;
+  if (admins.length === 0) return;
+
+  const admin = admins[0];
+  if (!admin) return;
+
+  try {
+    isSpeaking.value = true;
+    isStreamLoad.value = true;
+
+    const messageId = await addAiRtMessageService(meetingId.value, {
+      role: 'assistant',
+      thinking: '',
+      content: '',
+      participant_id: admin.id,
+      is_summary: 1,
+      is_interrupted: 0,
+      parent_message_id: ''
+    });
+    messages.value = await listAiRtMessageService(meetingId.value);
+
+    const onUpdateMessage = debounce(async (data: { thinking?: string; content?: string }) => {
+      await updateAiRtMessageService(messageId!, data);
+    }, 300);
+
+    await askToOpenAi({
+      messages: transferRtMessageTo(messages.value, meeting.value!, admin, participantMap.value),
+      assistant: {
+        model: admin.model,
+        temperature: admin.temperature,
+        topP: 0.9
+      },
+      onStart: () => {
+      },
+      onAppend: (data, t) => {
+        if (!data) return;
+        if (t) {
+          messages.value[messages.value.length - 1]!.thinking += data;
+        } else {
+          messages.value[messages.value.length - 1]!.content += data;
+          isStreamLoad.value = false;
+        }
+        if (isAtBottom.value) {
+          nextTick(() => {
+            backBottom();
+          });
+        }
+        onUpdateMessage(messages.value[messages.value.length - 1]!);
+      },
+      onAborted: (a) => {
+        abort.value = a;
+      }
+    });
+
+    messages.value = await listAiRtMessageService(meetingId.value);
+  } catch (e) {
+    console.error('上帝AI总结失败', e);
+  } finally {
+    isSpeaking.value = false;
+    isStreamLoad.value = false;
+  }
+};
 
 const getNextParticipant = () => {
   const active = activeParticipants.value;
@@ -172,6 +252,14 @@ const getNextParticipant = () => {
 
 const startNextParticipant = async () => {
   if (isPaused.value) return;
+
+  const currentRound = getCurrentRound();
+  
+  if (meeting.value?.max_rounds && meeting.value.max_rounds > 0 && currentRound >= meeting.value.max_rounds) {
+    await updateAiRtMeetingService(meetingId.value, {status: 'paused'});
+    isPaused.value = true;
+    return;
+  }
 
   const participant = getNextParticipant();
   if (!participant) {
@@ -237,6 +325,20 @@ const askParticipant = async (participant: AiRtParticipant) => {
 
     messages.value = await listAiRtMessageService(meetingId.value);
 
+    const active = activeParticipants.value;
+    const currentIndex = active.findIndex(p => p.id === participant.id);
+    
+    if (currentIndex === active.length - 1) {
+      roundsSinceLastInterrupt.value++;
+    }
+
+    const currentRound = getCurrentRound();
+    const summaryInterval = meeting.value?.summary_interval || 0;
+    
+    if (summaryInterval > 0 && currentRound % summaryInterval === 0) {
+      await triggerAdminSummary();
+    }
+
     if (isPauseWaiting.value) {
       isPaused.value = true;
       isPauseWaiting.value = false;
@@ -273,6 +375,7 @@ const handleSend = async () => {
   messages.value = await listAiRtMessageService(meetingId.value);
 
   if (isPaused.value) {
+    roundsSinceLastInterrupt.value = 0;
     await updateAiRtMeetingService(meetingId.value, {status: 'active'});
     isPaused.value = false;
 
@@ -299,6 +402,7 @@ const handleInterrupt = async () => {
   isSpeaking.value = false;
   isStreamLoad.value = false;
   isPaused.value = true;
+  roundsSinceLastInterrupt.value = 0;
   await updateAiRtMeetingService(meetingId.value, {status: 'paused'});
 };
 
@@ -309,6 +413,7 @@ const handlePause = async () => {
 
 const handleResume = async () => {
   isPaused.value = false;
+  roundsSinceLastInterrupt.value = 0;
   await updateAiRtMeetingService(meetingId.value, {status: 'active'});
   await startNextParticipant();
 };
