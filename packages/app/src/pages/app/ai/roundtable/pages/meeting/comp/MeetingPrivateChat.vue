@@ -87,7 +87,7 @@ import {
   type AiRtMeeting,
   type AiRtMessage,
   type AiRtParticipant,
-  transferRtMessageTo
+  transferRtPrivateMessageTo
 } from "@/entity/app/ai/roundtable";
 import {
   addAiRtMessageService,
@@ -177,7 +177,7 @@ const askAssistant = async () => {
       await updateAiRtMessageService(messageId!, data);
     }, 300);
 
-    const currentMessages = transferRtMessageTo(
+    const currentMessages = transferRtPrivateMessageTo(
       props.messages,
       props.meeting,
       props.participant,

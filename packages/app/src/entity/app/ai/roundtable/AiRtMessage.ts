@@ -42,7 +42,10 @@ export interface AiRtMessage extends BaseEntity, AiRtMessageCore {
 
 }
 
-export function transferRtMessageTo(messages: Array<AiRtMessage>, meeting: AiRtMeeting, participant:AiRtParticipant, participantMap: Map<string, AiRtParticipant>): Array<ChatMessageParam> {
+export function transferRtMessageTo(
+  messages: Array<AiRtMessage>,
+  meeting: AiRtMeeting,
+  participant:AiRtParticipant, participantMap: Map<string, AiRtParticipant>): Array<ChatMessageParam> {
   const results = new Array<ChatMessageParam>();
   results.push({
     role: 'system',
@@ -84,26 +87,6 @@ export function transferRtMessageTo(messages: Array<AiRtMessage>, meeting: AiRtM
         });
         break;
       }
-      case "private-assistant": {
-        if (message.participant_id !== participant.id) {
-          break;
-        }
-        results.push({
-          role: "assistant",
-          content: message.content,
-        });
-        break;
-      }
-      case "private-user": {
-        if (message.participant_id !== participant.id) {
-          break;
-        }
-        results.push({
-          role: "user",
-          content: message.content,
-        });
-        break;
-      }
     }
   }
   return results;
@@ -112,7 +95,9 @@ export function transferRtMessageTo(messages: Array<AiRtMessage>, meeting: AiRtM
 
 export function transferRtPrivateMessageTo(
   messages: Array<AiRtMessage>,
-  meeting: AiRtMeeting, participant:AiRtParticipant
+  meeting: AiRtMeeting,
+  participant:AiRtParticipant,
+  participantMap: Map<string, AiRtParticipant>
 ): Array<ChatMessageParam> {
   const results = new Array<ChatMessageParam>();
   results.push({
@@ -121,6 +106,40 @@ export function transferRtPrivateMessageTo(
   })
   for (const message of messages.sort((a, b) => a.turn_order - b.turn_order)) {
     switch (message.role) {
+      case "assistant": {
+        // 跳过上帝 AI 的总结
+        if (message.is_summary) break;
+        if (message.participant_id === participant.id) {
+          results.push({
+            role: "assistant",
+            content: message.content,
+          });
+          break;
+        }
+        // 判断是谁
+        const target = participantMap.get(message.participant_id);
+        if (target) {
+          results.push({
+            role: "user",
+            content: `[${target.name}] ${message.content}`,
+          });
+        }
+        break;
+      }
+      case 'user': {
+        results.push({
+          role: "user",
+          content: `[${meeting.user_role || "用户"}] ${message.content}`,
+        });
+        break;
+      }
+      case "system": {
+        results.push({
+          role: "system",
+          content: message.content,
+        });
+        break;
+      }
       case "private-assistant": {
         if (message.participant_id !== participant.id) {
           break;
