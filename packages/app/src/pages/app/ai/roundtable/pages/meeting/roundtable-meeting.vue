@@ -344,16 +344,19 @@ const askParticipant = async (participant: AiRtParticipant) => {
     const active = activeParticipants.value;
     const currentIndex = active.findIndex(p => p.id === participant.id);
 
+    let roundIncreased = false;
     if (currentIndex === active.length - 1) {
       roundsSinceLastInterrupt.value++;
+      roundIncreased = true;
     }
 
-    const currentRound = getCurrentRound();
     const summaryInterval = meeting.value?.summary_interval || 0;
 
-    // 触发管理员总结
-    if (summaryInterval > 0 && currentRound % summaryInterval === 0) {
-      await triggerAdminSummary();
+    if (roundIncreased && summaryInterval > 0) {
+      const currentRound = getCurrentRound();
+      if (currentRound % summaryInterval === 0) {
+        await triggerAdminSummary();
+      }
     }
 
     if (isPauseWaiting.value) {
