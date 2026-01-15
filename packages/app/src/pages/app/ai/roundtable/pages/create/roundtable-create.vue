@@ -117,9 +117,6 @@
           <t-form-item label-align="top" label="自动总结" help="会议结束时是否自动触发最终总结">
             <t-switch v-model="meeting.auto_summary_on_end" :custom-value="[0, 1]"/>
           </t-form-item>
-          <t-form-item label-align="top" label="允许用户插话" help="是否允许用户随时插话打断">
-            <t-switch v-model="meeting.allow_user_interruption" :custom-value="[0, 1]"/>
-          </t-form-item>
         </t-form>
         <div class="step-actions">
           <t-button theme="default" @click="current = 1">上一步</t-button>

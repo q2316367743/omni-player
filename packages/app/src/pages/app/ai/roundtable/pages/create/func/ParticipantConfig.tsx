@@ -10,8 +10,7 @@ import {
   CollapsePanel,
   InputNumber,
   Slider,
-  Space,
-  Checkbox, Select, Input,
+  Select, Input, Switch,
 } from "tdesign-vue-next";
 import "./participant-config.less"
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
@@ -43,7 +42,7 @@ export function openParticipantConfig(
       </div>}
       <Form>
         {!presets && <FormItem labelAlign="top" label="角色名称" class="config-form-item">
-          <Input v-model={data.value.name} />
+          <Input v-model={data.value.name}/>
         </FormItem>}
         {!presets && <FormItem labelAlign="top" label="角色提示词" class="config-form-item">
           <Textarea v-model={data.value.scene_prompt} placeholder="请输入场景提示词，描述具体的身份信息/行为信息"
@@ -76,11 +75,11 @@ export function openParticipantConfig(
             <FormItem label="最大思考时间（秒）">
               <InputNumber v-model={data.value.timeout_per_turn} min={1}/>
             </FormItem>
-            <FormItem label="功能设置">
-              <Space direction="vertical">
-                <Checkbox v-model={data.value.enable_fact_checking}>启用事实核查</Checkbox>
-                <Checkbox v-model={data.value.allow_cross_talk}>允许主动@他人</Checkbox>
-              </Space>
+            <FormItem label="启用事实核查">
+              <Switch v-model={data.value.enable_fact_checking} customValue={[0, 1]}/>
+            </FormItem>
+            <FormItem label="允许主动@他人">
+              <Switch v-model={data.value.allow_cross_talk} customValue={[0, 1]}/>
             </FormItem>
           </Form>
         </CollapsePanel>

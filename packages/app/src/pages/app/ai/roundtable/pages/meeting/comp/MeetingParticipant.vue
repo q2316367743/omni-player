@@ -1,15 +1,20 @@
 <template>
   <div class="rm-participants">
-    <div v-for="participant in participants" :key="participant.id" class="participant-card">
+    <div v-for="(participant, index) in participants" :key="participant.id" class="participant-card">
       <div class="participant-header">
         <div class="participant-avatar">{{ participant.name.charAt(0) }}</div>
         <div class="participant-info">
           <div class="participant-name">{{ participant.name }}</div>
           <div class="participant-type">{{ participant.type === 'admin' ? '上帝' : '成员' }}</div>
         </div>
-        <t-tag v-if="currentParticipantId === participant.id" theme="success" size="small">发言中</t-tag>
-        <t-tag v-else-if="participant.is_active === 0" theme="default" size="small">已禁言</t-tag>
-        <t-tag v-else theme="default" size="small">等待中</t-tag>
+        <div class="flex items-center">
+          <div class="mr-8px">
+            <t-switch class="mr-8px" :value="participant.is_active !== 0" @change="handleChange(participant, index)"/>
+          </div>
+          <t-tag v-if="currentParticipantId === participant.id" theme="success" size="small">发言中</t-tag>
+          <t-tag v-else-if="participant.is_active === 0" theme="default" size="small">已禁言</t-tag>
+          <t-tag v-else theme="default" size="small">等待中</t-tag>
+        </div>
       </div>
       <div class="participant-body">
         <div class="participant-stance" v-if="participant.stance">立场：{{ participant.stance }}</div>
@@ -20,8 +25,9 @@
 </template>
 <script lang="ts" setup>
 import type {AiRtParticipant} from "@/entity/app/ai/roundtable";
+import {updateAiRtParticipantService} from "@/services/app/roundtable";
 
-const props = defineProps({
+defineProps({
   // 全部的成员
   participants: {
     type: Array as PropType<Array<AiRtParticipant>>,
@@ -34,6 +40,18 @@ const props = defineProps({
   }
 });
 const emit = defineEmits(['change']);
+
+async function handleChange(participant: AiRtParticipant, index: number) {
+  await updateAiRtParticipantService(participant.id, {
+    is_active: participant.is_active === 0 ? 1 : 0
+  });
+  participant.is_active = participant.is_active === 0 ? 1 : 0
+  emit('change', {
+    index,
+    participant
+  });
+}
+
 </script>
 <style scoped lang="less">
 .rm-participants {

@@ -10,9 +10,6 @@
       <t-form-item label-align="top" label="自动总结" help="会议结束时是否自动触发最终总结">
         <t-switch v-model="data.auto_summary_on_end" :custom-value="[0, 1]"/>
       </t-form-item>
-      <t-form-item label-align="top" label="允许用户插话" help="是否允许用户随时插话打断">
-        <t-switch v-model="data.allow_user_interruption" :custom-value="[0, 1]"/>
-      </t-form-item>
       <t-form-item label-align="top">
         <t-button theme="primary" @click="handleSave">保存</t-button>
       </t-form-item>

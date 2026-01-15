@@ -46,9 +46,9 @@
                 </t-space>
               </template>
               <template #suffix>
-                <t-button  v-if="isSpeaking" shape="round" theme="danger" @click="handleInterrupt">
+                <t-button v-if="isSpeaking" shape="round" theme="danger" @click="handleInterrupt">
                   <template #icon>
-                    <stop-circle-icon />
+                    <stop-circle-icon/>
                   </template>
                   打断发言
                 </t-button>
@@ -64,7 +64,7 @@
         </div>
       </div>
       <meeting-participant v-else-if="page === '2'" :participants="participants"
-                           :current-participant-id="currentParticipantId" @change="fetchParticipant"/>
+                           :current-participant-id="currentParticipantId" @change="handleParticipantChange"/>
       <meeting-setting v-else-if="page === '3' && meeting" :meeting="meeting" @change="handleMeetingChange"/>
     </div>
     <t-button v-if="isShowToBottom" v-show="page === '1'" variant="text" class="bottomBtn" @click="backBottom">
@@ -330,6 +330,10 @@ const backBottom = () => {
     });
   }
 };
+
+const handleParticipantChange = async (opt: {index: number, participant: AiRtParticipant}) => {
+  participants.value[opt.index] = opt.participant;
+}
 
 const handleMeetingChange = async () => {
   await fetchMeeting();
