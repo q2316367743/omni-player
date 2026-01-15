@@ -1,0 +1,107 @@
+.roundtable-meeting {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--td-bg-color-container);
+
+  .rm-header {
+    height: 48px;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--fluent-border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--fluent-acrylic-bg);
+    backdrop-filter: var(--fluent-acrylic-blur);
+    box-shadow: var(--fluent-elevation-1);
+
+    .rm-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--td-text-color-primary);
+    }
+  }
+
+  .rm-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .rm-messages {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+
+      .chat-sender-wrapper {
+        margin-top: 16px;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+
+        .chat-sender {
+          background: var(--fluent-card-bg);
+          backdrop-filter: blur(10px);
+          border: 1px solid var(--fluent-card-border);
+          border-radius: var(--fluent-radius-large);
+          box-shadow: var(--fluent-elevation-3);
+          padding: 16px;
+          transition: all var(--fluent-transition-normal);
+
+          &:hover {
+            box-shadow: var(--fluent-elevation-4);
+          }
+
+          .sender-actions {
+            margin-top: 12px;
+            display: flex;
+            justify-content: flex-end;
+          }
+        }
+      }
+    }
+
+
+  }
+
+  .bottomBtn {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 180px;
+    padding: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--fluent-card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--fluent-card-border);
+    box-shadow: var(--fluent-elevation-4);
+    transition: all var(--fluent-transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+
+    &:hover {
+      transform: translateX(-50%) translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      background: var(--fluent-card-bg-hover);
+    }
+
+    &:active {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    svg {
+      width: 24px;
+      height: 24px;
+      color: var(--fluent-accent-color);
+    }
+  }
+}

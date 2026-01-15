@@ -3,7 +3,7 @@
     <t-aside class="h-full overflow-hidden shrink-0">
       <roundtable-aside v-model="activeKey" ref="aside"/>
     </t-aside>
-    <t-content class="h-full overflow-hidden overflow-x-hidden">
+    <t-content class="h-full overflow-hidden overflow-x-hidden relative">
       <roundtable-role v-show="activeKey === '/role'"/>
       <roundtable-group v-if="activeKey.startsWith('/group')"/>
       <roundtable-meeting v-else-if="activeKey.startsWith('/meeting')" v-model="activeKey"/>
