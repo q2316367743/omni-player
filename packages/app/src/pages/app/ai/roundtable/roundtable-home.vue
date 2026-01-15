@@ -5,7 +5,7 @@
     </t-aside>
     <t-content class="h-full overflow-hidden overflow-x-hidden relative">
       <roundtable-role v-show="activeKey === '/role'"/>
-      <roundtable-group v-if="activeKey.startsWith('/group')"/>
+      <roundtable-group v-if="activeKey === '/group'"/>
       <roundtable-meeting v-else-if="activeKey.startsWith('/meeting')" v-model="activeKey"/>
       <roundtable-create v-else-if="activeKey.startsWith('/create')" v-model="activeKey" @refresh="onRefreshMeeting" />
       <empty-result v-else-if="activeKey !== '/role'" title="AI 圆桌派" tip="让 AI 与你一起头脑风暴"/>

@@ -11,19 +11,9 @@
            @click="toggleRole">
         <div class="text ellipsis">角色管理</div>
       </div>
-      <div class="group">
-        <div>讨论组</div>
-        <t-tooltip content="创建讨论组">
-          <t-button theme="primary" variant="text" shape="square" size="small" @click="onAddGroup">
-            <template #icon>
-              <plus-icon/>
-            </template>
-          </t-button>
-        </t-tooltip>
-      </div>
-      <div class="item" v-for="group in groups" :key="group.id" :class="{active: modelValue === `/group/${group.id}`}"
-           @click="onClickGroup(group)" @contextmenu="onGroupMenuClick(group, $event, fetchGroup)">
-        <div class="text ellipsis">{{ group.name }}</div>
+      <div class="item" :class="{active: modelValue === '/group'}"
+           @click="toggleGroup">
+        <div class="text ellipsis">讨论组</div>
       </div>
       <div class="group">
         <div>圆桌会议</div>
@@ -46,27 +36,22 @@
 </template>
 <script lang="ts" setup>
 import {PlusIcon} from "tdesign-icons-vue-next";
-import type {AiRtGroup, AiRtMeeting} from "@/entity/app/ai/roundtable";
-import {listAiRtGroupService, listAiRtMeetingService} from "@/services/app/roundtable";
-import {onGroupMenuClick, onMeetingMenuClick} from "@/pages/app/ai/roundtable/func/RoundtableMeetingEdit.tsx";
+import type {AiRtMeeting} from "@/entity/app/ai/roundtable";
+import {listAiRtMeetingService} from "@/services/app/roundtable";
+import {onMeetingMenuClick} from "@/pages/app/ai/roundtable/func/RoundtableMeetingEdit.tsx";
 
 const modelValue = defineModel({
   type: String,
   default: ''
 });
 
-const groups = ref<Array<AiRtGroup>>([]);
 const meetings = ref<Array<AiRtMeeting>>([]);
 
-const fetchGroup = async () => {
-  groups.value = await listAiRtGroupService();
-}
 const fetchMeeting = async () => {
   meetings.value = await listAiRtMeetingService("");
 }
 
 tryOnMounted(() => {
-  fetchGroup();
   fetchMeeting();
 })
 
@@ -77,21 +62,18 @@ const toggleRole = () => {
     modelValue.value = '/role'
   }
 }
-
-const onAddGroup = () => {
-  console.log('添加讨论组');
+const toggleGroup = () => {
+  if (modelValue.value === '/group') {
+    modelValue.value = ''
+  } else {
+    modelValue.value = '/group'
+  }
 }
 
 const onAddMeeting = () => {
   // 创建临时圆桌会议
   modelValue.value = '';
   modelValue.value = `/create/`;
-}
-const onClickGroup = (group: AiRtGroup) => {
-  modelValue.value = '';
-  nextTick(() => {
-    modelValue.value = `/group/${group.id}`;
-  })
 }
 
 const onClickMeeting = (meeting: AiRtMeeting) => {
