@@ -27,44 +27,44 @@ CREATE TABLE IF NOT EXISTS ai_rt_role
 -- 圆桌会议 - 讨论组表
 CREATE TABLE IF NOT EXISTS ai_rt_group
 (
-    id                      TEXT PRIMARY KEY,
-    created_at              INTEGER NOT NULL,
-    updated_at              INTEGER NOT NULL,
-    deleted_at              INTEGER,
+    id                  TEXT PRIMARY KEY,
+    created_at          INTEGER NOT NULL,
+    updated_at          INTEGER NOT NULL,
+    deleted_at          INTEGER,
 
     -- 讨论组基本信息
-    name                    TEXT    NOT NULL,
+    name                TEXT    NOT NULL,
 
     -- 会议设置
-    max_rounds              INTEGER NOT NULL DEFAULT 0,
-    summary_interval        INTEGER NOT NULL DEFAULT 3,
-    auto_summary_on_end     INTEGER NOT NULL DEFAULT 1 CHECK (auto_summary_on_end IN (0, 1)),
-    user_role               TEXT    NOT NULL DEFAULT '用户'
+    max_rounds          INTEGER NOT NULL DEFAULT 0,
+    summary_interval    INTEGER NOT NULL DEFAULT 3,
+    auto_summary_on_end INTEGER NOT NULL DEFAULT 1 CHECK (auto_summary_on_end IN (0, 1)),
+    user_role           TEXT    NOT NULL DEFAULT '用户'
 );
 
 -- 圆桌会议 - 会议表
 CREATE TABLE IF NOT EXISTS ai_rt_meeting
 (
-    id                      TEXT PRIMARY KEY,
-    created_at              INTEGER NOT NULL,
-    updated_at              INTEGER NOT NULL,
-    deleted_at              INTEGER,
+    id                  TEXT PRIMARY KEY,
+    created_at          INTEGER NOT NULL,
+    updated_at          INTEGER NOT NULL,
+    deleted_at          INTEGER,
 
     -- 关联信息
-    group_id                TEXT,
+    group_id            TEXT,
 
     -- 会议基本信息
-    topic                   TEXT    NOT NULL,
-    content                 TEXT    NOT NULL,
+    topic               TEXT    NOT NULL,
+    content             TEXT    NOT NULL,
 
     -- 会议状态
-    status                  TEXT    NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'paused', 'ended', 'archived')),
+    status              TEXT    NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'paused', 'ended', 'archived')),
 
     -- 会议设置
-    max_rounds              INTEGER NOT NULL DEFAULT 0,
-    summary_interval        INTEGER NOT NULL DEFAULT 3,
-    auto_summary_on_end     INTEGER NOT NULL DEFAULT 1 CHECK (auto_summary_on_end IN (0, 1)),
-    user_role               TEXT    NOT NULL DEFAULT '用户'
+    max_rounds          INTEGER NOT NULL DEFAULT 0,
+    summary_interval    INTEGER NOT NULL DEFAULT 3,
+    auto_summary_on_end INTEGER NOT NULL DEFAULT 1 CHECK (auto_summary_on_end IN (0, 1)),
+    user_role           TEXT    NOT NULL DEFAULT '用户'
 
 );
 
@@ -177,7 +177,7 @@ CREATE TABLE IF NOT EXISTS ai_rt_message
     meeting_id        TEXT    NOT NULL,
 
     -- 消息核心信息
-    role              TEXT    NOT NULL CHECK (role IN ('system', 'user', 'assistant', 'model-change', 'error')),
+    role              TEXT    NOT NULL,
     thinking          TEXT    NOT NULL DEFAULT '',
     content           TEXT    NOT NULL,
     participant_id    TEXT    NOT NULL,

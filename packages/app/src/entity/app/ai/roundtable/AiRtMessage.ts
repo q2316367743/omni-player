@@ -6,9 +6,16 @@ import type {ChatMessageParam} from "@/util/lang/ChatUtil.ts";
 import type {AiRtMeeting} from "@/entity/app/ai/roundtable/AiRtMeeting.ts";
 
 export interface AiRtMessageCore {
-  role: AiChatRole;
+  /**
+   * - private-assistant：私聊 - 助手
+   * - private-user：私聊 - 用户
+   */
+  role: AiChatRole | 'private-assistant' | 'private-user';
   thinking: string;
   content: string;
+  /**
+   * 参与者 ID，只有 assistant 才有，或者私聊用户表示和那个 assistant 私聊
+   */
   participant_id: string;
   is_summary: YesOrNo;
   is_interrupted: YesOrNo;
@@ -73,6 +80,63 @@ export function transferRtMessageTo(messages: Array<AiRtMessage>, meeting: AiRtM
       case "system": {
         results.push({
           role: "system",
+          content: message.content,
+        });
+        break;
+      }
+      case "private-assistant": {
+        if (message.participant_id !== participant.id) {
+          break;
+        }
+        results.push({
+          role: "assistant",
+          content: message.content,
+        });
+        break;
+      }
+      case "private-user": {
+        if (message.participant_id !== participant.id) {
+          break;
+        }
+        results.push({
+          role: "user",
+          content: message.content,
+        });
+        break;
+      }
+    }
+  }
+  return results;
+}
+
+
+export function transferRtPrivateMessageTo(
+  messages: Array<AiRtMessage>,
+  meeting: AiRtMeeting, participant:AiRtParticipant
+): Array<ChatMessageParam> {
+  const results = new Array<ChatMessageParam>();
+  results.push({
+    role: 'system',
+    content: buildAiRtParticipantPrompt(participant, meeting)
+  })
+  for (const message of messages.sort((a, b) => a.turn_order - b.turn_order)) {
+    switch (message.role) {
+      case "private-assistant": {
+        if (message.participant_id !== participant.id) {
+          break;
+        }
+        results.push({
+          role: "assistant",
+          content: message.content,
+        });
+        break;
+      }
+      case "private-user": {
+        if (message.participant_id !== participant.id) {
+          break;
+        }
+        results.push({
+          role: "user",
           content: message.content,
         });
         break;

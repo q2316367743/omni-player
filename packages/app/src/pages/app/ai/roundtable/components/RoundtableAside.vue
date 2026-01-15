@@ -21,7 +21,6 @@
           </t-button>
         </t-tooltip>
       </div>
-      <t-empty v-if="groups.length === 0" description="暂无讨论组" size="small"/>
       <div class="item" v-for="group in groups" :key="group.id" :class="{active: modelValue === `/group/${group.id}`}"
            @click="onClickGroup(group)" @contextmenu="onGroupMenuClick(group, $event, fetchGroup)">
         <div class="text ellipsis">{{ group.name }}</div>

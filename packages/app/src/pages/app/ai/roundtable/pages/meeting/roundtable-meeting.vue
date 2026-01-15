@@ -5,8 +5,9 @@
       <div class="rm-controls">
         <t-radio-group v-model="page" variant="default-filled">
           <t-radio-button value="1">消息</t-radio-button>
-          <t-radio-button value="2">成员</t-radio-button>
-          <t-radio-button value="3">设置</t-radio-button>
+          <t-radio-button value="2">私聊</t-radio-button>
+          <t-radio-button value="3">成员</t-radio-button>
+          <t-radio-button value="4">设置</t-radio-button>
         </t-radio-group>
       </div>
     </div>
@@ -63,9 +64,11 @@
           </div>
         </div>
       </div>
-      <meeting-participant v-if="page === '2'" :participants="participants"
+      <meeting-private v-show="page === '2'" v-if="meeting" :participants :messages :meeting="meeting"
+                       :participant-map="participantMap" @refresh="fetchMessage"/>
+      <meeting-participant v-if="page === '3'" :participants="participants"
                            :current-participant-id="currentParticipantId" @change="handleParticipantChange"/>
-      <meeting-setting v-else-if="page === '3' && meeting" :meeting="meeting" @change="handleMeetingChange"/>
+      <meeting-setting v-else-if="page === '4' && meeting" :meeting="meeting" @change="handleMeetingChange"/>
     </div>
     <t-button v-if="isShowToBottom" v-show="page === '1'" variant="text" class="bottomBtn" @click="backBottom">
       <arrow-down-icon/>
@@ -96,6 +99,7 @@ import {map} from "@/util";
 import MeetingParticipant from "@/pages/app/ai/roundtable/pages/meeting/comp/MeetingParticipant.vue";
 import MeetingMessage from "@/pages/app/ai/roundtable/pages/meeting/comp/MeetingMessage.vue";
 import MeetingSetting from "@/pages/app/ai/roundtable/pages/meeting/comp/MeetingSetting.vue";
+import MeetingPrivate from "@/pages/app/ai/roundtable/pages/meeting/comp/MeetingPrivate.vue";
 
 const activeKey = defineModel({
   type: String,
@@ -143,6 +147,10 @@ const fetchMeeting = async () => {
   }
 }
 
+const fetchMessage = async () => {
+  messages.value = await listAiRtMessageService(meetingId.value);
+}
+
 tryOnMounted(async () => {
   const url = new URL(`https://example.com${activeKey.value}`)
   const item = url.pathname.split("/");
@@ -150,7 +158,8 @@ tryOnMounted(async () => {
   groupId.value = item.pop()!;
   // 获取圆桌会议基础信息
   await fetchMeeting();
-  messages.value = await listAiRtMessageService(meetingId.value);
+  // 获取圆桌会议消息
+  await fetchMessage();
   // 获取全部成员
   await fetchParticipant();
 
@@ -198,7 +207,7 @@ const triggerAdminSummary = async () => {
       is_interrupted: 0,
       parent_message_id: ''
     });
-    messages.value = await listAiRtMessageService(meetingId.value);
+    await fetchMessage();
 
     const onUpdateMessage = debounce(async (data: { thinking?: string; content?: string }) => {
       await updateAiRtMessageService(messageId!, data);
@@ -233,7 +242,10 @@ const triggerAdminSummary = async () => {
       }
     });
 
-    messages.value = await listAiRtMessageService(meetingId.value);
+    setTimeout(() => {
+      fetchMessage()
+    }, 310);
+
   } catch (e) {
     console.error('管理员AI总结失败', e);
   } finally {
@@ -289,7 +301,7 @@ const askParticipant = async (participant: AiRtParticipant) => {
       is_interrupted: 0,
       parent_message_id: ''
     });
-    messages.value = await listAiRtMessageService(meetingId.value);
+    await fetchMessage();
 
     const onUpdateMessage = debounce(async (data: { thinking?: string; content?: string }) => {
       await updateAiRtMessageService(messageId!, data);
@@ -323,8 +335,7 @@ const askParticipant = async (participant: AiRtParticipant) => {
         abort.value = a;
       }
     });
-
-    messages.value = await listAiRtMessageService(meetingId.value);
+    await fetchMessage();
 
     const active = activeParticipants.value;
     const currentIndex = active.findIndex(p => p.id === participant.id);
@@ -373,7 +384,7 @@ const handleSend = async () => {
     parent_message_id: ''
   });
 
-  messages.value = await listAiRtMessageService(meetingId.value);
+  await fetchMessage();
 
   if (isPaused.value) {
     roundsSinceLastInterrupt.value = 0;

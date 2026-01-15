@@ -18,7 +18,7 @@
       </div>
       <div class="participant-body">
         <div class="participant-stance" v-if="participant.stance">立场：{{ participant.stance }}</div>
-        <div class="participant-prompt">{{ participant.prompt }}</div>
+        <div class="participant-prompt" :title="participant.prompt" v-if="participant.prompt">{{ participant.prompt }}</div>
       </div>
     </div>
   </div>
@@ -121,6 +121,12 @@ async function handleChange(participant: AiRtParticipant, index: number) {
         font-size: 13px;
         color: var(--td-text-color-placeholder);
         line-height: 1.6;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-word;
       }
     }
   }
