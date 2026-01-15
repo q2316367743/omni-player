@@ -99,6 +99,7 @@ const props = defineProps({
     default: '0'
   }
 });
+const emit = defineEmits(["refreshGroup"]);
 
 const keyword = ref('');
 const group = ref<AiChatGroup>();
@@ -214,6 +215,7 @@ async function onChatContextMenuClick(data: AiChatItem, e: MouseEvent) {
 function onDelete() {
   onRemoveGroup(props.groupId, () => {
     activeKey.value = "/home/welcome";
+    emit("refreshGroup")
   })
 }
 

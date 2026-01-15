@@ -8,7 +8,7 @@
       </t-button>
     </div>
     <div class="home-group__content">
-      <home-group-content :group-id="groupId"/>
+      <home-group-content :group-id="groupId" @refresh-group="onRefreshGroup"/>
     </div>
     <div class="home-group__footer">
       <chat-sender
@@ -45,6 +45,8 @@ import HomeAssistantSelect from "@/pages/app/ai/chat/components/HomeAssistantSel
 import {createAiChatItemService, getAiChatGroupService} from "@/services/app/chat";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 
+const emit = defineEmits(["refreshGroup"]);
+
 const groupId = renderGroup(activeKey.value);
 
 const text = ref('');
@@ -66,6 +68,10 @@ const inputEnter = (inputValue: string) => {
   createAiChatItemService(groupId, inputValue, model.value)
     .then(id => activeKey.value = `/home/chat/${groupId}/${id}?mode=create`)
     .catch(e => MessageUtil.error("提问失败", e));
+};
+
+const onRefreshGroup = () => {
+  emit("refreshGroup");
 };
 
 onMounted(async () => {

@@ -62,6 +62,8 @@ import HomeAssistantSelect from "@/pages/app/ai/chat/components/HomeAssistantSel
 import {createAiChatItemService} from "@/services/app/chat";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 
+const emit = defineEmits(["refreshItem"]);
+
 const text = ref('');
 const model = ref(useSettingStore().aiSetting.defaultChatModel);
 
@@ -80,7 +82,10 @@ const inputEnter = (inputValue: string) => {
   // 添加到列表中
   // 创建聊天
   createAiChatItemService("", inputValue, model.value)
-    .then(id => activeKey.value = `/home/chat/0/${id}?mode=create`)
+    .then(id => {
+      activeKey.value = `/home/chat/0/${id}?mode=create`;
+      emit("refreshItem");
+    })
     .catch(e => MessageUtil.error("提问失败", e));
 
 };

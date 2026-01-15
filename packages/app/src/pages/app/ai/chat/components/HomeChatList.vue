@@ -5,11 +5,12 @@
       class="item"
       v-for="i in items"
       :key="i.id"
-      :class="{ active: activeKey === `/home/chat/0/${i.id}` }"
+      :class="{ active: activeKey.startsWith(`/home/chat/0/${i.id}`) }"
       @click="onClick(`/home/chat/0/${i.id}`)"
       @contextmenu="onChatMenuClick(i, $event)"
     >
-      <div class="text ellipsis">{{ i.name }}
+      <div class="text ellipsis">
+        {{ i.name }}
         <t-tag v-if="i.top" size="small" variant="outline" theme="primary">
           <template #icon>
             <align-top-icon/>
@@ -35,14 +36,21 @@
 import {AlignTopIcon, FolderIcon, MoreIcon, PlusIcon} from "tdesign-icons-vue-next";
 import ContextMenu, {type MenuItem} from "@imengyu/vue3-context-menu";
 import type {AiChatItem} from "@/entity/app/ai/chat";
-import {listAiChatItemService, listAiChatGroupService} from "@/services/app/chat";
+import {listAiChatGroupService} from "@/services/app/chat";
 import {activeKey, autoHideCollapsed} from "@/pages/app/ai/chat/model.ts";
 import {openAddAiChatGroupDialog} from "@/pages/app/ai/chat/modal/AddAiChatGroup.tsx";
 import {isDark} from "@/global/Constants.ts";
 import {onRemoveChat, onRenameChat, onTopChat} from "@/pages/app/ai/chat/components/HomeContext.tsx";
 import {chatMove} from "@/pages/app/ai/chat/components/ChatMove.ts";
 
-const items = ref(new Array<AiChatItem>());
+defineProps({
+  items: {
+    type: Array as PropType<Array<AiChatItem>>,
+    default: () => new Array<AiChatItem>(),
+  }
+});
+
+const emit = defineEmits(["refreshGroup", "refreshItem"]);
 
 
 const onClick = (path: string) => {
@@ -69,7 +77,9 @@ const onChatMenuClick = async (data: AiChatItem, e: MouseEvent) => {
   items.push({
     label: "新建分组",
     icon: () => h(PlusIcon),
-    onClick: () => openAddAiChatGroupDialog(),
+    onClick: () => openAddAiChatGroupDialog(() => {
+      emit("refreshGroup");
+    }),
   });
   e.preventDefault();
   ContextMenu.showContextMenu({
@@ -102,6 +112,7 @@ const onChatMenuClick = async (data: AiChatItem, e: MouseEvent) => {
           ),
         onClick: () =>
           onRemoveChat("0", data.id, () => {
+            emit('refreshItem');
             if (activeKey.value === `/home/chat/0/${data.id}`)
               activeKey.value = "";
           }),
@@ -114,12 +125,11 @@ function onMove(chat: AiChatItem, targetGroupId: string) {
   chatMove({
     chatId: chat.id,
     targetGroupId,
+  }).then(() => {
+    emit('refreshItem');
   });
 }
 
-tryOnMounted(async () => {
-  items.value = await listAiChatItemService();
-})
 </script>
 <style scoped lang="less">
 </style>

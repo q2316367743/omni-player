@@ -586,7 +586,6 @@ const handleDeleteChat = (index: number) => {
               }
 
               .message-content {
-                padding: 16px 20px;
                 background: var(--td-bg-color-container);
                 border: 1px solid var(--fluent-card-border);
                 border-radius: var(--fluent-radius-card);

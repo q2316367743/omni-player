@@ -59,14 +59,14 @@
             </t-button>
           </div>
         </div>
-        <home-chat-list />
+        <home-chat-list :items="items" @refresh-group="initGroup" @refresh-item="initItem"/>
       </div>
     </div>
     <div class="home-content" :class="{collapsed}">
       <home-temp v-if="activeKey === '/home/temp' && show"/>
-      <home-group v-else-if="activeKey.startsWith('/home/group/') && show"/>
+      <home-group v-else-if="activeKey.startsWith('/home/group/') && show" @refresh-group="initGroup"/>
       <home-chat v-else-if="activeKey.startsWith('/home/chat') && show"/>
-      <home-welcome v-else/>
+      <home-welcome v-else @refresh-item="initItem"/>
     </div>
   </div>
 </template>
@@ -84,7 +84,7 @@ import {
 import ContextMenu from '@imengyu/vue3-context-menu';
 import {useSortable, moveArrayElement} from "@vueuse/integrations/useSortable";
 import {activeKey, autoHideCollapsed, collapsed, toggleCollapsed} from './model';
-import type {AiChatGroup} from "@/entity/app/ai/chat";
+import type {AiChatGroup, AiChatItem} from "@/entity/app/ai/chat";
 import {listAiChatGroupService, sortAiChatGroupService} from "@/services/app/chat/AiChatGroupService.ts";
 import {isDark} from "@/global/Constants.ts";
 import {onRemoveGroup, onRenameGroup} from "@/pages/app/ai/chat/components/HomeContext.tsx";
@@ -95,11 +95,13 @@ import HomeTemp from "@/pages/app/ai/chat/pages/temp/HomeTemp.vue";
 import HomeGroup from "@/pages/app/ai/chat/pages/group/HomeGroup.vue";
 import HomeChat from "@/pages/app/ai/chat/pages/chat/HomeChat.vue";
 import HomeWelcome from "@/pages/app/ai/chat/pages/welcome/HomeWelcome.vue";
+import {listAiChatItemService} from "@/services/app/chat";
 
 const show = ref(true);
 const groupList = ref<HTMLDivElement>();
 
 const groups = ref(new Array<AiChatGroup>());
+const items = ref(new Array<AiChatItem>());
 
 watch(activeKey, () => {
   show.value = false;
@@ -154,8 +156,14 @@ const onGroupMenuClick = (group: AiChatGroup, e: MouseEvent) => {
 async function initGroup() {
   groups.value = await listAiChatGroupService();
 }
+async function initItem() {
+  items.value = await listAiChatItemService();
+}
 
-tryOnMounted(initGroup)
+tryOnMounted(() => {
+  initGroup();
+  initItem();
+})
 
 </script>
 <style scoped lang="less">
