@@ -230,12 +230,14 @@ defineExpose({
     }
 
     &.user {
+      margin-left: auto;
+
       .user-message {
         display: flex;
         gap: 12px;
         max-width: 800px;
         margin: 0 auto;
-        flex-direction: row-reverse;
+        flex-direction: row;
 
         .message-avatar {
           width: 40px;
@@ -260,7 +262,6 @@ defineExpose({
           min-width: 0;
 
           .message-content {
-            padding: 16px 20px;
             background: var(--td-bg-color-secondarycontainer);
             backdrop-filter: blur(10px);
             border: 1px solid var(--fluent-card-border);

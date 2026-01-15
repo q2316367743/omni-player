@@ -16,12 +16,13 @@
                          ref="chatContentRef" @scroll="handleChatScroll"/>
         <div class="chat-sender-wrapper">
           <div class="chat-sender">
-            <t-chat-sender v-model="text" placeholder="输入消息..." :loading="isSpeaking" @send="handleSend" @stop="handleInterrupt">
+            <t-chat-sender v-model="text" placeholder="输入消息...">
               <template #footer-prefix>
                 <t-space size="small">
                   <t-button
                     v-if="isPaused"
                     theme="primary"
+                    shape="round"
                     @click="handleResume"
                   >
                     <template #icon>
@@ -32,14 +33,31 @@
                   <t-button
                     v-else
                     theme="warning"
+                    shape="round"
+                    :loading="isPauseWaiting"
+                    :disabled="isPauseWaiting"
                     @click="handlePause"
                   >
                     <template #icon>
                       <pause-icon/>
                     </template>
-                    暂停
+                    我要发言
                   </t-button>
                 </t-space>
+              </template>
+              <template #suffix>
+                <t-button  v-if="isSpeaking" shape="round" theme="danger" @click="handleInterrupt">
+                  <template #icon>
+                    <stop-circle-icon />
+                  </template>
+                  打断发言
+                </t-button>
+                <t-button v-else shape="round" theme="primary" @click="handleSend">
+                  <template #icon>
+                    <send-icon/>
+                  </template>
+                  发送
+                </t-button>
               </template>
             </t-chat-sender>
           </div>
@@ -58,7 +76,7 @@
 import {
   ArrowDownIcon,
   PlayIcon,
-  PauseIcon,
+  PauseIcon, SendIcon, StopCircleIcon,
 } from "tdesign-icons-vue-next";
 import type {AiRtMeeting, AiRtMessage, AiRtParticipant} from "@/entity/app/ai/roundtable";
 import {
@@ -102,6 +120,8 @@ const isSpeaking = ref(false);
 const isStreamLoad = ref(false);
 const isShowToBottom = ref(false);
 const isAtBottom = ref(true);
+const isPauseWaiting = ref(false);
+const interruptedParticipantId = ref('');
 
 const currentParticipantIndex = ref(0);
 const currentParticipantId = ref('');
@@ -167,13 +187,10 @@ const startNextParticipant = async () => {
 };
 
 const askParticipant = async (participant: AiRtParticipant) => {
-  if (isPaused.value) return;
-
   try {
     isSpeaking.value = true;
     isStreamLoad.value = true;
 
-    // 插入新纪录
     const messageId = await addAiRtMessageService(meetingId.value, {
       role: 'assistant',
       thinking: '',
@@ -183,7 +200,6 @@ const askParticipant = async (participant: AiRtParticipant) => {
       is_interrupted: 0,
       parent_message_id: ''
     });
-    // 刷新消息列表
     messages.value = await listAiRtMessageService(meetingId.value);
 
     const onUpdateMessage = debounce(async (data: { thinking?: string; content?: string }) => {
@@ -221,6 +237,12 @@ const askParticipant = async (participant: AiRtParticipant) => {
 
     messages.value = await listAiRtMessageService(meetingId.value);
 
+    if (isPauseWaiting.value) {
+      isPaused.value = true;
+      isPauseWaiting.value = false;
+      return;
+    }
+
     if (!isPaused.value) {
       await startNextParticipant();
     }
@@ -253,26 +275,36 @@ const handleSend = async () => {
   if (isPaused.value) {
     await updateAiRtMeetingService(meetingId.value, {status: 'active'});
     isPaused.value = false;
+
+    if (interruptedParticipantId.value) {
+      const participant = participants.value.find(p => p.id === interruptedParticipantId.value);
+      if (participant) {
+        currentParticipantId.value = participant.id;
+        currentParticipantIndex.value = participants.value.findIndex(p => p.id === participant.id);
+        interruptedParticipantId.value = '';
+        await askParticipant(participant);
+        return;
+      }
+    }
+
     await startNextParticipant();
   }
 };
 
-const handleInterrupt = () => {
+const handleInterrupt = async () => {
+  interruptedParticipantId.value = currentParticipantId.value;
   if (abort.value) {
     abort.value.abort('用户打断');
   }
   isSpeaking.value = false;
   isStreamLoad.value = false;
+  isPaused.value = true;
+  await updateAiRtMeetingService(meetingId.value, {status: 'paused'});
 };
 
 const handlePause = async () => {
-  isPaused.value = true;
+  isPauseWaiting.value = true;
   await updateAiRtMeetingService(meetingId.value, {status: 'paused'});
-  if (abort.value) {
-    abort.value.abort('用户暂停');
-  }
-  isSpeaking.value = false;
-  isStreamLoad.value = false;
 };
 
 const handleResume = async () => {
