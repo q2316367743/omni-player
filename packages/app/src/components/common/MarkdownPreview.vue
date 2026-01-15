@@ -142,6 +142,9 @@ onBeforeUnmount(() => {
     .cherry-toolbar {
       display: none;
     }
+    p:last-child {
+      margin-bottom: 0 !important;
+    }
   }
 
   :deep(.cherry-previewer) {
