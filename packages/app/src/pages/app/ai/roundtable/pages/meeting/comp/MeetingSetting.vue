@@ -12,15 +12,17 @@
         </div>
       </div>
     </t-card>
-    <t-form>
+    <t-form class="!mt-16px">
       <t-form-item label-align="top" label="最大发言轮数" help="0 表示无限制">
-        <t-input-number v-model="data.max_rounds" :min="0" placeholder="0 表示无限制"/>
+        <t-input-number v-model="data.max_rounds" :min="0" placeholder="0 表示无限制"
+                        :disabled="meeting.status === 'ended'"/>
       </t-form-item>
       <t-form-item label-align="top" label="总结间隔" help="每 N 轮后触发管理员AI总结">
-        <t-input-number v-model="data.summary_interval" :min="1" placeholder="每 N 轮后总结"/>
+        <t-input-number v-model="data.summary_interval" :min="1" placeholder="每 N 轮后总结"
+                        :disabled="meeting.status === 'ended'"/>
       </t-form-item>
       <t-form-item label-align="top" label="自动总结" help="会议结束时是否自动触发最终总结">
-        <t-switch v-model="data.auto_summary_on_end" :custom-value="[0, 1]"/>
+        <t-switch v-model="data.auto_summary_on_end" :custom-value="[0, 1]" :disabled="meeting.status === 'ended'"/>
       </t-form-item>
       <t-form-item label-align="top">
         <t-space>
