@@ -23,6 +23,27 @@
     </div>
 
     <div class="tools-group">
+      <div class="group-title">AI 工具</div>
+      <div class="tools-grid mini-tools-grid">
+        <mini-tool-card label="聊天" value="ai/chat" tone="ai">
+          <template #icon>
+            <chat-icon />
+          </template>
+        </mini-tool-card>
+        <mini-tool-card label="圆桌会" value="ai/roundtable" tone="ai">
+          <template #icon>
+            <usergroup-icon />
+          </template>
+        </mini-tool-card>
+        <mini-tool-card label="小说创作" value="ai/fiction" tone="ai">
+          <template #icon>
+            <article-icon />
+          </template>
+        </mini-tool-card>
+      </div>
+    </div>
+
+    <div class="tools-group">
       <div class="group-title">程序员套件</div>
       <div class="tools-grid mini-tools-grid">
         <mini-tool-card value="programmer/regex" label="正则表达式" tone="regex">
@@ -101,26 +122,6 @@
       </div>
     </div>
 
-    <div class="tools-group">
-      <div class="group-title">AI 工具</div>
-      <div class="tools-grid mini-tools-grid">
-        <mini-tool-card label="聊天" value="ai/chat" tone="ai">
-          <template #icon>
-            <chat-icon />
-          </template>
-        </mini-tool-card>
-        <mini-tool-card label="圆桌会" value="ai/roundtable" tone="ai">
-          <template #icon>
-            <usergroup-icon />
-          </template>
-        </mini-tool-card>
-        <mini-tool-card label="小说创作" value="ai/fiction" tone="ai">
-          <template #icon>
-            <article-icon />
-          </template>
-        </mini-tool-card>
-      </div>
-    </div>
   </div>
 </template>
 
