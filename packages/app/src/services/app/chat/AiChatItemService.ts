@@ -32,10 +32,10 @@ export async function updateAiChatItemService(id: string, core: Partial<AiChatIt
 }
 
 export async function removeAiChatItemService(id: string) {
-  await useSql().beginTransaction(async sql => {
-    await sql.mapper<AiChatItem>('ai_chat_item').deleteById(id);
-    await sql.query<AiChatMessage>('ai_chat_message').eq('chat_id', id).delete();
-  })
+  await Promise.all([
+    useSql().mapper<AiChatItem>('ai_chat_item').deleteById(id),
+    useSql().query<AiChatMessage>('ai_chat_message').eq('chat_id', id).delete()
+  ])
 }
 
 /**

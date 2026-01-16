@@ -28,3 +28,7 @@ export function listAiChatMessageService(chatId: string) {
 export function updateAiChatMessageService(id: string, message: Partial<AiChatMessageCore>) {
   return useSql().mapper<AiChatMessage>('ai_chat_message').updateById(id, message);
 }
+
+export function removeAiChatMessageService(id: string) {
+  return useSql().mapper<AiChatMessage>('ai_chat_message').deleteById(id);
+}

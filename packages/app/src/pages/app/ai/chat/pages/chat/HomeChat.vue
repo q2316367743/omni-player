@@ -29,7 +29,8 @@
           <div v-else-if="item.role === 'assistant'" class="assistant-message">
             <div class="message-avatar assistant-avatar">
               <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
               </svg>
             </div>
             <div class="message-body">
@@ -41,25 +42,32 @@
                     <span class="dot"></span>
                     <span class="dot"></span>
                   </div>
-                  <span class="thinking-text">{{ isStreamLoad && index === messages.length - 1 ? '思考中...' : '已深度思考' }}</span>
+                  <span class="thinking-text">{{
+                      isStreamLoad && index === messages.length - 1 ? '思考中...' : '已深度思考'
+                    }}</span>
                 </div>
                 <div class="thinking-content">
-                  <markdown-preview :content="item.thinking"/></div>
+                  <markdown-preview :content="item.thinking"/>
+                </div>
               </div>
               <div v-if="item.content" class="message-content">
                 <markdown-preview :content="item.content"/>
               </div>
               <div class="message-footer">
-                <span class="message-info">tokens used: {{ calculateTokens(item.content) }}, model: {{ item.model }}</span>
+                <span class="message-info">tokens used: {{ calculateTokens(item.content) }}, model: {{
+                    item.model
+                  }}</span>
                 <div class="message-actions">
                   <t-tooltip content="复制">
-                    <t-button theme="primary" variant="text" shape="square" size="small" @click="handleOperator('copy', item, index)">
+                    <t-button theme="primary" variant="text" shape="square" size="small"
+                              @click="handleOperator('copy', item, index)">
                       <template #icon>
                         <copy-icon/>
                       </template>
                     </t-button>
                   </t-tooltip>
-                  <t-popconfirm content="是否删除此对话，删除后无法恢复" confirm-btn="删除" @confirm="handleOperator('delete', item, index)">
+                  <t-popconfirm content="是否删除此对话，删除后无法恢复" confirm-btn="删除"
+                                @confirm="handleOperator('delete', item, index)">
                     <t-button theme="danger" variant="text" shape="square" size="small">
                       <template #icon>
                         <delete-icon/>
@@ -76,7 +84,8 @@
             </div>
             <div class="message-avatar user-avatar">
               <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                <path
+                  d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
             </div>
           </div>
@@ -93,12 +102,11 @@
           v-model="text"
           class="chat-sender"
           :textarea-props="{placeholder: '请输入消息...',disabled: isAsked}"
-          @send="inputEnter"
         >
           <template #suffix>
             <t-button theme="danger" shape="circle" v-if="isAsked" @click="handleStop">
               <template #icon>
-                <stop-icon/>
+                <stop-circle-icon/>
               </template>
             </t-button>
             <t-space size="small" v-else>
@@ -130,8 +138,7 @@ import {
   ChevronDownIcon,
   CopyIcon,
   DeleteIcon,
-  MenuFoldIcon,
-  StopIcon
+  MenuFoldIcon, StopCircleIcon,
 } from "tdesign-icons-vue-next";
 import {activeKey, collapsed, toggleCollapsed} from "@/pages/app/ai/chat/model.ts";
 import HomeAssistantSelect from "@/pages/app/ai/chat/components/HomeAssistantSelect.vue";
@@ -146,7 +153,7 @@ import {askToOpenAi, type AskToOpenAiAbort} from "@/util/lang/ChatUtil";
 import {
   addAiChatMessageService,
   getAiChatGroupService, getAiChatItemService,
-  listAiChatMessageService,
+  listAiChatMessageService, removeAiChatMessageService,
   updateAiChatMessageService
 } from "@/services/app/chat";
 import MessageUtil from "@/util/model/MessageUtil.ts";
@@ -350,7 +357,6 @@ const handleOperator = (op: string, item: AiChatMessage, index: number) => {
 }
 // 停止
 const handleStop = () => {
-  if (!isStreamLoad.value) return;
   if (!abort.value) return;
   abort.value.abort("用户主动停止");
 }
@@ -365,17 +371,10 @@ const handleRemove = () => {
 const handleGroup = () => {
   activeKey.value = `/home/group/${group.value?.id}`;
 }
-const handleDeleteChat = (index: number) => {
-  messages.value.splice(index, 1);
+const handleDeleteChat = async (index: number) => {
+  const old = messages.value[index];
   // 删除提问
-  while (true) {
-    const old = messages.value[index];
-    if (!old) break;
-    if (old.role === 'assistant') break;
-    // 删除所有非助手回答
-    messages.value.splice(index, 1);
-  }
-  // TODO：删除
+  await removeAiChatMessageService(old!.id)
   onSaveContent().then(() => MessageUtil.success("已删除")).catch(e => MessageUtil.error("删除失败", e));
 }
 

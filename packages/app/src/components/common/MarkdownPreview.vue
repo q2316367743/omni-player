@@ -3,6 +3,7 @@
 </template>
 
 <script lang="ts" setup>
+import {openUrl} from '@tauri-apps/plugin-opener';
 import Cherry from "cherry-markdown";
 import {isDark} from "@/global/Constants.ts";
 
@@ -108,6 +109,18 @@ const initCherry = () => {
       floatWhenClosePreviewer: false,
       enablePreviewerBubble: false
     },
+    callback: {
+      onClickPreview(event: PointerEvent) {
+        const target = event.target as HTMLElement;
+        const anchor = target.closest('a');
+        
+        if (anchor && anchor.href) {
+          event.stopPropagation();
+          event.preventDefault();
+          openUrl(anchor.href);
+        }
+      }
+    }
   });
 };
 
