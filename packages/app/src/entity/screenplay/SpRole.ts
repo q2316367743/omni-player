@@ -1,7 +1,8 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {YesOrNo} from "@/global/YesOrNo.ts";
 
-export interface SpRole extends BaseEntity {
+export interface SpRoleCore {
+
   /**
    * 剧本 ID
    */
@@ -26,4 +27,7 @@ export interface SpRole extends BaseEntity {
    * 是否为叙述者
    */
   in_narrator: YesOrNo;
+}
+
+export interface SpRole extends BaseEntity, SpRoleCore {
 }

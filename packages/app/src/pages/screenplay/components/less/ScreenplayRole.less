@@ -1,0 +1,124 @@
+.role-sidebar {
+  width: 320px;
+  background: var(--fluent-sidebar-bg);
+  backdrop-filter: var(--fluent-acrylic-blur);
+  border-right: 1px solid var(--fluent-sidebar-border);
+  display: flex;
+  flex-direction: column;
+  transition: var(--fluent-transition-normal);
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--fluent-sidebar-border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-title {
+  margin: 0;
+  font: var(--td-font-title-medium);
+  color: var(--td-text-color-primary);
+}
+
+.role-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.role-card {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: var(--fluent-card-bg);
+  border: 1px solid var(--fluent-card-border);
+  border-radius: var(--fluent-radius-card);
+  cursor: pointer;
+  transition: all var(--fluent-transition-fast);
+  position: relative;
+}
+
+.role-card:hover {
+  background: var(--fluent-card-bg-hover);
+  box-shadow: var(--fluent-card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.role-active {
+  background: var(--fluent-item-selected);
+  border-color: var(--fluent-item-selected-border);
+}
+
+.role-narrator {
+  border-left: 3px solid var(--fluent-accent-color);
+}
+
+.role-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--td-radius-circle);
+  background: var(--fluent-gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: var(--td-font-title-medium);
+  color: white;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.role-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.role-name {
+  font: var(--td-font-subtitle-medium);
+  color: var(--td-text-color-primary);
+  margin-bottom: 4px;
+}
+
+.role-identity {
+  font: var(--td-font-body-small);
+  color: var(--td-text-color-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.role-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.role-detail {
+  margin: 12px;
+  background: var(--fluent-card-bg);
+}
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.detail-header h4 {
+  margin: 0;
+  font: var(--td-font-subtitle-medium);
+  color: var(--td-text-color-primary);
+}
+
+.detail-section {
+  margin-bottom: 16px;
+}
+
+.detail-section p {
+  margin: 8px 0 0 0;
+  font: var(--td-font-body-small);
+  color: var(--td-text-color-secondary);
+  line-height: var(--td-line-height-body-small);
+}

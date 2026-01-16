@@ -1,0 +1,116 @@
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  background: var(--td-bg-color-page);
+}
+
+.message-item {
+  margin-bottom: 24px;
+  animation: fadeIn var(--fluent-transition-normal);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-role {
+  display: flex;
+  gap: 12px;
+}
+
+.message-narrator {
+  display: flex;
+  gap: 12px;
+}
+
+.message-event {
+  display: flex;
+  gap: 12px;
+}
+
+.message-system {
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+}
+
+.message-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--td-radius-circle);
+  background: var(--fluent-gradient-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: var(--td-font-subtitle-medium);
+  color: white;
+  flex-shrink: 0;
+}
+
+.narrator-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--td-radius-circle);
+  background: var(--td-brand-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.event-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--td-radius-circle);
+  background: var(--td-warning-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.message-content {
+  flex: 1;
+  max-width: 70%;
+}
+
+.message-sender {
+  font: var(--td-font-caption);
+  color: var(--td-text-color-placeholder);
+  margin-bottom: 4px;
+}
+
+.message-action {
+  font: var(--td-font-body-small);
+  color: var(--td-text-color-secondary);
+  font-style: italic;
+  margin-bottom: 8px;
+}
+
+.message-card {
+  font: var(--td-font-body-medium);
+  color: var(--td-text-color-primary);
+  line-height: var(--td-line-height-body-medium);
+  box-shadow: var(--fluent-elevation-1);
+}
+
+.narrator-card {
+  background: var(--fluent-accent-light);
+  border-left: 3px solid var(--fluent-accent-color);
+}
+
+.event-card {
+  background: var(--td-warning-color-1);
+  border-left: 3px solid var(--td-warning-color);
+}

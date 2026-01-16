@@ -1,0 +1,30 @@
+import type {SpRole, SpRoleCore} from "@/entity/screenplay";
+import {useSql} from "@/lib/sql.ts";
+
+export function listSpRoleService(screenplayId: string) {
+  return useSql().query<SpRole>('sp_role').eq('screenplay_id', screenplayId).list();
+}
+
+export function addSpRoleService(prop: SpRoleCore) {
+  const now = Date.now();
+  return useSql().mapper<SpRole>('sp_role').insert({
+    ...prop,
+    created_at: now,
+    updated_at: now
+  });
+}
+
+export function updateSpRoleService(id: string, prop: Partial<SpRoleCore>) {
+  const now = Date.now();
+  return useSql().mapper<SpRole>('sp_role').updateById(id, {
+    ...prop,
+    updated_at: now
+  });
+}
+
+export async function deleteSpRoleService(id: string) {
+  // 删除角色
+  await useSql().mapper<SpRole>('sp_role').deleteById(id);
+  // TODO: 删除角色相关信息，此处需要校验，已经发过言的不应该删除
+
+}
