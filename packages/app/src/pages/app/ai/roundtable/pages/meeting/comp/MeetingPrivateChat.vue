@@ -49,7 +49,7 @@
         </div>
       </div>
     </div>
-    <div class="chat-sender-wrapper">
+    <div v-if="meeting.status !== 'ended'" class="chat-sender-wrapper">
       <div class="chat-sender">
         <t-chat-sender v-model="text" placeholder="输入私聊消息...">
           <template #suffix>

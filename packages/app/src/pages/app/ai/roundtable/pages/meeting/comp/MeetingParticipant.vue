@@ -10,7 +10,7 @@
             <div class="participant-type">管理员</div>
           </div>
           <div class="flex items-center">
-            <div class="mr-8px">
+            <div v-if="meeting.status !== 'ended'" class="mr-8px">
               <t-switch class="mr-8px" :value="participant.is_active !== 0" @change="handleChange(participant, getAdminIndex(index))"/>
             </div>
             <t-tag v-if="currentParticipantId === participant.id" theme="success" size="small">发言中</t-tag>
@@ -35,7 +35,7 @@
             <div class="participant-type">成员</div>
           </div>
           <div class="flex items-center">
-            <div class="mr-8px">
+            <div v-if="meeting.status !== 'ended'" class="mr-8px">
               <t-switch class="mr-8px" :value="participant.is_active !== 0" @change="handleChange(participant, getMemberIndex(index))"/>
             </div>
             <t-tag v-if="currentParticipantId === participant.id" theme="success" size="small">发言中</t-tag>
@@ -52,11 +52,15 @@
   </div>
 </template>
 <script lang="ts" setup>
-import type {AiRtParticipant} from "@/entity/app/ai/roundtable";
+import type {AiRtMeeting, AiRtParticipant} from "@/entity/app/ai/roundtable";
 import {updateAiRtParticipantService} from "@/services/app/roundtable";
 import {computed} from "vue";
 
 const props = defineProps({
+  meeting: {
+    type: Object as PropType<AiRtMeeting>,
+    required: true
+  },
   // 全部的成员
   participants: {
     type: Array as PropType<Array<AiRtParticipant>>,

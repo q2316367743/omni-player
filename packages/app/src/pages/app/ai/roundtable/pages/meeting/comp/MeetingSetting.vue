@@ -25,7 +25,8 @@
       <t-form-item label-align="top">
         <t-space>
           <t-button theme="primary" @click="handleSave">保存</t-button>
-          <t-button theme="danger" @click="handleEndMeeting">终止会议</t-button>
+          <t-button v-if="props.meeting.status !== 'ended'" theme="danger" @click="handleEndMeeting">终止会议</t-button>
+          <t-button v-else theme="success" @click="handleRestartMeeting">重启会议</t-button>
         </t-space>
       </t-form-item>
     </t-form>
@@ -56,6 +57,12 @@ const handleEndMeeting = async () => {
   await updateAiRtMeetingService(props.meeting.id, {status: 'ended'})
   emit('change');
   MessageUtil.success("会议已终止");
+}
+
+const handleRestartMeeting = async () => {
+  await updateAiRtMeetingService(props.meeting.id, {status: 'active'})
+  emit('change');
+  MessageUtil.success("会议已重启");
 }
 </script>
 <style scoped lang="less">

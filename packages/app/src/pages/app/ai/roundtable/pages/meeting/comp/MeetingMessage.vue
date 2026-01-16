@@ -160,39 +160,6 @@ defineExpose({
           line-height: 1.7;
           color: var(--td-text-color-primary);
 
-          :deep(.markdown-preview) {
-            p {
-              margin-bottom: 12px;
-
-              &:last-child {
-                margin-bottom: 0;
-              }
-            }
-
-            ul, ol {
-              padding-left: 20px;
-              margin-bottom: 12px;
-
-              li {
-                margin-bottom: 8px;
-              }
-            }
-
-            strong {
-              color: var(--td-success-color-7);
-              font-weight: 600;
-            }
-
-            h1, h2, h3 {
-              color: var(--td-success-color-7);
-              margin: 16px 0 8px;
-              font-weight: 600;
-
-              &:first-child {
-                margin-top: 0;
-              }
-            }
-          }
         }
       }
     }

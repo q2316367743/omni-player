@@ -25,20 +25,20 @@ const initCherry = () => {
     theme: isDark.value ? 'dark' : 'default',
     autoScroll: true,
     locale: 'zh_CN',
-    nameSpace: 'cherry-preview',
+    nameSpace: 'markdown-preview',
     themeSettings: {
       themeList: [
-        { className: 'default', label: '默认' },
-        { className: 'dark', label: '黑' },
-        { className: 'light', label: '白' },
-        { className: 'green', label: '绿' },
-        { className: 'red', label: '粉' },
-        { className: 'violet', label: '紫' },
-        { className: 'blue', label: '蓝' },
+        {className: 'default', label: '默认'},
+        {className: 'dark', label: '黑'},
+        {className: 'light', label: '白'},
+        {className: 'green', label: '绿'},
+        {className: 'red', label: '粉'},
+        {className: 'violet', label: '紫'},
+        {className: 'blue', label: '蓝'},
       ],
       toolbarTheme: isDark.value ? 'dark' : 'light',
       codeBlockTheme: isDark.value ? 'material-ocean' : 'default',
-      mainTheme: isDark.value ? 'dark' : 'light',
+      mainTheme: isDark.value ? 'dark' : 'violet',
       inlineCodeTheme: isDark.value ? 'black' : 'red',
     },
     editor: {
@@ -138,10 +138,14 @@ onBeforeUnmount(() => {
   overflow: auto;
 
   :deep(.cherry) {
+    --base-font-color: var(--td-text-color-primary);
+    --md-paragraph-color: var(--td-text-color-primary);
     background-color: transparent !important;
+
     .cherry-toolbar {
       display: none;
     }
+
     p:last-child {
       margin-bottom: 0 !important;
     }

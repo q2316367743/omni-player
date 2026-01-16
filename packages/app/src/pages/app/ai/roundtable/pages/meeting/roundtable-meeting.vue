@@ -66,7 +66,7 @@
       </div>
       <meeting-private v-show="page === '2'" v-if="meeting" :participants :messages :meeting="meeting"
                        :participant-map="participantMap" @refresh="fetchMessage"/>
-      <meeting-participant v-if="page === '3'" :participants="participants"
+      <meeting-participant v-if="page === '3' && meeting" :meeting :participants="participants"
                            :current-participant-id="currentParticipantId" @change="handleParticipantChange"/>
       <meeting-setting v-else-if="page === '4' && meeting" :meeting="meeting" @change="handleMeetingChange"/>
     </div>
