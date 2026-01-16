@@ -4,7 +4,7 @@
       <div class="top-row">
         <div class="welcome-card">
           <div class="welcome-info">
-            <h1 class="welcome-title">欢迎使用亦无悔</h1>
+            <h1 class="welcome-title">欢迎使用<span class="gradient-text">「楼下小黑」</span></h1>
             <p class="welcome-subtitle">
               <shi-ci/>
             </p>
@@ -40,6 +40,9 @@
           <t-tab-panel label="工" value="tool" draggable>
             <tools-section/>
           </t-tab-panel>
+          <t-tab-panel label="写" value="fiction" draggable>
+            <fiction-section />
+          </t-tab-panel>
           <t-tab-panel label="书" value="book" draggable>
             <subscribe-sources-section/>
           </t-tab-panel>
@@ -66,6 +69,7 @@ import SubscribeSourcesSection from "./components/SubscribeSourcesSection.vue";
 import ShiCi from "@/pages/home/components/ShiCi.vue";
 import VideoSection from "@/pages/home/components/VideoSection.vue";
 import {SettingIcon} from "tdesign-icons-vue-next";
+import FictionSection from "@/pages/home/components/FictionSection.vue";
 
 const router = useRouter();
 const activeKey = useLocalStorage(LocalName.PAGE_HOME_ACTIVE, 'book');

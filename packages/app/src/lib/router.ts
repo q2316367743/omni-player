@@ -173,11 +173,16 @@ export const router = createRouter({
         name: "AppAiRoundtable",
         path: "roundtable",
         component: () => import('@/pages/app/ai/roundtable/app-ai-roundtable.vue')
-      }, {
-        name: "AppAiFiction",
-        path: "fiction",
-        component: () => import('@/pages/app/ai/fiction/ao-fiction.vue')
       }]
+    }]
+  }, {
+    name: "Fiction",
+    path: "/fiction",
+    component: () => import('@/pages/fiction/ai-fiction.vue'),
+    children: [{
+      name: "FictionHome",
+      path: "home/:id",
+      component: () => import('@/pages/fiction/home/index.vue')
     }]
   }]
 });

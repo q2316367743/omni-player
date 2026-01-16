@@ -35,11 +35,6 @@
             <usergroup-icon />
           </template>
         </mini-tool-card>
-        <mini-tool-card label="小说创作" value="ai/fiction" tone="ai">
-          <template #icon>
-            <article-icon />
-          </template>
-        </mini-tool-card>
       </div>
     </div>
 

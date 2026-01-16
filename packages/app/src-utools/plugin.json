@@ -18,7 +18,7 @@
   "features": [
     {
       "code": "launch",
-      "explain": "亦无悔",
+      "explain": "楼下小黑",
       "icon": "public/logo.png",
       "platform": [
         "win32",
@@ -26,7 +26,7 @@
         "linux"
       ],
       "cmds": [
-        "亦无悔"
+        "楼下小黑"
       ]
     }
   ]

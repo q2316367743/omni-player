@@ -1,5 +1,5 @@
 <template>
-  <div>小说创作</div>
+  <div>小说主页</div>
 </template>
 <script lang="ts" setup>
 </script>
