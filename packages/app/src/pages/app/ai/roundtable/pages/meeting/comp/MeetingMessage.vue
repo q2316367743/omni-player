@@ -1,52 +1,60 @@
 <template>
-  <div class="chat-list" ref="chatContentRef">
-    <div v-for="(item, index) in messages" :key="item.id" class="chat-item" :class="[item.role]">
-      <div v-if="item.role === 'system'" class="system-message">
-        <div class="system-content">{{ item.content }}</div>
-      </div>
-      <div v-else-if="item.role === 'summary'" class="summary-message">
-        <div class="summary-header">
-          <file-icon class="summary-icon"/>
-          <span class="summary-title">会议总结</span>
+  <div class="chat-container">
+    <div class="chat-list" ref="chatContentRef">
+      <div v-for="(item, index) in messages" :key="item.id" class="chat-item" :class="[item.role]" :id="`message-${item.id}`">
+        <div v-if="item.role === 'system'" class="system-message">
+          <div class="system-content">{{ item.content }}</div>
         </div>
-        <div class="summary-content">
-          <markdown-preview :content="item.content"/>
+        <div v-else-if="item.role === 'summary'" class="summary-message">
+          <div class="summary-header">
+            <file-icon class="summary-icon"/>
+            <span class="summary-title">会议总结</span>
+          </div>
+          <div class="summary-content">
+            <markdown-preview :content="item.content"/>
+          </div>
         </div>
-      </div>
-      <div v-else-if="item.role === 'assistant'" class="assistant-message">
-        <div class="message-avatar assistant-avatar">
-          <internet-icon/>
-        </div>
-        <div class="message-body">
-          <div class="participant-name">{{ getParticipantName(item.participant_id) }}</div>
-          <div v-if="item.thinking && item.thinking.length > 0" class="thinking-section">
-            <div class="thinking-header">
-              <check-circle-icon v-if="!isStreamLoad || index !== messages.length - 1" class="thinking-icon"/>
-              <div v-else class="thinking-loading">
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
+        <div v-else-if="item.role === 'assistant'" class="assistant-message">
+          <div class="message-avatar assistant-avatar">
+            <internet-icon/>
+          </div>
+          <div class="message-body">
+            <div class="participant-name">{{ getParticipantName(item.participant_id) }}</div>
+            <div v-if="item.thinking && item.thinking.length > 0" class="thinking-section">
+              <div class="thinking-header">
+                <check-circle-icon v-if="!isStreamLoad || index !== messages.length - 1" class="thinking-icon"/>
+                <div v-else class="thinking-loading">
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                </div>
+                <span class="thinking-text">{{
+                    isStreamLoad && index === messages.length - 1 ? '思考中...' : '已深度思考'
+                  }}</span>
               </div>
-              <span class="thinking-text">{{
-                  isStreamLoad && index === messages.length - 1 ? '思考中...' : '已深度思考'
-                }}</span>
+              <div class="thinking-content">{{ item.thinking }}</div>
             </div>
-            <div class="thinking-content">{{ item.thinking }}</div>
+            <div v-if="item.content" class="message-content">
+              <markdown-preview :content="item.content"/>
+            </div>
           </div>
-          <div v-if="item.content" class="message-content">
-            <markdown-preview :content="item.content"/>
+        </div>
+        <div v-else-if="item.role === 'user'" class="user-message">
+          <div class="message-body">
+            <div class="message-content">
+              <markdown-preview :content="item.content"/>
+            </div>
+          </div>
+          <div class="message-avatar user-avatar">
+            <user-icon/>
           </div>
         </div>
       </div>
-      <div v-else-if="item.role === 'user'" class="user-message">
-        <div class="message-body">
-          <div class="message-content">
-            <markdown-preview :content="item.content"/>
-          </div>
-        </div>
-        <div class="message-avatar user-avatar">
-          <user-icon/>
-        </div>
+    </div>
+    <div class="chat-toc">
+      <div v-for="item in messages" :key="item.id" class="toc-item" :class="[item.role]" @click="scrollToMessage(item.id)">
+        <div class="toc-bar"></div>
+        <div class="toc-name">{{ getTocName(item) }}</div>
       </div>
     </div>
   </div>
@@ -77,6 +85,24 @@ const getParticipantName = (participantId: string) => {
   return participant ? participant.name : '未知';
 };
 
+const getTocName = (item: AiRtMessage) => {
+  if (item.role === 'summary') {
+    return '会议总结';
+  } else if (item.role === 'assistant') {
+    return getParticipantName(item.participant_id);
+  } else if (item.role === 'user') {
+    return '用户';
+  }
+  return '';
+};
+
+const scrollToMessage = (messageId: string) => {
+  const element = document.getElementById(`message-${messageId}`);
+  if (element && chatContentRef.value) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+};
+
 defineExpose({
   scrollTo: (obj: any) => {
     chatContentRef.value.scrollTo(obj);
@@ -85,255 +111,348 @@ defineExpose({
 })
 </script>
 <style scoped lang="less">
-.chat-list {
+.chat-container {
+  display: flex;
   flex: 1;
-  overflow-y: auto;
-  padding-right: 8px;
+  overflow: hidden;
+  position: relative;
 
-  .chat-item {
-    max-width: 900px;
-    margin: 0 auto 24px;
-    transition: all var(--fluent-transition-normal);
+  .chat-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
 
-    &.system {
-      .system-message {
-        padding: 12px 16px;
-        background: transparent;
-        border: 1px solid var(--td-text-color-disabled);
-        border-radius: var(--fluent-radius-card);
-        color: var(--td-text-color-disabled);
-        font-size: 13px;
-        line-height: 1.5;
-        max-width: 800px;
-        margin: 0 auto;
+    .chat-item {
+      max-width: 900px;
+      margin: 0 auto 24px;
+      transition: all var(--fluent-transition-normal);
 
-        .system-content {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-        }
-      }
-    }
+      &.system {
+        .system-message {
+          padding: 12px 16px;
+          background: transparent;
+          border: 1px solid var(--td-text-color-disabled);
+          border-radius: var(--fluent-radius-card);
+          color: var(--td-text-color-disabled);
+          font-size: 13px;
+          line-height: 1.5;
+          max-width: 800px;
+          margin: 0 auto;
 
-    &.summary {
-      .summary-message {
-        max-width: 900px;
-        margin: 0 auto;
-        background: linear-gradient(135deg, rgba(82, 196, 26, 0.05) 0%, rgba(82, 196, 26, 0.02) 100%);
-        border: 1px solid rgba(82, 196, 26, 0.2);
-        border-radius: var(--fluent-radius-card);
-        padding: 20px 24px;
-        box-shadow: var(--fluent-elevation-1);
-        transition: all var(--fluent-transition-normal);
-
-        &:hover {
-          box-shadow: var(--fluent-elevation-2);
-          border-color: rgba(82, 196, 26, 0.3);
-        }
-
-        .summary-header {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          margin-bottom: 16px;
-          padding-bottom: 12px;
-          border-bottom: 1px solid rgba(82, 196, 26, 0.15);
-
-          .summary-icon {
-            width: 20px;
-            height: 20px;
-            color: var(--td-success-color-5);
-          }
-
-          .summary-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--td-success-color-6);
-            letter-spacing: 0.5px;
-          }
-        }
-
-        .summary-content {
-          font-size: 15px;
-          line-height: 1.7;
-          color: var(--td-text-color-primary);
-
-        }
-      }
-    }
-
-    &.assistant {
-      .assistant-message {
-        display: flex;
-        gap: 12px;
-        max-width: 800px;
-        margin: 0 auto;
-
-        .message-avatar {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          background: var(--fluent-gradient-primary);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-          color: white;
-          box-shadow: var(--fluent-elevation-2);
-
-          svg {
-            width: 24px;
-            height: 24px;
-          }
-        }
-
-        .message-body {
-          flex: 1;
-          min-width: 0;
-
-          .participant-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--td-text-color-secondary);
-            margin-bottom: 8px;
-          }
-
-          .thinking-section {
-            margin-bottom: 12px;
-            background: var(--fluent-card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--fluent-card-border);
-            border-radius: var(--fluent-radius-card);
-            box-shadow: var(--fluent-elevation-1);
+          .system-content {
             overflow: hidden;
-            transition: all var(--fluent-transition-normal);
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+          }
+        }
+      }
 
-            &:hover {
-              box-shadow: var(--fluent-elevation-2);
+      &.summary {
+        .summary-message {
+          max-width: 900px;
+          margin: 0 auto;
+          background: linear-gradient(135deg, rgba(82, 196, 26, 0.05) 0%, rgba(82, 196, 26, 0.02) 100%);
+          border: 1px solid rgba(82, 196, 26, 0.2);
+          border-radius: var(--fluent-radius-card);
+          padding: 20px 24px;
+          box-shadow: var(--fluent-elevation-1);
+          transition: all var(--fluent-transition-normal);
+
+          &:hover {
+            box-shadow: var(--fluent-elevation-2);
+            border-color: rgba(82, 196, 26, 0.3);
+          }
+
+          .summary-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(82, 196, 26, 0.15);
+
+            .summary-icon {
+              width: 20px;
+              height: 20px;
+              color: var(--td-success-color-5);
             }
 
-            .thinking-header {
-              padding: 12px 16px;
-              background: var(--fluent-item-hover);
-              border-bottom: 1px solid var(--fluent-border-subtle);
-              display: flex;
-              align-items: center;
-              gap: 8px;
-              font-weight: 500;
-
-              .thinking-icon {
-                color: var(--td-success-color-5);
-                font-size: 20px;
-              }
-
-              .thinking-loading {
-                display: flex;
-                gap: 4px;
-
-                .dot {
-                  width: 6px;
-                  height: 6px;
-                  border-radius: 50%;
-                  background: var(--fluent-accent-color);
-                  animation: bounce 1.4s infinite ease-in-out both;
-
-                  &:nth-child(1) {
-                    animation-delay: -0.32s;
-                  }
-
-                  &:nth-child(2) {
-                    animation-delay: -0.16s;
-                  }
-                }
-              }
-
-              @keyframes bounce {
-                0%, 80%, 100% {
-                  transform: scale(0);
-                }
-                40% {
-                  transform: scale(1);
-                }
-              }
-
-              .thinking-text {
-                font-size: 14px;
-              }
-            }
-
-            .thinking-content {
-              padding: 16px;
-              font-size: 14px;
-              line-height: 1.6;
-              color: var(--td-text-color-secondary);
+            .summary-title {
+              font-size: 16px;
+              font-weight: 600;
+              color: var(--td-success-color-6);
+              letter-spacing: 0.5px;
             }
           }
 
-          .message-content {
-            background: var(--td-bg-color-container);
-            border: 1px solid var(--fluent-card-border);
-            border-radius: var(--fluent-radius-card);
+          .summary-content {
             font-size: 15px;
             line-height: 1.7;
             color: var(--td-text-color-primary);
-            word-wrap: break-word;
-            white-space: pre-wrap;
+
+          }
+        }
+      }
+
+      &.assistant {
+        .assistant-message {
+          display: flex;
+          gap: 12px;
+          max-width: 800px;
+          margin: 0 auto;
+
+          .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--fluent-gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: white;
+            box-shadow: var(--fluent-elevation-2);
+
+            svg {
+              width: 24px;
+              height: 24px;
+            }
+          }
+
+          .message-body {
+            flex: 1;
+            min-width: 0;
+
+            .participant-name {
+              font-size: 14px;
+              font-weight: 600;
+              color: var(--td-text-color-secondary);
+              margin-bottom: 8px;
+            }
+
+            .thinking-section {
+              margin-bottom: 12px;
+              background: var(--fluent-card-bg);
+              backdrop-filter: blur(10px);
+              border: 1px solid var(--fluent-card-border);
+              border-radius: var(--fluent-radius-card);
+              box-shadow: var(--fluent-elevation-1);
+              overflow: hidden;
+              transition: all var(--fluent-transition-normal);
+
+              &:hover {
+                box-shadow: var(--fluent-elevation-2);
+              }
+
+              .thinking-header {
+                padding: 12px 16px;
+                background: var(--fluent-item-hover);
+                border-bottom: 1px solid var(--fluent-border-subtle);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-weight: 500;
+
+                .thinking-icon {
+                  color: var(--td-success-color-5);
+                  font-size: 20px;
+                }
+
+                .thinking-loading {
+                  display: flex;
+                  gap: 4px;
+
+                  .dot {
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 50%;
+                    background: var(--fluent-accent-color);
+                    animation: bounce 1.4s infinite ease-in-out both;
+
+                    &:nth-child(1) {
+                      animation-delay: -0.32s;
+                    }
+
+                    &:nth-child(2) {
+                      animation-delay: -0.16s;
+                    }
+                  }
+                }
+
+                @keyframes bounce {
+                  0%, 80%, 100% {
+                    transform: scale(0);
+                  }
+                  40% {
+                    transform: scale(1);
+                  }
+                }
+
+                .thinking-text {
+                  font-size: 14px;
+                }
+              }
+
+              .thinking-content {
+                padding: 16px;
+                font-size: 14px;
+                line-height: 1.6;
+                color: var(--td-text-color-secondary);
+              }
+            }
+
+            .message-content {
+              background: var(--td-bg-color-container);
+              border: 1px solid var(--fluent-card-border);
+              border-radius: var(--fluent-radius-card);
+              font-size: 15px;
+              line-height: 1.7;
+              color: var(--td-text-color-primary);
+              word-wrap: break-word;
+              white-space: pre-wrap;
+            }
+          }
+        }
+      }
+
+      &.user {
+        margin-left: auto;
+
+        .user-message {
+          display: flex;
+          gap: 12px;
+          max-width: 800px;
+          margin: 0 auto;
+          flex-direction: row;
+
+          .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--fluent-gradient-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: white;
+            box-shadow: var(--fluent-elevation-2);
+
+            svg {
+              width: 24px;
+              height: 24px;
+            }
+          }
+
+          .message-body {
+            flex: 1;
+            min-width: 0;
+
+            .message-content {
+              background: var(--td-bg-color-secondarycontainer);
+              backdrop-filter: blur(10px);
+              border: 1px solid var(--fluent-card-border);
+              border-radius: var(--fluent-radius-card);
+              box-shadow: var(--fluent-card-shadow);
+              font-size: 15px;
+              line-height: 1.7;
+              color: var(--td-text-color-primary);
+              word-wrap: break-word;
+              white-space: pre-wrap;
+              transition: all var(--fluent-transition-normal);
+
+              &:hover {
+                box-shadow: var(--fluent-card-shadow-hover);
+              }
+            }
           }
         }
       }
     }
+  }
 
-    &.user {
-      margin-left: auto;
+  .chat-toc {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 20px 0;
+    overflow: visible;
+    z-index: 10;
 
-      .user-message {
-        display: flex;
-        gap: 12px;
-        max-width: 800px;
-        margin: 0 auto;
-        flex-direction: row;
+    .toc-item {
+      width: auto;
+      min-width: 40px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      cursor: pointer;
+      position: relative;
+      transition: all var(--fluent-transition-normal);
+      margin-bottom: 4px;
 
-        .message-avatar {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          background: var(--fluent-gradient-secondary);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-          color: white;
-          box-shadow: var(--fluent-elevation-2);
+      .toc-bar {
+        width: 12px;
+        height: 3px;
+        border-radius: 2px;
+        transition: all var(--fluent-transition-normal);
+        position: absolute;
+        right: 14px;
+      }
 
-          svg {
-            width: 24px;
-            height: 24px;
-          }
+      .toc-name {
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        transform: translateX(10px);
+        transition: all var(--fluent-transition-normal);
+        position: absolute;
+        right: 32px;
+        max-width: none;
+        padding-right: 10px;
+      }
+
+      &.assistant {
+        .toc-bar {
+          background-color: #000;
         }
+        .toc-name {
+          color: #000;
+        }
+      }
 
-        .message-body {
-          flex: 1;
-          min-width: 0;
+      &.user {
+        .toc-bar {
+          background-color: #999;
+        }
+        .toc-name {
+          color: #666;
+        }
+      }
 
-          .message-content {
-            background: var(--td-bg-color-secondarycontainer);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--fluent-card-border);
-            border-radius: var(--fluent-radius-card);
-            box-shadow: var(--fluent-card-shadow);
-            font-size: 15px;
-            line-height: 1.7;
-            color: var(--td-text-color-primary);
-            word-wrap: break-word;
-            white-space: pre-wrap;
-            transition: all var(--fluent-transition-normal);
+      &.summary {
+        .toc-bar {
+          background-color: #52c41a;
+        }
+        .toc-name {
+          color: #52c41a;
+        }
+      }
 
-            &:hover {
-              box-shadow: var(--fluent-card-shadow-hover);
-            }
-          }
+      &:hover {
+        .toc-bar {
+          right: 20px;
+          width: 16px;
+        }
+        .toc-name {
+          opacity: 1;
+          transform: translateX(0);
         }
       }
     }

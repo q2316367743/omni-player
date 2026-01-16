@@ -70,7 +70,7 @@
                            :current-participant-id="currentParticipantId" @change="handleParticipantChange"/>
       <meeting-setting v-else-if="page === '4' && meeting" :meeting="meeting" @change="handleMeetingChange"/>
     </div>
-    <t-button v-if="isShowToBottom" v-show="page === '1'" variant="text" class="bottomBtn" @click="backBottom">
+    <t-button v-if="isShowToBottom && meeting?.status !== 'ended'" v-show="page === '1'" variant="text" class="bottomBtn" @click="backBottom">
       <arrow-down-icon/>
     </t-button>
   </div>
