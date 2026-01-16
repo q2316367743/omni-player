@@ -19,8 +19,14 @@
           <t-dropdown-item style="color: var(--td-error-color)" @click="handleRemove">删除对话</t-dropdown-item>
         </t-dropdown-menu>
       </t-dropdown>
+      <div class="ml-auto">
+        <t-radio-group v-model="layout" theme="button" variant="default-filled">
+          <t-radio-button value="compact">紧凑</t-radio-button>
+          <t-radio-button value="relaxed">宽松</t-radio-button>
+        </t-radio-group>
+      </div>
     </div>
-    <div class="home-chat-content">
+    <div :class="['home-chat-content', layout]">
       <div class="chat-list" ref="chatContentRef" @scroll="handleChatScroll">
         <div v-for="(item, index) in messages" :key="item.id" class="chat-item" :class="[item.role]">
           <div v-if="item.role === 'system'" class="system-message">
@@ -160,6 +166,9 @@ import MessageUtil from "@/util/model/MessageUtil.ts";
 import {debounce} from "es-toolkit";
 import {onRemoveChat, onRenameChat} from "@/pages/app/ai/chat/components/HomeContext.tsx";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
+import {LocalName} from "@/global/LocalName.ts";
+
+const layout = useLocalStorage(LocalName.PAGE_APP_AI_CHAT_LAYOUT, "compact")
 
 const group = ref<AiChatGroup>();
 const chatItem = ref<AiChatItem>();
@@ -391,7 +400,7 @@ const handleDeleteChat = async (index: number) => {
   .home-chat-collapse {
     display: flex;
     align-items: center;
-    height: 40px;
+    height: 48px;
     padding: 0 12px;
     background: var(--fluent-acrylic-bg);
     backdrop-filter: var(--fluent-acrylic-blur);
@@ -447,19 +456,42 @@ const handleDeleteChat = async (index: number) => {
   .home-chat-content {
     flex: 1;
     overflow: hidden;
-    padding: 24px 16px;
     background: transparent;
     display: flex;
     flex-direction: column;
 
-    .chat-list {
-      flex: 1;
-      overflow-y: auto;
-      padding-right: 8px;
 
+    &.compact {
       .chat-item {
         max-width: 900px;
         margin: 0 auto 24px;
+      }
+
+      .chat-sender-wrapper {
+        max-width: 900px;
+        margin: 16px auto;
+      }
+    }
+
+    &.relaxed {
+      .chat-item {
+        max-width: 100%;
+        margin: 0 16px 24px;
+      }
+
+      .chat-sender-wrapper {
+        max-width: calc(100% - 32px);
+        margin: 16px;
+      }
+    }
+
+    .chat-list {
+      flex: 1;
+      overflow-y: auto;
+      padding-top: 16px;
+
+
+      .chat-item {
         transition: all var(--fluent-transition-normal);
 
         &.system {
@@ -488,8 +520,6 @@ const handleDeleteChat = async (index: number) => {
           .assistant-message {
             display: flex;
             gap: 12px;
-            max-width: 800px;
-            margin: 0 auto;
 
             .message-avatar {
               width: 40px;
@@ -620,8 +650,6 @@ const handleDeleteChat = async (index: number) => {
           .user-message {
             display: flex;
             gap: 12px;
-            max-width: 800px;
-            margin: 0 auto;
             flex-direction: row-reverse;
 
             .message-avatar {
@@ -674,8 +702,6 @@ const handleDeleteChat = async (index: number) => {
             background: var(--fluent-accent-light);
             border: 1px solid var(--fluent-accent-color);
             border-radius: var(--fluent-radius-card);
-            max-width: 800px;
-            margin: 0 auto;
             text-align: center;
             font-size: 14px;
             color: var(--td-text-color-primary);
@@ -705,10 +731,6 @@ const handleDeleteChat = async (index: number) => {
     }
 
     .chat-sender-wrapper {
-      margin-top: 16px;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
       width: 100%;
 
       .chat-sender {

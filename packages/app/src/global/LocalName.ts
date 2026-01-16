@@ -58,6 +58,10 @@ export const LocalName = {
 
   PAGE_SUBSCRIBE_VIEW_MODE: (id: string) => `/page/subscribe/view_mode/${id}`,
 
+  // 页面/app/ai/聊天/布局
+  PAGE_APP_AI_CHAT_LAYOUT: '/page/app/ai/chat/layout',
+  PAGE_APP_AI_ROUNDTABLE_LAYOUT: '/page/app/ai/roundtable/layout',
+
   // '/app/aside/subscribe/expanded'
   APP_ASIDE_SUBSCRIBE_EXPANDED: '/app/aside/subscribe/expanded',
   APP_ASIDE_MEDIA_EXPANDED: '/app/aside/media/expanded',
