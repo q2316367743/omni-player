@@ -2,7 +2,15 @@
   <div class="role-management">
     <div class="page-header">
       <div class="header-content">
-        <h1 class="page-title">角色管理</h1>
+        <div class="flex items-center">
+          <t-button class="menu-toggle-btn" theme="primary" variant="text" shape="square" @click="toggleCollapsed()" v-if="collapsed">
+            <template #icon>
+              <menu-fold-icon/>
+            </template>
+          </t-button>
+          <t-divider layout="vertical" v-if="collapsed"/>
+          <h1 class="page-title">角色管理</h1>
+        </div>
         <p class="page-description">管理圆桌会议的 AI 角色，包括管理员角色和参与者角色</p>
         <t-alert
           theme="info"
@@ -53,7 +61,7 @@
             trigger="hover"
           >
             <template #content>
-              <role-detail-popup :role="role" />
+              <role-detail-popup :role="role"/>
             </template>
             <div
               class="role-card admin-card"
@@ -112,7 +120,7 @@
             trigger="hover"
           >
             <template #content>
-              <role-detail-popup :role="role" />
+              <role-detail-popup :role="role"/>
             </template>
             <div
               class="role-card member-card"
@@ -140,9 +148,20 @@ import {ref, computed, onMounted} from 'vue'
 import type {AiRtRole, AiRtRoleType} from '@/entity/app/ai/roundtable'
 import {listAiRtRoleService} from '@/services/app/roundtable/AiRtRoleService'
 import {openRoundtableRoleAdd, openRoundtableRoleCxt} from '@/pages/app/ai/roundtable/func/RoundtableRoleEdit'
-import {AddIcon, UserIcon, InfoCircleIcon, SettingIcon, UsergroupIcon} from 'tdesign-icons-vue-next'
+import {AddIcon, UserIcon, InfoCircleIcon, SettingIcon, UsergroupIcon, MenuFoldIcon} from 'tdesign-icons-vue-next'
 import MessageUtil from '@/util/model/MessageUtil.ts'
 import RoleDetailPopup from "@/pages/app/ai/roundtable/components/RoleDetailPopup.vue";
+
+defineProps({
+  collapsed: {
+    type: Boolean,
+    default: false
+  }
+});
+const emit = defineEmits(['toggleCollapsed']);
+const toggleCollapsed = () => {
+  emit('toggleCollapsed');
+}
 
 const roles = ref<Array<AiRtRole>>([])
 
@@ -207,9 +226,9 @@ onMounted(() => {
 }
 
 .page-description {
-  margin: 0;
   color: var(--td-text-color-secondary);
   font-size: 14px;
+  margin: 8px 0 0;
 }
 
 .page-alert {
@@ -388,6 +407,30 @@ onMounted(() => {
 
   .t-alert__message {
     font-size: 12px;
+  }
+}
+
+.menu-toggle-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--fluent-radius-smooth);
+  transition: all var(--fluent-transition-fast);
+  margin-right: 8px;
+
+  &:hover {
+    background: var(--td-brand-color-light);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  :deep(.t-icon) {
+    font-size: 20px;
   }
 }
 

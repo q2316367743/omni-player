@@ -9,6 +9,39 @@
   }
 }
 
+.menu-toggle-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--fluent-radius-smooth);
+  transition: all var(--fluent-transition-fast);
+  margin-right: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+
+  &:hover {
+    background: var(--fluent-item-hover);
+    border-color: var(--fluent-border-subtle);
+  }
+
+  &:active {
+    background: var(--fluent-item-active);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--fluent-focus-ring);
+  }
+
+  :deep(.t-icon) {
+    font-size: 20px;
+    color: var(--td-text-color-primary);
+  }
+}
+
+
 .participant-section {
   margin-bottom: 24px;
 }
@@ -173,4 +206,77 @@
   margin-top: 24px;
   padding-top: 16px;
   border-top: 1px solid var(--fluent-border-subtle);
+}
+
+.action-btn {
+  min-width: 100px;
+  height: 36px;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--fluent-radius-smooth);
+  transition: all var(--fluent-transition-fast);
+  letter-spacing: 0.01em;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--fluent-focus-ring);
+  }
+}
+
+.primary-btn {
+  background: var(--fluent-accent-color);
+  border: 1px solid var(--fluent-accent-color);
+  color: #ffffff;
+
+  &:hover {
+    background: var(--td-brand-color-hover);
+    border-color: var(--td-brand-color-hover);
+    box-shadow: var(--fluent-elevation-2);
+  }
+
+  &:active {
+    background: var(--td-brand-color-active);
+    border-color: var(--td-brand-color-active);
+  }
+}
+
+.secondary-btn {
+  background: var(--fluent-card-bg);
+  border: 1px solid var(--fluent-border-subtle);
+  color: var(--td-text-color-primary);
+
+  &:hover {
+    background: var(--fluent-item-hover);
+    border-color: var(--fluent-border-subtle);
+  }
+
+  &:active {
+    background: var(--fluent-item-active);
+  }
+}
+
+.submit-btn {
+  min-width: 140px;
+  height: 40px;
+  padding: 0 28px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--fluent-accent-color);
+  border: 1px solid var(--fluent-accent-color);
+  color: #ffffff;
+  box-shadow: var(--fluent-elevation-1);
+  letter-spacing: 0.01em;
+
+  &:hover {
+    background: var(--td-brand-color-hover);
+    border-color: var(--td-brand-color-hover);
+    box-shadow: var(--fluent-elevation-2);
+  }
+
+  &:active {
+    background: var(--td-brand-color-active);
+    border-color: var(--td-brand-color-active);
+    box-shadow: var(--fluent-elevation-1);
+  }
 }

@@ -1,7 +1,15 @@
 <template>
   <div class="roundtable-meeting">
     <div class="rm-header">
-      <div class="rm-title">{{ meeting?.topic }}</div>
+      <div class="flex items-center">
+        <t-button theme="primary" variant="text" shape="square" @click="toggleCollapsed()" v-if="collapsed">
+          <template #icon>
+            <menu-fold-icon/>
+          </template>
+        </t-button>
+        <t-divider layout="vertical" v-if="collapsed"/>
+        <div class="rm-title">{{ meeting?.topic }}</div>
+      </div>
       <div class="rm-controls">
         <t-radio-group v-model="page" variant="default-filled">
           <t-radio-button value="1">消息</t-radio-button>
@@ -79,7 +87,7 @@
 import {
   ArrowDownIcon,
   PlayIcon,
-  PauseIcon, SendIcon, StopCircleIcon,
+  PauseIcon, SendIcon, StopCircleIcon, MenuFoldIcon,
 } from "tdesign-icons-vue-next";
 import type {AiRtMeeting, AiRtMessage, AiRtParticipant} from "@/entity/app/ai/roundtable";
 import {
@@ -104,6 +112,16 @@ const activeKey = defineModel({
   type: String,
   default: '/create/0'
 })
+defineProps({
+  collapsed: {
+    type: Boolean,
+    default: false
+  }
+});
+const emit = defineEmits(['toggleCollapsed']);
+const toggleCollapsed = () => {
+  emit('toggleCollapsed');
+}
 
 const meetingId = ref('');
 const groupId = ref('');

@@ -4,6 +4,13 @@
       <div class="flex gap-8px items-center">
         <app-tool-back/>
         <div class="title">圆桌派</div>
+        <div class="ml-auto">
+          <t-button theme="primary" variant="text" shape="square" @click="toggleCollapsed()">
+            <template #icon>
+              <menu-unfold-icon/>
+            </template>
+          </t-button>
+        </div>
       </div>
     </div>
     <div class="content">
@@ -35,7 +42,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {PlusIcon} from "tdesign-icons-vue-next";
+import {MenuUnfoldIcon, PlusIcon} from "tdesign-icons-vue-next";
 import type {AiRtMeeting} from "@/entity/app/ai/roundtable";
 import {listAiRtMeetingService} from "@/services/app/roundtable";
 import {onMeetingMenuClick} from "@/pages/app/ai/roundtable/func/RoundtableMeetingEdit.tsx";
@@ -44,6 +51,7 @@ const modelValue = defineModel({
   type: String,
   default: ''
 });
+const emit = defineEmits(['toggleCollapsed']);
 
 const meetings = ref<Array<AiRtMeeting>>([]);
 
@@ -68,6 +76,9 @@ const toggleGroup = () => {
   } else {
     modelValue.value = '/group'
   }
+}
+const toggleCollapsed = () => {
+  emit('toggleCollapsed');
 }
 
 const onAddMeeting = () => {

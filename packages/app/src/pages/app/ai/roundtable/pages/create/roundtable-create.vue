@@ -1,14 +1,27 @@
 <template>
   <div class="roundtable-create">
-    <t-card>
-      <t-steps :current="current">
-        <t-step-item title="确定主题"/>
-        <t-step-item title="选取 AI"/>
-        <t-step-item title="最后设置"/>
-      </t-steps>
-    </t-card>
+    <t-row :gutter="8">
+      <t-col v-if="collapsed" flex="48px">
+        <t-card size="small">
+          <t-button  theme="primary" variant="text" shape="square" @click="toggleCollapsed()">
+            <template #icon>
+              <menu-fold-icon/>
+            </template>
+          </t-button>
+        </t-card>
+      </t-col>
+      <t-col flex="auto">
+        <t-card size="small">
+          <t-steps :current="current" class="!m-2px">
+            <t-step-item title="确定主题"/>
+            <t-step-item title="选取 AI"/>
+            <t-step-item title="最后设置"/>
+          </t-steps>
+        </t-card>
+      </t-col>
+    </t-row>
     <div class="roundtable-create-content">
-      <t-card v-if="current === 0">
+      <t-card v-if="current === 0" size="small">
         <t-form>
           <t-form-item label-align="top" label="会议主题">
             <t-input v-model="meeting.topic"/>
@@ -18,10 +31,11 @@
           </t-form-item>
         </t-form>
         <div class="step-actions">
-          <t-button v-if="meeting.topic" theme="primary" @click="current = 1">下一步</t-button>
+          <t-button class="action-btn primary-btn" v-if="meeting.topic" theme="primary" @click="current = 1">下一步
+          </t-button>
         </div>
       </t-card>
-      <t-card v-else-if="current === 1">
+      <t-card v-else-if="current === 1" size="small">
         <div class="participant-section">
           <div class="section-header">
             <h4 class="section-title">管理员 AI</h4>
@@ -102,11 +116,13 @@
         </div>
 
         <div class="step-actions">
-          <t-button theme="default" @click="current = 0">上一步</t-button>
-          <t-button v-if="hasMemberParticipant" theme="primary" @click="current = 2">下一步</t-button>
+          <t-button class="action-btn secondary-btn" theme="default" @click="current = 0">上一步</t-button>
+          <t-button class="action-btn primary-btn" v-if="hasMemberParticipant" theme="primary" @click="current = 2">
+            下一步
+          </t-button>
         </div>
       </t-card>
-      <t-card v-else-if="current === 2">
+      <t-card v-else-if="current === 2" size="small">
         <t-form>
           <t-form-item label-align="top" label="最大发言轮数" help="0 表示无限制">
             <t-input-number v-model="meeting.max_rounds" :min="0" placeholder="0 表示无限制"/>
@@ -125,8 +141,8 @@
           </t-form-item>
         </t-form>
         <div class="step-actions">
-          <t-button theme="default" @click="current = 1">上一步</t-button>
-          <t-button theme="primary" @click="submitMeeting">开启圆桌会议</t-button>
+          <t-button class="action-btn secondary-btn" theme="default" @click="current = 1">上一步</t-button>
+          <t-button class="action-btn submit-btn" theme="primary" @click="submitMeeting">开启圆桌会议</t-button>
         </div>
       </t-card>
     </div>
@@ -139,7 +155,7 @@ import {listAiRtParticipantService} from "@/services/app/roundtable/AiRtParticip
 import {addAiRtMeetingService} from "@/services/app/roundtable/AiRtMeetingService.ts";
 import type {AiRtRoleType} from "@/entity/app/ai/roundtable";
 import type {AiRtParticipantCore} from "@/entity/app/ai/roundtable";
-import {AddIcon} from 'tdesign-icons-vue-next';
+import {AddIcon, MenuFoldIcon} from 'tdesign-icons-vue-next';
 import MessageUtil from '@/util/model/MessageUtil.ts';
 import {openParticipantConfig} from "@/pages/app/ai/roundtable/pages/create/func/ParticipantConfig.tsx";
 import {openRoleSelect} from "@/pages/app/ai/roundtable/pages/create/func/RoleSelect.tsx";
@@ -147,8 +163,17 @@ import {openRoleSelect} from "@/pages/app/ai/roundtable/pages/create/func/RoleSe
 const activeKey = defineModel({
   type: String,
   default: '/create/0'
-})
-const emit = defineEmits(['refresh']);
+});
+defineProps({
+  collapsed: {
+    type: Boolean,
+    default: false
+  }
+});
+const emit = defineEmits(['refresh', 'toggleCollapsed']);
+const toggleCollapsed = () => {
+  emit('toggleCollapsed');
+}
 
 const current = ref(0);
 const groupId = ref('');
