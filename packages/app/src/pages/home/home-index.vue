@@ -40,8 +40,8 @@
           <t-tab-panel label="工" value="tool" draggable>
             <tools-section/>
           </t-tab-panel>
-          <t-tab-panel label="写" value="fiction" draggable>
-            <fiction-section />
+          <t-tab-panel label="剧" value="screenplay" draggable>
+            <screenplay-section />
           </t-tab-panel>
           <t-tab-panel label="书" value="book" draggable>
             <subscribe-sources-section/>
@@ -69,7 +69,7 @@ import SubscribeSourcesSection from "./components/SubscribeSourcesSection.vue";
 import ShiCi from "@/pages/home/components/ShiCi.vue";
 import VideoSection from "@/pages/home/components/VideoSection.vue";
 import {SettingIcon} from "tdesign-icons-vue-next";
-import FictionSection from "@/pages/home/components/FictionSection.vue";
+import ScreenplaySection from "@/pages/home/components/ScreenplaySection.vue";
 
 const router = useRouter();
 const activeKey = useLocalStorage(LocalName.PAGE_HOME_ACTIVE, 'book');

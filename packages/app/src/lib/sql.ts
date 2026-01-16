@@ -31,7 +31,15 @@ export type TableName =
   | 'ai_rt_meeting'
   | 'ai_rt_message'
   | 'ai_rt_participant'
-  | 'ai_rt_role';
+  | 'ai_rt_role'
+  | 'screenplay'
+  | 'sp_dialogue'
+  | 'sp_initiative_log'
+  | 'sp_role'
+  | 'sp_role_belief'
+  | 'sp_role_emotion'
+  | 'sp_role_latent_clue'
+  | 'sp_scene';
 
 export class SqlWrapper {
 

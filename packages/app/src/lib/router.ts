@@ -184,6 +184,10 @@ export const router = createRouter({
       path: "home/:id",
       component: () => import('@/pages/fiction/home/index.vue')
     }]
+  }, {
+    name: "Screenplay",
+    path: "/screenplay/:id",
+    component: () => import("@/pages/screenplay/screenplay-index.vue")
   }]
 });
 
