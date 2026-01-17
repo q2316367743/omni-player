@@ -49,7 +49,7 @@ export class QueryChain<T extends Record<string, any>, K extends keyof T = keyof
   }
 
   ge(k: K, v: T[K]) {
-    return this.simpleWhere(k, ">=", v);  
+    return this.simpleWhere(k, ">=", v);
   }
 
   le(k: K, v: T[K]) {
@@ -164,12 +164,17 @@ export class QueryChain<T extends Record<string, any>, K extends keyof T = keyof
     return list.length > 0 ? list[0]! : null;
   }
 
+
+  async get(): Promise<T | undefined> {
+    return await this.one() || undefined;
+  }
+
   async count(): Promise<number> {
     const sql = `select count(1) as \`total\`
                  from (${this.getSql()}) t`;
     logDebug("select sql\t\t:" + sql);
     logDebug("select values\t:" + this.values);
-    const row = await this.db.select<Array<{total: number}>>(sql, this.values);
+    const row = await this.db.select<Array<{ total: number }>>(sql, this.values);
     logDebug("select result\t:" + stringifyJsonWithBigIntSupport(row));
     return row[0]!.total || 0;
   }

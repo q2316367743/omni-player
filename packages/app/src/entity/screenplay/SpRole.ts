@@ -2,7 +2,6 @@ import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {YesOrNo} from "@/global/YesOrNo.ts";
 
 export interface SpRoleCore {
-
   /**
    * 剧本 ID
    */

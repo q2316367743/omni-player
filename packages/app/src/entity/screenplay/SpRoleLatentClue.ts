@@ -23,7 +23,7 @@ export interface SpRoleLatentClue extends BaseEntity {
    */
   source_dialogue_id: number;
   /**
-   * 发生在哪个场景
+   * 发生在哪个场景，如果为空，则代表是场外事件
    */
   scene_id: string;
   /**

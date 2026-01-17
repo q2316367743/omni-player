@@ -1,6 +1,6 @@
 .role-sidebar {
   width: 320px;
-  background: var(--fluent-sidebar-bg);
+  background: var(--td-bg-color-container);
   backdrop-filter: var(--fluent-acrylic-blur);
   border-right: 1px solid var(--fluent-sidebar-border);
   display: flex;
@@ -97,13 +97,13 @@
 
 .role-detail {
   margin: 12px;
+  max-width: 350px;
   background: var(--fluent-card-bg);
 }
 .detail-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
 }
 
 .detail-header h4 {
@@ -121,4 +121,5 @@
   font: var(--td-font-body-small);
   color: var(--td-text-color-secondary);
   line-height: var(--td-line-height-body-small);
+  white-space: pre-line;   /* 只保留换行，空格仍折叠 */
 }

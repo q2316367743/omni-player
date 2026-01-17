@@ -1,14 +1,14 @@
 <template>
   <div class="screenplay-container">
 
-    <screenplay-role :roles="roles"/>
+    <screenplay-role v-if="screenplay" :roles="roles" :screenplay="screenplay" @refresh="fetchRoles"/>
 
     <main class="main-content">
       <screenplay-scene :scenes="scenes" :current-scene-id="currentSceneId" @select="onChangeScene"/>
 
       <div class="chat-container">
 
-        <screenplay-dialogue :role-map="roleMap" :dialogues="dialogues" />
+        <screenplay-dialogue :role-map="roleMap" :dialogues="dialogues"/>
 
         <div class="control-panel">
           <t-space size="small" break-line>
@@ -51,7 +51,7 @@
 
 <script lang="ts" setup>
 import {ref, computed, onMounted} from 'vue'
-import type {SpRole, SpScene, SpDialogue} from '@/entity/screenplay'
+import type {SpRole, SpScene, SpDialogue, Screenplay} from '@/entity/screenplay'
 import {
   AddIcon,
   LoginIcon,
@@ -63,15 +63,24 @@ import ScreenplayRole from "@/pages/screenplay/components/ScreenplayRole.vue";
 import ScreenplayScene from "@/pages/screenplay/components/ScreenplayScene.vue";
 import {map} from "@/util";
 import ScreenplayDialogue from "@/pages/screenplay/components/ScreenplayDialogue.vue";
+import {getScreenplayService, listSpRoleService} from "@/services/screenplay";
 
+const route = useRoute();
+
+const screenplay = ref<Screenplay>();
 const roles = ref<SpRole[]>([])
 const roleMap = ref(new Map<string, SpRole>());
 const scenes = ref<SpScene[]>([])
 const dialogues = ref<SpDialogue[]>([])
 const currentSceneId = ref<string>('')
 
+const currentScene = computed(() => scenes.value.find(s => s.id === currentSceneId.value));
 
-const currentScene = computed(() => scenes.value.find(s => s.id === currentSceneId.value))
+const fetchRoles = async () => {
+  if (!screenplay.value) return;
+  roles.value = await listSpRoleService(screenplay.value.id);
+  roleMap.value = map(roles.value, 'id');
+}
 
 const enterScene = () => {
   console.log('Enter scene:', currentScene.value)
@@ -97,42 +106,11 @@ const onChangeScene = (scene: SpScene) => {
   currentSceneId.value = scene.id
 }
 
-onMounted(() => {
-  roles.value = [
-    {
-      id: '1',
-      screenplay_id: '1',
-      name: '李维',
-      identity: '前AI工程师',
-      secret_info: '曾参与秘密AI项目',
-      personality: '理性、谨慎、有责任感',
-      in_narrator: 0,
-      created_at: Date.now(),
-      updated_at: Date.now()
-    },
-    {
-      id: '2',
-      screenplay_id: '1',
-      name: '张明',
-      identity: '科技公司CEO',
-      secret_info: '公司面临巨大危机',
-      personality: '果断、野心勃勃、有时冲动',
-      in_narrator: 0,
-      created_at: Date.now(),
-      updated_at: Date.now()
-    },
-    {
-      id: '3',
-      screenplay_id: '1',
-      name: '叙述者',
-      identity: '故事讲述者',
-      secret_info: '',
-      personality: '客观、冷静、富有洞察力',
-      in_narrator: 1,
-      created_at: Date.now(),
-      updated_at: Date.now()
-    }
-  ]
+onMounted(async () => {
+
+  screenplay.value = await getScreenplayService(route.params.id as string);
+  await fetchRoles();
+
 
   scenes.value = [
     {
@@ -211,7 +189,7 @@ onMounted(() => {
 .screenplay-container {
   display: flex;
   height: 100vh;
-  background: var(--td-bg-color-page);
+  background: var(--td-bg-color-container);
   font-family: var(--td-font-family), serif;
   overflow: hidden;
 }

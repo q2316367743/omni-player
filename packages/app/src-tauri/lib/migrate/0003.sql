@@ -127,3 +127,18 @@ CREATE INDEX idx_sp_role_latent_clue_role_id ON sp_role_latent_clue (role_id);
 CREATE INDEX idx_sp_role_latent_clue_scene_id ON sp_role_latent_clue (scene_id);
 CREATE INDEX idx_sp_role_latent_clue_status ON sp_role_latent_clue (status);
 CREATE INDEX idx_sp_role_latent_clue_source_dialogue_id ON sp_role_latent_clue (source_dialogue_id);
+
+CREATE TABLE RoleAppearance
+(
+    id         INTEGER PRIMARY KEY,
+    created_at INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL DEFAULT 0,
+    role_id    TEXT    NOT NULL DEFAULT '',
+    scene_id   TEXT    NOT NULL DEFAULT '',
+    enter_turn INTEGER NOT NULL DEFAULT 0, -- 进入场景的对话序号（可选）
+    exit_turn  INTEGER NOT NULL DEFAULT 0, -- 离开场景的对话序号（可选）
+    is_active  BOOLEAN NOT NULL DEFAULT 1, -- 当前是否在场景中（用于快速查询）
+    FOREIGN KEY (role_id) REFERENCES sp_role (id) ON DELETE CASCADE,
+    FOREIGN KEY (scene_id) REFERENCES sp_scene (id) ON DELETE CASCADE,
+    UNIQUE (role_id, scene_id)             -- 同一角色在同一场景只记录一次
+);

@@ -5,6 +5,10 @@ export function listScreenplayService() {
   return useSql().query<Screenplay>('screenplay').list();
 }
 
+export function getScreenplayService(id: string) {
+  return useSql().query<Screenplay>('screenplay').eq('id', id).get();
+}
+
 export function addScreenplayService(prop: ScreenplayCoreView) {
   const now = Date.now();
   return useSql().mapper<Screenplay>('screenplay')
