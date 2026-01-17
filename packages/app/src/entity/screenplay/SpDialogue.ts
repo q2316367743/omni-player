@@ -1,9 +1,8 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 
-/**
- * 剧本对话表
- */
-export interface SpDialogue extends BaseEntity {
+export type SpDialogueType = 'role' | 'narrator' | 'event' | 'system';
+
+export interface SpDialogueCore {
 
   /**
    * 剧本 ID
@@ -16,14 +15,9 @@ export interface SpDialogue extends BaseEntity {
   scene_id: string;
 
   /**
-   * 对话序号（全局递增）
-   */
-  turn_order: number;
-
-  /**
    * 对话类型
    */
-  type: 'role' | 'narrator' | 'event' | 'system';
+  type: SpDialogueType;
 
   /**
    * 角色发言时，type='role' 时必填
@@ -38,4 +32,16 @@ export interface SpDialogue extends BaseEntity {
    * 对话文本（可为空，如纯动作）
    */
   dialogue: string;
+
+}
+
+/**
+ * 剧本对话表
+ */
+export interface SpDialogue extends BaseEntity, SpDialogueCore {
+
+  /**
+   * 对话序号（全局递增）
+   */
+  turn_order: number;
 }

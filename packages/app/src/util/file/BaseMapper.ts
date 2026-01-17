@@ -1,6 +1,6 @@
 import {logDebug} from "@/lib/log";
 import {generatePlaceholders, useSnowflake} from "@/util";
-import {SqlWrapper} from "@/lib/sql.ts";
+import {SqlWrapper, type TableName} from "@/lib/sql.ts";
 
 export interface TableLike extends Record<string, any> {
   id: string;
@@ -8,9 +8,9 @@ export interface TableLike extends Record<string, any> {
 
 export class BaseMapper<T extends TableLike> {
   protected readonly db: SqlWrapper;
-  private readonly tableName: string;
+  private readonly tableName: TableName;
 
-  constructor(tableName: string, db: SqlWrapper) {
+  constructor(tableName: TableName, db: SqlWrapper) {
     this.db = db;
     this.tableName = tableName;
   }

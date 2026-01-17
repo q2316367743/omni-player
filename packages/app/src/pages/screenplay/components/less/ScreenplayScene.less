@@ -83,3 +83,34 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+
+.scene-detail {
+  margin: 12px;
+  max-width: 350px;
+  background: var(--fluent-card-bg);
+
+  .detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    h4 {
+      margin: 0;
+      font: var(--td-font-subtitle-medium);
+      color: var(--td-text-color-primary);
+    }
+  }
+
+
+  .detail-section {
+    margin-bottom: 16px;
+    p {
+      margin: 8px 0 0 0;
+      font: var(--td-font-body-small);
+      color: var(--td-text-color-secondary);
+      line-height: var(--td-line-height-body-small);
+      white-space: pre-line;   /* 只保留换行，空格仍折叠 */
+    }
+  }
+
+}

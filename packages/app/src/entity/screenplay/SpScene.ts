@@ -1,14 +1,11 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 
-/**
- * 剧本场景
- */
-export interface SpScene extends BaseEntity {
+export interface SpSceneCore {
 
   screenplay_id: string;
 
   /**
-   * 场景吗（如“市政厅会议室”）
+   * 场景名称（如“市政厅会议室”）
    */
   name: string;
 
@@ -17,10 +14,15 @@ export interface SpScene extends BaseEntity {
    */
   description: string;
 
+}
+
+/**
+ * 剧本场景
+ */
+export interface SpScene extends BaseEntity, SpSceneCore {
+
   /**
    * 场景顺序
    */
   order_index: number;
-
-
 }
