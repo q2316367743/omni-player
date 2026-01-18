@@ -56,11 +56,30 @@
     </div>
     <div v-else-if="type === 'current'" class="role-content">
       <div class="role-list">
+        <div v-if="decisionRoles[0]" class="role-card">
+          <div class="role-avatar">
+            <t-loading v-if="loadingRoleIds.includes(decisionRoles[0].id)" size="small" theme="primary"/>
+            <template v-else>{{ decisionRoles[0].name.charAt(0) }}</template>
+          </div>
+          <div class="role-info">
+            <div class="role-name">{{ decisionRoles[0].name }}</div>
+          </div>
+        </div>
+        <div v-if="narratorRoles[0]" class="role-card">
+          <div class="role-avatar">
+            <t-loading v-if="loadingRoleIds.includes(narratorRoles[0].id)" size="small" theme="primary"/>
+            <template v-else>{{ narratorRoles[0].name.charAt(0) }}</template>
+          </div>
+          <div class="role-info">
+            <div class="role-name">{{ narratorRoles[0].name }}</div>
+          </div>
+        </div>
         <t-popup v-for="role in currentRoles" :key="role.id" trigger="click" show-arrow placement="right"
                  destroy-on-close>
           <div class="role-card">
             <div class="role-avatar">
-              {{ role.name.charAt(0) }}
+              <t-loading v-if="loadingRoleIds.includes(role.id)" size="small" theme="primary"/>
+              <template v-else>{{ role.name.charAt(0) }}</template>
             </div>
             <div class="role-info">
               <div class="role-name">{{ role.name }}</div>
@@ -76,7 +95,7 @@
     <div class="role-footer">
       <t-tabs v-model="type" placement="bottom">
         <t-tab-panel label="全部角色" value="all"/>
-        <t-tab-panel label="当前角色" value="current"/>
+        <t-tab-panel label="当前场景" value="current"/>
       </t-tabs>
     </div>
   </aside>
@@ -112,6 +131,10 @@ const props = defineProps({
   },
   currentSceneId: {
     type: String,
+  },
+  loadingRoleIds: {
+    type: Array as PropType<Array<string>>,
+    default: () => []
   }
 });
 const emit = defineEmits(['refresh']);

@@ -33,11 +33,11 @@ const roleTools: Array<OpenAI.Chat.Completions.ChatCompletionTool> = [
     type: "function",
     function: {
       name: "speak",
-      description: "说出一句对话（可为空表示沉默）",
+      description: "角色说出一句对话。如果角色选择沉默，传入空字符串。例如：speak({\"text\": \"你好\"}) 或 speak({\"text\": \"\"})",
       parameters: {
         type: "object",
         properties: {
-          text: {type: "string", description: "对话内容，可为空"}
+          text: {type: "string", description: "对话内容，可以为空字符串表示沉默"}
         },
         required: ["text"]
       }
@@ -48,13 +48,13 @@ const roleTools: Array<OpenAI.Chat.Completions.ChatCompletionTool> = [
     type: "function",
     function: {
       name: "perform_action",
-      description: "执行一个动作或神态（将由 Narrator AI 润色）",
+      description: "角色执行一个动作或神态。传入简单的动作描述，后续会被润色。例如：perform_action({\"raw_action\": \"握紧拳头\"})",
       parameters: {
         type: "object",
         properties: {
           raw_action: {
             type: "string",
-            description: "原始动作描述，如'手伸向口袋'"
+            description: "原始动作描述，如'手伸向口袋'、'皱眉'、'看向窗外'"
           }
         },
         required: ["raw_action"]
@@ -66,12 +66,12 @@ const roleTools: Array<OpenAI.Chat.Completions.ChatCompletionTool> = [
     type: "function",
     function: {
       name: "update_emotion",
-      description: "调整当前情绪强度和情绪类型",
+      description: "调整角色的当前情绪强度和情绪类型。例如：update_emotion({\"intensity\": 80, \"emotion_type\": \"愤怒\"})",
       parameters: {
         type: "object",
         properties: {
-          intensity: {type: "integer", minimum: 1, maximum: 100},
-          emotion_type: {type: "string"}
+          intensity: {type: "integer", minimum: 1, maximum: 100, description: "情绪强度，1-100的整数"},
+          emotion_type: {type: "string", description: "情绪类型，如'愤怒'、'悲伤'、'平静'等"}
         },
         required: ["intensity"]
       }
@@ -82,12 +82,12 @@ const roleTools: Array<OpenAI.Chat.Completions.ChatCompletionTool> = [
     type: "function",
     function: {
       name: "add_belief",
-      description: "新增主观推断",
+      description: "角色新增一个主观推断。例如：add_belief({\"content\": \"他在隐瞒什么\", \"confidence\": 0.8})",
       parameters: {
         type: "object",
         properties: {
-          content: {type: "string"},
-          confidence: {type: "number", minimum: 0, maximum: 1}
+          content: {type: "string", description: "推断的内容描述"},
+          confidence: {type: "number", minimum: 0, maximum: 1, description: "置信度，0-1之间的小数"}
         },
         required: ["content", "confidence"]
       }
@@ -98,11 +98,11 @@ const roleTools: Array<OpenAI.Chat.Completions.ChatCompletionTool> = [
     type: "function",
     function: {
       name: "retract_belief",
-      description: "撤回某条主观推断",
+      description: "撤回或修改角色的某条主观推断。例如：retract_belief({\"id\": 123})",
       parameters: {
         type: "object",
         properties: {
-          id: {type: "integer"}
+          id: {type: "integer", description: "要撤回的主观推断的ID"}
         },
         required: ["id"]
       }
@@ -113,11 +113,11 @@ const roleTools: Array<OpenAI.Chat.Completions.ChatCompletionTool> = [
     type: "function",
     function: {
       name: "add_latent_clue",
-      description: "添加潜在线索",
+      description: "角色注意到并记录一个潜在线索。例如：add_latent_clue({\"content\": \"他的手在发抖\"})",
       parameters: {
         type: "object",
         properties: {
-          content: {type: "string"}
+          content: {type: "string", description: "线索的内容描述"}
         },
         required: ["content"]
       }
@@ -128,12 +128,12 @@ const roleTools: Array<OpenAI.Chat.Completions.ChatCompletionTool> = [
     type: "function",
     function: {
       name: "retract_latent_clue",
-      description: "解决/废弃某条主观推断",
+      description: "解决或废弃某条潜在线索。例如：retract_latent_clue({\"id\": 456, \"status\": \"resolved\"})",
       parameters: {
         type: "object",
         properties: {
-          id: {type: "integer"},
-          status: {type: "string", enum: ['resolved', 'discarded']}
+          id: {type: "integer", description: "线索的ID"},
+          status: {type: "string", enum: ['resolved', 'discarded'], description: "resolved表示已解决，discarded表示废弃"}
         },
         required: ["id"]
       }
@@ -164,18 +164,25 @@ export async function aiScreenplayRole(prop: AiScreenplayRoleProp) {
     {
       role: "system",
       content:
-        `你正在扮演一个真实的小说角色。你的一切行为都必须通过调用下方提供的工具来完成。
+        `你正在扮演一个真实的小说角色。你必须通过调用下方提供的工具来完成所有行为。
 
-你可以选择：
-- 说出一句对话（使用 speak）
-- 执行一个动作或神态（使用 perform_action）
-- 更新你的情绪状态（update_emotion）
-- 添加/撤回你的主观推断（add_belief / retract_belief）
-- 记录你注意到的细节（add_latent_clue）
+可用工具列表：
+1. speak - 说出一句对话（text参数：对话内容，可为空表示沉默）
+2. perform_action - 执行一个动作或神态（raw_action参数：原始动作描述）
+3. update_emotion - 调整当前情绪强度和情绪类型（intensity参数：1-100的整数，emotion_type参数：情绪类型）
+4. add_belief - 新增主观推断（content参数：推断内容，confidence参数：0-1的置信度）
+5. retract_belief - 撤回某条主观推断（id参数：推断的ID）
+6. add_latent_clue - 添加潜在线索（content参数：线索内容）
+7. retract_latent_clue - 解决/废弃某条潜在线索（id参数：线索ID，status参数："resolved"或"discarded"）
 
-你也可以选择不调用任何工具——这表示你当前没有外显行为（如发呆、观察、思考）。
-
-不要输出任何其他文本、解释或描述。`
+重要规则：
+- 你必须使用工具来表达所有行为，不能直接输出文本
+- 每次可以调用一个或多个工具
+- 如果你选择沉默或发呆，可以调用speak工具并传入空字符串，或者不调用任何工具
+- 工具调用格式：{"name": "工具名", "arguments": {"参数名": "参数值"}}
+- 例如：{"name": "speak", "arguments": {"text": "你好"}}
+- 例如：{"name": "update_emotion", "arguments": {"intensity": 80, "emotion_type": "愤怒"}}
+- 例如：{"name": "perform_action", "arguments": {"raw_action": "握紧拳头"}}`
     },
 
     // —————— USER CONTEXT ——————
@@ -256,36 +263,60 @@ ${dialogues.map(d => `[${roleMap.get(d.role_id)?.name || d.role_id}] “${d.dial
   };
 
   const tools = new Array<OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall>();
+  const toolCallsMap = new Map<number, OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall>();
+
+  console.log(`[Role AI] Processing role: ${role.name} (${role.id})`);
+
+  for await (const chunk of response) {
+    const toolCalls = chunk.choices[0]?.delta.tool_calls;
+    if (!toolCalls) continue;
+
+    toolCalls.forEach(toolCall => {
+      const index = toolCall.index;
+      if (index === undefined) return;
+
+      const existing = toolCallsMap.get(index);
+      if (existing) {
+        if (toolCall.id) existing.id = toolCall.id;
+        if (toolCall.function) {
+          if (!existing.function) existing.function = {name: '', arguments: ''};
+          if (toolCall.function.name) existing.function.name = toolCall.function.name;
+          if (toolCall.function.arguments) existing.function.arguments += toolCall.function.arguments;
+        }
+      } else {
+        toolCallsMap.set(index, {...toolCall});
+      }
+    });
+  }
+
   let actionCall: OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall | undefined;
   let speakCall: OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall | undefined;
 
-  for await (const chunk of response) {
-    // 工具调用：状态变更指令
-    const toolCalls = chunk.choices[0]?.delta.tool_calls;
-    // → 例如：
-    if (!toolCalls) continue;
-    toolCalls.forEach(toolCall => {
-      const functionCall = toolCall.function;
-      if (!functionCall) return;
-      const functionName = functionCall.name;
-      switch (functionName) {
-        case 'speak':
-          speakCall = toolCall;
-          break;
-        case 'perform_action':
-          actionCall = toolCall;
-          break;
-        default:
-          tools.push(toolCall);
-      }
-    })
+  for (const toolCall of toolCallsMap.values()) {
+    const functionCall = toolCall.function;
+    if (!functionCall) return;
+    const functionName = functionCall.name;
+    console.log(`[Role AI] Tool call: ${functionName}, arguments: ${functionCall.arguments}`);
+    switch (functionName) {
+      case 'speak':
+        speakCall = toolCall;
+        break;
+      case 'perform_action':
+        actionCall = toolCall;
+        break;
+      default:
+        tools.push(toolCall);
+    }
   }
+
+  console.log(`[Role AI] Action call: ${actionCall ? 'yes' : 'no'}, Speak call: ${speakCall ? 'yes' : 'no'}, Other tools: ${tools.length}`);
 
   // 先渲染动作
   if (actionCall) {
     const functionCall = actionCall.function;
     if (functionCall) {
       const functionArguments = JSON.parse(functionCall.arguments || '{}');
+      console.log(`[Role AI] Performing action: ${functionArguments.raw_action}`);
       await askAiScreenplayNarrator({
         ...prop,
         task: 'describe_action',
@@ -298,12 +329,13 @@ ${dialogues.map(d => `[${roleMap.get(d.role_id)?.name || d.role_id}] “${d.dial
     const functionCall = speakCall.function;
     if (functionCall) {
       const functionArguments = JSON.parse(functionCall.arguments || '{}');
+      console.log(`[Role AI] Speaking: ${functionArguments.text}`);
       const res = await addSpDialogueService({
         screenplay_id: screenplay.id,
         scene_id: scene.id,
         role_id: role.id,
         type: "role",
-        dialogue: functionArguments.content,
+        dialogue: functionArguments.text,
         action: "",
       })
       source_dialogue_id = res.id;
@@ -315,7 +347,14 @@ ${dialogues.map(d => `[${roleMap.get(d.role_id)?.name || d.role_id}] “${d.dial
     const functionCall = toolCall.function;
     if (!functionCall) continue;
     const functionName = functionCall.name;
-    const functionArguments = JSON.parse(functionCall.arguments || '{}');
+    let functionArguments;
+    try {
+
+      functionArguments = JSON.parse(functionCall.arguments || '{}');
+    } catch (e) {
+      console.error(`[Role AI]  Error parsing function arguments, functionName: `, functionName, ", functionArgument: ", functionCall.arguments, ', error: ', e);
+      continue;
+    }
     switch (functionName) {
       case 'update_emotion':
         updateEmotion(functionArguments.intensity, functionArguments.emotion_type);

@@ -77,7 +77,7 @@ const props = defineProps({
     default: false
   }
 });
-const emit = defineEmits(['refreshScene', 'refreshRoleAppearance', 'refreshDialogue']);
+const emit = defineEmits(['refreshScene', 'refreshRoleAppearance', 'refreshDialogue', 'pauseToggle']);
 
 const showRoleAdd = computed(() => {
   return props.currentSceneId &&
@@ -113,7 +113,7 @@ const advanceStory = () => {
 }
 
 const pauseStory = () => {
-  console.log('Pause story')
+  emit('pauseToggle');
 }
 
 const addScene = () => {
@@ -123,10 +123,10 @@ const addScene = () => {
 </script>
 <style scoped lang="less">
 .control-panel {
-  padding: 20px 24px;
+  padding: 16px;
   background: var(--fluent-acrylic-bg);
   backdrop-filter: var(--fluent-acrylic-blur);
-  border-top: 1px solid var(--fluent-border-subtle);
+  border-top: 1px solid var(--td-border-level-1-color);
   display: flex;
   gap: 8px;
 }

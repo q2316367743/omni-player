@@ -2,7 +2,7 @@
   <div class="screenplay-container">
 
     <screenplay-role v-if="screenplay" :roles="roles" :screenplay="screenplay" :current-scene-id="currentSceneId" :role-appearance-map="roleAppearanceMap"
-                     :role-map="roleMap" @refresh="fetchRoles"/>
+                     :role-map="roleMap" :loading-role-ids="loadingRoleIds" @refresh="fetchRoles"/>
 
     <main class="main-content">
       <screenplay-scene :scenes="scenes" :current-scene-id="currentSceneId" :role-appearance-map="roleAppearanceMap"
@@ -15,7 +15,7 @@
         <screenplay-control v-if="screenplay" :screenplay="screenplay" :scenes :current-scene-id="currentSceneId"
                             :pause="isPause"
                             @refresh-scene="refreshScene" @refresh-role-appearance="fetchRoleAppearance"
-                            @refresh-dialogue="fetchDialogue"/>
+                            @refresh-dialogue="fetchDialogue" @pause-toggle="toggleAutoPlay"/>
       </div>
     </main>
   </div>
@@ -35,6 +35,7 @@ import ScreenplayScene from "@/pages/screenplay/layout/ScreenplayScene.vue";
 import ScreenplayDialogue from "@/pages/screenplay/layout/ScreenplayDialogue.vue";
 import ScreenplayControl from "@/pages/screenplay/layout/ScreenplayControl.vue";
 import type {SpRoleAppearance} from "@/entity/screenplay/SpRoleAppearance.ts";
+import {AutoPlayManager} from "@/modules/ai/AutoPlayManager.ts";
 
 const route = useRoute();
 
@@ -45,6 +46,8 @@ const roleMap = ref(new Map<string, SpRole>());
 const scenes = ref<SpScene[]>([])
 const dialogues = ref<SpDialogue[]>([])
 const currentSceneId = ref<string>();
+const loadingRoleIds = ref<string[]>([]);
+const autoPlayManager = ref<AutoPlayManager | null>(null);
 // 角色分组 场景 => 角色列表
 const roleAppearanceMap = ref(new MapWrapper<string, Array<SpRoleAppearance>>());
 
@@ -84,6 +87,75 @@ const onChangeScene = (scene: SpScene) => {
   currentSceneId.value = scene.id
 }
 
+const toggleAutoPlay = () => {
+  if (!autoPlayManager.value) return;
+  
+  if (isPause.value) {
+    autoPlayManager.value.resume();
+    isPause.value = false;
+  } else {
+    autoPlayManager.value.pause();
+    isPause.value = true;
+  }
+}
+
+const initAutoPlayManager = () => {
+  if (!screenplay.value || !currentSceneId.value) return;
+  
+  const director = roles.value.find(r => r.type === 'decision');
+  const narrator = roles.value.find(r => r.type === 'narrator');
+  
+  if (!director || !narrator) {
+    console.error('Director or narrator role not found');
+    return;
+  }
+  
+  const currentScene = scenes.value.find(s => s.id === currentSceneId.value);
+  if (!currentScene) return;
+  
+  autoPlayManager.value = new AutoPlayManager({
+    screenplay: screenplay.value,
+    currentScene: currentScene,
+    scenes: scenes.value,
+    roles: roles.value,
+    roleMap: roleMap.value,
+    director: director,
+    narrator: narrator,
+    maxSceneTurns: 20,
+    onLoadingPush: (ids) => {
+      loadingRoleIds.value.push(...ids);
+    },
+    onLoadingPop: (ids) => {
+      loadingRoleIds.value = loadingRoleIds.value.filter(id => !ids.includes(id));
+    },
+    onDialogueUpdate: async () => {
+      await fetchDialogue();
+    },
+    onSceneChange: async (sceneId) => {
+      currentSceneId.value = sceneId;
+      await fetchDialogue();
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (autoPlayManager.value && !isPause.value) {
+        const newScene = scenes.value.find(s => s.id === sceneId);
+        if (newScene) {
+          await autoPlayManager.value.updateScene(newScene);
+          await autoPlayManager.value.resume();
+        }
+      }
+    },
+    onPause: () => {
+      isPause.value = true;
+    },
+    getDialogues: async () => {
+      // 获取全部角色对话
+      return dialogues.value.filter(e => e.type === 'role');
+    },
+    getRoleAppearances: async (sceneId: string) => {
+      return roleAppearanceMap.value.getOrDefault(sceneId, []);
+    }
+  });
+}
+
 onMounted(async () => {
   screenplay.value = await getScreenplayService(route.params.id as string);
   await Promise.all([
@@ -96,6 +168,8 @@ onMounted(async () => {
   console.log(scenes.value, currentSceneId.value)
   // 获取聊天记录
   await fetchDialogue();
+  // 初始化自动演绎管理器
+  initAutoPlayManager();
 })
 
 const refreshScene = async () => {
@@ -105,6 +179,8 @@ const refreshScene = async () => {
   currentSceneId.value = scenes.value[scenes.value.length - 1]?.id;
   // 获取聊天记录
   await fetchDialogue();
+  // 重新初始化自动演绎管理器
+  initAutoPlayManager();
 }
 </script>
 
