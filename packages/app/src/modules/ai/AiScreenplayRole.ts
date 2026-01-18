@@ -24,6 +24,12 @@ export interface AiScreenplayRoleProp {
   roleMap: Map<string, SpRole>;
   // 在场角色
   roles: Array<SpRole>;
+  // 强制对话（用于导演指令）
+  forcedDialogue?: string;
+  // 是否为失言（用于导演指令）
+  isSlip?: boolean;
+  // 导演指令 ID（用于标记对话来源）
+  directorInstructionId?: string;
 }
 
 // 角色的 mcp 工具
@@ -143,7 +149,12 @@ const roleTools: Array<OpenAI.Chat.Completions.ChatCompletionTool> = [
 
 
 export async function aiScreenplayRole(prop: AiScreenplayRoleProp) {
-  const {role, screenplay, scene, dialogues, roleMap} = prop;
+  const {role, screenplay, scene, dialogues, roleMap, forcedDialogue, isSlip, directorInstructionId} = prop;
+  
+  // isSlip 标记是否为失言，用于导演指令，暂时保留以备将来使用
+  if (isSlip) {
+    console.log(`[Role AI] This is a slip: ${role.name}`);
+  }
   const [emotion, beliefs, clues] = await Promise.all([
     // 获取心情
     getSpRoleEmotionService(screenplay.id, role.id),
@@ -355,6 +366,22 @@ ${dialogues.map(d => `[${roleMap.get(d.role_id)?.name || d.role_id}] ${d.action 
 
   console.log(`[Role AI] Action call: ${actionCall ? 'yes' : 'no'}, Speak call: ${speakCall ? 'yes' : 'no'}, Other tools: ${tools.length}`);
 
+  // 如果有强制对话，直接使用
+  if (forcedDialogue) {
+    console.log(`[Role AI] Forced dialogue: ${forcedDialogue}`);
+    const res = await addSpDialogueService({
+      screenplay_id: screenplay.id,
+      scene_id: scene.id,
+      role_id: role.id,
+      type: "role",
+      dialogue: forcedDialogue,
+      action: "",
+      director_instruction_id: directorInstructionId || "",
+    });
+    source_dialogue_id = res.id;
+    return;
+  }
+
   // 先渲染动作
   if (actionCall) {
     const functionCall = actionCall.function;
@@ -381,6 +408,7 @@ ${dialogues.map(d => `[${roleMap.get(d.role_id)?.name || d.role_id}] ${d.action 
         type: "role",
         dialogue: functionArguments.text,
         action: "",
+        director_instruction_id: directorInstructionId || "",
       })
       source_dialogue_id = res.id;
     }

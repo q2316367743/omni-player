@@ -1,5 +1,6 @@
 import type {Screenplay, SpDialogue, SpRole, SpScene} from "@/entity/screenplay";
 import type {SpRoleAppearance} from "@/entity/screenplay/SpRoleAppearance";
+import type {SpDirectorInstructionLog} from "@/entity/screenplay/SpDirectorInstructionLog";
 import {askAiScreenplayDirector, type DirectorDecision} from "@/modules/ai/AiScreenplayDirector";
 import {aiScreenplayRole} from "@/modules/ai/AiScreenplayRole";
 import {askAiScreenplayNarrator} from "@/modules/ai/AiScreenplayNarrator";
@@ -8,6 +9,7 @@ import {
   listSpRoleAppearanceService,
   retractSpRoleAppearanceService
 } from "@/services/screenplay/SpRoleAppearanceService";
+import {listSpDilService, updateSpDilService} from "@/services/screenplay/SpDilService";
 
 export interface AutoPlayConfig {
   screenplay: Screenplay;
@@ -90,6 +92,19 @@ export class AutoPlayManager {
       console.log('Dialogue length:', this.state.dialogueLength);
       console.log('Continuous dialogue count:', this.state.continuousDialogueCount);
       console.log('Last narration distance:', this.state.lastNarrationDistance);
+
+      const hasProcessedInstructions = await this.processDirectorInstructions();
+      
+      if (hasProcessedInstructions) {
+        await this.fetchDialogues();
+        this.state.dialogueLength++;
+        await this.delay(1000);
+        
+        if (this.state.isRunning) {
+          await this.runTurn();
+        }
+        return;
+      }
 
       const decision = await this.askDirector();
 
@@ -195,6 +210,155 @@ export class AutoPlayManager {
 
   private async getRoleAppearances(sceneId: string) {
     return listSpRoleAppearanceService(this.config.screenplay.id, sceneId);
+  }
+
+  private async getPendingDirectorInstructions() {
+    const instructions = await listSpDilService(this.config.screenplay.id, this.config.currentScene.id);
+    return instructions.filter(inst => inst.is_active === 0);
+  }
+
+  private async processDirectorInstructions() {
+    const instructions = await this.getPendingDirectorInstructions();
+    
+    if (instructions.length === 0) {
+      return false;
+    }
+
+    console.log('[Director Instructions] Found pending instructions:', instructions.length);
+
+    for (const instruction of instructions) {
+      console.log('[Director Instructions] Processing:', instruction.instruction, instruction.params);
+      
+      try {
+        await this.executeInstruction(instruction);
+        await updateSpDilService(instruction.id, { is_active: 1 });
+        console.log('[Director Instructions] Completed:', instruction.instruction);
+      } catch (error) {
+        console.error('[Director Instructions] Error processing instruction:', error);
+      }
+    }
+
+    return true;
+  }
+
+  private async executeInstruction(instruction: SpDirectorInstructionLog) {
+    const params = JSON.parse(instruction.params);
+    const roleAppearances = await this.getRoleAppearances(this.config.currentScene.id);
+    const currentSceneRoles = roleAppearances
+      .map((ra: SpRoleAppearance) => this.config.roleMap.get(ra.role_id)!)
+      .filter(Boolean);
+
+    switch (instruction.instruction) {
+      case 'character_slip':
+        await this.processCharacterSlip(params, currentSceneRoles, instruction.id);
+        break;
+      case 'reveal_item':
+        await this.processRevealItem(params, currentSceneRoles);
+        break;
+      case 'external_event':
+        await this.processExternalEvent(params, currentSceneRoles);
+        break;
+      case 'skip_turn':
+        await this.processSkipTurn(params);
+        break;
+      case 'trigger_emotion':
+        await this.processTriggerEmotion(params);
+        break;
+      default:
+        console.warn('[Director Instructions] Unknown instruction type:', instruction.instruction);
+    }
+  }
+
+  private async processCharacterSlip(params: { target_role_id: string; content: string }, currentSceneRoles: SpRole[], instructionId: string) {
+    const role = this.config.roleMap.get(params.target_role_id);
+    if (!role) {
+      console.error('[Character Slip] Role not found:', params.target_role_id);
+      return;
+    }
+
+    this.config.onLoadingPush?.([role.id]);
+
+    try {
+      await aiScreenplayRole({
+        role: role,
+        narrator: this.config.narrator,
+        screenplay: this.config.screenplay,
+        scene: this.config.currentScene,
+        dialogues: this.state.dialogues.slice(-10),
+        roleMap: this.config.roleMap,
+        roles: currentSceneRoles,
+        forcedDialogue: params.content,
+        isSlip: true,
+        directorInstructionId: instructionId
+      });
+    } finally {
+      this.config.onLoadingPop?.([role.id]);
+    }
+
+    this.config.onDialogueUpdate?.();
+  }
+
+  private async processRevealItem(params: { item_desc: string; discoverer_id: string }, currentSceneRoles: SpRole[]) {
+    const discoverer = this.config.roleMap.get(params.discoverer_id);
+    const roles = discoverer ? [discoverer] : currentSceneRoles;
+
+    this.config.onLoadingPush?.([this.config.narrator.id]);
+
+    try {
+      await askAiScreenplayNarrator({
+        narrator: this.config.narrator,
+        screenplay: this.config.screenplay,
+        scene: this.config.currentScene,
+        roles: roles,
+        dialogues: this.state.dialogues.slice(-10),
+        roleMap: this.config.roleMap,
+        task: 'polish_plot',
+        triggerReason: `物品发现：${params.item_desc}`
+      });
+    } finally {
+      this.config.onLoadingPop?.([this.config.narrator.id]);
+    }
+
+    this.config.onDialogueUpdate?.();
+  }
+
+  private async processExternalEvent(params: { description: string }, currentSceneRoles: SpRole[]) {
+    this.config.onLoadingPush?.([this.config.narrator.id]);
+
+    try {
+      await askAiScreenplayNarrator({
+        narrator: this.config.narrator,
+        screenplay: this.config.screenplay,
+        scene: this.config.currentScene,
+        roles: currentSceneRoles,
+        dialogues: this.state.dialogues.slice(-10),
+        roleMap: this.config.roleMap,
+        task: 'insert_atmosphere',
+        triggerReason: `环境事件：${params.description}`
+      });
+    } finally {
+      this.config.onLoadingPop?.([this.config.narrator.id]);
+    }
+
+    this.config.onDialogueUpdate?.();
+  }
+
+  private async processSkipTurn(params: { role_id: string }) {
+    const role = this.config.roleMap.get(params.role_id);
+    if (!role) {
+      console.error('[Skip Turn] Role not found:', params.role_id);
+      return;
+    }
+    console.log('[Skip Turn] Skipping turn for:', role.name);
+  }
+
+  private async processTriggerEmotion(params: { role_id: string; emotion: string; delta: number }) {
+    const role = this.config.roleMap.get(params.role_id);
+    if (!role) {
+      console.error('[Trigger Emotion] Role not found:', params.role_id);
+      return;
+    }
+    console.log('[Trigger Emotion]', role.name, params.emotion, params.delta);
   }
 
   private async processRoleTurn(roleId: string) {

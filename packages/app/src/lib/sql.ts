@@ -41,7 +41,8 @@ export type TableName =
   | 'sp_role_latent_clue'
   | 'sp_scene'
   | 'sp_role_appearance'
-  | 'sp_log';
+  | 'sp_log'
+  | 'sp_director_instruction_log';
 
 export class SqlWrapper {
 

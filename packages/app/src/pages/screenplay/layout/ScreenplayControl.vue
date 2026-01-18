@@ -24,16 +24,35 @@
       </template>
       推进剧情
     </t-button>
-    <t-button theme="default" variant="dashed" @click="addScene">
-      <template #icon>
-        <add-icon/>
-      </template>
-      新场景
-    </t-button>
+    <t-dropdown placement="top" trigger="click" max-column-width="350px">
+      <t-button theme="default" variant="dashed" @click="addScene">
+        <template #icon>
+          <add-icon/>
+        </template>
+        发送指令
+      </t-button>
+      <t-dropdown-menu>
+        <t-dropdown-item @click="openSpDirectorInstructionLog(screenplay.id, currentSceneId!, 'character_slip')">
+          强制角色说出指定台词
+        </t-dropdown-item>
+        <t-dropdown-item @click="openSpDirectorInstructionLog(screenplay.id, currentSceneId!, 'reveal_item')">
+          插入物品发现事件
+        </t-dropdown-item>
+        <t-dropdown-item @click="openSpDirectorInstructionLog(screenplay.id, currentSceneId!, 'external_event')">
+          插入环境事件
+        </t-dropdown-item>
+        <t-dropdown-item @click="openSpDirectorInstructionLog(screenplay.id, currentSceneId!, 'skip_turn')">
+          跳过某角色本轮发言
+        </t-dropdown-item>
+        <t-dropdown-item @click="openSpDirectorInstructionLog(screenplay.id, currentSceneId!, 'trigger_emotion')">
+          强制修改情绪
+        </t-dropdown-item>
+      </t-dropdown-menu>
+    </t-dropdown>
     <div class="ml-auto">
       <t-button v-if="pause" theme="default" variant="outline" @click="pauseStory">
         <template #icon>
-          <play-circle-icon />
+          <play-circle-icon/>
         </template>
         继续
       </t-button>
@@ -59,6 +78,7 @@ import type {Screenplay, SpRole, SpScene} from "@/entity/screenplay";
 import {openSpSceneAdd} from "@/pages/screenplay/func/SpSceneEdit.tsx";
 import {openSpRoleAppearanceAdd} from "@/pages/screenplay/func/SpRoleAppearanceEdit.tsx";
 import {openSpDialogueAddNarrator} from "@/pages/screenplay/func/SpDialogualEdit.tsx";
+import {openSpDirectorInstructionLog} from "@/pages/screenplay/func/SpDilEdit.tsx";
 
 const props = defineProps({
   screenplay: {

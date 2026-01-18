@@ -33,6 +33,11 @@ export interface SpDialogueCore {
    */
   dialogue: string;
 
+  /**
+   * 指导指令 ID，如果存在，则代表这句话是导演干涉的
+   */
+  director_instruction_id: string;
+
 }
 
 /**

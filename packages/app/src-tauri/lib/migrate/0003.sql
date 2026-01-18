@@ -13,15 +13,15 @@ CREATE INDEX idx_screenplay_updated_at ON screenplay (updated_at);
 
 CREATE TABLE sp_scene
 (
-    id            TEXT PRIMARY KEY,
-    created_at    INTEGER NOT NULL DEFAULT 0,
-    updated_at    INTEGER NOT NULL DEFAULT 0,
-    screenplay_id TEXT    NOT NULL DEFAULT '',
-    `name`        TEXT    NOT NULL DEFAULT '',
-    `description` TEXT    NOT NULL DEFAULT '',
-    order_index   INTEGER NOT NULL DEFAULT 0,
-    `narrative_goal` TEXT    NOT NULL DEFAULT '',
-    `key_clues` TEXT    NOT NULL DEFAULT '',
+    id                     TEXT PRIMARY KEY,
+    created_at             INTEGER NOT NULL DEFAULT 0,
+    updated_at             INTEGER NOT NULL DEFAULT 0,
+    screenplay_id          TEXT    NOT NULL DEFAULT '',
+    `name`                 TEXT    NOT NULL DEFAULT '',
+    `description`          TEXT    NOT NULL DEFAULT '',
+    order_index            INTEGER NOT NULL DEFAULT 0,
+    `narrative_goal`       TEXT    NOT NULL DEFAULT '',
+    `key_clues`            TEXT    NOT NULL DEFAULT '',
     `required_revelations` TEXT    NOT NULL DEFAULT ''
 );
 
@@ -39,7 +39,7 @@ CREATE TABLE sp_role
     `identity`    TEXT    NOT NULL DEFAULT '',
     secret_info   TEXT    NOT NULL DEFAULT '',
     personality   TEXT    NOT NULL DEFAULT '',
-    model         TEXT    NOT NULL DEFAULT '' -- 使用的模型
+    model         TEXT    NOT NULL DEFAULT ''  -- 使用的模型
 );
 
 CREATE INDEX idx_sp_role_screenplay_id ON sp_role (screenplay_id);
@@ -47,16 +47,17 @@ CREATE INDEX idx_sp_role_in_narrator ON sp_role (screenplay_id, type);
 
 CREATE TABLE sp_dialogue
 (
-    id            TEXT PRIMARY KEY,
-    created_at    INTEGER NOT NULL DEFAULT 0,
-    updated_at    INTEGER NOT NULL DEFAULT 0,
-    screenplay_id TEXT    NOT NULL DEFAULT '',
-    scene_id      TEXT    NOT NULL DEFAULT '',
-    turn_order    INTEGER NOT NULL DEFAULT 0,
-    `type`        TEXT    NOT NULL DEFAULT '',
-    role_id       TEXT    NOT NULL DEFAULT '',
-    `action`      TEXT    NOT NULL DEFAULT '',
-    dialogue      TEXT    NOT NULL DEFAULT ''
+    id                      TEXT PRIMARY KEY,
+    created_at              INTEGER NOT NULL DEFAULT 0,
+    updated_at              INTEGER NOT NULL DEFAULT 0,
+    screenplay_id           TEXT    NOT NULL DEFAULT '',
+    scene_id                TEXT    NOT NULL DEFAULT '',
+    turn_order              INTEGER NOT NULL DEFAULT 0,
+    `type`                  TEXT    NOT NULL DEFAULT '',
+    role_id                 TEXT    NOT NULL DEFAULT '',
+    `action`                TEXT    NOT NULL DEFAULT '',
+    dialogue                TEXT    NOT NULL DEFAULT '',
+    director_instruction_id TEXT    NOT NULL DEFAULT ''
 );
 
 CREATE INDEX idx_sp_dialogue_screenplay_id ON sp_dialogue (screenplay_id);
@@ -147,3 +148,19 @@ CREATE TABLE sp_role_appearance
     FOREIGN KEY (scene_id) REFERENCES sp_scene (id) ON DELETE CASCADE,
     UNIQUE (role_id, scene_id)                -- 同一角色在同一场景只记录一次
 );
+
+CREATE TABLE sp_director_instruction_log
+(
+    id          TEXT PRIMARY KEY,
+    created_at  INTEGER NOT NULL DEFAULT 0,
+    updated_at  INTEGER NOT NULL DEFAULT 0,
+    screenplay_id TEXT NOT NULL DEFAULT '',
+    scene_id      TEXT NOT NULL DEFAULT '',
+    instruction   TEXT NOT NULL DEFAULT '',
+    params        TEXT NOT NULL DEFAULT '',
+    dialogue_id   TEXT NOT NULL DEFAULT '',
+    is_active     INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX idx_sp_director_instruction_log_screenplay_id ON sp_director_instruction_log (screenplay_id);
+CREATE INDEX idx_sp_director_instruction_log_scene_id ON sp_director_instruction_log (scene_id);

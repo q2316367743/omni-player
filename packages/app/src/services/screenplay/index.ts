@@ -7,3 +7,4 @@ export * from "./SpRoleEmotionService.ts";
 export * from "./SpRoleBeliefService.ts";
 export * from "./SpRoleLatentClueService.ts";
 export * from "./SpLogService.ts";
+export * from "./SpDilService.ts";
