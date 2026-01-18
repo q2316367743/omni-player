@@ -15,7 +15,7 @@
         <screenplay-control v-if="screenplay" :screenplay="screenplay" :scenes :current-scene-id="currentSceneId"
                             :pause="isPause"
                             @refresh-scene="refreshScene" @refresh-role-appearance="fetchRoleAppearance"
-                            @refresh-dialogual="fetchDialogual"/>
+                            @refresh-dialogue="fetchDialogue"/>
       </div>
     </main>
   </div>
@@ -74,7 +74,7 @@ const fetchScenes = async () => {
   scenes.value = await listSpSceneService(screenplay.value.id);
 }
 
-const fetchDialogual = async () => {
+const fetchDialogue = async () => {
   if (!screenplay.value) return;
   if (!currentSceneId.value) return;
   dialogues.value = await listSpDialogueService(screenplay.value.id, currentSceneId.value);
@@ -95,7 +95,7 @@ onMounted(async () => {
   currentSceneId.value = scenes.value[scenes.value.length - 1]?.id;
   console.log(scenes.value, currentSceneId.value)
   // 获取聊天记录
-  await fetchDialogual();
+  await fetchDialogue();
 })
 
 const refreshScene = async () => {
@@ -104,7 +104,7 @@ const refreshScene = async () => {
   // 当前场景
   currentSceneId.value = scenes.value[scenes.value.length - 1]?.id;
   // 获取聊天记录
-  await fetchDialogual();
+  await fetchDialogue();
 }
 </script>
 

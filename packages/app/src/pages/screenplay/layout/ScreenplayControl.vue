@@ -77,7 +77,7 @@ const props = defineProps({
     default: false
   }
 });
-const emit = defineEmits(['refreshScene', 'refreshRoleAppearance', 'refreshDialogual']);
+const emit = defineEmits(['refreshScene', 'refreshRoleAppearance', 'refreshDialogue']);
 
 const showRoleAdd = computed(() => {
   return props.currentSceneId &&
@@ -107,7 +107,7 @@ const advanceStory = () => {
     props.screenplay.id,
     props.currentSceneId!,
     () => {
-      emit('refreshDialogual')
+      emit('refreshDialogue')
     }
   )
 }
