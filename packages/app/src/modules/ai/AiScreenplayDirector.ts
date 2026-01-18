@@ -4,6 +4,7 @@ import OpenAI from "openai";
 import {
   listSpRoleBeliefService,
   listSpRoleEmotionService,
+  listSpRoleService,
 } from "@/services/screenplay";
 import {group, map} from "@/util";
 
@@ -31,21 +32,38 @@ interface AiScreenplayDirectorProp {
 }
 
 export interface DirectorDecision {
+  // 下一个发言角色
   next_speaker: string | null;
+  // 插入旁白
   insert_narration: boolean;
+  // 建议场景切换
   suggest_scene_change: boolean;
+  // 请求人工介入
   request_director_intervention: string | null;
+  // 角色入场
+  role_enter: {
+    role_id: string;
+    entry_type: 'normal' | 'quiet' | 'dramatic' | 'sudden';
+  } | null;
+  // 角色离场
+  role_exit: {
+    role_id: string;
+  } | null;
 }
 
 export async function askAiScreenplayDirector(prop: AiScreenplayDirectorProp): Promise<DirectorDecision> {
   const {director, screenplay, scene, roles, dialogueLength, dialogues, roleMap, continuousDialogueCount, lastNarrationDistance, maxSceneTurns} = prop;
 
-  const [emotion, beliefs] = await Promise.all([
+  const [emotion, beliefs, allRoles] = await Promise.all([
     listSpRoleEmotionService(screenplay.id),
     listSpRoleBeliefService(screenplay.id, undefined, 1),
+    listSpRoleService(screenplay.id)
   ]);
   const emotionMap = map(emotion, 'role_id');
   const beliefGroupMap = group(beliefs, 'role_id');
+
+  const currentSceneRoleIds = new Set(roles.map(r => r.id));
+  const availableRoles = allRoles.filter((r: SpRole) => !currentSceneRoleIds.has(r.id) && r.type !== 'decision' && r.type !== 'narrator');
 
   const {model, personality} = director;
   const {aiSetting} = useSettingStore();
@@ -70,18 +88,30 @@ export async function askAiScreenplayDirector(prop: AiScreenplayDirectorProp): P
    - 考虑角色的未完成动机和信念
    - 考虑角色在对话中被提及的频率
    - 确保对话的连贯性和逻辑性
+   - 如果有新角色进入场景，优先让该角色发言以建立存在感
 
-2. **节奏控制**：只有在必要时才插入旁白（设置 insert_narration=true）
+2. **角色入场控制**：当剧情需要时，可以让新角色进入场景（设置 role_enter）
+   - entry_type 可选值：
+     - 'normal'：正常入场，如推门而入、走进来
+     - 'quiet'：悄悄入场，如偷偷溜进来、轻手轻脚
+     - 'dramatic'：戏剧性入场，如突然闯入、气势汹汹
+     - 'sudden'：突发入场，如意外出现、突然出现
+   - 角色入场后，优先让该角色发言
+
+3. **角色离场控制**：当角色需要离开场景时（设置 role_exit）
+   - 角色离场后，不再参与当前场景的对话
+
+4. **节奏控制**：只有在必要时才插入旁白（设置 insert_narration=true）
    - 连续 ≥5 轮纯对话后，可以考虑插入旁白
    - 上一次旁白 >6 轮前，可以考虑插入旁白
    - 需要调整氛围或节奏时，可以插入旁白
    - **注意：不要频繁插入旁白，保持对话的连贯性**
 
-3. **场景推进**：只有当场景目标达成时才建议切换（设置 suggest_scene_change=true）
+5. **场景推进**：只有当场景目标达成时才建议切换（设置 suggest_scene_change=true）
    - 秘密揭露、冲突爆发等关键情节完成后
    - 当前场景的主要目标达成后
 
-4. **异常处理**：只有在异常情况时才请求人工介入（设置 request_director_intervention）
+6. **异常处理**：只有在异常情况时才请求人工介入（设置 request_director_intervention）
    - 角色行为矛盾、无人想说话、剧情循环等
 
 重要提示：
@@ -89,6 +119,8 @@ export async function askAiScreenplayDirector(prop: AiScreenplayDirectorProp): P
 - 只有在需要调整节奏或氛围时才插入旁白
 - 不要频繁插入旁白，保持对话的连贯性
 - 确保每个角色都有机会参与对话
+- 如果发现某个角色应该在场但未出现，请提示检查角色出场配置
+- 可以通过 role_enter 和 role_exit 控制角色的入场和离场
 
 只输出 JSON，不要任何其他文本。`
     }, {
@@ -114,7 +146,12 @@ ${roles.map(r => [
         `  - 当前信念：${beliefGroupMap.get(r.id)?.map(b => `[${b.id}] ${b.content}（${b.confidence}）`).join(", ") || "无"}`
       ].join("\n")).join("\n")}
 
-【最近对话流】
+【可入场角色】（不在当前场景中的角色）
+${availableRoles.length > 0 
+  ? availableRoles.map(r => `- ${r.name}（${r.identity}） - ID: ${r.id}`).join("\n")
+  : "无可用角色"}
+
+【最近对话流】（最近10轮）
 ${dialogues
         .map(dialogue =>
           `[${roleMap.get(dialogue.role_id)?.name || dialogue.role_id}] ${dialogue.action ? `(${dialogue.action})` : ''}${dialogue.dialogue}`)
@@ -130,6 +167,8 @@ ${dialogues
 - insert_narration: boolean（仅在需要调整节奏时为 true，默认为 false）
 - suggest_scene_change: boolean（仅在场景目标达成时为 true，默认为 false）
 - request_director_intervention: string（原因，仅在异常情况时使用，默认为 null）
+- role_enter: {role_id: string, entry_type: 'normal' | 'quiet' | 'dramatic' | 'sudden'}（让角色入场，从可入场角色中选择）
+- role_exit: {role_id: string}（让角色离场，从在场角色中选择）
 
 请确保选择一个角色发言，推动剧情发展。`
     }],
@@ -153,7 +192,9 @@ ${dialogues
       next_speaker: null,
       insert_narration: false,
       suggest_scene_change: false,
-      request_director_intervention: "解析决策失败，请人工介入"
+      request_director_intervention: "解析决策失败，请人工介入",
+      role_enter: null,
+      role_exit: null
     };
   }
 }

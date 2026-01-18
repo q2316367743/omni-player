@@ -55,10 +55,10 @@ import {
   PauseCircleIcon, PlayCircleIcon,
   UserAddIcon
 } from "tdesign-icons-vue-next";
-import type {Screenplay, SpScene} from "@/entity/screenplay";
+import type {Screenplay, SpRole, SpScene} from "@/entity/screenplay";
 import {openSpSceneAdd} from "@/pages/screenplay/func/SpSceneEdit.tsx";
 import {openSpRoleAppearanceAdd} from "@/pages/screenplay/func/SpRoleAppearanceEdit.tsx";
-import {openSpDialogualAddNarrator} from "@/pages/screenplay/func/SpDialogualEdit.tsx";
+import {openSpDialogueAddNarrator} from "@/pages/screenplay/func/SpDialogualEdit.tsx";
 
 const props = defineProps({
   screenplay: {
@@ -75,6 +75,14 @@ const props = defineProps({
   pause: {
     type: Boolean,
     default: false
+  },
+  roles: {
+    type: Array as PropType<Array<SpRole>>,
+    required: true
+  },
+  roleMap: {
+    type: Map as PropType<Map<string, SpRole>>,
+    required: true
   }
 });
 const emit = defineEmits(['refreshScene', 'refreshRoleAppearance', 'refreshDialogue', 'pauseToggle']);
@@ -93,9 +101,17 @@ const enterScene = () => {
 }
 
 const roleAdd = () => {
-  openSpRoleAppearanceAdd(props.screenplay.id, props.currentSceneId!, 0, () => {
-    emit('refreshRoleAppearance')
-  })
+  openSpRoleAppearanceAdd(
+    props.screenplay.id,
+    props.currentSceneId!,
+    async () => {
+      emit('refreshRoleAppearance')
+    },
+    props.screenplay,
+    props.scenes.find(s => s.id === props.currentSceneId),
+    props.roleMap,
+    props.roles.find(r => r.type === 'narrator')
+  )
 }
 
 const triggerEvent = () => {
@@ -103,7 +119,7 @@ const triggerEvent = () => {
 }
 
 const advanceStory = () => {
-  openSpDialogualAddNarrator(
+  openSpDialogueAddNarrator(
     props.screenplay.id,
     props.currentSceneId!,
     () => {

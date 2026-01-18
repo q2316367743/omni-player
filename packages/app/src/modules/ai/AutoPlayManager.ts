@@ -3,6 +3,11 @@ import type {SpRoleAppearance} from "@/entity/screenplay/SpRoleAppearance";
 import {askAiScreenplayDirector, type DirectorDecision} from "@/modules/ai/AiScreenplayDirector";
 import {aiScreenplayRole} from "@/modules/ai/AiScreenplayRole";
 import {askAiScreenplayNarrator} from "@/modules/ai/AiScreenplayNarrator";
+import {
+  addSpRoleAppearanceService,
+  listSpRoleAppearanceService,
+  retractSpRoleAppearanceService
+} from "@/services/screenplay/SpRoleAppearanceService";
 
 export interface AutoPlayConfig {
   screenplay: Screenplay;
@@ -19,7 +24,7 @@ export interface AutoPlayConfig {
   onSceneChange?: (sceneId: string) => void;
   onPause?: () => void;
   getDialogues: () => Promise<SpDialogue[]>;
-  getRoleAppearances: (sceneId: string) => Promise<SpRoleAppearance[]>;
+  onRoleAppearanceUpdate?: () => void;
 }
 
 export interface AutoPlayState {
@@ -101,21 +106,40 @@ export class AutoPlayManager {
         return;
       }
 
-      if (decision.insert_narration) {
-        console.log('Inserting narration...');
-        await this.insertNarration();
-        this.state.continuousDialogueCount = 0;
-        this.state.lastNarrationDistance = 0;
+      if (decision.role_exit) {
+        console.log('Processing role exit for:', decision.role_exit.role_id);
+        await this.processRoleExit(decision.role_exit.role_id);
       }
 
-      if (decision.next_speaker) {
-        console.log('Processing role turn for:', decision.next_speaker);
-        await this.processRoleTurn(decision.next_speaker);
-        this.state.continuousDialogueCount++;
-        this.state.lastNarrationDistance++;
+      if (decision.role_enter) {
+        console.log('Processing role enter for:', decision.role_enter.role_id, 'type:', decision.role_enter.entry_type);
+        await this.processRoleEnter(decision.role_enter.role_id, decision.role_enter.entry_type);
+        if (decision.next_speaker) {
+          console.log('Processing role turn for:', decision.next_speaker);
+          await this.processRoleTurn(decision.next_speaker);
+          this.state.continuousDialogueCount++;
+          this.state.lastNarrationDistance++;
+        } else {
+          console.log('No speaker selected after role enter, skipping role turn');
+          this.state.continuousDialogueCount = 0;
+        }
       } else {
-        console.log('No speaker selected, skipping role turn');
-        this.state.continuousDialogueCount = 0;
+        if (decision.insert_narration) {
+          console.log('Inserting narration...');
+          await this.insertNarration();
+          this.state.continuousDialogueCount = 0;
+          this.state.lastNarrationDistance = 0;
+        }
+
+        if (decision.next_speaker) {
+          console.log('Processing role turn for:', decision.next_speaker);
+          await this.processRoleTurn(decision.next_speaker);
+          this.state.continuousDialogueCount++;
+          this.state.lastNarrationDistance++;
+        } else {
+          console.log('No speaker selected, skipping role turn');
+          this.state.continuousDialogueCount = 0;
+        }
       }
 
       this.state.dialogueLength++;
@@ -135,14 +159,19 @@ export class AutoPlayManager {
     }
   }
 
+
   private async askDirector(): Promise<DirectorDecision> {
-    const roleAppearances = await this.config.getRoleAppearances(this.config.currentScene.id);
+    const roleAppearances = await this.getRoleAppearances(this.config.currentScene.id);
     const currentSceneRoles = roleAppearances
       .map((ra: SpRoleAppearance) => this.config.roleMap.get(ra.role_id)!)
       .filter(Boolean);
     
     console.log('[Director] Current scene roles:', currentSceneRoles.map((r: SpRole) => `${r.name} (${r.id})`));
     console.log('[Director] Scene ID:', this.config.currentScene.id);
+
+    if (currentSceneRoles.length === 0) {
+      console.warn('[Director] No roles found in current scene. Please check role_appearance configuration.');
+    }
 
     this.config.onLoadingPush?.([this.config.director.id]);
 
@@ -153,7 +182,7 @@ export class AutoPlayManager {
         scene: this.config.currentScene,
         roles: currentSceneRoles,
         dialogueLength: this.state.dialogueLength,
-        dialogues: this.state.dialogues.slice(-3),
+        dialogues: this.state.dialogues.slice(-10),
         roleMap: this.config.roleMap,
         continuousDialogueCount: this.state.continuousDialogueCount,
         lastNarrationDistance: this.state.lastNarrationDistance,
@@ -164,11 +193,15 @@ export class AutoPlayManager {
     }
   }
 
+  private async getRoleAppearances(sceneId: string) {
+    return listSpRoleAppearanceService(this.config.screenplay.id, sceneId);
+  }
+
   private async processRoleTurn(roleId: string) {
     const role = this.config.roleMap.get(roleId);
     if (!role) return;
 
-    const roleAppearances = await this.config.getRoleAppearances(this.config.currentScene.id);
+    const roleAppearances = await this.getRoleAppearances(this.config.currentScene.id);
     const currentSceneRoles = roleAppearances
       .map((ra: SpRoleAppearance) => this.config.roleMap.get(ra.role_id)!)
       .filter(Boolean);
@@ -181,7 +214,7 @@ export class AutoPlayManager {
         narrator: this.config.narrator,
         screenplay: this.config.screenplay,
         scene: this.config.currentScene,
-        dialogues: this.state.dialogues.slice(-3),
+        dialogues: this.state.dialogues.slice(-10),
         roleMap: this.config.roleMap,
         roles: currentSceneRoles
       });
@@ -193,7 +226,7 @@ export class AutoPlayManager {
   }
 
   private async insertNarration() {
-    const roleAppearances = await this.config.getRoleAppearances(this.config.currentScene.id);
+    const roleAppearances = await this.getRoleAppearances(this.config.currentScene.id);
     const currentSceneRoles = roleAppearances
       .map((ra: SpRoleAppearance) => this.config.roleMap.get(ra.role_id)!)
       .filter(Boolean);
@@ -206,7 +239,7 @@ export class AutoPlayManager {
         screenplay: this.config.screenplay,
         scene: this.config.currentScene,
         roles: currentSceneRoles,
-        dialogues: this.state.dialogues.slice(-3),
+        dialogues: this.state.dialogues.slice(-10),
         roleMap: this.config.roleMap,
         task: 'insert_atmosphere',
         triggerReason: '导演要求插入氛围描写'
@@ -219,7 +252,7 @@ export class AutoPlayManager {
   }
 
   private async changeScene() {
-    const roleAppearances = await this.config.getRoleAppearances(this.config.currentScene.id);
+    const roleAppearances = await this.getRoleAppearances(this.config.currentScene.id);
     const currentSceneRoles = roleAppearances
       .map((ra: SpRoleAppearance) => this.config.roleMap.get(ra.role_id)!)
       .filter(Boolean);
@@ -229,7 +262,7 @@ export class AutoPlayManager {
       screenplay: this.config.screenplay,
       scene: this.config.currentScene,
       roles: currentSceneRoles,
-      dialogues: this.state.dialogues.slice(-3),
+      dialogues: this.state.dialogues.slice(-10),
       roleMap: this.config.roleMap,
       task: 'describe_scene',
       triggerReason: '场景切换'
@@ -246,6 +279,59 @@ export class AutoPlayManager {
       this.pause();
     }
   }
+
+  private async processRoleEnter(roleId: string, entryType: 'normal' | 'quiet' | 'dramatic' | 'sudden') {
+    const role = this.config.roleMap.get(roleId);
+    if (!role) {
+      console.error(`Role not found: ${roleId}`);
+      return;
+    }
+
+    await addSpRoleAppearanceService({
+      screenplay_id: this.config.screenplay.id,
+      role_id: roleId,
+      scene_id: this.config.currentScene.id,
+      is_active: 1
+    });
+
+    const entryTypeMap = {
+      'normal': '正常入场',
+      'quiet': '悄悄入场',
+      'dramatic': '戏剧性入场',
+      'sudden': '突发入场'
+    };
+
+    await askAiScreenplayNarrator({
+      narrator: this.config.narrator,
+      screenplay: this.config.screenplay,
+      scene: this.config.currentScene,
+      roles: [role],
+      dialogues: this.state.dialogues.slice(-10),
+      roleMap: this.config.roleMap,
+      task: 'describe_role_entry',
+      triggerReason: `${role.name}${entryTypeMap[entryType]}`
+    });
+
+    await this.fetchDialogues();
+
+    this.config.onRoleAppearanceUpdate?.();
+    this.config.onDialogueUpdate?.();
+  }
+
+  private async processRoleExit(roleId: string) {
+    const roleAppearances = await this.getRoleAppearances(this.config.currentScene.id);
+    const appearance = roleAppearances.find(ra => ra.role_id === roleId && ra.is_active === 1);
+    
+    if (!appearance) {
+      console.error(`Active role appearance not found: ${roleId}`);
+      return;
+    }
+
+    await retractSpRoleAppearanceService(appearance.id, this.config.screenplay.id, this.config.currentScene.id);
+    this.config.onRoleAppearanceUpdate?.();
+    this.config.onDialogueUpdate?.();
+  }
+
 
   private async fetchDialogues() {
     this.state.dialogues = await this.config.getDialogues();

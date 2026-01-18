@@ -1,7 +1,8 @@
 <template>
   <div class="screenplay-container">
 
-    <screenplay-role v-if="screenplay" :roles="roles" :screenplay="screenplay" :current-scene-id="currentSceneId" :role-appearance-map="roleAppearanceMap"
+    <screenplay-role v-if="screenplay" :roles="roles" :screenplay="screenplay" :current-scene-id="currentSceneId"
+                     :role-appearance-map="roleAppearanceMap"
                      :role-map="roleMap" :loading-role-ids="loadingRoleIds" @refresh="fetchRoles"/>
 
     <main class="main-content">
@@ -13,7 +14,7 @@
         <screenplay-dialogue :role-map="roleMap" :dialogues="dialogues"/>
 
         <screenplay-control v-if="screenplay" :screenplay="screenplay" :scenes :current-scene-id="currentSceneId"
-                            :pause="isPause"
+                            :pause="isPause" :roles="roles" :role-map="roleMap"
                             @refresh-scene="refreshScene" @refresh-role-appearance="fetchRoleAppearance"
                             @refresh-dialogue="fetchDialogue" @pause-toggle="toggleAutoPlay"/>
       </div>
@@ -47,7 +48,7 @@ const scenes = ref<SpScene[]>([])
 const dialogues = ref<SpDialogue[]>([])
 const currentSceneId = ref<string>();
 const loadingRoleIds = ref<string[]>([]);
-const autoPlayManager = ref<AutoPlayManager | null>(null);
+const autoPlayManager = ref<AutoPlayManager>();
 // 角色分组 场景 => 角色列表
 const roleAppearanceMap = ref(new MapWrapper<string, Array<SpRoleAppearance>>());
 
@@ -89,7 +90,7 @@ const onChangeScene = (scene: SpScene) => {
 
 const toggleAutoPlay = () => {
   if (!autoPlayManager.value) return;
-  
+
   if (isPause.value) {
     autoPlayManager.value.resume();
     isPause.value = false;
@@ -101,18 +102,18 @@ const toggleAutoPlay = () => {
 
 const initAutoPlayManager = () => {
   if (!screenplay.value || !currentSceneId.value) return;
-  
+
   const director = roles.value.find(r => r.type === 'decision');
   const narrator = roles.value.find(r => r.type === 'narrator');
-  
+
   if (!director || !narrator) {
     console.error('Director or narrator role not found');
     return;
   }
-  
+
   const currentScene = scenes.value.find(s => s.id === currentSceneId.value);
   if (!currentScene) return;
-  
+
   autoPlayManager.value = new AutoPlayManager({
     screenplay: screenplay.value,
     currentScene: currentScene,
@@ -130,6 +131,9 @@ const initAutoPlayManager = () => {
     },
     onDialogueUpdate: async () => {
       await fetchDialogue();
+    },
+    onRoleAppearanceUpdate: async () => {
+      await fetchRoleAppearance();
     },
     onSceneChange: async (sceneId) => {
       currentSceneId.value = sceneId;
@@ -149,9 +153,6 @@ const initAutoPlayManager = () => {
     getDialogues: async () => {
       // 获取全部角色对话
       return dialogues.value.filter(e => e.type === 'role');
-    },
-    getRoleAppearances: async (sceneId: string) => {
-      return roleAppearanceMap.value.getOrDefault(sceneId, []);
     }
   });
 }

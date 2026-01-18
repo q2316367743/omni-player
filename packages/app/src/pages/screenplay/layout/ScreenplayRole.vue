@@ -74,6 +74,7 @@
             <div class="role-name">{{ narratorRoles[0].name }}</div>
           </div>
         </div>
+        <t-divider />
         <t-popup v-for="role in currentRoles" :key="role.id" trigger="click" show-arrow placement="right"
                  destroy-on-close>
           <div class="role-card">
