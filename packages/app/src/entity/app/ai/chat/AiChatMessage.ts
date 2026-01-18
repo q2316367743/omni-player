@@ -1,5 +1,5 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
-import type {ChatMessageParam} from "@/util/lang/ChatUtil.ts";
+import type {ChatMessageParam} from "@/modules/ai/AiChat.ts";
 import type {TdChatItemMeta} from "@tdesign-vue-next/chat";
 import {formatDate} from "@/util/lang/FormatUtil.ts";
 import type {AiChatRole} from "@/global/CommonType.ts";

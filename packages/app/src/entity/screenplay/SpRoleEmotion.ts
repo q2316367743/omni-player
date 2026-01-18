@@ -16,6 +16,8 @@ export interface SpRoleEmotion extends BaseEntity {
 
   /**
    * 情绪类型（如“anxiety”，“anger”）
+   * - anxiety：焦虑
+   * - anger：愤怒
    */
   emotion_type: string;
   /**

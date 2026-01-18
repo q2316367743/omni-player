@@ -9,7 +9,7 @@ export async function openSpRoleAppearanceAdd(
   dialogualOrder: number,
   onUpdate: () => void) {
   const [roles, app] = await Promise.all([
-    listSpRoleService(screenplayId),
+    listSpRoleService(screenplayId, 'member'),
     listSpRoleAppearanceService(screenplayId, sceneId)
   ])
   const appMap = set(app, "role_id");

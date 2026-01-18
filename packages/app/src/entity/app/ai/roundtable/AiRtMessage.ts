@@ -2,7 +2,7 @@ import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {AiChatRole} from "@/global/CommonType.ts";
 import type {YesOrNo} from "@/global/YesOrNo.ts";
 import {type AiRtParticipant, buildAiRtParticipantPrompt} from "@/entity/app/ai/roundtable/AiRtParticipant.ts";
-import type {ChatMessageParam} from "@/util/lang/ChatUtil.ts";
+import type {ChatMessageParam} from "@/modules/ai/AiChat.ts";
 import type {AiRtMeeting} from "@/entity/app/ai/roundtable/AiRtMeeting.ts";
 
 export interface AiRtMessageCore {

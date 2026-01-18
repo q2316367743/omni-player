@@ -1,8 +1,11 @@
-import type {SpRole, SpRoleCore} from "@/entity/screenplay";
+import type {SpRole, SpRoleCore, SpRoleType} from "@/entity/screenplay";
 import {useSql} from "@/lib/sql.ts";
 
-export function listSpRoleService(screenplayId: string) {
-  return useSql().query<SpRole>('sp_role').eq('screenplay_id', screenplayId).list();
+export function listSpRoleService(screenplayId: string, type?: SpRoleType) {
+  return useSql().query<SpRole>('sp_role')
+    .eq('screenplay_id', screenplayId)
+    .eq('type', type)
+    .list();
 }
 
 export function addSpRoleService(prop: SpRoleCore) {

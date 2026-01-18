@@ -22,7 +22,6 @@ interface Assistant {
   // 上下文数
   maxChats?: number;
 }
-
 interface AskToOpenAiProps {
   messages: Array<ChatMessageParam>;
   assistant: Assistant;
@@ -34,6 +33,9 @@ interface AskToOpenAiProps {
   onAborted: (a: AskToOpenAiAbort) => void;
 }
 
+/**
+ * 向OpenAI进行提问
+ */
 export async function askToOpenAi(props: AskToOpenAiProps): Promise<void> {
   const {messages, assistant, onStart, onAppend, onAborted} = props;
   const {aiSetting} = useSettingStore();

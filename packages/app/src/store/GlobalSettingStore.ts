@@ -16,6 +16,7 @@ export const useSettingStore = defineStore("setting", () => {
   const aiEnabled = computed(() => {
     return aiSetting.value.url && aiSetting.value.key
   })
+  const defaultChatModel = computed(() => aiSetting.value.defaultChatModel);
 
   const modelOptions = computed(() => {
     return aiSetting.value.model.map(m => ({
@@ -29,6 +30,7 @@ export const useSettingStore = defineStore("setting", () => {
     aiSetting,
     rssRefreshInterval,
     modelOptions,
-    aiEnabled
+    aiEnabled,
+    defaultChatModel
   }
 })

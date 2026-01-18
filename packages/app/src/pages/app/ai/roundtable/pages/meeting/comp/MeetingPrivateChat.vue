@@ -93,7 +93,7 @@ import {
   addAiRtMessageService,
   updateAiRtMessageService
 } from "@/services/app/roundtable/AiRtMessageService";
-import {askToOpenAi, type AskToOpenAiAbort} from "@/util/lang/ChatUtil";
+import {askToOpenAi, type AskToOpenAiAbort} from "@/modules/ai/AiChat.ts";
 import {debounce} from "es-toolkit";
 
 const props = defineProps({

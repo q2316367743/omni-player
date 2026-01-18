@@ -3,3 +3,7 @@ export * from "./SpRoleService.ts";
 export * from "./SpSceneService.ts";
 export * from "./SpDialogueService.ts";
 export * from "./SpRoleAppearanceService.ts";
+export * from "./SpRoleEmotionService.ts";
+export * from "./SpRoleBeliefService.ts";
+export * from "./SpRoleLatentClueService.ts";
+export * from "./SpLogService.ts";

@@ -113,7 +113,7 @@ import HomeAssistantSelect from "@/pages/app/ai/chat/components/HomeAssistantSel
 import {collapsed, toggleCollapsed} from "@/pages/app/ai/chat/model";
 import MessageUtil from "@/util/model/MessageUtil";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
-import {askToOpenAi, type AskToOpenAiAbort} from "@/util/lang/ChatUtil.ts";
+import {askToOpenAi, type AskToOpenAiAbort} from "@/modules/ai/AiChat.ts";
 import {
   type AiChatItem,
   type AiChatMessageCore,

@@ -1,11 +1,28 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
-import type {YesOrNo} from "@/global/YesOrNo.ts";
+
+/**
+ * 角色类型
+ * - member：成员
+ * - narrator：叙述者
+ * - decision：决策者
+ */
+export type SpRoleType = 'member' | 'narrator' | 'decision';
+
+export const SpRoleTypeMap: Record<SpRoleType, string> = {
+  member: '成员',
+  narrator: '叙述者',
+  decision: '决策者',
+};
 
 export interface SpRoleCore {
   /**
    * 剧本 ID
    */
   screenplay_id: string;
+  /**
+   * 类型
+   */
+  type: SpRoleType
   /**
    * 角色名（如“李维”）
    */
@@ -23,9 +40,9 @@ export interface SpRoleCore {
    */
   personality: string
   /**
-   * 是否为叙述者
+   * 角色使用的模型
    */
-  in_narrator: YesOrNo;
+  model: string;
 }
 
 export interface SpRole extends BaseEntity, SpRoleCore {

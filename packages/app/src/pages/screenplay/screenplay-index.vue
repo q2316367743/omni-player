@@ -1,7 +1,8 @@
 <template>
   <div class="screenplay-container">
 
-    <screenplay-role v-if="screenplay" :roles="roles" :screenplay="screenplay" @refresh="fetchRoles"/>
+    <screenplay-role v-if="screenplay" :roles="roles" :screenplay="screenplay" :current-scene-id="currentSceneId" :role-appearance-map="roleAppearanceMap"
+                     :role-map="roleMap" @refresh="fetchRoles"/>
 
     <main class="main-content">
       <screenplay-scene :scenes="scenes" :current-scene-id="currentSceneId" :role-appearance-map="roleAppearanceMap"
@@ -29,10 +30,10 @@ import {
   listSpRoleService,
   listSpSceneService
 } from "@/services/screenplay";
-import ScreenplayRole from "@/pages/screenplay/components/ScreenplayRole.vue";
-import ScreenplayScene from "@/pages/screenplay/components/ScreenplayScene.vue";
-import ScreenplayDialogue from "@/pages/screenplay/components/ScreenplayDialogue.vue";
-import ScreenplayControl from "@/pages/screenplay/components/ScreenplayControl.vue";
+import ScreenplayRole from "@/pages/screenplay/layout/ScreenplayRole.vue";
+import ScreenplayScene from "@/pages/screenplay/layout/ScreenplayScene.vue";
+import ScreenplayDialogue from "@/pages/screenplay/layout/ScreenplayDialogue.vue";
+import ScreenplayControl from "@/pages/screenplay/layout/ScreenplayControl.vue";
 import type {SpRoleAppearance} from "@/entity/screenplay/SpRoleAppearance.ts";
 
 const route = useRoute();

@@ -1,9 +1,8 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 
-/**
- * 剧本角色 - 潜在线索表
- */
-export interface SpRoleLatentClue extends BaseEntity {
+export type SpRoleLatentClueStatus = "active" | "resolved" | "discarded";
+
+export interface SpRoleLatentClueCore {
 
   /**
    * 剧本 ID
@@ -21,7 +20,7 @@ export interface SpRoleLatentClue extends BaseEntity {
   /**
    * 源自那条对话
    */
-  source_dialogue_id: number;
+  source_dialogue_id: string;
   /**
    * 发生在哪个场景，如果为空，则代表是场外事件
    */
@@ -32,6 +31,13 @@ export interface SpRoleLatentClue extends BaseEntity {
    * - resolved: 解决
    * - discarded: 废弃
    */
-  status: 'active' | 'resolved' | 'discarded'
+  status: SpRoleLatentClueStatus
+
+}
+
+/**
+ * 剧本角色 - 潜在线索表
+ */
+export interface SpRoleLatentClue extends BaseEntity, SpRoleLatentClueCore {
 
 }

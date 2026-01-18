@@ -100,7 +100,7 @@ import {
   addAiRtMessageService,
   updateAiRtMessageService
 } from "@/services/app/roundtable/AiRtMessageService";
-import {askToOpenAi, type AskToOpenAiAbort} from "@/util/lang/ChatUtil";
+import {askToOpenAi, type AskToOpenAiAbort} from "@/modules/ai/AiChat.ts";
 import {transferRtMessageTo} from "@/entity/app/ai/roundtable/AiRtMessage.ts";
 import {map} from "@/util";
 import MeetingParticipant from "@/pages/app/ai/roundtable/pages/meeting/comp/MeetingParticipant.vue";

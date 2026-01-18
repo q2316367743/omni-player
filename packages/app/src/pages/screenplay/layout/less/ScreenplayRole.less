@@ -1,4 +1,5 @@
 .role-sidebar {
+  position: relative;
   width: 320px;
   background: var(--td-bg-color-container);
   backdrop-filter: var(--fluent-acrylic-blur);
@@ -6,6 +7,19 @@
   display: flex;
   flex-direction: column;
   transition: var(--fluent-transition-normal);
+  .role-content {
+    position: absolute;
+    top: 73px;
+    left: 0;
+    right: 0;
+    bottom: 48px;
+  }
+  .role-footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
 }
 
 .sidebar-header {
@@ -20,6 +34,46 @@
   margin: 0;
   font: var(--td-font-title-medium);
   color: var(--td-text-color-primary);
+}
+
+.role-single {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--fluent-card-bg);
+  border-bottom: 1px solid var(--fluent-sidebar-border);
+  transition: all var(--fluent-transition-fast);
+}
+
+.role-single:hover {
+  background: var(--fluent-card-bg-hover);
+}
+
+.role-single > div:first-child {
+  font: var(--td-font-body-medium);
+  color: var(--td-text-color-primary);
+  font-weight: 500;
+}
+
+.role-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--fluent-card-bg);
+  border-bottom: 1px solid var(--fluent-sidebar-border);
+  transition: all var(--fluent-transition-fast);
+}
+
+.role-header:hover {
+  background: var(--fluent-card-bg-hover);
+}
+
+.role-header > div:first-child {
+  font: var(--td-font-body-medium);
+  color: var(--td-text-color-primary);
+  font-weight: 500;
 }
 
 .role-list {
@@ -93,33 +147,4 @@
   position: absolute;
   top: 8px;
   right: 8px;
-}
-
-.role-detail {
-  margin: 12px;
-  max-width: 350px;
-  background: var(--fluent-card-bg);
-}
-.detail-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.detail-header h4 {
-  margin: 0;
-  font: var(--td-font-subtitle-medium);
-  color: var(--td-text-color-primary);
-}
-
-.detail-section {
-  margin-bottom: 16px;
-}
-
-.detail-section p {
-  margin: 8px 0 0 0;
-  font: var(--td-font-body-small);
-  color: var(--td-text-color-secondary);
-  line-height: var(--td-line-height-body-small);
-  white-space: pre-line;   /* 只保留换行，空格仍折叠 */
 }

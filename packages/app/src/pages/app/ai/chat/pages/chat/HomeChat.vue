@@ -155,7 +155,7 @@ import {
   type AiChatMessageCore,
   transferAiChatItemToChatMessageParam
 } from "@/entity/app/ai/chat";
-import {askToOpenAi, type AskToOpenAiAbort} from "@/util/lang/ChatUtil";
+import {askToOpenAi, type AskToOpenAiAbort} from "@/modules/ai/AiChat.ts";
 import {
   addAiChatMessageService,
   getAiChatGroupService, getAiChatItemService,

@@ -1,11 +1,11 @@
 CREATE TABLE screenplay
 (
     id         TEXT PRIMARY KEY,
-    created_at INTEGER NOT NULL,
-    updated_at INTEGER NOT NULL,
-    title      TEXT    NOT NULL,
-    background TEXT    NOT NULL,
-    tags       TEXT    NOT NULL
+    created_at INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL DEFAULT 0,
+    title      TEXT    NOT NULL DEFAULT '',
+    background TEXT    NOT NULL DEFAULT '',
+    tags       TEXT    NOT NULL DEFAULT ''
 );
 
 CREATE INDEX idx_screenplay_created_at ON screenplay (created_at);
@@ -14,12 +14,12 @@ CREATE INDEX idx_screenplay_updated_at ON screenplay (updated_at);
 CREATE TABLE sp_scene
 (
     id            TEXT PRIMARY KEY,
-    created_at    INTEGER NOT NULL,
-    updated_at    INTEGER NOT NULL,
-    screenplay_id TEXT    NOT NULL,
-    `name`        TEXT    NOT NULL,
-    `description` TEXT    NOT NULL,
-    order_index   INTEGER NOT NULL
+    created_at    INTEGER NOT NULL DEFAULT 0,
+    updated_at    INTEGER NOT NULL DEFAULT 0,
+    screenplay_id TEXT    NOT NULL DEFAULT '',
+    `name`        TEXT    NOT NULL DEFAULT '',
+    `description` TEXT    NOT NULL DEFAULT '',
+    order_index   INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE INDEX idx_sp_scene_screenplay_id ON sp_scene (screenplay_id);
@@ -28,31 +28,32 @@ CREATE INDEX idx_sp_scene_order ON sp_scene (`order_index`);
 CREATE TABLE sp_role
 (
     id            TEXT PRIMARY KEY,
-    created_at    INTEGER NOT NULL,
-    updated_at    INTEGER NOT NULL,
-    screenplay_id TEXT    NOT NULL,
-    `name`        TEXT    NOT NULL,
-    `identity`    TEXT    NOT NULL,
-    secret_info   TEXT    NOT NULL,
-    personality   TEXT    NOT NULL,
-    in_narrator   INTEGER NOT NULL
+    created_at    INTEGER NOT NULL DEFAULT 0,
+    updated_at    INTEGER NOT NULL DEFAULT 0,
+    screenplay_id TEXT    NOT NULL DEFAULT '',
+    `type`        TEXT    NOT NULL DEFAULT '', --- 角色类型
+    `name`        TEXT    NOT NULL DEFAULT '',
+    `identity`    TEXT    NOT NULL DEFAULT '',
+    secret_info   TEXT    NOT NULL DEFAULT '',
+    personality   TEXT    NOT NULL DEFAULT '',
+    model         TEXT    NOT NULL DEFAULT '' -- 使用的模型
 );
 
 CREATE INDEX idx_sp_role_screenplay_id ON sp_role (screenplay_id);
-CREATE INDEX idx_sp_role_in_narrator ON sp_role (in_narrator);
+CREATE INDEX idx_sp_role_in_narrator ON sp_role (screenplay_id, type);
 
 CREATE TABLE sp_dialogue
 (
     id            TEXT PRIMARY KEY,
-    created_at    INTEGER NOT NULL,
-    updated_at    INTEGER NOT NULL,
-    screenplay_id TEXT    NOT NULL,
-    scene_id      TEXT    NOT NULL,
-    turn_order    INTEGER NOT NULL,
-    `type`        TEXT    NOT NULL,
-    role_id       TEXT    NOT NULL,
-    `action`      TEXT    NOT NULL,
-    dialogue      TEXT    NOT NULL
+    created_at    INTEGER NOT NULL DEFAULT 0,
+    updated_at    INTEGER NOT NULL DEFAULT 0,
+    screenplay_id TEXT    NOT NULL DEFAULT '',
+    scene_id      TEXT    NOT NULL DEFAULT '',
+    turn_order    INTEGER NOT NULL DEFAULT 0,
+    `type`        TEXT    NOT NULL DEFAULT '',
+    role_id       TEXT    NOT NULL DEFAULT '',
+    `action`      TEXT    NOT NULL DEFAULT '',
+    dialogue      TEXT    NOT NULL DEFAULT ''
 );
 
 CREATE INDEX idx_sp_dialogue_screenplay_id ON sp_dialogue (screenplay_id);
