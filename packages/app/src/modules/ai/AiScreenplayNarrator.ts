@@ -178,7 +178,11 @@ export async function askAiScreenplayNarrator(prop: AiScreenplayNarratorProp) {
   * 避免重复使用"指节泛白"、"喉结滚动"、"站在门口"等常见描写
   * 每次描写都应该有新的视角、新的细节、新的词汇
 - **保持新鲜感**：每次描写都应该有新的视角或细节
-- **推动氛围**：描写应该服务于当前的情绪和剧情需要`
+- **推动氛围**：描写应该服务于当前的情绪和剧情需要
+- **配合场景目标**：在描写时可以暗示或铺垫【场景目标】、【关键线索】、【必须发生的坦白/冲突】
+  * 通过环境描写暗示即将发生的剧情转折
+  * 通过细节描写为关键线索的揭露做铺垫
+  * 通过氛围描写烘托即将爆发的冲突`
     }, {
       role: 'user',
       content: `[SYSTEM]
@@ -190,6 +194,15 @@ ${screenplay.background}
 【当前场景】
 地点：${scene.name}
 描述：${scene.description}
+
+【场景目标】
+${scene.narrative_goal || "无"}
+
+【关键线索】（必须在此场景揭露）
+${scene.key_clues ? JSON.parse(scene.key_clues).map((clue: string) => `- ${clue}`).join("\n") : "无"}
+
+【必须发生的坦白/冲突】
+${scene.required_revelations ? JSON.parse(scene.required_revelations).map((revelation: string) => `- ${revelation}`).join("\n") : "无"}
 
 【在场角色】
 ${roles.map(r => `- ${r.name}（${r.identity}）`).join("\n")}

@@ -197,6 +197,16 @@ export async function aiScreenplayRole(prop: AiScreenplayRoleProp) {
 - 根据角色入场/离场的情况调整自己的反应和对话
 - 如果有角色刚刚入场，注意观察其入场方式和在场其他人的反应
 - 如果有角色刚刚离场，注意观察在场其他人的反应
+- **配合场景目标**：你的对话和行动应该有助于达成【场景目标】
+  * 如果场景目标需要揭露某个信息，考虑在合适的时机提及或暗示
+  * 如果场景目标需要引发冲突，可以主动挑起话题或表达不同意见
+  * 如果场景目标需要建立某种关系，通过对话推进这种关系
+- **揭露关键线索**：如果你知道【关键线索】中的信息，考虑在合适的时机揭露
+  * 可以通过对话自然地提及，或者通过动作暗示
+  * 注意不要一次性揭露所有信息，保持叙事节奏
+- **触发必须的坦白/冲突**：如果【必须发生的坦白/冲突】中涉及你，考虑主动采取行动
+  * 如果需要坦白，寻找合适的时机表达
+  * 如果需要引发冲突，可以通过对话或动作激化矛盾
 
 **关于动作描写的特殊规则**：
 - 如果你刚刚入场，**不要**重复描写入场动作（如"站在门口"、"走进来"等）
@@ -221,6 +231,15 @@ ${screenplay.background}
 【当前场景】
 地点：${scene.name}
 描述：${scene.description}
+
+【场景目标】
+${scene.narrative_goal || "无"}
+
+【关键线索】（必须在此场景揭露）
+${scene.key_clues ? JSON.parse(scene.key_clues).map((clue: string) => `- ${clue}`).join("\n") : "无"}
+
+【必须发生的坦白/冲突】
+${scene.required_revelations ? JSON.parse(scene.required_revelations).map((revelation: string) => `- ${revelation}`).join("\n") : "无"}
 
 【你的当前状态】
 - 情绪：${emotion?.emotion_type || "平静"}（强度：${emotion?.intensity || 0}/100）

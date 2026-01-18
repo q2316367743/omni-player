@@ -21,7 +21,7 @@ export interface AutoPlayConfig {
   onLoadingPush?: (loadingRoleIds: string[]) => void;
   onLoadingPop?: (loadingRoleIds: string[]) => void;
   onDialogueUpdate?: () => void;
-  onSceneChange?: (sceneId: string) => void;
+  onSceneChange?: () => void;
   onPause?: () => void;
   getDialogues: () => Promise<SpDialogue[]>;
   onRoleAppearanceUpdate?: () => void;
@@ -165,7 +165,7 @@ export class AutoPlayManager {
     const currentSceneRoles = roleAppearances
       .map((ra: SpRoleAppearance) => this.config.roleMap.get(ra.role_id)!)
       .filter(Boolean);
-    
+
     console.log('[Director] Current scene roles:', currentSceneRoles.map((r: SpRole) => `${r.name} (${r.id})`));
     console.log('[Director] Scene ID:', this.config.currentScene.id);
 
@@ -188,7 +188,7 @@ export class AutoPlayManager {
         lastNarrationDistance: this.state.lastNarrationDistance,
         maxSceneTurns: this.config.maxSceneTurns || 20
       });
-    }finally {
+    } finally {
       this.config.onLoadingPop?.([this.config.director.id]);
     }
   }
@@ -270,14 +270,8 @@ export class AutoPlayManager {
 
     this.config.onDialogueUpdate?.();
 
-    const currentSceneIndex = this.config.scenes.findIndex(s => s.id === this.config.currentScene.id);
-    const nextScene = this.config.scenes[currentSceneIndex + 1];
-
-    if (nextScene) {
-      this.config.onSceneChange?.(nextScene.id);
-    } else {
-      this.pause();
-    }
+    this.config.onSceneChange?.();
+    this.pause();
   }
 
   private async processRoleEnter(roleId: string, entryType: 'normal' | 'quiet' | 'dramatic' | 'sudden') {
@@ -321,7 +315,7 @@ export class AutoPlayManager {
   private async processRoleExit(roleId: string) {
     const roleAppearances = await this.getRoleAppearances(this.config.currentScene.id);
     const appearance = roleAppearances.find(ra => ra.role_id === roleId && ra.is_active === 1);
-    
+
     if (!appearance) {
       console.error(`Active role appearance not found: ${roleId}`);
       return;
@@ -343,8 +337,9 @@ export class AutoPlayManager {
     });
   }
 
-  async updateScene(scene: SpScene) {
+  async updateScene(scene: SpScene, res: Array<SpScene>) {
     this.config.currentScene = scene;
+    this.config.scenes = res;
     this.state.dialogueLength = 0;
     this.state.continuousDialogueCount = 0;
     this.state.lastNarrationDistance = 0;

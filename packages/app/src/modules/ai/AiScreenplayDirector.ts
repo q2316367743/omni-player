@@ -89,6 +89,9 @@ export async function askAiScreenplayDirector(prop: AiScreenplayDirectorProp): P
    - 考虑角色在对话中被提及的频率
    - 确保对话的连贯性和逻辑性
    - 如果有新角色进入场景，优先让该角色发言以建立存在感
+   - **优先推动场景目标**：引导角色对话朝着【场景目标】方向推进
+   - **引导揭露关键线索**：创造机会让角色揭露【关键线索】
+   - **触发必须的坦白/冲突**：安排合适的时机让角色进行【必须发生的坦白/冲突】
 
 2. **角色入场控制**：当剧情需要时，可以让新角色进入场景（设置 role_enter）
    - entry_type 可选值：
@@ -107,9 +110,24 @@ export async function askAiScreenplayDirector(prop: AiScreenplayDirectorProp): P
    - 需要调整氛围或节奏时，可以插入旁白
    - **注意：不要频繁插入旁白，保持对话的连贯性**
 
-5. **场景推进**：只有当场景目标达成时才建议切换（设置 suggest_scene_change=true）
-   - 秘密揭露、冲突爆发等关键情节完成后
-   - 当前场景的主要目标达成后
+5. **场景推进**：根据【场景终止策略】决定何时建议切换（设置 suggest_scene_change=true）
+   - goal_driven（目标驱动）：场景目标达成时切换
+     - 秘密揭露、冲突爆发等关键情节完成后
+     - 当前场景的主要目标达成后
+     - **必须确保场景目标达成**：检查【场景目标】是否已完成
+     - **必须揭露关键线索**：检查【关键线索】是否已揭露
+     - **必须触发角色坦白/冲突**：检查【必须发生的坦白/冲突】是否已触发
+   - tension_peak（情绪峰值）：情绪达到峰值后切换
+     - 角色情绪强度达到最高点后
+     - 剧情冲突达到最激烈时刻后
+     - 情绪开始回落时切换
+   - external_event（外部事件）：等待外部事件触发
+     - 不要主动建议场景切换
+     - 等待外部事件（如警察敲门、电话响起等）发生
+     - 只有当外部事件明确发生时才切换
+   - manual（手动控制）：完全由人工控制
+     - 不要主动建议场景切换
+     - 等待人工指令
 
 6. **异常处理**：只有在异常情况时才请求人工介入（设置 request_director_intervention）
    - 角色行为矛盾、无人想说话、剧情循环等
@@ -138,6 +156,16 @@ export async function askAiScreenplayDirector(prop: AiScreenplayDirectorProp): P
 ID：${scene.id} | 名称：${scene.name}
 描述：${scene.description}
 已持续 ${dialogueLength} 轮对话
+场景终止策略：${scene.termination_strategy}
+
+【场景目标】
+${scene.narrative_goal || "无"}
+
+【关键线索】（必须在此场景揭露）
+${scene.key_clues ? JSON.parse(scene.key_clues).map((clue: string) => `- ${clue}`).join("\n") : "无"}
+
+【必须发生的坦白/冲突】
+${scene.required_revelations ? JSON.parse(scene.required_revelations).map((revelation: string) => `- ${revelation}`).join("\n") : "无"}
 
 【在场角色状态】
 ${roles.map(r => [
@@ -165,7 +193,11 @@ ${dialogues
 【可用操作】
 - next_speaker: role_id（**必须选择一个角色发言**，从以下角色ID中选择：${roles.map(r => r.id).join(', ')}）
 - insert_narration: boolean（仅在需要调整节奏时为 true，默认为 false）
-- suggest_scene_change: boolean（仅在场景目标达成时为 true，默认为 false）
+- suggest_scene_change: boolean（根据场景终止策略决定：
+  - goal_driven：仅在场景目标达成时为 true
+  - tension_peak：仅在情绪达到峰值后为 true
+  - external_event：仅在明确的外部事件发生时为 true
+  - manual：不要主动设置为 true，等待人工指令）
 - request_director_intervention: string（原因，仅在异常情况时使用，默认为 null）
 - role_enter: {role_id: string, entry_type: 'normal' | 'quiet' | 'dramatic' | 'sudden'}（让角色入场，从可入场角色中选择）
 - role_exit: {role_id: string}（让角色离场，从在场角色中选择）

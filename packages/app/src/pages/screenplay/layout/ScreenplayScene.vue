@@ -13,24 +13,7 @@
           </div>
         </div>
         <template #content>
-          <div class="scene-detail">
-            <div class="detail-header">
-              <h4>{{ scene.name }}</h4>
-            </div>
-            <t-divider size="8px"/>
-            <div class="detail-section">
-              <h4>场景描述</h4>
-              <p>{{ scene.description }}</p>
-              <h4 v-if="scene.roles && scene.roles.length > 0">出场角色</h4>
-              <t-space v-if="scene.roles && scene.roles.length > 0" break-line>
-                <t-tooltip v-for="role in scene.roles" :key="role.id" :content="role?.name">
-                  <t-avatar >
-                    {{ role?.name?.substring(0, 1) }}
-                  </t-avatar>
-                </t-tooltip>
-              </t-space>
-            </div>
-          </div>
+          <sp-scene-detail :scene="scene" />
         </template>
       </t-popup>
     </div>
@@ -40,6 +23,7 @@
 import type {SpRole, SpScene} from "@/entity/screenplay";
 import type {SpRoleAppearance} from "@/entity/screenplay/SpRoleAppearance.ts";
 import {MapWrapper} from "@/util";
+import SpSceneDetail from "@/pages/screenplay/components/SpSceneDetail.vue";
 
 const props = defineProps({
   scenes: {

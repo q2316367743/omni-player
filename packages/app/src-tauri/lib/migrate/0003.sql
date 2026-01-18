@@ -19,7 +19,10 @@ CREATE TABLE sp_scene
     screenplay_id TEXT    NOT NULL DEFAULT '',
     `name`        TEXT    NOT NULL DEFAULT '',
     `description` TEXT    NOT NULL DEFAULT '',
-    order_index   INTEGER NOT NULL DEFAULT 0
+    order_index   INTEGER NOT NULL DEFAULT 0,
+    `narrative_goal` TEXT    NOT NULL DEFAULT '',
+    `key_clues` TEXT    NOT NULL DEFAULT '',
+    `required_revelations` TEXT    NOT NULL DEFAULT ''
 );
 
 CREATE INDEX idx_sp_scene_screenplay_id ON sp_scene (screenplay_id);

@@ -135,15 +135,16 @@ const initAutoPlayManager = () => {
     onRoleAppearanceUpdate: async () => {
       await fetchRoleAppearance();
     },
-    onSceneChange: async (sceneId) => {
-      currentSceneId.value = sceneId;
-      await fetchDialogue();
+    onSceneChange: async () => {
+      // 刷新场景
+      await fetchScenes();
+
+      currentSceneId.value = scenes.value[scenes.value.length - 1]?.id;
       await new Promise(resolve => setTimeout(resolve, 1000));
       if (autoPlayManager.value && !isPause.value) {
-        const newScene = scenes.value.find(s => s.id === sceneId);
+        const newScene = scenes.value.find(s => s.id === currentSceneId.value);
         if (newScene) {
-          await autoPlayManager.value.updateScene(newScene);
-          await autoPlayManager.value.resume();
+          await autoPlayManager.value.updateScene(newScene, scenes.value);
         }
       }
     },
@@ -166,7 +167,6 @@ onMounted(async () => {
   ])
   // 当前场景
   currentSceneId.value = scenes.value[scenes.value.length - 1]?.id;
-  console.log(scenes.value, currentSceneId.value)
   // 获取聊天记录
   await fetchDialogue();
   // 初始化自动演绎管理器
