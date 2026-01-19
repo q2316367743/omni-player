@@ -88,12 +88,6 @@ export function transferRtMessageTo(
         });
         break;
       }
-      case 'summary': {
-        results.push({
-          role: "user",
-          content: `[主持人] ${message.content}`,
-        })
-      }
     }
   }
   return results;

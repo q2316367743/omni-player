@@ -27,7 +27,7 @@
             <t-input v-model="meeting.topic"/>
           </t-form-item>
           <t-form-item label-align="top" label="会议内容">
-            <t-textarea v-model="meeting.content"/>
+            <t-textarea v-model="meeting.content" :autosize="{minRows: 3, maxRows: 10}"/>
           </t-form-item>
         </t-form>
         <div class="step-actions">

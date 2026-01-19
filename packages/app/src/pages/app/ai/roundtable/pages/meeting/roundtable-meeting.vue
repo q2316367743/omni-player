@@ -17,6 +17,27 @@
           <t-radio-button value="3">成员</t-radio-button>
           <t-radio-button value="4">设置</t-radio-button>
         </t-radio-group>
+        <t-dropdown trigger="click" placement="bottom-right" :max-column-width="350">
+          <t-button theme="primary" variant="text" shape="square" :disabled="page !== '1'">
+            <template #icon>
+              <more-icon />
+            </template>
+          </t-button>
+          <t-dropdown-menu>
+            <t-dropdown-item @click="handleExportImage">
+              <template #prefix-icon>
+                <file-image-icon />
+              </template>
+              导出为图片
+            </t-dropdown-item>
+            <t-dropdown-item @click="handleExportFile">
+              <template #prefix-icon>
+                <file-word-icon />
+              </template>
+              导出为文件
+            </t-dropdown-item>
+          </t-dropdown-menu>
+        </t-dropdown>
       </div>
     </div>
     <div class="rm-content">
@@ -88,6 +109,7 @@ import {
   ArrowDownIcon,
   PlayIcon,
   PauseIcon, SendIcon, StopCircleIcon, MenuFoldIcon,
+  MoreIcon, FileImageIcon, FileWordIcon,
 } from "tdesign-icons-vue-next";
 import type {AiRtMeeting, AiRtMessage, AiRtParticipant} from "@/entity/app/ai/roundtable";
 import {
@@ -107,6 +129,10 @@ import MeetingParticipant from "@/pages/app/ai/roundtable/pages/meeting/comp/Mee
 import MeetingMessage from "@/pages/app/ai/roundtable/pages/meeting/comp/MeetingMessage.vue";
 import MeetingSetting from "@/pages/app/ai/roundtable/pages/meeting/comp/MeetingSetting.vue";
 import MeetingPrivate from "@/pages/app/ai/roundtable/pages/meeting/comp/MeetingPrivate.vue";
+import { save } from '@tauri-apps/plugin-dialog';
+import { writeTextFile, writeFile } from '@tauri-apps/plugin-fs';
+import MessageUtil from "@/util/model/MessageUtil.ts";
+import { snapdom } from "@zumer/snapdom";
 
 const activeKey = defineModel({
   type: String,
@@ -482,6 +508,84 @@ const handleMeetingChange = async () => {
   await fetchMeeting();
   page.value = '1';
 }
+
+const handleExportImage = async () => {
+  if (!chatContentRef.value?.chatContentRef) return;
+  
+  try {
+    const element = document.querySelector('.chat-list-wrapper') as HTMLElement;
+    const blob = await snapdom.toBlob(element, {
+      type: 'png',
+      scale: 2,
+      backgroundColor: '#ffffff'
+    });
+    
+    const filePath = await save({
+      filters: [
+        {
+          name: 'PNG Image',
+          extensions: ['png']
+        }
+      ],
+      defaultPath: `圆桌会议-${meeting.value?.topic || '导出'}.png`
+    });
+    
+    if (filePath) {
+      const arrayBuffer = await blob.arrayBuffer();
+      await writeFile(filePath, new Uint8Array(arrayBuffer));
+      MessageUtil.success('导出成功');
+    }
+  } catch (error) {
+    MessageUtil.error('导出失败: ' + (error as Error).message);
+  }
+};
+
+const handleExportFile = async () => {
+  if (!messages.value.length) return;
+  
+  let content = `# 圆桌会议记录\n\n`;
+  content += `## 会议主题: ${meeting.value?.topic || '未命名'}\n`;
+  content += `## 会议时间: ${meeting.value?.created_at ? new Date(meeting.value.created_at).toLocaleString() : new Date().toLocaleString()}\n`;
+  content += `## 会议状态: ${meeting.value?.status || '未知'}\n\n`;
+  content += `---\n\n`;
+  
+  messages.value.forEach((msg) => {
+    if (msg.role === 'system') {
+      content += `[系统消息] ${msg.content}\n\n`;
+    } else if (msg.role === 'summary') {
+      content += `## 会议总结\n${msg.content}\n\n`;
+    } else if (msg.role === 'assistant') {
+      const participantName = participantMap.value.get(msg.participant_id)?.name || '未知参与者';
+      content += `### ${participantName}\n`;
+      if (msg.thinking) {
+        content += `> 思考过程: ${msg.thinking}\n\n`;
+      }
+      content += `${msg.content}\n\n`;
+    } else if (msg.role === 'user') {
+      content += `### 用户\n${msg.content}\n\n`;
+    }
+    content += `---\n\n`;
+  });
+  
+  try {
+    const filePath = await save({
+      filters: [
+        {
+          name: 'Markdown',
+          extensions: ['md']
+        }
+      ],
+      defaultPath: `圆桌会议-${meeting.value?.topic || '导出'}.md`
+    });
+    
+    if (filePath) {
+      await writeTextFile(filePath, content);
+      MessageUtil.success('导出成功');
+    }
+  } catch (error) {
+    MessageUtil.error('导出失败: ' + (error as Error).message);
+  }
+};
 </script>
 <style scoped lang="less">
 @import "./roundtable-meeting.less";
