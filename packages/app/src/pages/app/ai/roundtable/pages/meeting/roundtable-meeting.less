@@ -36,9 +36,18 @@
       flex-direction: column;
 
       .chat-sender-wrapper {
-        max-width: 800px;
         width: 100%;
-        margin: 16px auto;
+
+        &.compact {
+            max-width: 900px;
+            margin: 16px auto 24px;
+
+        }
+
+        &.relaxed {
+            max-width: calc(100% - 32px);
+            margin: 16px 16px 24px;
+        }
 
         .chat-sender {
           background: var(--fluent-card-bg);

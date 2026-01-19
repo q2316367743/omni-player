@@ -36,6 +36,13 @@
               </template>
               导出为文件
             </t-dropdown-item>
+            <t-dropdown-item @click.stop>
+              <div class="flex">
+                <t-switch v-model="layout" :custom-value="['compact', 'relaxed']"/>
+                <span v-if="layout === 'compact'" class="ml-auto">紧凑</span>
+                <span v-else-if="layout === 'relaxed'" class="ml-auto">宽松</span>
+              </div>
+            </t-dropdown-item>
           </t-dropdown-menu>
         </t-dropdown>
       </div>
@@ -43,8 +50,9 @@
     <div class="rm-content">
       <div v-show="page === '1'" class="rm-messages">
         <meeting-message :is-stream-load="isStreamLoad" :messages="messages" :participant-map="participantMap"
+                         :layout="layout"
                          ref="chatContentRef" @scroll="handleChatScroll"/>
-        <div v-if="meeting?.status !== 'ended'" class="chat-sender-wrapper">
+        <div v-if="meeting?.status !== 'ended'" :class="['chat-sender-wrapper', layout]">
           <div class="chat-sender">
             <t-chat-sender v-model="text" placeholder="输入消息...">
               <template #footer-prefix>
@@ -133,6 +141,7 @@ import { save } from '@tauri-apps/plugin-dialog';
 import { writeTextFile, writeFile } from '@tauri-apps/plugin-fs';
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import { snapdom } from "@zumer/snapdom";
+import {LocalName} from "@/global/LocalName.ts";
 
 const activeKey = defineModel({
   type: String,
@@ -148,6 +157,8 @@ const emit = defineEmits(['toggleCollapsed']);
 const toggleCollapsed = () => {
   emit('toggleCollapsed');
 }
+
+const layout = useLocalStorage(LocalName.PAGE_APP_AI_ROUNDTABLE_LAYOUT, "compact")
 
 const meetingId = ref('');
 const groupId = ref('');

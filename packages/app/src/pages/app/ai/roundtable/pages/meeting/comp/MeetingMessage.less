@@ -10,9 +10,25 @@
     overflow-y: auto;
     padding-right: 8px;
 
+    .chat-list-wrapper {
+
+      &.compact {
+        .chat-item {
+          max-width: 900px;
+          margin: 0 auto 24px;
+        }
+
+      }
+
+      &.relaxed {
+        .chat-item {
+          max-width: 100%;
+          margin: 0 16px 24px;
+        }
+      }
+    }
+
     .chat-item {
-      max-width: 900px;
-      margin: 0 auto 24px;
       transition: all var(--fluent-transition-normal);
 
       &.system {
@@ -24,8 +40,6 @@
           color: var(--td-text-color-disabled);
           font-size: 13px;
           line-height: 1.5;
-          max-width: 800px;
-          margin: 0 auto;
 
           .system-content {
             overflow: hidden;
@@ -39,8 +53,6 @@
 
       &.summary {
         .summary-message {
-          max-width: 900px;
-          margin: 0 auto;
           background: linear-gradient(135deg, rgba(82, 196, 26, 0.05) 0%, rgba(82, 196, 26, 0.02) 100%);
           border: 1px solid rgba(82, 196, 26, 0.2);
           border-radius: var(--fluent-radius-card);
@@ -88,8 +100,6 @@
         .assistant-message {
           display: flex;
           gap: 12px;
-          max-width: 800px;
-          margin: 0 auto;
 
           .message-avatar {
             width: 40px;
@@ -211,8 +221,6 @@
         .user-message {
           display: flex;
           gap: 12px;
-          max-width: 800px;
-          margin: 0 auto;
           flex-direction: row;
 
           .message-avatar {

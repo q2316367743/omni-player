@@ -1,7 +1,7 @@
 <template>
   <div class="chat-container">
     <div class="chat-list" ref="chatContentRef">
-      <div class="chat-list-wrapper">
+      <div :class="['chat-list-wrapper', layout]">
       <div v-for="(item, index) in messages" :key="item.id" class="chat-item" :class="[item.role]" :id="`message-${item.id}`">
         <div v-if="item.role === 'system'" class="system-message">
           <div class="system-content">{{ item.content }}</div>
@@ -77,6 +77,9 @@ const props = defineProps({
   participantMap: {
     type: Map as PropType<Map<string, AiRtParticipant>>,
     default: () => new Map()
+  },
+  layout: {
+    type: String,
   }
 });
 

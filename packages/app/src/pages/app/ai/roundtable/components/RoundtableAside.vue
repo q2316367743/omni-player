@@ -18,7 +18,7 @@
            @click="toggleRole">
         <div class="text ellipsis">角色管理</div>
       </div>
-      <div class="item" :class="{active: modelValue === '/group'}"
+      <div class="item" :class="{active: modelValue.startsWith('/group')}"
            @click="toggleGroup">
         <div class="text ellipsis">讨论组</div>
       </div>

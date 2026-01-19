@@ -8,25 +8,27 @@
       <div class="detail-label">提示词</div>
       <div class="detail-content">{{ role.prompt || '暂无提示词' }}</div>
     </div>
-    <div class="detail-section">
-      <div class="detail-label">使用的模型</div>
-      <div class="detail-content">{{ role.model }}</div>
-    </div>
-    <div class="detail-section">
-      <div class="detail-label">响应字数限制</div>
-      <div class="detail-content">
-        {{ role.min_response_length === -1 && role.max_response_length === -1
-        ? '无限制'
-        : `${role.min_response_length} - ${role.max_response_length === -1 ? '无限制' : role.max_response_length}` }}
+    <div class="detail-grid">
+      <div class="detail-section">
+        <div class="detail-label">使用的模型</div>
+        <div class="detail-content">{{ role.model }}</div>
       </div>
-    </div>
-    <div class="detail-section">
-      <div class="detail-label">生成随机性</div>
-      <div class="detail-content">{{ role.temperature }}</div>
-    </div>
-    <div class="detail-section">
-      <div class="detail-label">最大思考时间</div>
-      <div class="detail-content">{{ role.timeout_per_turn }} 秒</div>
+      <div class="detail-section">
+        <div class="detail-label">响应字数限制</div>
+        <div class="detail-content">
+          {{ role.min_response_length === -1 && role.max_response_length === -1
+          ? '无限制'
+          : `${role.min_response_length} - ${role.max_response_length === -1 ? '无限制' : role.max_response_length}` }}
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">生成随机性</div>
+        <div class="detail-content">{{ role.temperature }}</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">最大思考时间</div>
+        <div class="detail-content">{{ role.timeout_per_turn }} 秒</div>
+      </div>
     </div>
     <div class="detail-section">
       <div class="detail-label">功能设置</div>
@@ -83,6 +85,17 @@ defineProps({
     margin-bottom: 12px;
 
     &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    .detail-section {
       margin-bottom: 0;
     }
   }

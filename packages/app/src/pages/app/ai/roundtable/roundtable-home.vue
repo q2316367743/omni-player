@@ -8,6 +8,8 @@
                        @toggle-collapsed="toggleCollapsed()"/>
       <roundtable-group v-if="activeKey === '/group'" :collapsed="collapsed"
                         @toggle-collapsed="toggleCollapsed()"/>
+      <roundtable-groupadd v-else-if="activeKey.startsWith('/group/')" :collapsed="collapsed"
+                          @toggle-collapsed="toggleCollapsed()"/>
       <roundtable-meeting v-else-if="activeKey.startsWith('/meeting')" v-model="activeKey" :collapsed="collapsed"
                           @toggle-collapsed="toggleCollapsed()"/>
       <roundtable-create v-else-if="activeKey.startsWith('/create')" v-model="activeKey" :collapsed="collapsed"
@@ -24,6 +26,7 @@ import RoundtableRole from "@/pages/app/ai/roundtable/pages/role/roundtable-role
 import RoundtableGroup from "@/pages/app/ai/roundtable/pages/group/roundtable-group.vue";
 import RoundtableMeeting from "@/pages/app/ai/roundtable/pages/meeting/roundtable-meeting.vue";
 import RoundtableCreate from "@/pages/app/ai/roundtable/pages/create/roundtable-create.vue";
+import RoundtableGroupadd from "@/pages/app/ai/roundtable/pages/groupadd/roundtable-groupadd.vue";
 
 const activeKey = ref('');
 const aside = ref();

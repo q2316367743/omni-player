@@ -1,10 +1,8 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {YesOrNo} from "@/global/YesOrNo.ts";
 
-/**
- * 圆桌会议 - 讨论组
- */
-export interface AiRtGroup extends BaseEntity {
+export interface AiRtGroupCore {
+
 
   /**
    * 讨论组名称
@@ -31,5 +29,11 @@ export interface AiRtGroup extends BaseEntity {
    * 用户角色
    */
   user_role: string;
+}
+
+/**
+ * 圆桌会议 - 讨论组
+ */
+export interface AiRtGroup extends BaseEntity, AiRtGroupCore {
 
 }
