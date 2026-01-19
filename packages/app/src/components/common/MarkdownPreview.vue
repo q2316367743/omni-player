@@ -49,7 +49,7 @@ const initCherry = () => {
       global: {
         htmlAttrWhiteList: 'part|slot',
         flowSessionContext: props.stream,
-        flowSessionCursor: ''
+        flowSessionCursor: 'default'
       },
       syntax: {
         autoLink: {
@@ -126,7 +126,7 @@ const initCherry = () => {
 
 watch(() => props.content, (newValue) => {
   if (cherry && cherry.getValue() !== newValue) {
-    cherry.setValue(newValue);
+    cherry.setMarkdown(newValue);
   }
 });
 

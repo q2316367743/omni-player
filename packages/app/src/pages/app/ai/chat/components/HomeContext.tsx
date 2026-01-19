@@ -12,7 +12,7 @@ import {activeKey} from "@/pages/app/ai/chat/model.ts";
 export function onRenameChat(data: AiChatItem, onUpdate?: (name: string) => void) {
   MessageBoxUtil.prompt("请输入新的对话名称", "编辑对话名称", {
     inputValue: data.name,
-    maxlength: 10
+    maxlength: 18
   })
     .then(name => {
       updateAiChatItemService(data.id, {

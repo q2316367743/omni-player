@@ -40,8 +40,9 @@
               </svg>
             </div>
             <div class="message-body">
-              <div v-if="item.thinking && item.thinking.length > 0" class="thinking-section">
-                <div class="thinking-header">
+              <div v-if="item.thinking && item.thinking.length > 0" class="thinking-section" :class="{collapsed: isThinkingCollapsed(item.id)}">
+                <div class="thinking-header" @click="toggleThinking(item.id)">
+                  <chevron-right-icon class="collapse-icon" :class="{rotated: !isThinkingCollapsed(item.id)}"/>
                   <check-circle-icon v-if="!isStreamLoad || index !== messages.length - 1" class="thinking-icon"/>
                   <div v-else class="thinking-loading">
                     <span class="dot"></span>
@@ -52,12 +53,12 @@
                       isStreamLoad && index === messages.length - 1 ? '思考中...' : '已深度思考'
                     }}</span>
                 </div>
-                <div class="thinking-content">
-                  <markdown-preview :content="item.thinking"/>
+                <div class="thinking-content" v-show="!isThinkingCollapsed(item.id)">
+                  <markdown-preview :content="item.thinking" stream/>
                 </div>
               </div>
               <div v-if="item.content" class="message-content">
-                <markdown-preview :content="item.content"/>
+                <markdown-preview :content="item.content" stream/>
               </div>
               <div class="message-footer">
                 <span class="message-info">tokens used: {{ calculateTokens(item.content) }}, model: {{
@@ -142,6 +143,7 @@ import {
   ArrowDownIcon,
   CheckCircleIcon,
   ChevronDownIcon,
+  ChevronRightIcon,
   CopyIcon,
   DeleteIcon,
   MenuFoldIcon, StopCircleIcon,
@@ -189,6 +191,16 @@ const isStreamLoad = ref(false);
 const isShowToBottom = ref(false);
 const isAsked = ref(false);
 const isAtBottom = ref(true);
+
+const thinkingCollapsedMap = ref<Map<string, boolean>>(new Map());
+
+const toggleThinking = (messageId: string) => {
+  thinkingCollapsedMap.value.set(messageId, !thinkingCollapsedMap.value.get(messageId));
+};
+
+const isThinkingCollapsed = (messageId: string): boolean => {
+  return thinkingCollapsedMap.value.get(messageId) ?? true;
+};
 
 const calculateTokens = (content: string): number => {
   return Math.ceil(content.length / 4);
@@ -279,6 +291,7 @@ async function onAsk() {
     isStreamLoad.value = true;
     isAsked.value = true;
     // 插入回答
+    const oldMessages = transferAiChatItemToChatMessageParam(messages.value);
     const messageId = await onSaveContent({
       role: 'assistant',
       content: '',
@@ -289,7 +302,7 @@ async function onAsk() {
       await updateAiChatMessageService(messageId!, {thinking: data.thinking, content: data.content});
     }, 300);
     await askToOpenAi({
-      messages: transferAiChatItemToChatMessageParam(messages.value),
+      messages: oldMessages,
       assistant: {
         model
       },
@@ -390,402 +403,5 @@ const handleDeleteChat = async (index: number) => {
 
 </script>
 <style scoped lang="less">
-.home-chat {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background: var(--td-bg-color-container);
-
-  .home-chat-collapse {
-    display: flex;
-    align-items: center;
-    height: 48px;
-    padding: 0 12px;
-    background: var(--fluent-acrylic-bg);
-    backdrop-filter: var(--fluent-acrylic-blur);
-    border-bottom: 1px solid var(--fluent-border-subtle);
-    box-shadow: var(--fluent-elevation-1);
-    transition: all var(--fluent-transition-normal);
-
-    .divider {
-      margin: 0 8px;
-      color: var(--td-text-color-placeholder);
-    }
-
-    .breadcrumb {
-      user-select: none;
-      cursor: pointer;
-      border-radius: var(--fluent-radius-smooth);
-      transition: all var(--fluent-transition-fast);
-      padding: 6px 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-
-      &:hover {
-        background: var(--fluent-item-hover);
-        transform: translateY(-1px);
-      }
-
-      &:active {
-        background: var(--fluent-item-active);
-        transform: translateY(0);
-      }
-
-      &.group {
-        color: var(--td-text-color-secondary);
-        font-weight: 500;
-      }
-
-      .text {
-        font-weight: 500;
-      }
-
-      .icon {
-        transition: transform var(--fluent-transition-fast);
-        color: var(--td-text-color-placeholder);
-      }
-
-      &:hover .icon {
-        transform: rotate(180deg);
-      }
-    }
-  }
-
-  .home-chat-content {
-    flex: 1;
-    overflow: hidden;
-    background: transparent;
-    display: flex;
-    flex-direction: column;
-
-
-    &.compact {
-      .chat-item {
-        max-width: 900px;
-        margin: 0 auto 24px;
-      }
-
-      .chat-sender-wrapper {
-        max-width: 900px;
-        margin: 16px auto;
-      }
-    }
-
-    &.relaxed {
-      .chat-item {
-        max-width: 100%;
-        margin: 0 16px 24px;
-      }
-
-      .chat-sender-wrapper {
-        max-width: calc(100% - 32px);
-        margin: 16px;
-      }
-    }
-
-    .chat-list {
-      flex: 1;
-      overflow-y: auto;
-      padding-top: 16px;
-
-
-      .chat-item {
-        transition: all var(--fluent-transition-normal);
-
-        &.system {
-          .system-message {
-            padding: 12px 16px;
-            background: transparent;
-            border: 1px solid var(--td-text-color-disabled);
-            border-radius: var(--fluent-radius-card);
-            color: var(--td-text-color-disabled);
-            font-size: 13px;
-            line-height: 1.5;
-            max-width: 800px;
-            margin: 0 auto;
-
-            .system-content {
-              overflow: hidden;
-              text-overflow: ellipsis;
-              display: -webkit-box;
-              -webkit-line-clamp: 2;
-              -webkit-box-orient: vertical;
-            }
-          }
-        }
-
-        &.assistant {
-          .assistant-message {
-            display: flex;
-            gap: 12px;
-
-            .message-avatar {
-              width: 40px;
-              height: 40px;
-              border-radius: 50%;
-              background: var(--fluent-gradient-primary);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              flex-shrink: 0;
-              color: white;
-              box-shadow: var(--fluent-elevation-2);
-
-              svg {
-                width: 24px;
-                height: 24px;
-              }
-            }
-
-            .message-body {
-              flex: 1;
-              min-width: 0;
-
-              .thinking-section {
-                margin-bottom: 12px;
-                background: var(--fluent-card-bg);
-                backdrop-filter: blur(10px);
-                border: 1px solid var(--fluent-card-border);
-                border-radius: var(--fluent-radius-card);
-                box-shadow: var(--fluent-elevation-1);
-                overflow: hidden;
-                transition: all var(--fluent-transition-normal);
-
-                &:hover {
-                  box-shadow: var(--fluent-elevation-2);
-                }
-
-                .thinking-header {
-                  padding: 12px 16px;
-                  background: var(--fluent-item-hover);
-                  border-bottom: 1px solid var(--fluent-border-subtle);
-                  display: flex;
-                  align-items: center;
-                  gap: 8px;
-                  font-weight: 500;
-
-                  .thinking-icon {
-                    color: var(--td-success-color-5);
-                    font-size: 20px;
-                  }
-
-                  .thinking-loading {
-                    display: flex;
-                    gap: 4px;
-
-                    .dot {
-                      width: 6px;
-                      height: 6px;
-                      border-radius: 50%;
-                      background: var(--fluent-accent-color);
-                      animation: bounce 1.4s infinite ease-in-out both;
-
-                      &:nth-child(1) {
-                        animation-delay: -0.32s;
-                      }
-
-                      &:nth-child(2) {
-                        animation-delay: -0.16s;
-                      }
-                    }
-                  }
-
-                  @keyframes bounce {
-                    0%, 80%, 100% {
-                      transform: scale(0);
-                    }
-                    40% {
-                      transform: scale(1);
-                    }
-                  }
-
-                  .thinking-text {
-                    font-size: 14px;
-                  }
-                }
-
-                .thinking-content {
-                  padding: 16px;
-                  font-size: 14px;
-                  line-height: 1.6;
-                  color: var(--td-text-color-secondary);
-                }
-              }
-
-              .message-content {
-                background: var(--td-bg-color-container);
-                border: 1px solid var(--fluent-card-border);
-                border-radius: var(--fluent-radius-card);
-                font-size: 15px;
-                line-height: 1.7;
-                color: var(--td-text-color-primary);
-                word-wrap: break-word;
-                white-space: pre-wrap;
-              }
-
-              .message-footer {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 8px 0;
-
-                .message-info {
-                  font-size: 12px;
-                  color: var(--td-text-color-placeholder);
-                  font-family: var(--td-font-family);
-                }
-
-                .message-actions {
-                  display: flex;
-                  gap: 4px;
-                }
-              }
-            }
-          }
-        }
-
-        &.user {
-          .user-message {
-            display: flex;
-            gap: 12px;
-            flex-direction: row-reverse;
-
-            .message-avatar {
-              width: 40px;
-              height: 40px;
-              border-radius: 50%;
-              background: var(--fluent-gradient-secondary);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              flex-shrink: 0;
-              color: white;
-              box-shadow: var(--fluent-elevation-2);
-
-              svg {
-                width: 24px;
-                height: 24px;
-              }
-            }
-
-            .message-body {
-              flex: 1;
-              min-width: 0;
-
-              .message-content {
-                padding: 16px 20px;
-                background: var(--td-bg-color-secondarycontainer);
-                backdrop-filter: blur(10px);
-                border: 1px solid var(--fluent-card-border);
-                border-radius: var(--fluent-radius-card);
-                box-shadow: var(--fluent-card-shadow);
-                font-size: 15px;
-                line-height: 1.7;
-                color: var(--td-text-color-primary);
-                word-wrap: break-word;
-                white-space: pre-wrap;
-                transition: all var(--fluent-transition-normal);
-
-                &:hover {
-                  box-shadow: var(--fluent-card-shadow-hover);
-                }
-              }
-            }
-          }
-        }
-
-        &.model-change {
-          .model-change-message {
-            padding: 12px 16px;
-            background: var(--fluent-accent-light);
-            border: 1px solid var(--fluent-accent-color);
-            border-radius: var(--fluent-radius-card);
-            text-align: center;
-            font-size: 14px;
-            color: var(--td-text-color-primary);
-
-            .model-change-content {
-              :deep(span) {
-                font-weight: 600;
-                color: var(--fluent-accent-color);
-              }
-            }
-          }
-        }
-
-        &.error {
-          .error-message {
-            padding: 16px 20px;
-            background: var(--td-error-color-1);
-            border: 1px solid var(--td-error-color-3);
-            border-radius: var(--fluent-radius-card);
-            max-width: 800px;
-            margin: 0 auto;
-            font-size: 14px;
-            color: var(--td-error-color-6);
-          }
-        }
-      }
-    }
-
-    .chat-sender-wrapper {
-      width: 100%;
-
-      .chat-sender {
-        background: var(--fluent-card-bg);
-        backdrop-filter: blur(10px);
-        border: 1px solid var(--fluent-card-border);
-        border-radius: var(--fluent-radius-large);
-        box-shadow: var(--fluent-elevation-3);
-        padding: 16px;
-        transition: all var(--fluent-transition-normal);
-
-        &:hover {
-          box-shadow: var(--fluent-elevation-4);
-        }
-      }
-    }
-  }
-
-  .bottomBtn {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 180px;
-    padding: 0;
-    border: none;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--fluent-card-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--fluent-card-border);
-    box-shadow: var(--fluent-elevation-4);
-    transition: all var(--fluent-transition-normal);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-
-    &:hover {
-      transform: translateX(-50%) translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-      background: var(--fluent-card-bg-hover);
-    }
-
-    &:active {
-      transform: translateX(-50%) translateY(0);
-    }
-
-    svg {
-      width: 24px;
-      height: 24px;
-      color: var(--fluent-accent-color);
-    }
-  }
-
-}
+@import "./HomeChat.less";
 </style>

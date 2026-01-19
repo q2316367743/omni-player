@@ -69,7 +69,7 @@
 <script lang="ts" setup>
 import {
   ChatDoubleIcon,
-  ChevronRightIcon,
+  ChevronRightIcon, DeleteIcon, Edit1Icon,
   FolderIcon,
   MinusIcon,
   MoreIcon,
@@ -189,6 +189,7 @@ async function onChatContextMenuClick(data: AiChatItem, e: MouseEvent) {
         }]
     }, {
       label: '编辑名称',
+      icon: () => h(Edit1Icon),
       onClick() {
         onRenameChat(data, () => {
           // 重新初始化
@@ -202,6 +203,7 @@ async function onChatContextMenuClick(data: AiChatItem, e: MouseEvent) {
         },
         class: 'label'
       }, "删除"),
+      icon: () => h(DeleteIcon),
       onClick() {
         onRemoveChat(props.groupId, data.id, () => {
           // 重新初始化

@@ -116,6 +116,7 @@ export default {
         header: title,
         draggable: true,
         placement: "center",
+        closeOnEscKeydown: false,
         confirmBtn: {
           default: confirmButtonText
         },
@@ -132,7 +133,7 @@ export default {
         },
         onClose() {
           res.destroy();
-          onClose && onClose();
+          onClose?.();
           console.log("onClose");
           reject("cancel");
         }

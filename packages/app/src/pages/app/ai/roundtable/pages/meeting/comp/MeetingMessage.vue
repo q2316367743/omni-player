@@ -12,7 +12,7 @@
             <span class="summary-title">会议总结</span>
           </div>
           <div class="summary-content">
-            <markdown-preview :content="item.content"/>
+            <markdown-preview :content="item.content" stream/>
           </div>
         </div>
         <div v-else-if="item.role === 'assistant'" class="assistant-message">
@@ -36,14 +36,14 @@
               <div class="thinking-content">{{ item.thinking }}</div>
             </div>
             <div v-if="item.content" class="message-content">
-              <markdown-preview :content="item.content"/>
+              <markdown-preview :content="item.content" stream/>
             </div>
           </div>
         </div>
         <div v-else-if="item.role === 'user'" class="user-message">
           <div class="message-body">
             <div class="message-content">
-              <markdown-preview :content="item.content"/>
+              <markdown-preview :content="item.content" stream/>
             </div>
           </div>
           <div class="message-avatar user-avatar">
