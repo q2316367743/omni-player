@@ -249,13 +249,17 @@
               .message-content {
                 background: var(--td-bg-color-container);
                 border: 1px solid var(--fluent-card-border);
-                border-top: none;
-                border-radius: 0 0 var(--fluent-radius-card) var(--fluent-radius-card);
+                border-radius: var(--fluent-radius-card);
                 font-size: 15px;
                 line-height: 1.7;
                 color: var(--td-text-color-primary);
                 word-wrap: break-word;
                 white-space: pre-wrap;
+
+                &.with-thinking {
+                  border-top: none;
+                  border-radius: 0 0 var(--fluent-radius-card) var(--fluent-radius-card);
+                }
               }
 
               .message-footer {

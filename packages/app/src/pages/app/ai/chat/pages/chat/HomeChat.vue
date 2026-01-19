@@ -57,7 +57,7 @@
                   <markdown-preview :content="item.thinking" stream/>
                 </div>
               </div>
-              <div v-if="item.content" class="message-content">
+              <div v-if="item.content" class="message-content" :class="{'with-thinking': item.thinking && item.thinking.length > 0}">
                 <markdown-preview :content="item.content" stream/>
               </div>
               <div class="message-footer">
