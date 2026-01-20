@@ -34,7 +34,7 @@
       </div>
     </div>
     <div class="subscribe-tree-wrapper">
-      <subscribe-tree-view
+      <subscribe-grid-view
         v-if="subscribeTree.length > 0"
         :nodes="subscribeTree"
         @jump="jumpSubscribe"
@@ -55,7 +55,7 @@ import {RssIcon, AddIcon, RefreshIcon, FileImportIcon, FileExportIcon} from "tde
 import type {SubscribeItem} from "@/entity/subscribe";
 import {useSubscribeStore} from "@/store/SubscribeStore.ts";
 import {openSubscribeContextmenu, openSubscribeEdit} from "@/pages/home/func/SubscribeEdit.tsx";
-import SubscribeTreeView from "./SubscribeTreeView.vue";
+import SubscribeGridView from "./SubscribeGridView.vue";
 import {exportSubscribe, importSubscribe} from "@/pages/home/func/SubscribeExtra.tsx";
 
 const router = useRouter();

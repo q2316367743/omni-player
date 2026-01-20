@@ -7,6 +7,10 @@
   --vue-scroll-rect-scrollbar-size: 8px
 }
 
+#mx-menu-default-container {
+  z-index: 5501 !important;
+}
+
 .vue-scroll-rect {
   position: relative;
   width: 100%;
@@ -141,6 +145,7 @@
 }
 
 .mx-context-menu {
+  z-index: 5501;
   pointer-events: all;
   display: inline-block;
   overflow: visible;
