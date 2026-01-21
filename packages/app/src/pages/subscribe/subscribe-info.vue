@@ -41,7 +41,7 @@
     </div>
 
     <div class="subscribe-info__wrap" ref="scrollRef" @click="onContentClick">
-      <custome-webview v-if="showViewMode === 'web' && content?.link" :url="content.link"/>
+      <custom-webview v-if="showViewMode === 'web' && content?.link" :url="content.link"/>
       <t-loading v-else :loading="loading" class="subscribe-info__scroll">
         <div class="subscribe-info__scroll-inner">
 
