@@ -149,7 +149,9 @@ const text = ref('');
 const thinkingCollapsedMap = ref<Map<string, boolean>>(new Map());
 const isShowToBottom = ref(false);
 const isAsked = ref(false);
-const isAtBottom = ref(true);
+const isUserScrolling = ref(false);
+const isAutoScroll = ref(true);
+let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const customModel = computed({
   get: () => props.model,
@@ -172,8 +174,23 @@ const handleChatScroll = function (e: Event) {
   const scrollTop = target.scrollTop;
   const scrollHeight = target.scrollHeight;
   const clientHeight = target.clientHeight;
-  isShowToBottom.value = scrollHeight - scrollTop - clientHeight > 100;
-  isAtBottom.value = scrollHeight - scrollTop - clientHeight < 50;
+  const distanceToBottom = scrollHeight - scrollTop - clientHeight;
+
+  isShowToBottom.value = distanceToBottom > 100;
+
+  if (!isUserScrolling.value) {
+    isUserScrolling.value = true;
+    isAutoScroll.value = false;
+
+    if (scrollTimeout) {
+      clearTimeout(scrollTimeout);
+    }
+    scrollTimeout = setTimeout(() => {
+      isUserScrolling.value = false;
+    }, 1500);
+  }
+
+  isAutoScroll.value = distanceToBottom < 50;
 };
 // 滚动到底部
 const backBottom = () => {
@@ -206,6 +223,49 @@ const onSend = () => {
   emit('send', text.value);
   text.value = '';
 }
+
+const scrollToBottom = (behavior: 'auto' | 'smooth' = 'auto') => {
+  if (chatContentRef.value) {
+    chatContentRef.value.scrollTo({
+      top: chatContentRef.value.scrollHeight,
+      behavior,
+    });
+  }
+};
+
+watch(
+  () => props.messages.length,
+  async () => {
+    await nextTick();
+    if (isAutoScroll.value) {
+      scrollToBottom();
+    }
+  }
+);
+
+watch(
+  () => props.isStreamLoad,
+  async (newVal, oldVal) => {
+    if (newVal === false && oldVal === true) {
+      await nextTick();
+      if (isAutoScroll.value) {
+        scrollToBottom();
+      }
+    }
+  }
+);
+
+onMounted(() => {
+  nextTick(() => {
+    scrollToBottom();
+  });
+});
+
+onUnmounted(() => {
+  if (scrollTimeout) {
+    clearTimeout(scrollTimeout);
+  }
+});
 </script>
 <style scoped lang="less">
 @import "./CustomChat.less";
