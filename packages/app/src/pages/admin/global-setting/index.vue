@@ -12,6 +12,16 @@
         <t-form-item label="RSS刷新间隔" label-align="top">
           <t-input-number v-model="globalSetting.rssRefreshInterval" suffix="分钟" auto-width :min="2" :step="1"/>
         </t-form-item>
+        <t-form-item label="Github Token" label-align="top">
+          <t-input v-model="globalSetting.githubToken"/>
+          <template #help>
+            <span class="pr-4px">获取</span>
+            <t-link theme="primary"
+                    href="https://github.com/settings/tokens/new?description=MyApp-Downloader&scopes=public_repo"
+                    target="_blank">Fine-grained tokens
+            </t-link>
+          </template>
+        </t-form-item>
       </t-form>
     </t-card>
   </div>

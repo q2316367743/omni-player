@@ -37,8 +37,11 @@
               </template>
             </t-button>
           </template>
-          <t-tab-panel label="工" value="tool" draggable>
+          <t-tab-panel label="首" value="tool" draggable>
             <tools-section/>
+          </t-tab-panel>
+          <t-tab-panel label="小程序" value="mp" draggable>
+            <program-section />
           </t-tab-panel>
           <t-tab-panel label="剧" value="screenplay" draggable>
             <screenplay-section />
@@ -70,6 +73,7 @@ import ShiCi from "@/pages/home/components/ShiCi.vue";
 import VideoSection from "@/pages/home/components/VideoSection.vue";
 import {SettingIcon} from "tdesign-icons-vue-next";
 import ScreenplaySection from "@/pages/home/components/ScreenplaySection.vue";
+import ProgramSection from "@/pages/home/components/ProgramSection.vue";
 
 const router = useRouter();
 const activeKey = useLocalStorage(LocalName.PAGE_HOME_ACTIVE, 'book');

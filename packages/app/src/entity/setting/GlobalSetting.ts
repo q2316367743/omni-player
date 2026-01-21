@@ -1,4 +1,3 @@
-
 export interface GlobalSetting {
 
   /**
@@ -6,10 +5,16 @@ export interface GlobalSetting {
    */
   rssRefreshInterval: number;
 
+  /**
+   * GitHub Token
+   */
+  githubToken: '';
+
 }
 
 export function buildGlobalSetting(): GlobalSetting {
   return {
     rssRefreshInterval: 15,
+    githubToken: ''
   }
 }
