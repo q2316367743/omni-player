@@ -104,7 +104,7 @@ const getTocName = (item: AiRtMessage) => {
 const scrollToMessage = (messageId: string) => {
   const element = document.getElementById(`message-${messageId}`);
   if (element && chatContentRef.value) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 };
 
