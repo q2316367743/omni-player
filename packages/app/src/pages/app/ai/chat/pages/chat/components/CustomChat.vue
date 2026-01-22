@@ -76,7 +76,7 @@
         </div>
       </div>
       <div class="chat-toc">
-        <div v-for="item in messages" :key="item.id" class="toc-item" :class="[item.role]" @click="scrollToMessage(item.id)">
+        <div v-for="item in messages" :key="item.id" class="toc-item" :class="[item.role, {active: item.id === activeMessageId}]" @click="scrollToMessage(item.id)">
           <div class="toc-bar"></div>
           <div class="toc-name">{{ getTocName(item) }}</div>
         </div>
@@ -155,6 +155,7 @@ const isShowToBottom = ref(false);
 const isAsked = ref(false);
 const isUserScrolling = ref(false);
 const isAutoScroll = ref(true);
+const activeMessageId = ref<string>('');
 let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const customModel = computed({
@@ -194,6 +195,32 @@ const scrollToMessage = (messageId: string) => {
   }
 };
 
+const updateActiveMessage = () => {
+  if (!chatContentRef.value) return;
+  
+  const containerRect = chatContentRef.value.getBoundingClientRect();
+  
+  let maxOverlap = 0;
+  let activeId = '';
+  
+  props.messages.forEach((message) => {
+    const element = document.getElementById(`message-${message.id}`);
+    if (element) {
+      const elementRect = element.getBoundingClientRect();
+      const overlap = Math.max(0, Math.min(elementRect.bottom, containerRect.bottom) - Math.max(elementRect.top, containerRect.top));
+      
+      if (overlap > maxOverlap) {
+        maxOverlap = overlap;
+        activeId = message.id;
+      }
+    }
+  });
+  
+  if (activeId) {
+    activeMessageId.value = activeId;
+  }
+};
+
 // 是否显示回到底部按钮
 const handleChatScroll = function (e: Event) {
   const target = e.target as HTMLDivElement;
@@ -217,6 +244,7 @@ const handleChatScroll = function (e: Event) {
   }
 
   isAutoScroll.value = distanceToBottom < 50;
+  updateActiveMessage();
 };
 // 滚动到底部
 const backBottom = () => {
