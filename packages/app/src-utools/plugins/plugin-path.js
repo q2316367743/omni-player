@@ -49,7 +49,7 @@ module.exports = async (cmd, args) => {
         case 13:
           return Promise.resolve(utools.getPath("appConfig"));
         case 14:
-          return Promise.resolve(join(utools.getPath("appData"), "uTools", "plugins", "nor-regret"));
+          return Promise.resolve(join(utools.getPath("appData"), "uTools", "plugins", "xiaohei"));
         case 15:
           return Promise.resolve(utools.getPath("appLocalData"));
         case 16:
@@ -69,7 +69,7 @@ module.exports = async (cmd, args) => {
         case 23:
           return Promise.resolve(utools.getPath("template"));
         default:
-          return Promise.resolve(join(utools.getPath("appData"), "uTools", "plugins", "nor-regret"));
+          return Promise.resolve(join(utools.getPath("appData"), "uTools", "plugins", "xiaohei"));
       }
     }
     return join("/Users/esion/Documents/workspace/omni-player/src-tauri", path);

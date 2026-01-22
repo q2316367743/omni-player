@@ -6,7 +6,7 @@
         <t-radio-button value="novel">小说</t-radio-button>
       </t-radio-group>
     </div>
-    <div class="chat-messages" ref="chatMessagesRef" :class="`layout-${layoutMode}`">
+    <div class="chat-messages" :class="`layout-${layoutMode}`">
       <div
         v-for="dialogue in dialogues"
         :key="dialogue.id"
@@ -65,7 +65,6 @@ const props = defineProps({
   }
 });
 
-const chatMessagesRef = ref<HTMLElement>()
 const layoutMode = ref<'chat' | 'novel'>('chat')
 
 const getRoleName = (roleId: string) => {

@@ -2,8 +2,8 @@
   <div class="art-player" ref="art-player"></div>
 </template>
 <script lang="ts" setup>
-import Artplayer from '@/components/VideoPlayer/ArtPlayer.vue';
 import {useArtPlayer} from "@/hooks/UseArtPlayer.ts";
+import type Artplayer from "artplayer";
 
 const props = defineProps({
   url: {

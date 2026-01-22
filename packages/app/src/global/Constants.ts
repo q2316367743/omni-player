@@ -2,7 +2,7 @@ import {appDataDir, join} from "@tauri-apps/api/path";
 import {useColorMode} from "@/hooks/ColorMode.ts";
 import {useBoolState} from "@/hooks";
 
-export const APP_NAME = "nor-regret";
+export const APP_NAME = "xiaohei";
 export const APP_VERSION = "1.0.0";
 export const APP_PASSWORD = "vpj13Q7AFKjpin"
 

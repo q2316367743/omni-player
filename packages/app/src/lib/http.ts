@@ -36,7 +36,7 @@ instance.interceptors.response.use(e => {
 })
 
 export interface RequestConfig extends AxiosRequestConfig {
-  webview: boolean
+  webview?: boolean
 }
 
 export function requestAction<T = Record<string, any>>(config: RequestConfig) {

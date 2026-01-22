@@ -147,6 +147,7 @@ const inputEnter = async (inputValue: string) => {
       content: inputValue,
       model: model.value,
       thinking: '',
+      think: 1
     };
     messages.value.unshift(message)
     // 上一次聊天项
@@ -159,7 +160,8 @@ const inputEnter = async (inputValue: string) => {
           role: 'model-change',
           content: `模型由<span>${old.model}</span>变为<span>${message.model}</span>`,
           model: model.value,
-          thinking: ''
+          thinking: '',
+          think: 1
         });
       }
     }
@@ -195,7 +197,8 @@ async function onAsk() {
           role: 'assistant',
           content: '',
           model: model,
-          thinking: ''
+          thinking: '',
+          think: 1
         });
       },
       onAppend: (data, t) => {
@@ -219,6 +222,7 @@ async function onAsk() {
       content: '请求出错！原因：' + (e instanceof Error ? e.message : `${e}`),
       thinking: '',
       model: model,
+      think: 1
     })
   } finally {
     loading.value = false;

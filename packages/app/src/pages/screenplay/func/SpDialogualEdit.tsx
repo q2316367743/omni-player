@@ -21,7 +21,8 @@ export function openSpDialogueAddNarrator(
     role_id: '',
     type: 'narrator',
     action: '',
-    dialogue: ''
+    dialogue: '',
+    director_instruction_id: ''
   });
   const useAiPolish = ref(false);
   const loading = ref(false);

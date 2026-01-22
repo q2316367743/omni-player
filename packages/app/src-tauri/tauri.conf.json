@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "nor-regret",
+  "productName": "xiaohei",
   "version": "1.1.0",
-  "identifier": "nor-regret",
+  "identifier": "xyz.esion.xiaohei",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5123",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "亦无悔",
+        "title": "楼下小黑",
         "width": 1200,
         "height": 800,
         "minWidth": 1200,
@@ -50,7 +50,10 @@
     ],
     "category": "Entertainment",
     "macOS": {
-      "entitlements": "./Entitlements.plist"
+      "entitlements": "./Entitlements.plist",
+      "files": {
+        "embedded.provisionprofile": "/Users/esion/Documents/workspace/omni-player/packages/app/src-tauri/mac_installer.cer"
+      }
     }
   },
   "plugins": {

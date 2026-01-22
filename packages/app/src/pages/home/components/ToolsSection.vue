@@ -133,7 +133,6 @@ import ToolCard from "@/pages/home/components/ToolCard.vue";
 import MiniToolCard from "@/pages/home/components/MiniToolCard.vue";
 import HomebrewIcon from "@/pages/home/icon/HomebrewIcon.vue";
 import {platform} from "@tauri-apps/plugin-os";
-import MiniProgramCard from "@/pages/home/components/MiniProgramCard.vue";
 
 const p = platform();
 const showHomebrew = (p === "macos" || p === "linux");

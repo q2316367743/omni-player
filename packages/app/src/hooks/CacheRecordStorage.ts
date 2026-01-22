@@ -1,3 +1,5 @@
+import type {Ref} from 'vue';
+
 type initialValueFunc<T> = () => T
 type initialValue<T> = T | initialValueFunc<T>
 

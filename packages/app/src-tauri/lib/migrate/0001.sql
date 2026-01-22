@@ -25,7 +25,6 @@ CREATE TABLE snippet_tags
 
     snippet_id TEXT,
     tag_id     TEXT,
-    PRIMARY KEY (snippet_id, tag_id),
     FOREIGN KEY (snippet_id) REFERENCES snippet_meta (id) ON DELETE CASCADE,
     FOREIGN KEY (tag_id) REFERENCES snippet_tag (id) ON DELETE CASCADE
 );

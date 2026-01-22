@@ -236,5 +236,6 @@ ${triggerReason}`
     role_id: '',
     action: '',
     dialogue: results.join(""),
+    director_instruction_id: ''
   })
 }

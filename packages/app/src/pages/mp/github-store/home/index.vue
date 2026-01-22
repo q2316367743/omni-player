@@ -36,9 +36,9 @@
   </app-tool-layout>
 </template>
 <script lang="ts" setup>
+import type {RepoItem} from "@/api/github/searchRepositories.ts";
 import {searchRepositories} from "@/api/github/searchRepositories.ts";
 import {reposReleaseLatest} from "@/api/github/repos/releases/latest.ts";
-import type {RepoItem} from "@/api/github/searchRepositories.ts";
 
 const activeTab = ref('popular');
 const displayRepos = ref<RepoItem[]>([]);
@@ -71,14 +71,13 @@ async function fetchReleases(repos: RepoItem[]): Promise<RepoItem[]> {
   );
   const releases = await Promise.all(releasePromises);
   
-  return repos.filter((repo, index) => {
+  return repos.filter((_repo, index) => {
     const release = releases[index];
     if (!release) return false;
-    
-    const hasValidAsset = release.assets.some(asset => 
+
+    return release.assets.some(asset =>
       asset.name !== 'Source Code.zip' && asset.name !== 'source-code.zip'
     );
-    return hasValidAsset;
   });
 }
 
