@@ -188,7 +188,7 @@ tryOnMounted(() => {
 
     .content {
       width: 233px;
-      height: calc(100% - 96px);
+      height: calc(100% - 104px);
       padding: 8px;
       overflow: auto;
     }
