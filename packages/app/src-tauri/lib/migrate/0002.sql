@@ -186,7 +186,8 @@ CREATE TABLE IF NOT EXISTS ai_rt_message
     parent_message_id TEXT    NOT NULL DEFAULT '',
 
     -- 本轮中的顺序
-    turn_order        INTEGER NOT NULL
+    turn_order        INTEGER NOT NULL DEFAULT 0,
+    think             INTEGER NOT NULL DEFAULT 1
 );
 
 -- 创建索引

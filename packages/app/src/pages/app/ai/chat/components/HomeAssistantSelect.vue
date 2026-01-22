@@ -19,7 +19,6 @@ const serviceOptions = computed<Array<SelectOption>>(() => {
 <style scoped lang="less">
 .home-assistant-select {
   :deep(.t-select) {
-    width: 112px;
     height: var(--td-comp-size-m);
     margin-right: var(--td-comp-margin-s);
 

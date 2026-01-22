@@ -29,7 +29,16 @@
           </t-space>
         </template>
         <template #footer-prefix>
-          <home-assistant-select v-model="model"/>
+          <div class="flex items-center">
+            <home-assistant-select v-model="model"/>
+            <div v-if="supportThink">
+              <t-button :theme="think?'primary':'default'" variant="outline" shape="round">
+                <template #icon>
+                </template>
+                深度思考
+              </t-button>
+            </div>
+          </div>
         </template>
       </chat-sender>
     </div>
@@ -51,8 +60,10 @@ const groupId = renderGroup(activeKey.value);
 
 const text = ref('');
 const model = ref(useSettingStore().aiSetting.defaultChatModel);
+const think = ref(true);
 
 const disabled = computed(() => text.value.trim() === '');
+const supportThink = computed(() => useSettingStore().supportThink(model.value));
 
 const onClear = () => text.value = '';
 const onSend = () => {
@@ -65,7 +76,7 @@ const onSend = () => {
 // 模拟消息发送
 const inputEnter = (inputValue: string) => {
   // 添加到列表中
-  createAiChatItemService(groupId, inputValue, model.value)
+  createAiChatItemService(groupId, inputValue, model.value, think.value)
     .then(id => activeKey.value = `/home/chat/${groupId}/${id}?mode=create`)
     .catch(e => MessageUtil.error("提问失败", e));
 };

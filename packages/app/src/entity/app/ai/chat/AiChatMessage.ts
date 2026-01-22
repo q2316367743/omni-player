@@ -3,6 +3,7 @@ import type {ChatMessageParam} from "@/modules/ai/AiChat.ts";
 import type {TdChatItemMeta} from "@tdesign-vue-next/chat";
 import {formatDate} from "@/util/lang/FormatUtil.ts";
 import type {AiChatRole} from "@/global/CommonType.ts";
+import type {YesOrNo} from "@/global/YesOrNo.ts";
 
 
 export interface AiChatMessageCore {
@@ -14,6 +15,8 @@ export interface AiChatMessageCore {
   content: string;
   // 使用的模型
   model: string;
+  // 是否开启深度思考
+  think: YesOrNo;
 }
 
 

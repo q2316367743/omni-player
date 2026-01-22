@@ -207,6 +207,7 @@ CREATE TABLE ai_chat_message
     thinking   TEXT    NOT NULL DEFAULT '',
     content    TEXT    NOT NULL DEFAULT '',
     model      TEXT    NOT NULL DEFAULT '',
+    think      INTEGER NOT NULL DEFAULT 1,
     FOREIGN KEY (chat_id) REFERENCES ai_chat_item (id) ON DELETE CASCADE
 );
 

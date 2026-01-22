@@ -26,8 +26,8 @@
         </t-radio-group>
       </div>
     </div>
-    <custom-chat v-model:model="model" :messages :is-stream-load="isStreamLoad" :layout
-    @operator="handleOperator" @send="onSend" @stop="handleStop"/>
+    <custom-chat v-model:model="model" v-model:think="think" :messages :is-stream-load="isStreamLoad" :layout
+                 @operator="handleOperator" @send="onSend" @stop="handleStop"/>
   </div>
 </template>
 <script lang="ts" setup>
@@ -75,7 +75,7 @@ const abort = shallowRef<AskToOpenAiAbort>();
 const loading = ref(false);
 const isStreamLoad = ref(false);
 const isAsked = ref(false);
-
+const think = ref(true);
 
 tryOnMounted(async () => {
 
@@ -91,6 +91,9 @@ tryOnMounted(async () => {
   // 先获取聊天消息
   messages.value = await listAiChatMessageService(chatId.value);
   model.value = messages.value[messages.value.length - 1]?.model || group.value?.model || useSettingStore().aiSetting.defaultChatModel;
+  think.value = typeof messages.value[messages.value.length - 1]?.think === 'undefined' ?
+    true :
+    messages.value[messages.value.length - 1]?.think === 1;
   if (mode === 'create') {
     // 立即提问
     onAsk();
@@ -123,6 +126,7 @@ const inputEnter = async (inputValue: string) => {
       content: inputValue,
       model: model.value,
       thinking: '',
+      think: think.value ? 1 : 0
     };
     await onSaveContent(message)
     if (old) {
@@ -132,7 +136,8 @@ const inputEnter = async (inputValue: string) => {
           role: 'model-change',
           content: `模型由<span>${old.model}</span>变为<span>${message.model}</span>`,
           model: model.value,
-          thinking: ''
+          thinking: '',
+          think: message.think
         });
       }
     }
@@ -149,6 +154,7 @@ const onSend = (text: string) => {
 async function onAsk() {
   abort.value = undefined;
   const model = messages.value[messages.value.length - 1]!.model;
+  const _think = think.value ? 1 : 0;
   try {
     loading.value = true;
     isStreamLoad.value = true;
@@ -159,7 +165,8 @@ async function onAsk() {
       role: 'assistant',
       content: '',
       model: model,
-      thinking: ''
+      thinking: '',
+      think: _think
     })
     const onUpdateMessage = debounce(async (data: AiChatMessageCore) => {
       await updateAiChatMessageService(messageId!, {thinking: data.thinking, content: data.content});
@@ -193,6 +200,7 @@ async function onAsk() {
       content: '请求出错！原因：' + (e instanceof Error ? e.message : `${e}`),
       thinking: '',
       model: model,
+      think: _think
     });
   } finally {
     loading.value = false;
@@ -204,7 +212,7 @@ async function onAsk() {
 }
 
 // 复制
-const handleOperator = (prop: {operator: string, item: AiChatMessage, index: number}) => {
+const handleOperator = (prop: { operator: string, item: AiChatMessage, index: number }) => {
   const {operator: op, item, index} = prop;
   switch (op) {
     case 'copy':

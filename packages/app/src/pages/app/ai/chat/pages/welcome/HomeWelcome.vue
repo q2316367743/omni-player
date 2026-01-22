@@ -46,7 +46,17 @@
             </t-space>
           </template>
           <template #footer-prefix>
-            <home-assistant-select v-model="model"/>
+            <div class="flex items-center">
+              <home-assistant-select v-model="model"/>
+              <div v-if="supportThink" >
+                <t-button :theme="think?'primary':'default'" variant="outline" shape="round" @click="think = !think">
+                  <template #icon>
+                    <chart-ring1-icon/>
+                  </template>
+                  深度思考
+                </t-button>
+              </div>
+            </div>
           </template>
         </chat-sender>
       </div>
@@ -54,7 +64,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {DeleteIcon, LogoGithubIcon, MenuFoldIcon} from "tdesign-icons-vue-next";
+import {ChartRing1Icon, DeleteIcon, LogoGithubIcon, MenuFoldIcon} from "tdesign-icons-vue-next";
 import {ChatSender} from '@tdesign-vue-next/chat';
 import {activeKey, collapsed, toggleCollapsed} from "@/pages/app/ai/chat/model.ts";
 import MessageUtil from "@/util/model/MessageUtil";
@@ -66,8 +76,10 @@ const emit = defineEmits(["refreshItem"]);
 
 const text = ref('');
 const model = ref(useSettingStore().aiSetting.defaultChatModel);
+const think = ref(true);
 
 const disabled = computed(() => text.value.trim() === '');
+const supportThink = computed(() => useSettingStore().supportThink(model.value));
 
 const onClear = () => text.value = '';
 const onSend = () => {
@@ -81,7 +93,7 @@ const onSend = () => {
 const inputEnter = (inputValue: string) => {
   // 添加到列表中
   // 创建聊天
-  createAiChatItemService("", inputValue, model.value)
+  createAiChatItemService("", inputValue, model.value, think.value)
     .then(id => {
       activeKey.value = `/home/chat/0/${id}?mode=create`;
       emit("refreshItem");

@@ -3,7 +3,8 @@
   <div :class="['home-chat-content', layout]">
     <div class="chat-container">
       <div class="chat-list" ref="chatContentRef" @scroll="handleChatScroll">
-        <div v-for="(item, index) in messages" :key="item.id" class="chat-item" :class="[item.role]" :id="`message-${item.id}`">
+        <div v-for="(item, index) in messages" :key="item.id" class="chat-item" :class="[item.role]"
+             :id="`message-${item.id}`">
           <div v-if="item.role === 'system'" class="system-message">
             <div class="system-content">{{ item.content }}</div>
           </div>
@@ -60,11 +61,32 @@
             </div>
           </div>
           <div v-else-if="item.role === 'user'" class="user-message">
-            <div class="message-body">
-              <div class="message-content">{{ item.content }}</div>
-            </div>
             <div class="message-avatar user-avatar">
               <user-icon/>
+            </div>
+            <div class="message-body">
+              <div class="message-content">{{ item.content }}</div>
+              <div class="message-footer">
+                  <span class="message-info">tokens used: {{ calculateTokens(item.content) }}</span>
+                <div class="message-actions">
+                  <t-tooltip content="复制">
+                    <t-button theme="primary" variant="text" shape="square" size="small"
+                              @click="handleOperator('copy', item, index)">
+                      <template #icon>
+                        <copy-icon/>
+                      </template>
+                    </t-button>
+                  </t-tooltip>
+                  <t-popconfirm content="是否删除此对话，删除后无法恢复" confirm-btn="删除"
+                                @confirm="handleOperator('delete', item, index)">
+                    <t-button theme="danger" variant="text" shape="square" size="small">
+                      <template #icon>
+                        <delete-icon/>
+                      </template>
+                    </t-button>
+                  </t-popconfirm>
+                </div>
+              </div>
             </div>
           </div>
           <div v-else-if="item.role === 'model-change'" class="model-change-message">
@@ -76,7 +98,8 @@
         </div>
       </div>
       <div class="chat-toc">
-        <div v-for="item in messages" :key="item.id" class="toc-item" :class="[item.role, {active: item.id === activeMessageId}]" @click="scrollToMessage(item.id)">
+        <div v-for="item in messages" :key="item.id" class="toc-item"
+             :class="[item.role, {active: item.id === activeMessageId}]" @click="scrollToMessage(item.id)">
           <div class="toc-bar"></div>
           <div class="toc-name">{{ getTocName(item) }}</div>
         </div>
@@ -105,7 +128,18 @@
           </t-space>
         </template>
         <template #footer-prefix>
-          <home-assistant-select v-model="customModel"/>
+          <div class="flex items-center">
+            <home-assistant-select v-model="customModel"/>
+            <div v-if="supportThink">
+              <t-button :theme="customThink ? 'primary' : 'default'" variant="outline" shape="round"
+                        @click="customThink = !customThink">
+                <template #icon>
+                  <chart-ring1-icon/>
+                </template>
+                深度思考
+              </t-button>
+            </div>
+          </div>
         </template>
       </t-chat-sender>
     </div>
@@ -124,9 +158,10 @@ import {
   DeleteIcon,
   StopCircleIcon,
   UserIcon,
-  ServiceIcon
+  ServiceIcon, ChartRing1Icon
 } from "tdesign-icons-vue-next";
 import HomeAssistantSelect from "@/pages/app/ai/chat/components/HomeAssistantSelect.vue";
+import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 
 const props = defineProps({
   messages: {
@@ -144,9 +179,13 @@ const props = defineProps({
   model: {
     type: String,
     default: ''
+  },
+  think: {
+    type: Boolean,
+    default: true
   }
 });
-const emit = defineEmits(['send', 'stop', 'operator', 'update:model']);
+const emit = defineEmits(['send', 'stop', 'operator', 'update:model', 'update:think']);
 
 const chatContentRef = ref<HTMLDivElement>();
 const text = ref('');
@@ -156,14 +195,20 @@ const isAsked = ref(false);
 const isUserScrolling = ref(false);
 const isAutoScroll = ref(true);
 const activeMessageId = ref<string>('');
+
 let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const customModel = computed({
   get: () => props.model,
   set: val => emit('update:model', val)
 })
+const customThink = computed({
+  get: () => props.think,
+  set: val => emit('update:think', val)
+})
 
 const disabled = computed(() => text.value.trim() === '');
+const supportThink = computed(() => useSettingStore().supportThink(customModel.value));
 
 const toggleThinking = (messageId: string) => {
   thinkingCollapsedMap.value.set(messageId, !thinkingCollapsedMap.value.get(messageId));
@@ -191,31 +236,31 @@ const getTocName = (item: AiChatMessage) => {
 const scrollToMessage = (messageId: string) => {
   const element = document.getElementById(`message-${messageId}`);
   if (element && chatContentRef.value) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    element.scrollIntoView({behavior: 'smooth', block: 'start'});
   }
 };
 
 const updateActiveMessage = () => {
   if (!chatContentRef.value) return;
-  
+
   const containerRect = chatContentRef.value.getBoundingClientRect();
-  
+
   let maxOverlap = 0;
   let activeId = '';
-  
+
   props.messages.forEach((message) => {
     const element = document.getElementById(`message-${message.id}`);
     if (element) {
       const elementRect = element.getBoundingClientRect();
       const overlap = Math.max(0, Math.min(elementRect.bottom, containerRect.bottom) - Math.max(elementRect.top, containerRect.top));
-      
+
       if (overlap > maxOverlap) {
         maxOverlap = overlap;
         activeId = message.id;
       }
     }
   });
-  
+
   if (activeId) {
     activeMessageId.value = activeId;
   }

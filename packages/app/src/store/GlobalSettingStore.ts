@@ -23,7 +23,15 @@ export const useSettingStore = defineStore("setting", () => {
       label: m,
       value: m
     }))
-  })
+  });
+
+  /**
+   * 是否支持深度思考
+   * @param model 模型名称
+   */
+  const supportThink = (model: string) => {
+    return aiSetting.value.thinks?.includes(model);
+  }
 
   return {
     globalSetting,
@@ -31,6 +39,7 @@ export const useSettingStore = defineStore("setting", () => {
     rssRefreshInterval,
     modelOptions,
     aiEnabled,
-    defaultChatModel
+    defaultChatModel,
+    supportThink
   }
 })

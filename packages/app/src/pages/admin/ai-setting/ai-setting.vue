@@ -2,11 +2,17 @@
   <div class="p-8px overflow-auto" style="height: calc(100% - 40px)">
     <t-card>
       <t-form :data="aiSetting">
+        <t-form-item label="AI 类型" label-align="top">
+          <t-radio-group v-model="aiSetting.type">
+            <t-radio value="openai">openai</t-radio>
+            <t-radio value="ollama">ollama</t-radio>
+          </t-radio-group>
+        </t-form-item>
         <t-form-item label="模型服务地址" label-align="top">
           <t-input v-model="aiSetting.url" placeholder="请输入模型服务地址"/>
         </t-form-item>
         <t-form-item label="模型服务密钥" label-align="top">
-          <t-input v-model="aiSetting.key" placeholder="请输入模型服务密钥" type="password" />
+          <t-input v-model="aiSetting.key" placeholder="请输入模型服务密钥" type="password"/>
         </t-form-item>
         <t-form-item label="模型" label-align="top">
           <div class="flex gap-8px w-full">
@@ -19,6 +25,9 @@
               刷新
             </t-button>
           </div>
+        </t-form-item>
+        <t-form-item label="支持深度思考的模型" label-align="top">
+          <t-select v-model="aiSetting.thinks" multiple :options="thinkOptions"/>
         </t-form-item>
         <t-form-item label="默认聊天模型" label-align="top">
           <t-select v-model="aiSetting.defaultChatModel" :options="modelOptions"/>
@@ -43,6 +52,12 @@ import MessageUtil from "@/util/model/MessageUtil.ts";
 const {aiSetting, modelOptions} = storeToRefs(useSettingStore());
 const loading = ref(false);
 
+const thinkOptions = computed(() => aiSetting.value.model?.map(e => ({label: e, value: e})) || []);
+
+watch(() => aiSetting.value.model, val => {
+  // 删除不存在的模型
+  aiSetting.value.thinks = aiSetting.value.thinks.filter(e => val.includes(e));
+})
 
 const handleRefresh = async () => {
   if (loading.value) return;

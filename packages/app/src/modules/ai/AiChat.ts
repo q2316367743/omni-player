@@ -25,6 +25,7 @@ interface Assistant {
 interface AskToOpenAiProps {
   messages: Array<ChatMessageParam>;
   assistant: Assistant;
+  think?: boolean;
   // 流式处理回调开始
   onStart?: () => void;
   // 流式处理回调
@@ -37,8 +38,9 @@ interface AskToOpenAiProps {
  * 向OpenAI进行提问
  */
 export async function askToOpenAi(props: AskToOpenAiProps): Promise<void> {
-  const {messages, assistant, onStart, onAppend, onAborted} = props;
-  const {aiSetting} = useSettingStore();
+  const {messages, assistant, think, onStart, onAppend, onAborted} = props;
+  const {aiSetting, supportThink} = useSettingStore();
+  const st = supportThink(assistant.model);
   const openAi = new OpenAI({
     baseURL: aiSetting.url,
     apiKey: aiSetting.key,
@@ -51,7 +53,7 @@ export async function askToOpenAi(props: AskToOpenAiProps): Promise<void> {
     stream: true,
     temperature: assistant.temperature,
     top_p: assistant.topP,
-    // top_logprobs: assistant.maxChats,
+    ...(st && {thinking: {type: think ? 'enabled' : 'disabled'}}),
   });
   onStart?.();
   onAborted(response.controller);

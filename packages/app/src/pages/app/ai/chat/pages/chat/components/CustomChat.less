@@ -21,6 +21,24 @@
       .chat-item {
         transition: all var(--fluent-transition-normal);
 
+        .message-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 8px 0;
+
+          .message-info {
+            font-size: 12px;
+            color: var(--td-text-color-placeholder);
+            font-family: var(--td-font-family), serif;
+          }
+
+          .message-actions {
+            display: flex;
+            gap: 4px;
+          }
+        }
+
         &.system {
           .system-message {
             padding: 12px 16px;
@@ -186,23 +204,7 @@
                 }
               }
 
-              .message-footer {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 8px 0;
 
-                .message-info {
-                  font-size: 12px;
-                  color: var(--td-text-color-placeholder);
-                  font-family: var(--td-font-family);
-                }
-
-                .message-actions {
-                  display: flex;
-                  gap: 4px;
-                }
-              }
             }
           }
         }

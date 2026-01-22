@@ -43,9 +43,10 @@ export async function removeAiChatItemService(id: string) {
  * @param groupId 所属分组
  * @param message 内容
  * @param model 模型
+ * @param think 是否思考
  * @returns 聊天项ID
  */
-export async function createAiChatItemService(groupId: string, message: string, model: string) {
+export async function createAiChatItemService(groupId: string, message: string, model: string, think: boolean) {
   const sql = useSql();
   const now = Date.now();
   // 创建聊天记录
@@ -71,7 +72,8 @@ export async function createAiChatItemService(groupId: string, message: string, 
         content: group.prompt,
         created_at: now,
         updated_at: now,
-        index: 0
+        index: 0,
+        think: think ? 1 : 0
       });
       idx = 1;
     }

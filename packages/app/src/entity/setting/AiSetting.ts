@@ -26,6 +26,11 @@ export interface AiModel {
 export interface AiSetting {
 
   /**
+   * AI 类型
+   */
+  type: 'openai' | 'ollama'
+
+  /**
    * 模型服务地址
    */
   url: string;
@@ -39,6 +44,11 @@ export interface AiSetting {
    * 启用的模型
    */
   model: Array<string>;
+
+  /**
+   * 支持深度思考的模型，默认为空，如果加入，则会出现是否启用深度思考的按钮
+   */
+  thinks: Array<string>;
 
   /**
    * 支持的模型
@@ -69,9 +79,11 @@ export interface AiSetting {
 
 export function buildAiSetting(): AiSetting {
   return {
+    type: 'openai',
     url: "https://api.openai.com/v1",
     key: '',
     model: ["gpt-3.5-turbo"],
+    thinks: [],
     defaultChatModel: "gpt-3.5-turbo",
     defaultTopicModel: '',
     defaultSearchModel: '',
