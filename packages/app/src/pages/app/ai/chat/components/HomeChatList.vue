@@ -33,7 +33,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {AlignTopIcon, FolderIcon, MoreIcon, PlusIcon} from "tdesign-icons-vue-next";
+import {AlignTopIcon, DeleteIcon, EditIcon, FolderIcon, MoreIcon, MoveIcon, PlusIcon} from "tdesign-icons-vue-next";
 import ContextMenu, {type MenuItem} from "@imengyu/vue3-context-menu";
 import type {AiChatItem} from "@/entity/app/ai/chat";
 import {listAiChatGroupService} from "@/services/app/chat";
@@ -62,6 +62,8 @@ const onClick = (path: string) => {
 };
 
 const onChatMenuClick = async (data: AiChatItem, e: MouseEvent) => {
+  e.stopPropagation();
+  e.preventDefault();
   const groups = await listAiChatGroupService();
   const items = new Array<MenuItem>();
   groups.forEach((group) => {
@@ -89,14 +91,17 @@ const onChatMenuClick = async (data: AiChatItem, e: MouseEvent) => {
     items: [
       {
         label: "移动到分组",
+        icon: () => h(MoveIcon),
         children: items,
       },
       {
+        icon: () => h(EditIcon),
         label: "编辑名称",
         onClick: () => onRenameChat(data),
       },
       {
         label: data.top ? "取消置顶" : "置顶",
+        icon: () => h(AlignTopIcon),
         onClick: () => onTopChat(data),
       },
       {
@@ -107,9 +112,11 @@ const onChatMenuClick = async (data: AiChatItem, e: MouseEvent) => {
               style: {
                 color: "var(--td-error-color)",
               },
+              class: 'label'
             },
             "删除"
           ),
+        icon: () => h(DeleteIcon),
         onClick: () =>
           onRemoveChat("0", data.id, () => {
             emit('refreshItem');

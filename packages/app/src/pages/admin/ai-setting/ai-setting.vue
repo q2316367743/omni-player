@@ -48,6 +48,7 @@ import {OpenAI} from 'openai';
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 import {RefreshIcon} from "tdesign-icons-vue-next";
 import MessageUtil from "@/util/model/MessageUtil.ts";
+import {getTauriFetch} from "@/lib/http.ts";
 
 const {aiSetting, modelOptions} = storeToRefs(useSettingStore());
 const loading = ref(false);
@@ -68,7 +69,8 @@ const handleRefresh = async () => {
       baseURL: aiSetting.value.url,
       apiKey: aiSetting.value.key,
       timeout: aiSetting.value.timeout,
-      dangerouslyAllowBrowser: true
+      dangerouslyAllowBrowser: true,
+      fetch: getTauriFetch()
     });
     const models = await client.models.list({})
     models.data.forEach(model => {

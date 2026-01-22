@@ -3,7 +3,7 @@
 
     <div class="tools-group">
       <div class="group-title">程序员三件套</div>
-      <div class="tools-grid mini-tools-grid">
+      <div class="tools-grid">
         <tool-card value="todo" label="待办" desc="井井有条" tone="media">
           <template #icon>
             <check-rectangle-icon/>

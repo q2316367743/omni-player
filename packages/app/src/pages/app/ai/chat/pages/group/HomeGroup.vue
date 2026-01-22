@@ -13,44 +13,19 @@
     <div class="home-group__footer">
       <chat-sender
         v-model="text"
-        class="chat-sender"
-        :textarea-props="{placeholder: '在这里提问，新建对话'}"
+        :model="model"
+        :think="think"
+        placeholder="在这里提问，新建对话"
         @send="inputEnter"
-      >
-        <template #suffix>
-          <t-space size="small">
-            <t-button variant="outline" shape="round" :disabled @click="onClear">
-              <template #icon>
-                <delete-icon/>
-              </template>
-              清空输入
-            </t-button>
-            <t-button shape="round" :disabled @click="onSend">发送</t-button>
-          </t-space>
-        </template>
-        <template #footer-prefix>
-          <div class="flex items-center">
-            <home-assistant-select v-model="model"/>
-            <div v-if="supportThink">
-              <t-button :theme="think?'primary':'default'" variant="outline" shape="round">
-                <template #icon>
-                </template>
-                深度思考
-              </t-button>
-            </div>
-          </div>
-        </template>
-      </chat-sender>
+      />
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import {DeleteIcon, MenuFoldIcon} from "tdesign-icons-vue-next";
-import {ChatSender} from "@tdesign-vue-next/chat";
+import {MenuFoldIcon} from "tdesign-icons-vue-next";
 import MessageUtil from "@/util/model/MessageUtil";
 import {activeKey, collapsed, renderGroup, toggleCollapsed} from "@/pages/app/ai/chat/model";
 import HomeGroupContent from "@/pages/app/ai/chat/pages/group/HomeGroupContent.vue";
-import HomeAssistantSelect from "@/pages/app/ai/chat/components/HomeAssistantSelect.vue";
 import {createAiChatItemService, getAiChatGroupService} from "@/services/app/chat";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 
@@ -62,20 +37,7 @@ const text = ref('');
 const model = ref(useSettingStore().aiSetting.defaultChatModel);
 const think = ref(true);
 
-const disabled = computed(() => text.value.trim() === '');
-const supportThink = computed(() => useSettingStore().supportThink(model.value));
-
-const onClear = () => text.value = '';
-const onSend = () => {
-  if (disabled.value) {
-    return;
-  }
-  inputEnter(text.value);
-  text.value = '';
-};
-// 模拟消息发送
 const inputEnter = (inputValue: string) => {
-  // 添加到列表中
   createAiChatItemService(groupId, inputValue, model.value, think.value)
     .then(id => activeKey.value = `/home/chat/${groupId}/${id}?mode=create`)
     .catch(e => MessageUtil.error("提问失败", e));
@@ -88,7 +50,6 @@ const onRefreshGroup = () => {
 onMounted(async () => {
   const group = await getAiChatGroupService(groupId);
   if (group) {
-    // 尝试获取分组的模型
     model.value = group.model || model.value;
   }
 })

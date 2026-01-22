@@ -53,52 +53,56 @@
                          :layout="layout"
                          ref="chatContentRef" @scroll="handleChatScroll"/>
         <div v-if="meeting?.status !== 'ended'" :class="['chat-sender-wrapper', layout]">
-          <div class="chat-sender">
-            <t-chat-sender v-model="text" placeholder="输入消息...">
-              <template #footer-prefix>
-                <t-space size="small">
-                  <t-button
-                    v-if="isPaused"
-                    theme="primary"
-                    shape="round"
-                    @click="handleResume"
-                  >
-                    <template #icon>
-                      <play-icon/>
-                    </template>
-                    继续
-                  </t-button>
-                  <t-button
-                    v-else
-                    theme="warning"
-                    shape="round"
-                    :loading="isPauseWaiting"
-                    :disabled="isPauseWaiting"
-                    @click="handlePause"
-                  >
-                    <template #icon>
-                      <pause-icon/>
-                    </template>
-                    我要发言
-                  </t-button>
-                </t-space>
-              </template>
-              <template #suffix>
-                <t-button v-if="isSpeaking" shape="round" theme="danger" @click="handleInterrupt">
+          <chat-sender
+            v-model="text"
+            placeholder="输入消息..."
+            :show-clear="false"
+            :show-model-select="false"
+            :show-think="false"
+          >
+            <template #footer-prefix>
+              <t-space size="small">
+                <t-button
+                  v-if="isPaused"
+                  theme="primary"
+                  shape="round"
+                  @click="handleResume"
+                >
                   <template #icon>
-                    <stop-circle-icon/>
+                    <play-icon/>
                   </template>
-                  打断发言
+                  继续
                 </t-button>
-                <t-button v-else shape="round" theme="primary" @click="handleSend">
+                <t-button
+                  v-else
+                  theme="warning"
+                  shape="round"
+                  :loading="isPauseWaiting"
+                  :disabled="isPauseWaiting"
+                  @click="handlePause"
+                >
                   <template #icon>
-                    <send-icon/>
+                    <pause-icon/>
                   </template>
-                  发送
+                  我要发言
                 </t-button>
-              </template>
-            </t-chat-sender>
-          </div>
+              </t-space>
+            </template>
+            <template #suffix>
+              <t-button v-if="isSpeaking" shape="round" theme="danger" @click="handleInterrupt">
+                <template #icon>
+                  <stop-circle-icon/>
+                </template>
+                打断发言
+              </t-button>
+              <t-button v-else shape="round" theme="primary" @click="handleSend">
+                <template #icon>
+                  <send-icon/>
+                </template>
+                发送
+              </t-button>
+            </template>
+          </chat-sender>
         </div>
       </div>
       <meeting-private v-show="page === '2'" v-if="meeting" :participants :messages :meeting="meeting"

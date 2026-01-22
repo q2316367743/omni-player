@@ -106,42 +106,15 @@
       </div>
     </div>
     <div class="chat-sender-wrapper">
-      <t-chat-sender
+      <chat-sender
         v-model="text"
-        class="chat-sender"
-        :textarea-props="{placeholder: '请输入消息...',disabled: isAsked}"
-      >
-        <template #suffix>
-          <t-button theme="danger" shape="circle" v-if="isAsked" @click="handleStop">
-            <template #icon>
-              <stop-circle-icon/>
-            </template>
-          </t-button>
-          <t-space size="small" v-else>
-            <t-button variant="outline" shape="round" :disabled @click="onClear">
-              <template #icon>
-                <delete-icon/>
-              </template>
-              清空输入
-            </t-button>
-            <t-button shape="round" :disabled @click="onSend">发送</t-button>
-          </t-space>
-        </template>
-        <template #footer-prefix>
-          <div class="flex items-center">
-            <home-assistant-select v-model="customModel"/>
-            <div v-if="supportThink">
-              <t-button :theme="customThink ? 'primary' : 'default'" variant="outline" shape="round"
-                        @click="customThink = !customThink">
-                <template #icon>
-                  <chart-ring1-icon/>
-                </template>
-                深度思考
-              </t-button>
-            </div>
-          </div>
-        </template>
-      </t-chat-sender>
+        :model="model"
+        :think="think"
+        :disabled="isAsked"
+        :show-stop="isAsked"
+        @send="emit('send', $event)"
+        @stop="emit('stop')"
+      />
     </div>
     <t-button v-if="isShowToBottom" variant="text" class="bottomBtn" @click="backBottom">
       <arrow-down-icon/>
@@ -156,12 +129,9 @@ import {
   ChevronRightIcon,
   CopyIcon,
   DeleteIcon,
-  StopCircleIcon,
   UserIcon,
-  ServiceIcon, ChartRing1Icon
+  ServiceIcon
 } from "tdesign-icons-vue-next";
-import HomeAssistantSelect from "@/pages/app/ai/chat/components/HomeAssistantSelect.vue";
-import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 
 const props = defineProps({
   messages: {
@@ -197,18 +167,6 @@ const isAutoScroll = ref(true);
 const activeMessageId = ref<string>('');
 
 let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
-
-const customModel = computed({
-  get: () => props.model,
-  set: val => emit('update:model', val)
-})
-const customThink = computed({
-  get: () => props.think,
-  set: val => emit('update:think', val)
-})
-
-const disabled = computed(() => text.value.trim() === '');
-const supportThink = computed(() => useSettingStore().supportThink(customModel.value));
 
 const toggleThinking = (messageId: string) => {
   thinkingCollapsedMap.value.set(messageId, !thinkingCollapsedMap.value.get(messageId));
@@ -305,22 +263,8 @@ const calculateTokens = (content: string): number => {
   return Math.ceil(content.length / 4);
 };
 
-const onClear = () => {
-  text.value = '';
-}
-
 const handleOperator = (operator: string, item: AiChatMessage, index: number) => {
   emit('operator', {operator, item, index});
-}
-const handleStop = () => {
-  emit('stop');
-}
-const onSend = () => {
-  if (text.value.trim() === '') {
-    return;
-  }
-  emit('send', text.value);
-  text.value = '';
 }
 
 const scrollToBottom = (behavior: 'auto' | 'smooth' = 'auto') => {
@@ -345,6 +289,7 @@ watch(
 watch(
   () => props.isStreamLoad,
   async (newVal, oldVal) => {
+    isAsked.value = newVal;
     if (newVal === false && oldVal === true) {
       await nextTick();
       if (isAutoScroll.value) {

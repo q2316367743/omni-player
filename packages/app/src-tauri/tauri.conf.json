@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "xiaohei",
+  "productName": "楼下小黑",
   "version": "1.1.0",
   "identifier": "xyz.esion.xiaohei",
   "build": {
@@ -29,7 +29,8 @@
       },
       "csp": {
         "default-src": ["'self'", "ipc:", "http://ipc.localhost"],
-        "img-src": ["'self'", "asset:", "http://asset.localhost", "*"]
+        "img-src": ["'self'", "asset:", "http://asset.localhost", "*"],
+        "style-src": ["'self'", "'unsafe-inline'"]
       }
     },
     "withGlobalTauri": true

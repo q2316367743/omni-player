@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
+import {getTauriFetch} from "@/lib/http.ts";
 
 export interface AskToOpenAiAbort {
   abort: (reason?: string) => void;
@@ -44,7 +45,9 @@ export async function askToOpenAi(props: AskToOpenAiProps): Promise<void> {
   const openAi = new OpenAI({
     baseURL: aiSetting.url,
     apiKey: aiSetting.key,
-    dangerouslyAllowBrowser: true
+    timeout: aiSetting.timeout,
+    dangerouslyAllowBrowser: true,
+    fetch: getTauriFetch()
   });
 
   const response = await openAi.chat?.completions.create({

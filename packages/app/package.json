@@ -38,7 +38,6 @@
     "@tauri-apps/plugin-sql": "^2.3.1",
     "@tauri-apps/plugin-store": "~2.4.1",
     "@tauri-apps/plugin-updater": "~2",
-    "@tdesign-vue-next/chat": "0.5.0-alpha.10",
     "@vueuse/core": "^14.1.0",
     "@vueuse/integrations": "^14.1.0",
     "@zumer/snapdom": "^2.0.1",
