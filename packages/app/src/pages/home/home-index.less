@@ -1,7 +1,7 @@
 .home-container {
   width: 100%;
   height: 100%;
-  overflow-y: auto;
+  overflow: hidden;
   background: var(--td-bg-color-page);
   position: relative;
   padding: var(--td-size-6);
@@ -20,7 +20,7 @@
   max-width: 1600px;
   margin: 0 auto;
   :deep(.t-tabs__content) {
-    max-height: calc(100vh - 254px);
+    height: calc(100vh - 232px);
     overflow: auto;
   }
 }
