@@ -4,14 +4,12 @@ import type {BaseEntity} from "@/entity/BaseEntity.ts";
  * 角色类型
  * - member：成员
  * - narrator：叙述者
- * - decision：决策者
  */
-export type SpRoleType = 'member' | 'narrator' | 'decision';
+export type SpRoleType = 'member' | 'narrator';
 
 export const SpRoleTypeMap: Record<SpRoleType, string> = {
   member: '成员',
   narrator: '叙述者',
-  decision: '决策者',
 };
 
 export interface SpRoleCore {

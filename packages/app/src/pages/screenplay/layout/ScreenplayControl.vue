@@ -6,63 +6,49 @@
       </template>
       进入场景
     </t-button>
-    <t-button v-if="showRoleAdd" theme="primary" variant="outline" @click="roleAdd">
+    <t-button theme="primary" variant="outline" @click="roleAdd">
       <template #icon>
         <user-add-icon/>
       </template>
       角色入场
     </t-button>
-    <t-button v-if="showRoleAdd" theme="warning" variant="outline" @click="triggerEvent">
+    <t-button theme="warning" variant="outline" @click="triggerEvent">
       <template #icon>
         <error-circle-icon/>
       </template>
       突发事件
     </t-button>
-    <t-button v-if="showRoleAdd" theme="default" @click="advanceStory">
+    <t-button theme="default" @click="advanceStory">
       <template #icon>
         <chevron-right-icon/>
       </template>
       推进剧情
     </t-button>
     <t-dropdown placement="top" trigger="click" max-column-width="350px">
-      <t-button theme="default" variant="dashed" @click="addScene">
+      <t-button theme="default" variant="dashed">
         <template #icon>
           <add-icon/>
         </template>
         发送指令
       </t-button>
       <t-dropdown-menu>
-        <t-dropdown-item @click="openSpDirectorInstructionLog(screenplay.id, currentSceneId!, 'character_slip')">
+        <t-dropdown-item @click="openSpDirector('character_slip')">
           强制角色说出指定台词
         </t-dropdown-item>
-        <t-dropdown-item @click="openSpDirectorInstructionLog(screenplay.id, currentSceneId!, 'reveal_item')">
+        <t-dropdown-item @click="openSpDirector('reveal_item')">
           插入物品发现事件
         </t-dropdown-item>
-        <t-dropdown-item @click="openSpDirectorInstructionLog(screenplay.id, currentSceneId!, 'external_event')">
+        <t-dropdown-item @click="openSpDirector('external_event')">
           插入环境事件
         </t-dropdown-item>
-        <t-dropdown-item @click="openSpDirectorInstructionLog(screenplay.id, currentSceneId!, 'skip_turn')">
+        <t-dropdown-item @click="openSpDirector('skip_turn')">
           跳过某角色本轮发言
         </t-dropdown-item>
-        <t-dropdown-item @click="openSpDirectorInstructionLog(screenplay.id, currentSceneId!, 'trigger_emotion')">
+        <t-dropdown-item @click="openSpDirector('trigger_emotion')">
           强制修改情绪
         </t-dropdown-item>
       </t-dropdown-menu>
     </t-dropdown>
-    <div class="ml-auto">
-      <t-button v-if="pause" theme="default" variant="outline" @click="pauseStory">
-        <template #icon>
-          <play-circle-icon/>
-        </template>
-        继续
-      </t-button>
-      <t-button v-else theme="default" variant="outline" @click="pauseStory">
-        <template #icon>
-          <pause-circle-icon/>
-        </template>
-        暂停
-      </t-button>
-    </div>
   </div>
 </template>
 <script lang="ts" setup>
@@ -71,89 +57,38 @@ import {
   ChevronRightIcon,
   ErrorCircleIcon,
   LoginIcon,
-  PauseCircleIcon, PlayCircleIcon,
   UserAddIcon
 } from "tdesign-icons-vue-next";
-import type {Screenplay, SpRole, SpScene} from "@/entity/screenplay";
-import {openSpSceneAdd} from "@/pages/screenplay/func/SpSceneEdit.tsx";
-import {openSpRoleAppearanceAdd} from "@/pages/screenplay/func/SpRoleAppearanceEdit.tsx";
-import {openSpDialogueAddNarrator} from "@/pages/screenplay/func/SpDialogualEdit.tsx";
+import type {SpDilInstruction} from "@/entity/screenplay";
 import {openSpDirectorInstructionLog} from "@/pages/screenplay/func/SpDilEdit.tsx";
+import type {ScreenEngine} from "@/pages/screenplay/ScreenEngine.ts";
 
 const props = defineProps({
-  screenplay: {
-    type: Object as PropType<Screenplay>,
+  engine: {
+    type: Object as PropType<ScreenEngine>,
     required: true
   },
-  scenes: {
-    type: Array as PropType<Array<SpScene>>,
-    required: true
-  },
-  currentSceneId: {
-    type: String,
-  },
-  pause: {
-    type: Boolean,
-    default: false
-  },
-  roles: {
-    type: Array as PropType<Array<SpRole>>,
-    required: true
-  },
-  roleMap: {
-    type: Map as PropType<Map<string, SpRole>>,
-    required: true
-  }
 });
-const emit = defineEmits(['refreshScene', 'refreshRoleAppearance', 'refreshDialogue', 'pauseToggle']);
 
-const showRoleAdd = computed(() => {
-  return props.currentSceneId &&
-    props.scenes.length > 0 &&
-    props.currentSceneId ===
-    props.scenes[props.scenes.length - 1]?.id
-})
-
+// 进入场景
 const enterScene = () => {
-  openSpSceneAdd(props.screenplay.id, () => {
-    emit('refreshScene');
-  })
 }
 
+// 角色入场
 const roleAdd = () => {
-  openSpRoleAppearanceAdd(
-    props.screenplay.id,
-    props.currentSceneId!,
-    async () => {
-      emit('refreshRoleAppearance')
-    },
-    props.screenplay,
-    props.scenes.find(s => s.id === props.currentSceneId),
-    props.roleMap,
-    props.roles.find(r => r.type === 'narrator')
-  )
 }
 
+// 触发事件
 const triggerEvent = () => {
   console.log('Trigger event')
 }
 
+// 推进剧情
 const advanceStory = () => {
-  openSpDialogueAddNarrator(
-    props.screenplay.id,
-    props.currentSceneId!,
-    () => {
-      emit('refreshDialogue')
-    }
-  )
 }
 
-const pauseStory = () => {
-  emit('pauseToggle');
-}
-
-const addScene = () => {
-  console.log('Add scene')
+const openSpDirector = (instruction: SpDilInstruction) => {
+  openSpDirectorInstructionLog(props.engine.config.screenplay.id, props.engine.config.getCurrentScene()!.id, instruction)
 }
 
 </script>

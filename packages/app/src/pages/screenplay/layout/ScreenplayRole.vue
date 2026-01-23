@@ -6,17 +6,7 @@
         {{ screenplay.title }}
       </h3>
     </div>
-    <div v-if="type === 'all'" class="role-content">
-      <div class="role-single">
-        <div>决策者</div>
-        <t-button theme="primary" size="small" class="!ml-auto" @click="addOrUpdateDecisionRole">
-          <template #icon>
-            <edit1-icon v-if="decisionRoles.length>0"/>
-            <add-icon v-else/>
-          </template>
-          {{ decisionRoles.length > 0 ? '修改' : '新增' }}
-        </t-button>
-      </div>
+    <div v-if="type === 'role'" class="role-content">
       <div class="role-single">
         <div>叙述者</div>
         <t-button theme="primary" size="small" class="!ml-auto" @click="addOrUpdateNarratorRole">
@@ -56,15 +46,6 @@
     </div>
     <div v-else-if="type === 'current'" class="role-content">
       <div class="role-list">
-        <div v-if="decisionRoles[0]" class="role-card">
-          <div class="role-avatar">
-            <t-loading v-if="loadingRoleIds.includes(decisionRoles[0].id)" size="small" theme="primary"/>
-            <template v-else>{{ decisionRoles[0].name.charAt(0) }}</template>
-          </div>
-          <div class="role-info">
-            <div class="role-name">{{ decisionRoles[0].name }}</div>
-          </div>
-        </div>
         <div v-if="narratorRoles[0]" class="role-card">
           <div class="role-avatar">
             <t-loading v-if="loadingRoleIds.includes(narratorRoles[0].id)" size="small" theme="primary"/>
@@ -95,8 +76,9 @@
     </div>
     <div class="role-footer">
       <t-tabs v-model="type" placement="bottom">
-        <t-tab-panel label="全部角色" value="all"/>
-        <t-tab-panel label="当前场景" value="current"/>
+        <t-tab-panel label="章节" value="chapter"/>
+        <t-tab-panel label="角色" value="role"/>
+        <t-tab-panel label="日志" value="log"/>
       </t-tabs>
     </div>
   </aside>
@@ -105,7 +87,6 @@
 import {type Screenplay, type SpRole} from "@/entity/screenplay";
 import {AddIcon, Edit1Icon} from "tdesign-icons-vue-next";
 import {
-  openSpDecisionRoleAdd,
   openSpNarratorRoleAdd,
   openSpRoleAdd,
 } from "@/pages/screenplay/func/SpRoleEdit.tsx";
@@ -140,9 +121,8 @@ const props = defineProps({
 });
 const emit = defineEmits(['refresh']);
 
-const type = ref('all');
+const type = ref('chapter');
 
-const decisionRoles = computed(() => props.roles.filter(role => role.type === 'decision'));
 const narratorRoles = computed(() => props.roles.filter(role => role.type === 'narrator'));
 const memberRoles = computed(() => props.roles.filter(role => role.type === 'member'));
 
@@ -161,11 +141,6 @@ const addOrUpdateNarratorRole = () => {
   }, narratorRoles.value[0])
 }
 
-const addOrUpdateDecisionRole = () => {
-  openSpDecisionRoleAdd(props.screenplay.id, () => {
-    emit('refresh');
-  }, decisionRoles.value[0])
-}
 
 const deleteRole = () => {
   emit('refresh');

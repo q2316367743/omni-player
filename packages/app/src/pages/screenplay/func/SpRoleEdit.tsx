@@ -94,45 +94,6 @@ export function openSpNarratorRoleAdd(screenplayId: string, onUpdate: () => void
   })
 }
 
-
-export function openSpDecisionRoleAdd(screenplayId: string, onUpdate: () => void, old?: SpRole) {
-  const {defaultChatModel, modelOptions} = useSettingStore();
-  const data = ref<SpRoleCore>(old ? cloneDeep(old) : {
-    screenplay_id: screenplayId,
-    name: '决策者',
-    identity: '决策者',
-    secret_info: '',
-    personality: '',
-    type: 'decision',
-    model: defaultChatModel
-  });
-  const op = old ? '修改' : '新增';
-  const dp = DrawerPlugin({
-    header: op + "决策者",
-    confirmBtn: op,
-    size: "800px",
-    onConfirm() {
-      (old ? updateSpRoleService(old.id, data.value) : addSpRoleService(data.value))
-        .then(() => {
-          onUpdate();
-          dp.destroy?.();
-          MessageUtil.success(op + "成功");
-        })
-        .catch(e => {
-          MessageUtil.error(op + "新增失败", e);
-        })
-    },
-    default: () => (<Form>
-      <FormItem labelAlign="top" label="模型" class="config-form-item">
-        <Select v-model={data.value.model} options={modelOptions} filterable={true}/>
-      </FormItem>
-      <FormItem labelAlign="top" label="提示词" help={'影响故事发展的走向'} class="config-form-item">
-        <Textarea autosize={{minRows: 3, maxRows: 10}} v-model={data.value.personality}/>
-      </FormItem>
-    </Form>)
-  })
-}
-
 export function openSpRoleDelete(roleId: string, onUpdate: () => void) {
   // TODO: 此处要校验，该角色是否已经发生过对话
   MessageBoxUtil.confirm("是否删除此角色？", "删除角色")

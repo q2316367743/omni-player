@@ -13,10 +13,7 @@
 
         <screenplay-dialogue :role-map="roleMap" :dialogues="dialogues"/>
 
-        <screenplay-control v-if="screenplay" :screenplay="screenplay" :scenes :current-scene-id="currentSceneId"
-                            :pause="isPause" :roles="roles" :role-map="roleMap"
-                            @refresh-scene="refreshScene" @refresh-role-appearance="fetchRoleAppearance"
-                            @refresh-dialogue="fetchDialogue" @pause-toggle="toggleAutoPlay"/>
+        <screenplay-control v-if="engine" :engine="engine"/>
       </div>
     </main>
   </div>
@@ -37,6 +34,7 @@ import ScreenplayDialogue from "@/pages/screenplay/layout/ScreenplayDialogue.vue
 import ScreenplayControl from "@/pages/screenplay/layout/ScreenplayControl.vue";
 import type {SpRoleAppearance} from "@/entity/screenplay/SpRoleAppearance.ts";
 import {AutoPlayManager} from "@/modules/ai/AutoPlayManager.ts";
+import {ScreenEngine} from "@/pages/screenplay/ScreenEngine.ts";
 
 const route = useRoute();
 
@@ -51,6 +49,8 @@ const loadingRoleIds = ref<string[]>([]);
 const autoPlayManager = ref<AutoPlayManager>();
 // 角色分组 场景 => 角色列表
 const roleAppearanceMap = ref(new MapWrapper<string, Array<SpRoleAppearance>>());
+
+const engine = ref<ScreenEngine>();
 
 watch(currentSceneId, async (newSceneId) => {
   if (!screenplay.value) return;
@@ -88,20 +88,22 @@ const onChangeScene = (scene: SpScene) => {
   currentSceneId.value = scene.id
 }
 
-const toggleAutoPlay = () => {
-  if (!autoPlayManager.value) return;
-
-  if (isPause.value) {
-    autoPlayManager.value.resume();
-    isPause.value = false;
-  } else {
-    autoPlayManager.value.pause();
-    isPause.value = true;
-  }
-}
-
 const initAutoPlayManager = () => {
   if (!screenplay.value || !currentSceneId.value) return;
+
+  engine.value = new ScreenEngine({
+    screenplay: screenplay.value,
+    getCurrentScene: () => scenes.value.find(s => s.id === currentSceneId.value),
+    getScenes: () => scenes.value,
+    getRoles: () => roles.value,
+    getDialogues: () => dialogues.value,
+    getNarrator: () => roles.value.find(r => r.type === 'narrator'),
+    getRoleMap: () => roleMap.value,
+
+    onDialogueUpdate: async () => {
+      await fetchDialogue();
+    },
+  })
 
   const director = roles.value.find(r => r.type === 'decision');
   const narrator = roles.value.find(r => r.type === 'narrator');
@@ -113,6 +115,7 @@ const initAutoPlayManager = () => {
 
   const currentScene = scenes.value.find(s => s.id === currentSceneId.value);
   if (!currentScene) return;
+
 
   autoPlayManager.value = new AutoPlayManager({
     screenplay: screenplay.value,
