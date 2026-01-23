@@ -3,7 +3,7 @@ import {DialogPlugin, Option, Select} from "tdesign-vue-next";
 import {addSpRoleAppearanceService, listSpRoleAppearanceService, listSpRoleService} from "@/services/screenplay";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import type {Screenplay, SpRole, SpScene} from "@/entity/screenplay";
-import {askAiScreenplayNarrator} from "@/modules/ai/AiScreenplayNarrator";
+import {askAiScreenplayNarrator} from "@/modules/ai/AiScreenplayNarrator.ts";
 
 export async function openSpRoleAppearanceAdd(
   screenplayId: string,

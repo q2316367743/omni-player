@@ -4,6 +4,9 @@ export interface SpSceneCore {
 
   screenplay_id: string;
 
+  // 章节ID
+  chapter_id: string;
+
   /**
    * 场景名称（如“市政厅会议室”）
    */

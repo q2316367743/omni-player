@@ -2,15 +2,16 @@
   <t-button :theme :variant :size shape="square"
             @click="goBack()">
     <template #icon>
-      <chevron-left-icon/>
+      <home-icon v-if="home"/>
+      <chevron-left-icon v-else/>
     </template>
   </t-button>
 </template>
 <script lang="ts" setup>
-import {ChevronLeftIcon} from "tdesign-icons-vue-next";
+import {ChevronLeftIcon, HomeIcon} from "tdesign-icons-vue-next";
 import {type TdButtonProps} from "tdesign-vue-next";
 
-defineProps({
+const props = defineProps({
   theme: {
     type: String as PropType<TdButtonProps["theme"]>,
     default: "primary"
@@ -22,11 +23,21 @@ defineProps({
   size: {
     type: String as PropType<TdButtonProps["size"]>,
     default: "medium"
+  },
+  home: {
+    type: Boolean,
+    default: false
   }
 });
 
 const router = useRouter();
-const goBack = () => router.back();
+const goBack = () => {
+  if (props.home) {
+    router.push('/home');
+    return;
+  }
+  router.back();
+}
 </script>
 <style scoped lang="less">
 

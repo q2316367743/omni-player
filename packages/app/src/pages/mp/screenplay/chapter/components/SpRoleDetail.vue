@@ -52,7 +52,7 @@
 <script lang="ts" setup>
 import type {Screenplay, SpRole, SpRoleBelief, SpRoleEmotion, SpRoleLatentClue} from "@/entity/screenplay";
 import {getSpRoleEmotionService, listSpRoleBeliefService, listSpRoleLatentClueService} from "@/services/screenplay";
-import {openSpRoleDelete} from "@/pages/screenplay/func/SpRoleEdit.tsx";
+import {openSpRoleDelete} from "@/pages/mp/screenplay/chapter/func/SpRoleEdit.tsx";
 import {DeleteIcon} from "tdesign-icons-vue-next";
 
 const props = defineProps({

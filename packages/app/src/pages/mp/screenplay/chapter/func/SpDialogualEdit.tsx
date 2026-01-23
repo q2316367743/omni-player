@@ -2,11 +2,11 @@ import type {SpDialogueCore} from "@/entity/screenplay";
 import {DialogPlugin, Form, FormItem, Textarea, Checkbox} from "tdesign-vue-next";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {addSpDialogueService} from "@/services/screenplay";
-import {askAiScreenplayNarrator} from "@/modules/ai/AiScreenplayNarrator";
-import {getScreenplayService} from "@/services/screenplay/ScreenplayService";
-import {getSpSceneService} from "@/services/screenplay/SpSceneService";
-import {listSpRoleService} from "@/services/screenplay/SpRoleService";
-import {listSpDialogueService} from "@/services/screenplay/SpDialogueService";
+import {askAiScreenplayNarrator} from "@/modules/ai/AiScreenplayNarrator.ts";
+import {getScreenplayService} from "@/services/screenplay/ScreenplayService.ts";
+import {getSpSceneService} from "@/services/screenplay/SpSceneService.ts";
+import {listSpRoleService} from "@/services/screenplay/SpRoleService.ts";
+import {listSpDialogueService} from "@/services/screenplay/SpDialogueService.ts";
 
 /**
  * 新增旁白

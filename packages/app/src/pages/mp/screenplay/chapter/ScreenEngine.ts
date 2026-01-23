@@ -1,4 +1,6 @@
-import type {Screenplay, SpDialogue, SpRole, SpScene} from "@/entity/screenplay";
+import type {Screenplay, SpRole, SpScene} from "@/entity/screenplay";
+import {openSpSceneAdd} from "@/pages/mp/screenplay/chapter/func/SpSceneEdit.tsx";
+import MessageUtil from "@/util/model/MessageUtil.ts";
 
 export interface ScreenEngineConfig {
   screenplay: Screenplay;
@@ -13,20 +15,33 @@ export interface ScreenEngineConfig {
   getRoles: () => SpRole[];
   // 获取角色映射
   getRoleMap: () => Map<string, SpRole>;
-  // 获取当前场景的全部对话
-  getDialogues: () => SpDialogue[];
+  getChapterId: () => string | undefined;
 
   // ------------------------------------------------
   // -------------------- 各种事件 --------------------
   // ------------------------------------------------
 
-  // 对话更新
-  onDialogueUpdate?: () => void;
+  onRefreshRole: () => void;
+  onRefreshChapter: () => void;
+  onRefreshScene: () => void;
+
 }
 
 export class ScreenEngine {
   public readonly config: ScreenEngineConfig;
   constructor(config: ScreenEngineConfig) {
     this.config = config;
+  }
+
+  enterScene() {
+    const chapterId = this.config.getChapterId();
+    if (!chapterId) return MessageUtil.error('请选择一个章节！');
+    openSpSceneAdd(
+      this.config.screenplay.id,
+      chapterId,
+      () => {
+        this.config.onRefreshScene();
+      }
+    )
   }
 }

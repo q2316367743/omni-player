@@ -21,9 +21,7 @@
 </template>
 <script lang="ts" setup>
 import type {SpRole, SpScene} from "@/entity/screenplay";
-import type {SpRoleAppearance} from "@/entity/screenplay/SpRoleAppearance.ts";
-import {MapWrapper} from "@/util";
-import SpSceneDetail from "@/pages/screenplay/components/SpSceneDetail.vue";
+import SpSceneDetail from "@/pages/mp/screenplay/chapter/components/SpSceneDetail.vue";
 
 const props = defineProps({
   scenes: {
@@ -33,10 +31,6 @@ const props = defineProps({
   roleMap: {
     type: Object as PropType<Map<string, SpRole>>,
     required: true
-  },
-  roleAppearanceMap: {
-    type: Object as PropType<MapWrapper<string, Array<SpRoleAppearance>>>,
-    default: () => new Map<string, Array<SpRoleAppearance>>(),
   },
   currentSceneId: {
     type: String,
@@ -62,5 +56,5 @@ const handleSelectScene = (scene: SpScene) => {
 
 </script>
 <style scoped lang="less">
-@import "./less/ScreenplayScene";
+@import "less/ScreenplayScene";
 </style>

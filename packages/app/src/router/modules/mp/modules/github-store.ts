@@ -1,7 +1,7 @@
 import {type RouteRecordRaw} from "vue-router";
 
 export const mpGithubStoreRouter: RouteRecordRaw = {
-  name: 'MiniProgram',
+  name: 'MpGs',
   path: '/mp/github-store',
   redirect: '/mp/github-store/home',
   component: () => import('@/pages/mp/github-store/index.vue'),

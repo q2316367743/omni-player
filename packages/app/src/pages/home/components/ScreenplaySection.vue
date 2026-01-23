@@ -56,12 +56,7 @@ const loadScreenplay = async () => {
 }
 
 const toScreenplay = (id: string) => {
-  router.push({
-    name: 'Screenplay',
-    params: {
-      id: id
-    }
-  })
+  router.push(`/mp/screenplay/${id}/chapter`)
 }
 
 onMounted(() => {

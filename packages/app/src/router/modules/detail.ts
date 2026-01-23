@@ -22,5 +22,5 @@ export const detailRouters: Array<RouteRecordRaw> = [{
 }, {
   name: "Screenplay",
   path: "/screenplay/:id",
-  component: () => import("@/pages/screenplay/screenplay-index.vue")
+  component: () => import("@/pages/mp/screenplay/chapter/screenplay-index.vue")
 }]

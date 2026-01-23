@@ -4,9 +4,10 @@ import {addSpSceneService, deleteSpSceneService} from "@/services/screenplay";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import MessageBoxUtil from "@/util/model/MessageBoxUtil.tsx";
 
-export function openSpSceneAdd(screenplayId: string, onUpdate: () => void) {
+export function openSpSceneAdd(screenplayId: string, chapterId: string, onUpdate: () => void) {
   const data = ref<SpSceneCore>({
     screenplay_id: screenplayId,
+    chapter_id: chapterId,
     name: '',
     description: '',
     narrative_goal: '',
@@ -50,7 +51,8 @@ export function openSpSceneAdd(screenplayId: string, onUpdate: () => void) {
       <FormItem labelAlign="top" label="场景描述" help={'时间/天气/氛围'} class="config-form-item">
         <Textarea autosize={{minRows: 3, maxRows: 10}} v-model={data.value.description}/>
       </FormItem>
-      <FormItem labelAlign="top" label="本场景必须达成的叙事目标" help={'example: 揭示林美如死前曾向至少一人透露过‘稿子’的存在'}
+      <FormItem labelAlign="top" label="本场景必须达成的叙事目标"
+                help={'example: 揭示林美如死前曾向至少一人透露过‘稿子’的存在'}
                 class="config-form-item">
         <Textarea autosize={{minRows: 3, maxRows: 10}} v-model={data.value.narrative_goal}/>
       </FormItem>

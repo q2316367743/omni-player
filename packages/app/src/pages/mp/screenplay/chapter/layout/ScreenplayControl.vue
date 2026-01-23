@@ -60,8 +60,8 @@ import {
   UserAddIcon
 } from "tdesign-icons-vue-next";
 import type {SpDilInstruction} from "@/entity/screenplay";
-import {openSpDirectorInstructionLog} from "@/pages/screenplay/func/SpDilEdit.tsx";
-import type {ScreenEngine} from "@/pages/screenplay/ScreenEngine.ts";
+import {openSpDirectorInstructionLog} from "@/pages/mp/screenplay/chapter/func/SpDilEdit.tsx";
+import type {ScreenEngine} from "@/pages/mp/screenplay/chapter/ScreenEngine.ts";
 
 const props = defineProps({
   engine: {
@@ -72,6 +72,7 @@ const props = defineProps({
 
 // 进入场景
 const enterScene = () => {
+  props.engine.enterScene()
 }
 
 // 角色入场
@@ -94,7 +95,7 @@ const openSpDirector = (instruction: SpDilInstruction) => {
 </script>
 <style scoped lang="less">
 .control-panel {
-  padding: 16px;
+  padding: 7px 16px 8px;
   background: var(--fluent-acrylic-bg);
   backdrop-filter: var(--fluent-acrylic-blur);
   border-top: 1px solid var(--td-border-level-1-color);

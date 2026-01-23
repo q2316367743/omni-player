@@ -1,11 +1,11 @@
 <template>
   <div class="app-layout">
     <div class="app-layout-header">
-      <app-tool-back />
+      <app-tool-back :home/>
       <slot v-if="slot.title" name="title"/>
       <div v-else>{{ title }}</div>
       <div class="ml-auto mr-32px">
-        <slot name="action" />
+        <slot name="action"/>
       </div>
     </div>
     <div class="app-layout-content">
@@ -14,10 +14,14 @@
   </div>
 </template>
 <script lang="ts" setup>
-import type { JSX } from "vue/jsx-runtime";
+import type {JSX} from "vue/jsx-runtime";
 
 defineProps({
-  title: String
+  title: String,
+  home: {
+    type: Boolean,
+    default: false
+  }
 })
 const slot = defineSlots<{
   default: () => JSX.Element,

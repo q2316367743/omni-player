@@ -5,5 +5,8 @@ export * from "./SpRole.ts";
 export * from "./SpRoleBelief.ts";
 export * from "./SpRoleEmotion.ts";
 export * from "./SpRoleLatentClue.ts";
+export * from "./SpRoleTimeline.ts";
 export * from "./SpScene.ts";
 export * from "./SpDirectorInstructionLog.ts"
+export * from "./SpChapter.ts";
+export * from "./SpChapterContent.ts";

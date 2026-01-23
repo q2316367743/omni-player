@@ -1,4 +1,4 @@
-import type {SpScene, SpSceneCore} from "@/entity/screenplay";
+import type {SpChapterContent, SpScene, SpSceneCore} from "@/entity/screenplay";
 import {useSql} from "@/lib/sql.ts";
 
 export function listSpSceneService(screenplayId: string) {
@@ -16,12 +16,24 @@ export async function addSpSceneService(prop: SpSceneCore) {
     .orderByDesc('order_index')
     .get();
   const now = Date.now();
-  return useSql().mapper<SpScene>('sp_scene').insert({
+  const {id} = await useSql().mapper<SpScene>('sp_scene').insert({
     ...prop,
     created_at: now,
     updated_at: now,
     order_index: (last?.order_index || 0) + 1
   });
+  try {
+    // 创建场景要同步创建一个场景内容
+    await useSql().mapper<SpChapterContent>('sp_chapter_content').insert({
+      screenplay_id: prop.screenplay_id,
+      chapter_id: prop.chapter_id,
+      scene_id: id,
+      content: '',
+    })
+  } catch (e) {
+    await useSql().mapper<SpScene>('sp_scene').deleteById(id);
+    throw e;
+  }
 }
 
 export async function updateSpSceneService(id: string, prop: SpSceneCore) {

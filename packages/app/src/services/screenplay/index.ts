@@ -8,3 +8,4 @@ export * from "./SpRoleBeliefService.ts";
 export * from "./SpRoleLatentClueService.ts";
 export * from "./SpLogService.ts";
 export * from "./SpDilService.ts";
+export * from "./SpChapterService.ts";

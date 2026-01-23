@@ -39,10 +39,13 @@ export type TableName =
   | 'sp_role_belief'
   | 'sp_role_emotion'
   | 'sp_role_latent_clue'
+  | 'sp_role_timeline'
   | 'sp_scene'
   | 'sp_role_appearance'
   | 'sp_log'
-  | 'sp_director_instruction_log';
+  | 'sp_director_instruction_log'
+  | 'sp_chapter'
+  | 'sp_chapter_content';
 
 export class SqlWrapper {
 
