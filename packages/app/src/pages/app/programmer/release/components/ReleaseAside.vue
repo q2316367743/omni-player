@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full h-full">
+  <div class="w-232px h-full overflow-hidden">
     <div class="header">
       <t-button block @click="openReleaseProjectDialog(handleList)">
         <template #icon>

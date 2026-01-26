@@ -10,8 +10,11 @@
 
 <script lang="ts" setup>
 import dayjs from 'dayjs';
+import 'dayjs/locale/zh-cn';
 import lunisolar from 'lunisolar'
-import festivals from 'lunisolar/markers/festivals.zh-cn' // 简体版
+import festivals from 'lunisolar/markers/festivals.zh-cn'
+
+dayjs.locale('zh-cn')
 
 // 全局加载节日列表
 lunisolar.Markers.add(festivals)
@@ -26,7 +29,7 @@ const getLunarDate = (date: Date): string => {
   const lunar = lunisolar(date);
   const lunarMonth = lunar.lunar.getMonthName();
   const lunarDay = lunar.lunar.getDayName();
-  const jieQi = lunar.markers.list.map(e => e.name).join(",");
+  const jieQi = [...new Set(lunar.markers.list.map(e => e.name))].join(",");
   
   return `农历${lunarMonth}${lunarDay}${jieQi ? ' · ' + jieQi : ''}`;
 };

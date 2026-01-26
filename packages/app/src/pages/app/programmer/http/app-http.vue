@@ -667,10 +667,27 @@ const getStatusTheme = (status: number) => {
 };
 
 const formatResponseBody = (data: any) => {
+  if (data === null || data === undefined) {
+    return '';
+  }
+  
   if (typeof data === 'object') {
     return JSON.stringify(data, null, 2);
   }
-  return String(data);
+  
+  if (typeof data === 'string') {
+    return data;
+  }
+  
+  if (data instanceof ArrayBuffer || data instanceof Uint8Array || data instanceof Blob) {
+    return '[Binary data - cannot display]';
+  }
+  
+  if (typeof data === 'number' || typeof data === 'boolean') {
+    return String(data);
+  }
+  
+  return '[Unsupported data type]';
 };
 
 const formatSize = (bytes: number) => {

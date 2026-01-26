@@ -2,7 +2,7 @@
   <app-tool-layout>
     <template #title>
       <div class="flex gap-8px items-center">
-        <t-button theme="primary" variant="text" shape="square">
+        <t-button theme="primary" variant="text" shape="square" @click="toggleCollapsed()">
           <template #icon>
             <view-list-icon/>
           </template>
@@ -11,11 +11,11 @@
       </div>
     </template>
     <t-layout class="w-full h-full overflow-hidden">
-      <t-aside>
+      <t-aside :width="collapsed ? '0px' : '232px'" class="overflow-hidden">
         <release-aside :select-project-id="selectProject?.id" @select="handleSelectProject"/>
       </t-aside>
       <t-content class="overflow-auto">
-        <release-content v-if="selectProject" :select="selectProject" />
+        <release-content v-if="selectProject" :select="selectProject"/>
         <empty-result v-else title="请选择项目"/>
       </t-content>
     </t-layout>
@@ -27,7 +27,9 @@ import type {ReleaseProject} from "@/entity/app/release";
 import ReleaseAside from "@/pages/app/programmer/release/components/ReleaseAside.vue";
 import ReleaseContent from "@/pages/app/programmer/release/components/ReleaseContent.vue";
 
-const selectProject = ref<ReleaseProject>()
+const selectProject = ref<ReleaseProject>();
+const collapsed = ref(false);
+const toggleCollapsed = useToggle(collapsed);
 
 function handleSelectProject(project?: ReleaseProject) {
   if (project && selectProject.value?.id === project?.id) {
