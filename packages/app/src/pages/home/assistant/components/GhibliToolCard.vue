@@ -27,7 +27,7 @@ const jumpTool = () => router.push(`/app/${props.value}`);
 
 <style scoped lang="less">
 .ghibli-tool-card {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--td-bg-color-container);
   border-radius: 16px;
   padding: 16px;
   display: flex;
@@ -35,8 +35,8 @@ const jumpTool = () => router.push(`/app/${props.value}`);
   gap: 16px;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border: 2px solid rgba(255, 255, 255, 0.6);
+  box-shadow: var(--td-shadow-2);
+  border: 2px solid var(--td-border-level-1-color);
   backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
@@ -55,7 +55,7 @@ const jumpTool = () => router.push(`/app/${props.value}`);
 
   &:hover {
     transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--td-shadow-3);
     border-color: var(--td-brand-color);
 
     &::before {
@@ -84,7 +84,7 @@ const jumpTool = () => router.push(`/app/${props.value}`);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     z-index: 1;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--td-shadow-2);
 
     &::after {
       content: '';
@@ -110,7 +110,7 @@ const jumpTool = () => router.push(`/app/${props.value}`);
 
     &.regex {
       background: linear-gradient(135deg, #ffffd2 0%, #a8e6cf 100%);
-      color: #4a4a4a;
+      color: var(--td-text-color-primary);
     }
 
     &.http {
@@ -120,7 +120,7 @@ const jumpTool = () => router.push(`/app/${props.value}`);
 
     &.online {
       background: linear-gradient(135deg, #dcedc1 0%, #a8e6cf 100%);
-      color: #4a4a4a;
+      color: var(--td-text-color-primary);
     }
 
     &.media {
@@ -130,7 +130,7 @@ const jumpTool = () => router.push(`/app/${props.value}`);
 
     &.ai {
       background: linear-gradient(135deg, #b5e7a0 0%, #95e1d3 100%);
-      color: #4a4a4a;
+      color: var(--td-text-color-primary);
     }
   }
 

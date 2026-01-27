@@ -60,7 +60,7 @@ const description = computed(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: var(--td-bg-color-page);
   padding: 66px 20px 20px 20px;
   position: relative;
   overflow: hidden;
@@ -71,10 +71,10 @@ const description = computed(() => {
   position: relative;
   z-index: 1;
   padding: 60px;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--td-bg-color-container);
   border-radius: 20px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--td-shadow-3);
   animation: fadeIn 0.6s ease-out;
 
   :deep(.t-icon) {
@@ -111,9 +111,10 @@ const description = computed(() => {
 
 .cloud {
   position: absolute;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--td-bg-color-container);
   border-radius: 50%;
   animation: float 8s ease-in-out infinite;
+  opacity: 0.8;
 
   &::before,
   &::after {

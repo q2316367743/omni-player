@@ -1,0 +1,22 @@
+[package]
+name = "tauri-plugin-hnsw"
+version = "0.1.0"
+authors = [ "esion" ]
+description = "tauri插件 hnsw"
+edition = "2021"
+rust-version = "1.77.2"
+exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules"]
+links = "tauri-plugin-hnsw"
+
+[dependencies]
+tauri = { version = "2.9.5" }
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "2"
+
+
+faiss = "0.11" # Faiss Rust 绑定
+nalgebra = { version = "0.32", features = ["serde"] } # 向量基础运算
+tokio = { version = "1.0", features = ["full"] } # 异步（可选）
+
+[build-dependencies]
+tauri-plugin = { version = "2.5.2", features = ["build"] }

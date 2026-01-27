@@ -103,7 +103,7 @@ const loadMemo = (memo: Memo) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: var(--td-bg-color-page);
   padding: 66px 20px 20px 120px;
 }
 
@@ -133,7 +133,7 @@ const loadMemo = (memo: Memo) => {
   top: 0;
   width: 50px;
   height: 100%;
-  background: linear-gradient(90deg, #8b7355 0%, #a0896c 50%, #8b7355 100%);
+  background: var(--td-gray-color-7);
   border-radius: 8px 0 0 8px;
   cursor: pointer;
   display: flex;
@@ -144,7 +144,7 @@ const loadMemo = (memo: Memo) => {
   transition: all 0.3s ease-in-out;
 
   &:hover {
-    background: linear-gradient(90deg, #9a8264 0%, #b09a7d 50%, #9a8264 100%);
+    background: var(--td-gray-color-6);
   }
 
   .spine-rings {
@@ -155,9 +155,9 @@ const loadMemo = (memo: Memo) => {
     .ring {
       width: 20px;
       height: 20px;
-      border: 3px solid #6b5344;
+      border: 3px solid var(--td-gray-color-9);
       border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #d4c4b0, #a0896c);
+      background: radial-gradient(circle at 30% 30%, var(--td-gray-color-4), var(--td-gray-color-7));
       box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3),
                   0 2px 4px rgba(0, 0, 0, 0.2);
     }
@@ -166,7 +166,7 @@ const loadMemo = (memo: Memo) => {
   .spine-label {
     writing-mode: vertical-rl;
     text-orientation: mixed;
-    color: #f5f5dc;
+    color: var(--td-text-color-primary);
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 2px;
@@ -177,7 +177,7 @@ const loadMemo = (memo: Memo) => {
 
 .notebook-content {
   flex: 1;
-  background: linear-gradient(to bottom, #fffef9, #f9f6f0);
+  background: var(--td-bg-color-container);
   border-radius: 0 8px 8px 0;
   box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.15);
   overflow: hidden;
@@ -191,7 +191,7 @@ const loadMemo = (memo: Memo) => {
     top: 0;
     width: 30px;
     height: 100%;
-    background: linear-gradient(90deg, rgba(139, 115, 85, 0.1), transparent);
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.05), transparent);
   }
 }
 
@@ -206,8 +206,8 @@ const loadMemo = (memo: Memo) => {
       background-image: repeating-linear-gradient(
         transparent,
         transparent 31px,
-        #e8e4d9 31px,
-        #e8e4d9 32px
+        var(--td-border-level-1-color) 31px,
+        var(--td-border-level-1-color) 32px
       );
     }
   }
@@ -228,13 +228,13 @@ const loadMemo = (memo: Memo) => {
   font-family: 'LXGW WenKai', 'KaiTi', '楷体', serif;
   font-size: 18px;
   line-height: 32px;
-  color: #4a4a4a;
+  color: var(--td-text-color-primary);
   outline: none;
   padding: 0;
   margin: 0;
 
   &::placeholder {
-    color: #b8b4ae;
+    color: var(--td-text-color-placeholder);
     font-style: italic;
   }
 
@@ -250,7 +250,7 @@ const loadMemo = (memo: Memo) => {
   bottom: 10px;
   right: 20px;
   font-size: 12px;
-  color: #8b7355;
+  color: var(--td-text-color-secondary);
   font-style: italic;
 }
 
@@ -260,7 +260,7 @@ const loadMemo = (memo: Memo) => {
   top: 0;
   width: 280px;
   height: 100%;
-  background: linear-gradient(135deg, #fffef9, #f5f0e6);
+  background: var(--td-bg-color-container);
   border-radius: 8px 0 0 8px;
   box-shadow: -5px 0 20px rgba(0, 0, 0, 0.15);
   padding: 20px;
@@ -273,7 +273,7 @@ const loadMemo = (memo: Memo) => {
   .history-header {
     margin-bottom: 20px;
     padding-bottom: 15px;
-    border-bottom: 2px solid #e8e4d9;
+    border-bottom: 2px solid var(--td-border-level-1-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -281,7 +281,7 @@ const loadMemo = (memo: Memo) => {
     h3 {
       margin: 0;
       font-size: 18px;
-      color: #6b5344;
+      color: var(--td-text-color-primary);
       font-family: 'LXGW WenKai', 'KaiTi', '楷体', serif;
     }
 
@@ -291,14 +291,14 @@ const loadMemo = (memo: Memo) => {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(139, 115, 85, 0.1);
+      background: var(--td-bg-color-secondarycomponent);
       border-radius: 50%;
       cursor: pointer;
       transition: all 0.3s ease;
-      color: #8b7355;
+      color: var(--td-text-color-secondary);
 
       &:hover {
-        background: rgba(139, 115, 85, 0.2);
+        background: var(--td-bg-color-component-hover);
         transform: rotate(90deg);
       }
     }
@@ -312,28 +312,28 @@ const loadMemo = (memo: Memo) => {
 
   .history-item {
     padding: 12px;
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--td-bg-color-secondarycontainer);
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    border: 1px solid rgba(139, 115, 85, 0.1);
+    border: 1px solid var(--td-border-level-1-color);
 
     &:hover {
-      background: rgba(255, 255, 255, 0.9);
+      background: var(--td-bg-color-container-hover);
       transform: translateX(5px);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .history-date {
       font-size: 12px;
-      color: #8b7355;
+      color: var(--td-text-color-secondary);
       margin-bottom: 6px;
       font-style: italic;
     }
 
     .history-content {
       font-size: 14px;
-      color: #4a4a4a;
+      color: var(--td-text-color-primary);
       font-family: 'LXGW WenKai', 'KaiTi', '楷体', serif;
       line-height: 1.6;
       display: -webkit-box;

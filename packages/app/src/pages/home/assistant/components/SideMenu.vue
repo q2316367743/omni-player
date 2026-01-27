@@ -44,14 +44,14 @@ const menuItems: MenuItem[] = [
 ];
 
 const tooltipStyle = {
-  background: 'rgba(255, 255, 255, 0.95)',
-  color: '#4a4a4a',
+  background: 'var(--td-bg-color-container)',
+  color: 'var(--td-text-color-primary)',
   padding: '8px 16px',
   borderRadius: '12px',
   fontSize: '14px',
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+  boxShadow: 'var(--td-shadow-2)',
   backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(0, 0, 0, 0.06)',
+  border: '1px solid var(--td-border-level-1-color)',
 };
 
 const handleMenuClick = (key: string) => {
@@ -76,18 +76,18 @@ const handleMenuClick = (key: string) => {
   padding: 8px;
   width: 24px;
   height: 24px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--td-bg-color-container);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--td-shadow-1);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--td-border-level-1-color);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    background: rgba(255, 255, 255, 0.95);
+    box-shadow: var(--td-shadow-2);
+    background: var(--td-bg-color-container-hover);
   }
 
   &.active {

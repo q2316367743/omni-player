@@ -168,7 +168,7 @@ const showHomebrew = (p === "macos" || p === "linux");
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: var(--td-bg-color-page);
   padding: 66px 16px 16px 16px;
   position: relative;
   overflow: hidden;
@@ -235,9 +235,10 @@ const showHomebrew = (p === "macos" || p === "linux");
 
 .cloud {
   position: absolute;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--td-bg-color-container);
   border-radius: 50%;
   animation: float 20s ease-in-out infinite;
+  opacity: 0.6;
 
   &::before,
   &::after {
@@ -318,10 +319,10 @@ const showHomebrew = (p === "macos" || p === "linux");
   position: absolute;
   width: 4px;
   height: 4px;
-  background: #ffd700;
+  background: var(--td-brand-color);
   border-radius: 50%;
   animation: twinkle 3s ease-in-out infinite;
-  box-shadow: 0 0 6px 2px rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 6px 2px var(--td-brand-color-light);
 
   &.star-1 {
     top: 15%;
