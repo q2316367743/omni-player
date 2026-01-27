@@ -45,7 +45,7 @@
 import {AddIcon, DeleteIcon, Edit1Icon, RefreshIcon} from "tdesign-icons-vue-next";
 import {listScreenplayService} from "@/services/screenplay";
 import type {Screenplay} from "@/entity/screenplay";
-import {deleteScreenplay, openScreenplayAdd, openScreenplayUpdate} from "@/pages/home/func/ScreenplayEdit.tsx";
+import {deleteScreenplay, openScreenplayAdd, openScreenplayUpdate} from "@/pages/home/default/func/ScreenplayEdit.tsx";
 
 const router = useRouter();
 

@@ -14,7 +14,7 @@ export const router = createRouter({
       name: "首页",
       path: '/',
       alias: '/home',
-      component: () => import('@/pages/home/home-index.vue'),
+      component: () => import('@/pages/home/assistant/home-assistant.vue'),
     },
     ...appRouters, ...adminRouters,
     ...mpRouters, ...mediaRouters, ...networkRouters, ...detailRouters

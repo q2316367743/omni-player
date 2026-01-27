@@ -69,11 +69,11 @@ import {LocalName} from "@/global/LocalName.ts";
 import NowClock from "./components/NowClock.vue";
 import ToolsSection from "./components/ToolsSection.vue";
 import SubscribeSourcesSection from "./components/SubscribeSourcesSection.vue";
-import ShiCi from "@/pages/home/components/ShiCi.vue";
-import VideoSection from "@/pages/home/components/VideoSection.vue";
+import ShiCi from "@/pages/home/default/components/ShiCi.vue";
+import VideoSection from "@/pages/home/default/components/VideoSection.vue";
 import {SettingIcon} from "tdesign-icons-vue-next";
-import ScreenplaySection from "@/pages/home/components/ScreenplaySection.vue";
-import ProgramSection from "@/pages/home/components/ProgramSection.vue";
+import ScreenplaySection from "@/pages/home/default/components/ScreenplaySection.vue";
+import ProgramSection from "@/pages/home/default/components/ProgramSection.vue";
 
 const router = useRouter();
 const activeKey = useLocalStorage(LocalName.PAGE_HOME_ACTIVE, 'book');
@@ -89,5 +89,5 @@ const toSetting = () => {
 </script>
 
 <style scoped lang="less">
-@import "home-index.less";
+@import "./home-index.less";
 </style>

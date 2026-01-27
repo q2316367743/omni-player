@@ -51,7 +51,7 @@
     </div>
     <div v-if="meeting.status !== 'ended'" class="chat-sender-wrapper">
       <div class="chat-sender">
-        <t-chat-sender v-model="text" placeholder="输入私聊消息...">
+        <ChatSender v-model="text" placeholder="输入私聊消息...">
           <template #suffix>
             <t-button v-if="isSpeaking" shape="round" theme="danger" @click="handleInterrupt">
               <template #icon>
@@ -66,7 +66,7 @@
               发送
             </t-button>
           </template>
-        </t-chat-sender>
+        </ChatSender>
       </div>
     </div>
     <t-button v-if="isShowToBottom" variant="text" class="bottomBtn" @click="backBottom">
@@ -93,7 +93,7 @@ import {
   addAiRtMessageService,
   updateAiRtMessageService
 } from "@/services/app/roundtable/AiRtMessageService";
-import {askToOpenAi, type AskToOpenAiAbort} from "@/modules/ai/AiChat.ts";
+import {askToOpenAi, type AskToOpenAiAbort} from "@/modules/ai";
 import {debounce} from "es-toolkit";
 
 const props = defineProps({

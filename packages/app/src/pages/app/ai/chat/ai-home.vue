@@ -4,7 +4,7 @@
       <div class="header">
         <div class="flex justify-between items-center mb-12px">
           <div class="flex gap-8px items-center">
-            <app-tool-back />
+            <app-tool-back/>
             <div style="font-weight: bold;font-size: var(--td-font-size-title-large)">问一问</div>
           </div>
           <t-space size="small">
@@ -40,7 +40,8 @@
       <div class="content" ref="contentRef">
         <div class="group first">
           <div>分组</div>
-          <t-button theme="primary" variant="text" shape="square" size="small" @click="openAddAiChatGroupDialog(initGroup)">
+          <t-button theme="primary" variant="text" shape="square" size="small"
+                    @click="openAddAiChatGroupDialog(initGroup)">
             <template #icon>
               <plus-icon/>
             </template>
@@ -96,6 +97,7 @@ import HomeGroup from "@/pages/app/ai/chat/pages/group/HomeGroup.vue";
 import HomeChat from "@/pages/app/ai/chat/pages/chat/HomeChat.vue";
 import HomeWelcome from "@/pages/app/ai/chat/pages/welcome/HomeWelcome.vue";
 import {listAiChatItemService} from "@/services/app/chat";
+import {appAiChatRename} from "@/global/EventBus.ts";
 
 const show = ref(true);
 const groupList = ref<HTMLDivElement>();
@@ -156,6 +158,7 @@ const onGroupMenuClick = (group: AiChatGroup, e: MouseEvent) => {
 async function initGroup() {
   groups.value = await listAiChatGroupService();
 }
+
 async function initItem() {
   items.value = await listAiChatItemService();
 }
@@ -163,6 +166,11 @@ async function initItem() {
 tryOnMounted(() => {
   initGroup();
   initItem();
+  appAiChatRename.off(initItem);
+  appAiChatRename.on(initItem);
+});
+onUnmounted(() => {
+  appAiChatRename.off(initItem);
 })
 
 </script>

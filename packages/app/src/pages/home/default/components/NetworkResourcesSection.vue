@@ -96,9 +96,9 @@
 import {useNetworkServerStore} from "@/store";
 import {InternetIcon, AddIcon, SearchIcon, FileImportIcon, FileExportIcon, ChevronRightIcon} from "tdesign-icons-vue-next";
 import type {NetworkServer} from "@/entity/NetworkServer.ts";
-import {openNetworkContextmenu, openNetworkServerEdit} from "@/pages/home/func/NetworkServerEdit.tsx";
+import {openNetworkContextmenu, openNetworkServerEdit} from "@/pages/home/default/func/NetworkServerEdit.tsx";
 import {openSearchModel} from "@/util/model/SearchUtil.tsx";
-import {exportNetwork, importNetwork} from "@/pages/home/func/NetworkExtra.tsx";
+import {exportNetwork, importNetwork} from "@/pages/home/default/func/NetworkExtra.tsx";
 
 const router = useRouter();
 

@@ -54,9 +54,9 @@
 import {RssIcon, AddIcon, RefreshIcon, FileImportIcon, FileExportIcon} from "tdesign-icons-vue-next";
 import type {SubscribeItem} from "@/entity/subscribe";
 import {useSubscribeStore} from "@/store/SubscribeStore.ts";
-import {openSubscribeContextmenu, openSubscribeEdit} from "@/pages/home/func/SubscribeEdit.tsx";
+import {openSubscribeContextmenu, openSubscribeEdit} from "@/pages/home/default/func/SubscribeEdit.tsx";
 import SubscribeGridView from "./SubscribeGridView.vue";
-import {exportSubscribe, importSubscribe} from "@/pages/home/func/SubscribeExtra.tsx";
+import {exportSubscribe, importSubscribe} from "@/pages/home/default/func/SubscribeExtra.tsx";
 
 const router = useRouter();
 

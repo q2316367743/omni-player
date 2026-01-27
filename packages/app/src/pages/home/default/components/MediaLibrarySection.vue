@@ -41,7 +41,7 @@ import type {MediaServer} from "@/entity/MediaServer.ts";
 import JellyfinIcon from "@/modules/icon/JellyfinIcon.vue";
 import EmbyIcon from "@/modules/icon/EmbyIcon.vue";
 import PlexIcon from "@/modules/icon/PlexIcon.vue";
-import {openMediaContextmenu, openMediaServerEdit} from "@/pages/home/func/MediaServerEdit.tsx";
+import {openMediaContextmenu, openMediaServerEdit} from "@/pages/home/default/func/MediaServerEdit.tsx";
 
 const router = useRouter();
 

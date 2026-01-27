@@ -1,5 +1,9 @@
 import {useSql} from "@/lib/sql.ts";
 import type {AiChatGroup, AiChatItem, AiChatItemCore, AiChatMessage} from "@/entity/app/ai/chat";
+import {useSettingStore} from "@/store/GlobalSettingStore.ts";
+import {askQuestionOpenAi} from "@/modules/ai";
+import {appAiChatRename} from "@/global/EventBus.ts";
+import {logDebug, logError} from "@/lib/log.ts";
 
 export async function listAiChatItemService(groupId = "") {
   return useSql().query<AiChatItem>('ai_chat_item')
@@ -57,7 +61,32 @@ export async function createAiChatItemService(groupId: string, message: string, 
     sort: now,
     created_at: now,
     updated_at: now
-  })
+  });
+  // 异步尝试重命名
+  (async () => {
+    const {aiSetting} = useSettingStore();
+    const {defaultTopicModel} = aiSetting;
+    const {content} = await askQuestionOpenAi({
+      think: false,
+      assistant: {
+        model: defaultTopicModel
+      },
+      messages: []
+    });
+    await sql.mapper<AiChatItem>('ai_chat_item').updateById(chat.id, {
+      name: content
+    })
+  })().then(() => {
+    // 重命名成功
+    appAiChatRename.emit({
+      groupId: groupId,
+      chatId: chat.id,
+    });
+    logDebug(`话题「${chat.id}」命名成功`);
+  }).catch(e => {
+    logError("话题命名失败", e);
+  });
+
   let idx = 0;
   if (groupId) {
     //获取分组

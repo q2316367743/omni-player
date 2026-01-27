@@ -129,9 +129,9 @@ import {
   TranslateIcon, UsergroupIcon,
   VideoIcon
 } from "tdesign-icons-vue-next";
-import ToolCard from "@/pages/home/components/ToolCard.vue";
-import MiniToolCard from "@/pages/home/components/MiniToolCard.vue";
-import HomebrewIcon from "@/pages/home/icon/HomebrewIcon.vue";
+import ToolCard from "@/pages/home/default/components/ToolCard.vue";
+import MiniToolCard from "@/pages/home/default/components/MiniToolCard.vue";
+import HomebrewIcon from "@/pages/home/default/icon/HomebrewIcon.vue";
 import {platform} from "@tauri-apps/plugin-os";
 
 const p = platform();

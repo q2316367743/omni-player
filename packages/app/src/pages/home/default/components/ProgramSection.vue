@@ -9,7 +9,7 @@
 </template>
 <script lang="ts" setup>
 import {StoreIcon} from "tdesign-icons-vue-next";
-import MiniProgramCard from "@/pages/home/components/MiniProgramCard.vue";
+import MiniProgramCard from "@/pages/home/default/components/MiniProgramCard.vue";
 </script>
 <style scoped lang="less">
 .program-section {

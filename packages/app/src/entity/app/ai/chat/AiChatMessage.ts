@@ -1,5 +1,5 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
-import type {ChatMessageParam} from "@/modules/ai/AiChat.ts";
+import type {ChatMessageParam} from "@/modules/ai";
 import type {AiChatRole} from "@/global/CommonType.ts";
 import type {YesOrNo} from "@/global/YesOrNo.ts";
 
