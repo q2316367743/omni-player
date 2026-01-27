@@ -1,6 +1,6 @@
 <template>
   <div class="home-assistant">
-    <SideMenu @menu-change="handleMenuChange" />
+    <SideMenu :active-menu="currentMenu" @menu-change="handleMenuChange" />
     <div class="content-area">
       <MemoPage v-if="currentMenu === 'memo'" />
       <ToolboxPage v-else-if="currentMenu === 'toolbox'" />
@@ -10,13 +10,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
 import SideMenu from './components/SideMenu.vue';
 import MemoPage from './components/MemoPage.vue';
 import ToolboxPage from './components/ToolboxPage.vue';
 import PlaceholderPage from './components/PlaceholderPage.vue';
+import {LocalName} from "@/global/LocalName.ts";
 
-const currentMenu = ref('memo');
+const currentMenu = useSessionStorage(LocalName.PAGE_HOME_ASSISTANT_ACTIVE, 'memo');
 
 const handleMenuChange = (menu: string) => {
   currentMenu.value = menu;

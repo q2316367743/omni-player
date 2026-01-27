@@ -20,7 +20,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+
+defineProps({
+  activeMenu: String
+});
 
 interface MenuItem {
   key: string;
@@ -31,8 +34,6 @@ interface MenuItem {
 const emit = defineEmits<{
   menuChange: [key: string];
 }>();
-
-const activeMenu = ref('memo');
 
 const menuItems: MenuItem[] = [
   { key: 'memo', label: '碎念', icon: 'chat' },
@@ -54,7 +55,6 @@ const tooltipStyle = {
 };
 
 const handleMenuClick = (key: string) => {
-  activeMenu.value = key;
   emit('menuChange', key);
 };
 </script>

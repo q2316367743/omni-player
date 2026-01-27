@@ -104,13 +104,13 @@ const loadMemo = (memo: Memo) => {
   justify-content: center;
   align-items: center;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 100px 20px 20px 100px;
+  padding: 66px 20px 20px 120px;
 }
 
 .notebook {
   position: relative;
   width: 800px;
-  height: 600px;
+  height: 640px;
   display: flex;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -141,7 +141,7 @@ const loadMemo = (memo: Memo) => {
   align-items: center;
   padding-top: 20px;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
+  transition: all 0.3s ease-in-out;
 
   &:hover {
     background: linear-gradient(90deg, #9a8264 0%, #b09a7d 50%, #9a8264 100%);
