@@ -35,7 +35,11 @@ impl<R: Runtime, T: Manager<R>> crate::HnswExt<R> for T {
 /// Initializes the plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
   Builder::new("hnsw")
-    .invoke_handler(tauri::generate_handler![commands::ping])
+    .invoke_handler(tauri::generate_handler![
+      commands::save,
+      commands::query,
+      commands::remove
+    ])
     .setup(|app, api| {
       #[cfg(mobile)]
       let hnsw = mobile::init(app, api)?;

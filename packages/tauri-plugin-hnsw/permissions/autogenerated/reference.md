@@ -4,7 +4,9 @@ Default permissions for the plugin
 
 #### This default permission set includes the following:
 
-- `allow-ping`
+- `allow-save`
+- `allow-query`
+- `allow-remove`
 
 ## Permission Table
 
@@ -18,12 +20,12 @@ Default permissions for the plugin
 <tr>
 <td>
 
-`hnsw:allow-ping`
+`hnsw:allow-query`
 
 </td>
 <td>
 
-Enables the ping command without any pre-configured scope.
+Enables the query command without any pre-configured scope.
 
 </td>
 </tr>
@@ -31,12 +33,64 @@ Enables the ping command without any pre-configured scope.
 <tr>
 <td>
 
-`hnsw:deny-ping`
+`hnsw:deny-query`
 
 </td>
 <td>
 
-Denies the ping command without any pre-configured scope.
+Denies the query command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`hnsw:allow-remove`
+
+</td>
+<td>
+
+Enables the remove command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`hnsw:deny-remove`
+
+</td>
+<td>
+
+Denies the remove command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`hnsw:allow-save`
+
+</td>
+<td>
+
+Enables the save command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`hnsw:deny-save`
+
+</td>
+<td>
+
+Denies the save command without any pre-configured scope.
 
 </td>
 </tr>

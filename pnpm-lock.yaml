@@ -32,6 +32,9 @@ importers:
       '@tauri-apps/plugin-fs':
         specifier: ~2.4.4
         version: 2.4.5
+      '@tauri-apps/plugin-hnsw':
+        specifier: workspace:*
+        version: link:../tauri-plugin-hnsw
       '@tauri-apps/plugin-homebrew':
         specifier: workspace:*
         version: link:../tauri-plugin-homebrew

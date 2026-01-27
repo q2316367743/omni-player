@@ -1,7 +1,7 @@
 {
-  "name": "tauri-plugin-hnsw-api",
+  "name": "@tauri-apps/plugin-hnsw",
   "version": "0.1.0",
-  "author": "You",
+  "author": "esion",
   "description": "",
   "type": "module",
   "types": "./dist-js/index.d.ts",

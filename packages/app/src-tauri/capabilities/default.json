@@ -91,6 +91,7 @@
     "dialog:allow-open",
     "dialog:allow-save",
     "homebrew:default",
+    "hnsw:default",
     "clipboard-manager:allow-write-text"
   ]
 }
