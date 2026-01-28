@@ -91,7 +91,7 @@
     "dialog:allow-open",
     "dialog:allow-save",
     "homebrew:default",
-    "hnsw:default",
+    "velesdb:default",
     "clipboard-manager:allow-write-text"
   ]
 }

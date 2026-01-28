@@ -68,6 +68,9 @@ importers:
       '@vueuse/integrations':
         specifier: ^14.1.0
         version: 14.1.0(axios@1.13.2)(fuse.js@7.1.0)(sortablejs@1.15.6)(vue@3.5.26(typescript@5.9.3))
+      '@wiscale/tauri-plugin-velesdb':
+        specifier: ^1.1.1
+        version: 1.1.1(@tauri-apps/api@2.9.1)
       '@zumer/snapdom':
         specifier: ^2.0.1
         version: 2.0.1
@@ -1430,6 +1433,11 @@ packages:
     resolution: {integrity: sha512-EcKxtYvn6gx1F8z9J5/rsg3+lTQnvOruQd8fUecW99DCK04BkWD7z5KQ/wTAx+DazyoEE9dJt/zV8OIEQbM6kw==}
     peerDependencies:
       vue: ^3.5.0
+
+  '@wiscale/tauri-plugin-velesdb@1.1.1':
+    resolution: {integrity: sha512-5RNJL4Y5GdkTj8Ky2cLnfzyV8aucZYjocy8Ccgc5xhDRE+b18UhKkxxKw/nr7kIcumTuTxgYdRGBPksObUKwxw==}
+    peerDependencies:
+      '@tauri-apps/api': '>=2.0.0'
 
   '@zumer/snapdom@2.0.1':
     resolution: {integrity: sha512-78/qbYl2FTv4H6qaXcNfAujfIOSzdvs83NW63VbyC9QA3sqNPfPvhn4xYMO6Gy11hXwJUEhd0z65yKiNzDwy9w==}
@@ -4168,6 +4176,10 @@ snapshots:
   '@vueuse/shared@14.1.0(vue@3.5.26(typescript@5.9.3))':
     dependencies:
       vue: 3.5.26(typescript@5.9.3)
+
+  '@wiscale/tauri-plugin-velesdb@1.1.1(@tauri-apps/api@2.9.1)':
+    dependencies:
+      '@tauri-apps/api': 2.9.1
 
   '@zumer/snapdom@2.0.1': {}
 

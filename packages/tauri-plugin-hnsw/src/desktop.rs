@@ -33,17 +33,18 @@ struct VectorStore {
   index: IdMap<IndexImpl>,
   id_mapping: HashMap<String, u64>,
   reverse_mapping: HashMap<u64, String>,
+  timestamp_mapping: HashMap<u64, i64>,
   next_id: u64,
 }
 
 impl VectorStore {
   fn new(index_file: PathBuf) -> Result<Self, Box<dyn std::error::Error>> {
-    let (index, id_mapping, reverse_mapping, next_id) = if index_file.exists() {
+    let (index, id_mapping, reverse_mapping, timestamp_mapping, next_id) = if index_file.exists() {
       Self::load_from_file(&index_file)?
     } else {
       let index = index_factory(768, "Flat", MetricType::L2)?;
       let index = IdMap::new(index)?;
-      (index, HashMap::new(), HashMap::new(), 0)
+      (index, HashMap::new(), HashMap::new(), HashMap::new(), 0)
     };
     
     Ok(Self {
@@ -51,15 +52,16 @@ impl VectorStore {
       index,
       id_mapping,
       reverse_mapping,
+      timestamp_mapping,
       next_id,
     })
   }
 
-  fn load_from_file(path: &PathBuf) -> Result<(IdMap<IndexImpl>, HashMap<String, u64>, HashMap<u64, String>, u64), Box<dyn std::error::Error>> {
+  fn load_from_file(path: &PathBuf) -> Result<(IdMap<IndexImpl>, HashMap<String, u64>, HashMap<u64, String>, HashMap<u64, i64>, u64), Box<dyn std::error::Error>> {
     let path_str = path.to_str().ok_or("Invalid path")?;
     let index = read_index(path_str)?;
     let index = IdMap::new(index)?;
-    Ok((index, HashMap::new(), HashMap::new(), 0))
+    Ok((index, HashMap::new(), HashMap::new(), HashMap::new(), 0))
   }
 
   fn save_to_file(&self) -> Result<(), Box<dyn std::error::Error>> {
@@ -72,8 +74,14 @@ impl VectorStore {
     let internal_id = self.next_id;
     self.next_id += 1;
     
+    let timestamp = std::time::SystemTime::now()
+      .duration_since(std::time::UNIX_EPOCH)
+      .unwrap()
+      .as_secs() as i64;
+    
     self.id_mapping.insert(id.clone(), internal_id);
-    self.reverse_mapping.insert(internal_id, id);
+    self.reverse_mapping.insert(internal_id, id.clone());
+    self.timestamp_mapping.insert(internal_id, timestamp);
     
     let idx = Idx::new(internal_id);
     self.index.add_with_ids(&vectors, &[idx])?;
@@ -97,6 +105,7 @@ impl VectorStore {
       for id in ids {
         if let Some(internal_id) = self.id_mapping.remove(&id) {
           self.reverse_mapping.remove(&internal_id);
+          self.timestamp_mapping.remove(&internal_id);
         }
       }
       
@@ -109,15 +118,32 @@ impl VectorStore {
   fn query(&mut self, query: Vec<f32>, top_k: usize) -> Vec<String> {
     let result = self.index.search(&query, top_k).unwrap();
     
-    result
+    let current_time = std::time::SystemTime::now()
+      .duration_since(std::time::UNIX_EPOCH)
+      .unwrap()
+      .as_secs() as i64;
+    
+    let mut scored_results: Vec<(String, f32)> = result
       .labels
-      .into_iter()
-      .filter_map(|idx: Idx| {
+      .iter()
+      .zip(result.distances.iter())
+      .filter_map(|(idx, &distance)| {
         idx.get().and_then(|internal_id| {
-          self.reverse_mapping.get(&internal_id).cloned()
+          self.reverse_mapping.get(&internal_id).map(|id| {
+            let timestamp = self.timestamp_mapping.get(&internal_id).unwrap_or(&0);
+            let days_elapsed = (current_time - timestamp) as f64 / 86400.0;
+            let lambda = 0.1;
+            let time_decay = (-lambda * days_elapsed).exp();
+            let adjusted_score = distance * time_decay as f32;
+            (id.clone(), adjusted_score)
+          })
         })
       })
-      .collect()
+      .collect();
+    
+    scored_results.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
+    
+    scored_results.into_iter().map(|(id, _)| id).collect()
   }
 }
 

@@ -32,6 +32,8 @@ tauri-plugin-shell = "2"
 tauri-plugin-store = "2"
 tauri-plugin-clipboard-manager = "2.3.2"
 
+tauri-plugin-velesdb = "0.1"
+
 [dependencies.tauri-plugin-sql]
 features = ["sqlite"] # or "postgres", or "mysql"
 version = "2.0.0"
@@ -40,5 +42,4 @@ version = "2.0.0"
 tauri-plugin-updater = "2"
 
 tauri-plugin-homebrew = { path = "../../tauri-plugin-homebrew" }
-tauri-plugin-hnsw = { path = "../../tauri-plugin-hnsw"}
 

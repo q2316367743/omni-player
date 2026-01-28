@@ -26,7 +26,7 @@ pub fn run() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_homebrew::init())
-        .plugin(tauri_plugin_hnsw::init())
+        .plugin(tauri_plugin_velesdb::init("./velesdb_data"))
         .plugin(
             tauri_plugin_log::Builder::new()
                 .targets([
