@@ -7,5 +7,7 @@ export interface MemoChunk extends BaseEntity {
 
   memo_id: string;
 
+  index: number;
+
   content: string;
 }

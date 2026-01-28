@@ -45,7 +45,9 @@ export type TableName =
   | 'sp_log'
   | 'sp_director_instruction_log'
   | 'sp_chapter'
-  | 'sp_chapter_content';
+  | 'sp_chapter_content'
+  | 'memo_item'
+  | 'memo_chunk';
 
 export class SqlWrapper {
 

@@ -75,6 +75,11 @@ export interface AiSetting {
    */
   defaultSearchModel: string;
 
+  /**
+   * 默认嵌入模型
+   */
+  defaultEmbeddingModel: string;
+
 }
 
 export function buildAiSetting(): AiSetting {
@@ -87,6 +92,7 @@ export function buildAiSetting(): AiSetting {
     defaultChatModel: "gpt-3.5-turbo",
     defaultTopicModel: '',
     defaultSearchModel: '',
+    defaultEmbeddingModel: '',
     timeout: 15000,
     models: [
       {

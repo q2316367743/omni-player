@@ -2,6 +2,8 @@ import {defineStore} from "pinia";
 import {LocalName} from "@/global/LocalName.ts";
 import {buildGlobalSetting} from "@/entity/setting/GlobalSetting.ts";
 import {buildAiSetting} from "@/entity/setting/AiSetting.ts";
+import OpenAI from "openai";
+import {getTauriFetch} from "@/lib/http.ts";
 
 export const useSettingStore = defineStore("setting", () => {
   const globalSetting = useLocalStorage(LocalName.KEY_SETTING_GLOBAL, buildGlobalSetting());
@@ -33,6 +35,16 @@ export const useSettingStore = defineStore("setting", () => {
     return aiSetting.value.thinks?.includes(model);
   }
 
+  const createAiClient = () => {
+    return new OpenAI({
+      baseURL: aiSetting.value.url,
+      apiKey: aiSetting.value.key,
+      timeout: aiSetting.value.timeout,
+      dangerouslyAllowBrowser: true,
+      fetch: getTauriFetch()
+    });
+  }
+
   return {
     globalSetting,
     aiSetting,
@@ -40,6 +52,7 @@ export const useSettingStore = defineStore("setting", () => {
     modelOptions,
     aiEnabled,
     defaultChatModel,
+    createAiClient,
     supportThink
   }
 })
