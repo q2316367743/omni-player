@@ -75,10 +75,17 @@ export interface AiSetting {
    */
   defaultSearchModel: string;
 
+  // ==== memo ==== 相关配置
+
+  /**
+   * memo 分析模型
+   */
+  memoAnalyzerModel: string;
+
   /**
    * 默认嵌入模型
    */
-  defaultEmbeddingModel: string;
+  memoEmbeddingModel: string;
 
 }
 
@@ -92,7 +99,8 @@ export function buildAiSetting(): AiSetting {
     defaultChatModel: "gpt-3.5-turbo",
     defaultTopicModel: '',
     defaultSearchModel: '',
-    defaultEmbeddingModel: '',
+    memoAnalyzerModel: 'gpt-3.5-turbo',
+    memoEmbeddingModel: '',
     timeout: 15000,
     models: [
       {

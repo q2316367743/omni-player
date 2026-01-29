@@ -17,3 +17,10 @@ export function updateMemoLayerCognitive(id: string, data: Partial<Omit<MemoLaye
     updated_at: now
   });
 }
+
+export function getActiveMemoLayerCognitives() {
+  const now = Date.now();
+  return useSql().query<MemoLayerCognitive>('memo_layer_cognitive')
+    .gt('expire_at', now)
+    .list();
+}

@@ -1,0 +1,242 @@
+
+.memo-editor-section {
+  .editor-card {
+    padding: var(--monica-spacing-md);
+  }
+}
+
+.editor-wrapper {
+  position: relative;
+}
+
+.editor-wrapper.focused .editor-collapsed {
+  background: var(--monica-warm-bg-secondary);
+  border-radius: var(--monica-radius-md);
+}
+
+.editor-collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--monica-spacing-md);
+  cursor: text;
+  transition: all 0.3s ease;
+  min-height: 48px;
+}
+
+.editor-collapsed:hover {
+  background: var(--monica-warm-bg-secondary);
+  border-radius: var(--monica-radius-md);
+}
+
+.placeholder-content {
+  flex: 1;
+  color: var(--monica-text-primary);
+  font-size: var(--monica-font-md);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: var(--monica-spacing-md);
+}
+
+.collapsed-placeholder {
+  display: flex;
+  align-items: center;
+  gap: var(--monica-spacing-sm);
+}
+
+.placeholder-icon {
+  font-size: 20px;
+}
+
+.placeholder-text {
+  color: var(--monica-text-tertiary);
+  font-size: var(--monica-font-md);
+}
+
+.collapsed-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--monica-spacing-sm);
+}
+
+.collapsed-mood {
+  font-size: 18px;
+}
+
+.collapsed-at {
+  font-size: var(--monica-font-sm);
+  color: var(--monica-coral);
+  background: var(--monica-coral-light);
+  padding: 2px 8px;
+  border-radius: var(--monica-radius-sm);
+}
+
+.editor-expanded {
+  padding: var(--monica-spacing-md);
+}
+
+.memo-textarea {
+  width: 100%;
+  resize: none;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  line-height: 1.6;
+  padding: 0;
+  min-height: 24px;
+  font-size: var(--monica-font-md);
+}
+
+.memo-textarea:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.editor-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--monica-spacing-md);
+  padding-top: var(--monica-spacing-md);
+  border-top: 1px solid var(--monica-border);
+}
+
+.at-section {
+  display: flex;
+  align-items: center;
+  gap: var(--monica-spacing-sm);
+}
+
+.at-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--monica-spacing-xs);
+  background: var(--monica-warm-bg-secondary);
+  border: 1px solid var(--monica-border);
+  border-radius: var(--monica-radius-md);
+  padding: var(--monica-spacing-xs) var(--monica-spacing-md);
+  color: var(--monica-text-secondary);
+  font-size: var(--monica-font-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.at-btn:hover {
+  background: var(--monica-peach-light);
+  border-color: var(--monica-coral);
+  color: var(--monica-coral-dark);
+}
+
+.at-icon {
+  font-weight: bold;
+  color: var(--monica-coral);
+}
+
+.mood-selector {
+  display: flex;
+  gap: var(--monica-spacing-xs);
+}
+
+.mood-item {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--monica-radius-sm);
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.2s ease;
+}
+
+.mood-item:hover {
+  background: var(--monica-warm-bg-secondary);
+  transform: scale(1.1);
+}
+
+.mood-item.active {
+  background: var(--monica-coral-light);
+  transform: scale(1.15);
+}
+
+.editor-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--monica-spacing-md);
+  padding-top: var(--monica-spacing-md);
+  border-top: 1px solid var(--monica-border);
+}
+
+.char-count {
+  font-size: var(--monica-font-sm);
+  color: var(--monica-text-tertiary);
+}
+
+.publish-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--monica-spacing-sm);
+}
+
+.publish-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.editor-expand-enter-active,
+.editor-expand-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.editor-expand-enter-from,
+.editor-expand-leave-to {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.editor-expand-enter-to,
+.editor-expand-leave-from {
+  max-height: 300px;
+}
+
+.editor-collapse-enter-active,
+.editor-collapse-leave-active {
+  transition: all 0.25s ease;
+}
+
+.editor-collapse-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.editor-collapse-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.toolbar-fade-enter-active,
+.toolbar-fade-leave-active {
+  transition: all 0.2s ease;
+}
+
+.toolbar-fade-enter-from,
+.toolbar-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.footer-fade-enter-active,
+.footer-fade-leave-active {
+  transition: all 0.2s ease 0.1s;
+}
+
+.footer-fade-enter-from,
+.footer-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}

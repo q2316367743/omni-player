@@ -17,3 +17,10 @@ export function updateMemoLayerBehavior(id: string, data: Partial<MemoLayerBehav
     updated_at: now
   });
 }
+
+export function getActiveMemoLayerBehaviors() {
+  const now = Date.now();
+  return useSql().query<MemoLayerBehavior>('memo_layer_behavior')
+    .gt('expire_at', now)
+    .list();
+}

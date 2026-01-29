@@ -17,3 +17,10 @@ export function updateMemoLayerEmotion(id: string, data: Partial<Omit<MemoLayerE
     updated_at: now
   });
 }
+
+export function getActiveMemoLayerEmotions() {
+  const now = Date.now();
+  return useSql().query<MemoLayerEmotion>('memo_layer_emotion')
+    .gt('expire_at', now)
+    .list();
+}

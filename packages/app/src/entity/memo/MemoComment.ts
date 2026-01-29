@@ -1,10 +1,8 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {YesOrNo} from "@/global/YesOrNo.ts";
 
-/**
- * 评论
- */
-export interface MemoComment extends BaseEntity {
+export interface MemoCommentCore {
+
   memo_id: string;
   /**
    * 朋友ID，为空代表是我自己的回复
@@ -23,5 +21,11 @@ export interface MemoComment extends BaseEntity {
    * 标记是否由 @ 触发（用于统计/展示）
    */
   is_mention_reply: YesOrNo;
+}
+
+/**
+ * 评论
+ */
+export interface MemoComment extends BaseEntity, MemoCommentCore {
 
 }

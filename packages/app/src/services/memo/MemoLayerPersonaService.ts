@@ -17,3 +17,10 @@ export function updateMemoLayerPersona(id: string, data: Partial<Omit<MemoLayerP
     updated_at: now
   });
 }
+
+export function getActiveMemoLayerPersonas() {
+  const now = Date.now();
+  return useSql().query<MemoLayerPersona>('memo_layer_persona')
+    .gt('expire_at', now)
+    .list();
+}

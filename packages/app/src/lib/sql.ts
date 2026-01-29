@@ -48,6 +48,7 @@ export type TableName =
   | 'sp_chapter_content'
   | 'memo_item'
   | 'memo_chunk'
+  | 'memo_comment'
   | 'memo_layer_behavior'
   | 'memo_layer_cognitive'
   | 'memo_layer_emotion'

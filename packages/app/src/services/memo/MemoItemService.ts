@@ -1,16 +1,19 @@
-import type {MemoChunk, MemoItem, MemoItemCore} from "@/entity/memo";
+import type {MemoChunk, MemoComment, MemoCommentCore, MemoItem, MemoItemCore} from "@/entity/memo";
 import {useSql} from "@/lib/sql.ts";
 import type {PageResponse} from "@/global/PageResponse.ts";
 import {group} from "@/util";
 import {chunkMemo} from "@/util/text/ChunkUtil.ts";
 import {useMemoVelesdb} from "@/lib/velesdb.ts";
+import {aiMemoAnalyzer} from "@/modules/ai/AiMemoAnalyzer.ts";
+
+export interface MemoCommentView extends MemoCommentCore{
+  reply: Array<MemoCommentView>;
+}
 
 export interface MemoItemView extends MemoItem {
   content: string;
-}
-
-export interface MemoItemAdd extends MemoItemCore {
-  content: string;
+  // 评论信息
+  comments: Array<MemoCommentView>
 }
 
 export async function pageMemoItem(pageNum: number, pageSize: number): Promise<PageResponse<MemoItemView>> {
@@ -27,6 +30,11 @@ export async function pageMemoItem(pageNum: number, pageSize: number): Promise<P
   const chunks = await useSql().query<MemoChunk>('memo_chunk').in('memo_id', itemIds).list();
   const chunkMap = group(chunks, 'memo_id');
 
+  // 获取全部相关的评论
+  const comments = await useSql().query<MemoComment>('memo_comment').in('memo_id', itemIds).list();
+  // 分组
+  const commentMap = group(comments, 'memo_id');
+
   return {
     ...itemPage,
     records: itemPage.records.map(item => {
@@ -36,10 +44,15 @@ export async function pageMemoItem(pageNum: number, pageSize: number): Promise<P
         content: chunks
           .sort((a, b) => a.index - b.index)
           .map(chunk => chunk.content)
-          .join('\n'),
+          .join('\n\n'),
+        comments: commentMap.get(item.id) || []
       };
     }),
   };
+}
+
+export interface MemoItemAdd extends MemoItemCore {
+  content: string;
 }
 
 /**
@@ -83,4 +96,11 @@ export async function addMemoService(data: MemoItemAdd) {
     }
   })))
   // 5. 使用 AI 进行处理
+  if (data.type === "normal") {
+    await aiMemoAnalyzer({
+      memoContent: data.content,
+      sourceId: newMemo.id,
+      source: 'memo'
+    });
+  }
 }
