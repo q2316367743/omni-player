@@ -1,14 +1,15 @@
 import {
   type CollectionInfo,
-  createCollection,
+  createCollection, deletePoints,
   getCollection,
-  type PointInput,
+  type PointInput, textSearch,
   upsert
 } from "@wiscale/tauri-plugin-velesdb";
 import {logError} from "@/lib/log.ts";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 
 interface VelesdbChunk {
+  id: number;
   // 内容
   content: string;
   // 元数据
@@ -32,7 +33,7 @@ class VelesdbWrap {
       logError("未找到memo集合，创建memo集合", e);
       this.db = await createCollection({
         name: this.name,
-        dimension: 768,
+        dimension: 1536,
         metric: "cosine",
       });
     }
@@ -40,7 +41,6 @@ class VelesdbWrap {
 
   async addChunkBatch(chunks: Array<VelesdbChunk>) {
     await this.getVelesdb();
-    const now = Date.now();
     const points = new Array<PointInput>();
     const {createAiClient, aiSetting} = useSettingStore();
     // 向量化
@@ -52,12 +52,12 @@ class VelesdbWrap {
 
       const newVar = await openAI.embeddings.create({
         input: chunk.content,
-        model: aiSetting.defaultEmbeddingModel,
+        model: aiSetting.memoEmbeddingModel,
       });
 
 
       points.push({
-        id: now + i,
+        id: chunk.id,
         vector: newVar.data.flatMap(c => c.embedding),
         payload: chunk.payload
       });
@@ -67,6 +67,24 @@ class VelesdbWrap {
     await upsert({
       collection: this.name,
       points: points
+    })
+  }
+
+  async query(query: string, topK: number = 10) {
+    await this.getVelesdb();
+    const res = await textSearch({
+      collection: this.name,
+      query: query,
+      topK: topK,
+    });
+    return res.results.map(r => r.payload)
+  }
+
+  async delete(id: number) {
+    await this.getVelesdb();
+    await deletePoints({
+      collection: this.name,
+      ids: [id]
     })
   }
 

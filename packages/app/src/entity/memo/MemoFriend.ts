@@ -98,8 +98,10 @@ export interface MemoFriendActiveHours {
   end: number;
 }
 
-export interface MemoFriend extends BaseEntity {
-
+/**
+ * 静态人设层
+ */
+export interface MemoFriendStatic {
   /**
    * 头像
    */
@@ -196,6 +198,26 @@ export interface MemoFriend extends BaseEntity {
    */
   proactivity_level: number;
 
+  // ===== 朋友圈行为配置 =====
+
+  /**
+   * 发圈风格
+   */
+  posting_style: MemoFriendPostingStyle;
+
+  /**
+   * 特定关键词触发（JSON数组）
+   */
+  trigger_keywords: string;
+
+  /**
+   * 活跃时间段（防止深夜发圈打扰）
+   */
+  active_hours: string;
+}
+
+// 动态修改层
+export interface MemoFriendDynamic {
   // ===== 动态关系层（随互动变化） =====
 
   /**
@@ -251,23 +273,10 @@ export interface MemoFriend extends BaseEntity {
    * 情绪持续时间（AI也会"第二天心情不好"）
    */
   mood_expires_at: number;
+}
 
-  // ===== 朋友圈行为配置 =====
+export interface MemoFriend extends BaseEntity, MemoFriendStatic, MemoFriendDynamic {
 
-  /**
-   * 发圈风格
-   */
-  posting_style: MemoFriendPostingStyle;
-
-  /**
-   * 特定关键词触发（JSON数组）
-   */
-  trigger_keywords: string;
-
-  /**
-   * 活跃时间段（防止深夜发圈打扰）
-   */
-  active_hours: string;
 
   // ===== 状态管理 =====
 
@@ -296,4 +305,113 @@ export interface MemoFriend extends BaseEntity {
    */
   version: number;
 
+}
+
+/**
+ * 将 MemoFriend 对象转换为 LLM 提示词
+ * @param friend MemoFriend 对象
+ * @param options 可选参数
+ * @param options.includeSocialBehavior 是否包含朋友圈行为，默认为 true
+ * @returns 格式化的提示词字符串
+ */
+export function memoFriendToPrompt(friend: MemoFriend, options?: { includeSocialBehavior?: boolean }): string {
+  const {includeSocialBehavior = true} = options || {};
+  const knowledgeScope = JSON.parse(friend.knowledge_scope || '{"domains":[],"blindspots":[]}') as MemoFriendKnowledgeScope;
+  const tabooTopics = JSON.parse(friend.taboo_topics || '[]') as string[];
+  const personalityTags = JSON.parse(friend.personality_tags || '[]') as string[];
+  const relationshipMilestones = JSON.parse(friend.relationship_milestones || '[]') as MemoFriendMilestone[];
+  const activeHours = JSON.parse(friend.active_hours || '{"start":0,"end":24}') as MemoFriendActiveHours;
+  const triggerKeywords = JSON.parse(friend.trigger_keywords || '[]') as string[];
+
+  const ageRangeText = {
+    teen: '青少年(13-18岁)',
+    young: '青年(19-25岁)',
+    middle: '中年(26-35岁)',
+    senior: '中老年(36-45岁)',
+    ageless: '老年(46岁以上)'
+  }[friend.age_range];
+
+  const relationText = {
+    friend: '朋友',
+    mentor: '导师',
+    peer: '同事',
+    caregiver: '照料者',
+    mystery: '神秘人',
+    teammate: '队友'
+  }[friend.relation];
+
+  const archetypeText = {
+    caregiver: '照料者',
+    jester: '骗子',
+    sage: '智者',
+    rebel: '叛逆者',
+    lover: '恋人',
+    explorer: '探索者',
+    ruler: '统治者',
+    everyman: '普通人'
+  }[friend.archetype];
+
+  const memorySpanText = {
+    short: '短期记忆',
+    medium: '中期记忆',
+    long: '长期记忆'
+  }[friend.memory_span];
+
+  const moodText = friend.current_mood ? {
+    happy: '开心',
+    concerned: '担忧',
+    playful: '俏皮',
+    melancholy: '忧郁',
+    excited: '兴奋'
+  }[friend.current_mood] : '无';
+
+  const postingStyleText = {
+    encouraging: '鼓励型',
+    teasing: '调侃型',
+    observational: '观察型',
+    poetic: '诗意型',
+    sarcastic: '讽刺型'
+  }[friend.posting_style];
+
+  const socialBehaviorSection = includeSocialBehavior ? `
+【朋友圈行为】
+发圈风格：${postingStyleText}
+触发关键词：${triggerKeywords.join('、') || '无'}
+活跃时间段：${activeHours.start}:00 - ${activeHours.end}:00` : '';
+
+  return `【角色设定】
+姓名：${friend.name}
+性别：${friend.gender}
+年龄：${ageRangeText}${friend.age_exact ? `（具体年龄：${friend.age_exact}岁）` : ''}
+职业/身份：${friend.occupation}
+与用户的关系：${relationText}
+荣格原型：${archetypeText}
+
+【人格描述】
+人设：${friend.personality_prompt}
+性格标签：${personalityTags.join('、')}
+语言风格：${friend.speaking_style}
+背景故事：${friend.background_story}
+
+【知识域与局限】
+擅长领域：${knowledgeScope.domains.join('、') || '无'}
+知识盲区：${knowledgeScope.blindspots.join('、') || '无'}
+禁忌话题：${tabooTopics.join('、') || '无'}
+
+【认知参数】
+记忆跨度：${memorySpanText}
+共情能力：${friend.emotional_depth}/10
+主动性：${friend.proactivity_level}/10
+
+【关系状态】
+亲密度：${friend.intimacy_score}/100
+信任度：${friend.trust_level}/100
+对话次数：${friend.interaction_count}
+上次互动：${friend.last_interaction ? new Date(friend.last_interaction).toLocaleString('zh-CN') : '无'}
+互动频率：${friend.conversation_frequency || '未知'}
+关系里程碑：${relationshipMilestones.length > 0 ? relationshipMilestones.map(m => `${m.event}（${new Date(m.date).toLocaleDateString('zh-CN')}）`).join('、') : '无'}
+
+【当前情绪】
+情绪状态：${moodText}
+情绪持续时间：${friend.mood_expires_at ? `至 ${new Date(friend.mood_expires_at).toLocaleString('zh-CN')}` : '无限制'}${socialBehaviorSection}`;
 }

@@ -1,0 +1,128 @@
+.memo-item {
+  padding: 16px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  background: var(--monica-bg-secondary);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.memo-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.memo-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.memo-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.memo-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--monica-text-primary);
+}
+
+.memo-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.memo-mood {
+  font-size: 16px;
+}
+
+.memo-time {
+  font-size: 12px;
+  color: var(--monica-text-secondary);
+}
+
+.memo-content {
+  margin-bottom: 12px;
+
+  p {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--monica-text-primary);
+  }
+}
+
+.memo-at {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: var(--monica-bg-tertiary);
+  border-radius: 16px;
+  font-size: 12px;
+  color: var(--monica-text-secondary);
+}
+
+.at-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.memo-ai-comment {
+  padding: 12px;
+  margin-bottom: 12px;
+  background: var(--monica-bg-tertiary);
+  border-radius: 8px;
+  border-left: 3px solid var(--monica-accent);
+}
+
+.ai-comment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.ai-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.ai-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--monica-text-primary);
+}
+
+.ai-badge {
+  padding: 2px 8px;
+  font-size: 10px;
+  color: var(--monica-accent);
+  background: var(--monica-accent-bg);
+  border-radius: 4px;
+}
+
+.ai-comment-content {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--monica-text-secondary);
+}
+
+.memo-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}

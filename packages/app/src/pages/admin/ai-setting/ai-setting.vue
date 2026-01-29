@@ -38,11 +38,11 @@
         <t-form-item label="搜索词构建模型" label-align="top">
           <t-select v-model="aiSetting.defaultSearchModel" :options="modelOptions"/>
         </t-form-item>
-        <t-divider title="memo 相关配置" align="left"/>
+        <t-divider align="left">memo 相关配置</t-divider>
         <t-form-item label="memo 分析模型" label-align="top">
           <t-select v-model="aiSetting.memoAnalyzerModel" :options="modelOptions"/>
         </t-form-item>
-        <t-form-item label="文本向量化模型" label-align="top">
+        <t-form-item label="文本向量化模型" label-align="top" help="仅支持 1536 维的向量模型">
           <t-select v-model="aiSetting.memoEmbeddingModel" :options="modelOptions"/>
         </t-form-item>
       </t-form>

@@ -1,4 +1,3 @@
-
 .memo-editor-section {
   .editor-card {
     padding: var(--monica-spacing-md);
@@ -60,10 +59,6 @@
   gap: var(--monica-spacing-sm);
 }
 
-.collapsed-mood {
-  font-size: 18px;
-}
-
 .collapsed-at {
   font-size: var(--monica-font-sm);
   color: var(--monica-coral);
@@ -76,88 +71,152 @@
   padding: var(--monica-spacing-md);
 }
 
-.memo-textarea {
+// Contenteditable 编辑器样式
+.memo-editor {
   width: 100%;
-  resize: none;
+  min-height: 100px;
+  max-height: 300px;
+  overflow-y: auto;
   border: none;
   background: transparent;
   font-family: inherit;
   line-height: 1.6;
   padding: 0;
-  min-height: 24px;
   font-size: var(--monica-font-md);
+  outline: none;
+  word-wrap: break-word;
+  white-space: pre-wrap;
 }
 
-.memo-textarea:focus {
+.memo-editor:empty::before {
+  content: attr(placeholder);
+  color: var(--monica-text-tertiary);
+  pointer-events: none;
+}
+
+.memo-editor:focus {
   outline: none;
   box-shadow: none;
 }
 
-.editor-toolbar {
+// @ 标签样式
+:deep(.at-tag) {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--monica-coral-light);
+  color: var(--monica-coral);
+  padding: 2px 8px;
+  border-radius: var(--monica-radius-sm);
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  margin: 0 2px;
+  transition: all 0.2s ease;
+}
+
+:deep(.at-tag:hover) {
+  background: var(--monica-coral);
+  color: white;
+}
+
+:deep(.at-tag .at-remove) {
+  font-size: 12px;
+  margin-left: 4px;
+  opacity: 0.7;
+}
+
+:deep(.at-tag:hover .at-remove) {
+  opacity: 1;
+}
+
+// @ 下拉选择列表
+.at-dropdown {
+  position: absolute;
+  z-index: 1000;
+  background: white;
+  border: 1px solid var(--monica-border);
+  border-radius: var(--monica-radius-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  min-width: 240px;
+  max-width: 320px;
+  max-height: 280px;
+  overflow: hidden;
+}
+
+.at-dropdown-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: var(--monica-spacing-md);
-  padding-top: var(--monica-spacing-md);
-  border-top: 1px solid var(--monica-border);
-}
-
-.at-section {
-  display: flex;
-  align-items: center;
-  gap: var(--monica-spacing-sm);
-}
-
-.at-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--monica-spacing-xs);
-  background: var(--monica-warm-bg-secondary);
-  border: 1px solid var(--monica-border);
-  border-radius: var(--monica-radius-md);
-  padding: var(--monica-spacing-xs) var(--monica-spacing-md);
-  color: var(--monica-text-secondary);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--monica-border);
   font-size: var(--monica-font-sm);
+  font-weight: 500;
+  color: var(--monica-text-secondary);
+  background: var(--monica-warm-bg-secondary);
+}
+
+.at-dropdown-header .at-hint {
+  font-size: 11px;
+  color: var(--monica-text-tertiary);
+}
+
+.at-dropdown-list {
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.at-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.at-btn:hover {
-  background: var(--monica-peach-light);
-  border-color: var(--monica-coral);
-  color: var(--monica-coral-dark);
+.at-dropdown-item:hover,
+.at-dropdown-item.active {
+  background: var(--monica-warm-bg-secondary);
 }
 
-.at-icon {
-  font-weight: bold;
-  color: var(--monica-coral);
-}
-
-.mood-selector {
-  display: flex;
-  gap: var(--monica-spacing-xs);
-}
-
-.mood-item {
+.at-dropdown-avatar {
   width: 32px;
   height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.at-dropdown-info {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--monica-radius-sm);
-  cursor: pointer;
-  font-size: 18px;
-  transition: all 0.2s ease;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
 }
 
-.mood-item:hover {
-  background: var(--monica-warm-bg-secondary);
-  transform: scale(1.1);
+.at-dropdown-name {
+  font-size: var(--monica-font-sm);
+  font-weight: 500;
+  color: var(--monica-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.mood-item.active {
-  background: var(--monica-coral-light);
-  transform: scale(1.15);
+.at-dropdown-desc {
+  font-size: 11px;
+  color: var(--monica-text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.at-dropdown-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--monica-text-tertiary);
+  font-size: var(--monica-font-sm);
 }
 
 .editor-footer {
@@ -167,6 +226,49 @@
   margin-top: var(--monica-spacing-md);
   padding-top: var(--monica-spacing-md);
   border-top: 1px solid var(--monica-border);
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: var(--monica-spacing-lg);
+}
+
+// Type 选择器
+.type-selector {
+  display: flex;
+  align-items: center;
+  gap: var(--monica-spacing-md);
+}
+
+.type-radio {
+  display: flex;
+  align-items: center;
+  gap: var(--monica-spacing-xs);
+  cursor: pointer;
+  font-size: var(--monica-font-sm);
+  color: var(--monica-text-secondary);
+  transition: all 0.2s ease;
+}
+
+.type-radio:hover {
+  color: var(--monica-text-primary);
+}
+
+.type-radio input[type="radio"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--monica-coral);
+  cursor: pointer;
+}
+
+.type-radio .radio-label {
+  user-select: none;
+}
+
+.type-radio input[type="radio"]:checked + .radio-label {
+  color: var(--monica-coral);
+  font-weight: 500;
 }
 
 .char-count {
@@ -201,7 +303,7 @@
 
 .editor-expand-enter-to,
 .editor-expand-leave-from {
-  max-height: 300px;
+  max-height: 400px;
 }
 
 .editor-collapse-enter-active,
@@ -217,26 +319,4 @@
 .editor-collapse-leave-to {
   opacity: 0;
   transform: translateY(10px);
-}
-
-.toolbar-fade-enter-active,
-.toolbar-fade-leave-active {
-  transition: all 0.2s ease;
-}
-
-.toolbar-fade-enter-from,
-.toolbar-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-
-.footer-fade-enter-active,
-.footer-fade-leave-active {
-  transition: all 0.2s ease 0.1s;
-}
-
-.footer-fade-enter-from,
-.footer-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
 }

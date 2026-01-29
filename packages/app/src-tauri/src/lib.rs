@@ -26,7 +26,6 @@ pub fn run() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_homebrew::init())
-        .plugin(tauri_plugin_velesdb::init("./velesdb_data"))
         .plugin(
             tauri_plugin_log::Builder::new()
                 .targets([
@@ -46,6 +45,10 @@ pub fn run() {
             system_process_kill
         ])
         .setup(|app| {
+            let app_data_dir = app.path().app_data_dir().expect("Failed to get app data dir");
+            let velesdb_dir = app_data_dir.join("velesdb_data");
+            std::fs::create_dir_all(&velesdb_dir).expect("Failed to create velesdb data directory");
+            app.handle().plugin(tauri_plugin_velesdb::init(velesdb_dir.to_str().unwrap()))?;
 
             // 注册更新插件
             #[cfg(desktop)]

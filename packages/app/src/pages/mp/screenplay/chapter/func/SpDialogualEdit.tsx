@@ -2,7 +2,7 @@ import type {SpDialogueCore} from "@/entity/screenplay";
 import {DialogPlugin, Form, FormItem, Textarea, Checkbox} from "tdesign-vue-next";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {addSpDialogueService} from "@/services/screenplay";
-import {askAiScreenplayNarrator} from "@/modules/ai/AiScreenplayNarrator.ts";
+import {askAiScreenplayNarrator} from "@/modules/ai/screenplay/AiScreenplayNarrator.ts";
 import {getScreenplayService} from "@/services/screenplay/ScreenplayService.ts";
 import {getSpSceneService} from "@/services/screenplay/SpSceneService.ts";
 import {listSpRoleService} from "@/services/screenplay/SpRoleService.ts";

@@ -7,7 +7,7 @@ import {
   listSpRoleBeliefService,
   listSpRoleLatentClueService, retractSpRoleBeliefService, retractSpRoleLatentClueService, updateSpRoleEmotionService
 } from "@/services/screenplay";
-import {askAiScreenplayNarrator} from "@/modules/ai/AiScreenplayNarrator.ts";
+import {askAiScreenplayNarrator} from "@/modules/ai/screenplay/AiScreenplayNarrator.ts";
 
 export interface AiScreenplayRoleProp {
   // 叙述者 AI

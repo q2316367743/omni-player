@@ -92,6 +92,7 @@
     "dialog:allow-save",
     "homebrew:default",
     "velesdb:default",
+    "velesdb:allow-delete-points",
     "clipboard-manager:allow-write-text"
   ]
 }

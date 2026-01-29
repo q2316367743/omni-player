@@ -13,7 +13,7 @@ export interface MemoCommentCore {
    */
   content: string;
   /**
-   * 0 - 一级评论，大于 0 - 二级回复
+   * 不存在 - 一级评论，存在 - 二级回复
    */
   parent_id: string;
 

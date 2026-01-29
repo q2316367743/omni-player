@@ -1,9 +1,9 @@
 import type {Screenplay, SpDialogue, SpRole, SpScene} from "@/entity/screenplay";
 import type {SpRoleAppearance} from "@/entity/screenplay/SpRoleAppearance";
 import type {SpDirectorInstructionLog} from "@/entity/screenplay/SpDirectorInstructionLog";
-import {askAiScreenplayDirector, type DirectorDecision} from "@/modules/ai/AiScreenplayDirector";
-import {aiScreenplayRole} from "@/modules/ai/AiScreenplayRole";
-import {askAiScreenplayNarrator} from "@/modules/ai/AiScreenplayNarrator";
+import {askAiScreenplayDirector, type DirectorDecision} from "@/modules/ai/screenplay/AiScreenplayDirector.ts";
+import {aiScreenplayRole} from "@/modules/ai/screenplay/AiScreenplayRole.ts";
+import {askAiScreenplayNarrator} from "@/modules/ai/screenplay/AiScreenplayNarrator.ts";
 import {
   addSpRoleAppearanceService,
   listSpRoleAppearanceService,
