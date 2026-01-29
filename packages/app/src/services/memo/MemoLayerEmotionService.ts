@@ -24,3 +24,9 @@ export function getActiveMemoLayerEmotions() {
     .gt('expire_at', now)
     .list();
 }
+
+
+export function listActiveMemoLayerEmotions() {
+  return useSql().query<MemoLayerEmotion>('memo_layer_emotion')
+    .list();
+}

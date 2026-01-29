@@ -24,3 +24,9 @@ export function getActiveMemoLayerPersonas() {
     .gt('expire_at', now)
     .list();
 }
+
+export function listActiveMemoLayerPersonas() {
+  return useSql().query<MemoLayerPersona>('memo_layer_persona')
+    .list();
+}
+

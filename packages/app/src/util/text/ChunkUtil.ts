@@ -43,7 +43,7 @@ function splitByDoubleNewline(text: string): string[] {
   return text.split(/\n\s*\n/).map(p => p.trim()).filter(p => p !== '');
 }
 
-// 辅助函数：智能按单换行分（合并连续非空行）
+// 辅助函数：智能按单换行分（保留换行符）
 function splitBySingleNewlineSmart(text: string): string[] {
   const lines = text.split('\n');
   const paragraphs: string[] = [];
@@ -57,7 +57,7 @@ function splitBySingleNewlineSmart(text: string): string[] {
         currentPara = '';
       }
     } else {
-      currentPara += (currentPara ? ' ' : '') + trimmedLine;
+      currentPara += (currentPara ? '\n' : '') + line;
     }
   }
   if (currentPara !== '') {

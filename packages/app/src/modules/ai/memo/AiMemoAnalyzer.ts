@@ -5,7 +5,7 @@ import {
   getActiveMemoLayerBehaviors,
   updateMemoLayerBehavior,
   addMemoLayerCognitive,
-  getActiveMemoLayerCognitives,
+  getActiveMemoLayerCognitive,
   updateMemoLayerCognitive,
   addMemoLayerEmotion,
   getActiveMemoLayerEmotions,
@@ -29,7 +29,7 @@ export async function aiMemoAnalyzer(prop: AiMemoAnalyzerProp) {
   const [behaviors, emotions, cognitives, personas] = await Promise.all([
     getActiveMemoLayerBehaviors(),
     getActiveMemoLayerEmotions(),
-    getActiveMemoLayerCognitives(),
+    getActiveMemoLayerCognitive(),
     getActiveMemoLayerPersonas()
   ]);
 

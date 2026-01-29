@@ -24,3 +24,8 @@ export function getActiveMemoLayerBehaviors() {
     .gt('expire_at', now)
     .list();
 }
+
+export function listActiveMemoLayerBehaviors() {
+  return useSql().query<MemoLayerBehavior>('memo_layer_behavior')
+    .list();
+}

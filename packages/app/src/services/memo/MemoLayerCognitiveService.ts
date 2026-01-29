@@ -18,9 +18,14 @@ export function updateMemoLayerCognitive(id: string, data: Partial<Omit<MemoLaye
   });
 }
 
-export function getActiveMemoLayerCognitives() {
+export function getActiveMemoLayerCognitive() {
   const now = Date.now();
   return useSql().query<MemoLayerCognitive>('memo_layer_cognitive')
     .gt('expire_at', now)
+    .list();
+}
+
+export function listActiveMemoLayerCognitive() {
+  return useSql().query<MemoLayerCognitive>('memo_layer_cognitive')
     .list();
 }

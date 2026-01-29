@@ -34,6 +34,9 @@
         <DiaryPage
           v-else-if="currentPage === 'diary'"
         />
+        <MemoryPage
+          v-else-if="currentPage === 'memory'"
+        />
         <ToolsPage
           v-else-if="currentPage === 'tools'"
         />
@@ -69,11 +72,13 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import MemoHome from './components/MemoHome.vue'
+import MemoHome from './components/memo/MemoHome.vue'
 import PartnerPage from './components/PartnerPage.vue'
-import MomentsPage from './components/MomentsPage.vue'
+import MomentsPage from './components/memo/MomentsPage.vue'
 import DiaryPage from './components/DiaryPage.vue'
 import ToolsPage from './components/ToolsPage.vue'
+import MemoryPage from './components/memory/MemoryPage.vue'
+import {LocalName} from "@/global/LocalName.ts";
 
 interface Partner {
   id: string
@@ -88,10 +93,11 @@ const navItems = [
   { id: 'partner', label: '伙伴', icon: '👥' },
   { id: 'moments', label: '朋友圈', icon: '🌸' },
   { id: 'diary', label: '日记', icon: '📅' },
+  { id: 'memory', label: '记忆', icon: '🧠' },
   { id: 'tools', label: '工具', icon: '🧰' }
 ]
 
-const currentPage = ref('home')
+const currentPage = useSessionStorage(LocalName.PAGE_HOME_ASSISTANT_ACTIVE, 'home');
 const currentTime = ref('')
 const showPartnerSelector = ref(false)
 const selectedMemoPartner = ref<((partner: Partner) => void) | null>(null)
