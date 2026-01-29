@@ -22,10 +22,12 @@ export function getActiveMemoLayerBehaviors() {
   const now = Date.now();
   return useSql().query<MemoLayerBehavior>('memo_layer_behavior')
     .gt('expire_at', now)
+    .orderByDesc('expire_at')
     .list();
 }
 
 export function listActiveMemoLayerBehaviors() {
   return useSql().query<MemoLayerBehavior>('memo_layer_behavior')
+    .orderByDesc('expire_at')
     .list();
 }

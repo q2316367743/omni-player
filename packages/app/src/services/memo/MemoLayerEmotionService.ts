@@ -22,11 +22,13 @@ export function getActiveMemoLayerEmotions() {
   const now = Date.now();
   return useSql().query<MemoLayerEmotion>('memo_layer_emotion')
     .gt('expire_at', now)
+    .orderByDesc('expire_at')
     .list();
 }
 
 
 export function listActiveMemoLayerEmotions() {
   return useSql().query<MemoLayerEmotion>('memo_layer_emotion')
+    .orderByDesc('expire_at')
     .list();
 }

@@ -22,11 +22,13 @@ export function getActiveMemoLayerPersonas() {
   const now = Date.now();
   return useSql().query<MemoLayerPersona>('memo_layer_persona')
     .gt('expire_at', now)
+    .orderByDesc('expire_at')
     .list();
 }
 
 export function listActiveMemoLayerPersonas() {
   return useSql().query<MemoLayerPersona>('memo_layer_persona')
+    .orderByDesc('expire_at')
     .list();
 }
 

@@ -22,10 +22,12 @@ export function getActiveMemoLayerCognitive() {
   const now = Date.now();
   return useSql().query<MemoLayerCognitive>('memo_layer_cognitive')
     .gt('expire_at', now)
+    .orderByDesc('expire_at')
     .list();
 }
 
 export function listActiveMemoLayerCognitive() {
   return useSql().query<MemoLayerCognitive>('memo_layer_cognitive')
+    .orderByDesc('expire_at')
     .list();
 }
