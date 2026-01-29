@@ -38,6 +38,10 @@
         <t-form-item label="搜索词构建模型" label-align="top">
           <t-select v-model="aiSetting.defaultSearchModel" :options="modelOptions"/>
         </t-form-item>
+        <t-divider title="memo"/>
+        <t-form-item label="文本向量化模型" label-align="top">
+          <t-select v-model="aiSetting.defaultEmbeddingModel" :options="modelOptions"/>
+        </t-form-item>
       </t-form>
     </t-card>
   </div>

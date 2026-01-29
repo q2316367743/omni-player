@@ -1,6 +1,17 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {MemoLayerSource} from "@/entity/memo/MemoCommon.ts";
 
+/**
+ * 情绪类型
+ * - anger: 生气
+ * - joy: 满足
+ * - anxiety: 焦虑
+ * - sadness: 悲伤
+ * - fear: 害怕
+ * - disgust: 厌恶
+ * - surprise: 惊讶
+ * - neutral: 中性
+ */
 export type MemoLayerEmotionType =
   | 'anger'
   | 'anxiety'

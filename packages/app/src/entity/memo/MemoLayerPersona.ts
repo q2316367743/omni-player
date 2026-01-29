@@ -1,6 +1,17 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {MemoLayerSource} from "@/entity/memo/MemoCommon.ts";
 
+/**
+ * 人格名称
+ * - openness: 开放性
+ * - conscientiousness: 尽责性
+ * - extraversion: 外向性
+ * - agreeableness: 友好的性
+ * - neuroticism: 神经过敏性（神经质）
+ * - resilience: 弹性
+ * - curiosity: 好奇心
+ * - optimism: 乐观
+ */
 export type MemoLayerPersonaName =
   | 'openness'
   | 'conscientiousness'

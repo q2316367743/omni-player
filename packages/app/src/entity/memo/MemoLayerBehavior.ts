@@ -4,16 +4,13 @@ import type {MemoLayerSource} from "@/entity/memo/MemoCommon.ts";
 export type MemoLayerBehaviorType =
   | 'todo'
   | 'habit_cue'
-  |'social_intent'
-  |'avoidance'
-  |'seeking';
+  | 'social_intent'
+  | 'avoidance'
+  | 'seeking';
 
 export type MemoLayerBehaviorStatus = 'active' | 'completed' | 'snoozed' | 'expired';
 
-/**
- * 行为层 (待办与习惯，7-14天有效期，可主动延长)
- */
-export interface MemoLayerBehavior extends BaseEntity {
+export interface MemoLayerBehaviorCore {
 
   /**
    * 来源
@@ -55,4 +52,11 @@ export interface MemoLayerBehavior extends BaseEntity {
    * 有效期
    */
   expire_at: number;
+}
+
+
+/**
+ * 行为层 (待办与习惯，7-14天有效期，可主动延长)
+ */
+export interface MemoLayerBehavior extends BaseEntity, MemoLayerBehaviorCore {
 }

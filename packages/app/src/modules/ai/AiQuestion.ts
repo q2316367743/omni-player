@@ -1,20 +1,12 @@
 import type {AiQuestionResult, AskToOpenAiProps} from "@/modules/ai/types.ts";
-import {getTauriFetch} from "@/lib/http.ts";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
-import {OpenAI} from "openai";
 
 
 export async function askQuestionOpenAi(props: Omit<AskToOpenAiProps, 'onAborted' | 'onAppend' | 'onStart'>): Promise<AiQuestionResult> {
   const {messages, assistant, think} = props;
-  const {aiSetting, supportThink} = useSettingStore();
+  const {supportThink, createAiClient} = useSettingStore();
   const st = supportThink(assistant.model);
-  const openAi = new OpenAI({
-    baseURL: aiSetting.url,
-    apiKey: aiSetting.key,
-    timeout: aiSetting.timeout,
-    dangerouslyAllowBrowser: true,
-    fetch: getTauriFetch()
-  });
+  const openAi = createAiClient();
 
   const response = await openAi.chat?.completions.create({
     model: assistant.model,

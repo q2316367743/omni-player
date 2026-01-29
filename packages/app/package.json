@@ -29,7 +29,6 @@
     "@tauri-apps/plugin-clipboard-manager": "^2.3.2",
     "@tauri-apps/plugin-dialog": "~2.4.2",
     "@tauri-apps/plugin-fs": "~2.4.4",
-    "@tauri-apps/plugin-hnsw": "workspace:*",
     "@tauri-apps/plugin-homebrew": "workspace:*",
     "@tauri-apps/plugin-http": "2.5.4",
     "@tauri-apps/plugin-log": "~2.7.1",

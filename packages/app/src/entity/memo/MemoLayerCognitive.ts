@@ -1,6 +1,14 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {MemoLayerSource} from "@/entity/memo/MemoCommon.ts";
 
+/**
+ * 类型
+ * - value_conflict: 冲突
+ * - unsolved_problem: 未解决
+ * - growth_need: 成长需求
+ * - relationship_issue: 关系问题
+ * - existential: 存在性
+ */
 export type MemoLayerCognitiveType =
   | 'value_conflict'
   | 'unsolved_problem'

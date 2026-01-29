@@ -1,6 +1,12 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {YesOrNo} from "@/global/YesOrNo.ts";
 
+/**
+ * memo 类型
+ * - normal: 普通
+ * - memo: 备忘录
+ * - private: 私密
+ */
 export type MemoItemType = 'normal' | 'memo' | 'private';
 
 export interface MemoItemCore {

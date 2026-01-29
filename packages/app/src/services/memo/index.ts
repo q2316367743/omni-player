@@ -1,1 +1,5 @@
 export * from "./MemoItemService.ts";
+export * from "./MemoLayerBehaviorService.ts";
+export * from "./MemoLayerCognitiveService.ts";
+export * from "./MemoLayerEmotionService.ts";
+export * from "./MemoLayerPersonaService.ts";
