@@ -5,7 +5,7 @@
     @click="handleClick"
   >
     <div class="partner-avatar-wrap">
-      <XhAvatar :model-value="friend.avatar" :size="80" shape="circle" />
+      <XhAvatar :value="friend.avatar" :size="80" shape="circle"/>
       <div class="partner-status" :class="moodToStatus(friend.current_mood)"></div>
       <div v-if="friend.is_locked === 1" class="locked-badge">🔒</div>
     </div>
@@ -28,18 +28,26 @@
         <span class="stat-label">亲密度</span>
       </div>
     </div>
+    <div class="partner-action">
+      <t-button theme="primary" shape="round" @click.stop="handleChat">
+        {{ hasSession ? '继续聊天' : '开始聊天' }}
+      </t-button>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
-import type { MemoFriend } from '@/entity/memo'
+import {computed} from 'vue'
+import type {MemoFriend} from '@/entity/memo'
 import {
   getArchetypeText,
   parsePersonalityTags,
   moodToStatus
 } from '@/entity/memo/MemoFriend'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
+import {useMemoFriendStore} from "@/store";
+import {createMemoSession} from "@/services/memo";
+import MessageUtil from "@/util/model/MessageUtil.ts";
 
 const props = defineProps<{
   friend: MemoFriend
@@ -50,7 +58,10 @@ const emit = defineEmits<{
   (e: 'click', friend: MemoFriend): void
 }>()
 
-const allTags = computed(() => parsePersonalityTags(props.friend.personality_tags))
+const router = useRouter();
+
+const allTags = computed(() => parsePersonalityTags(props.friend.personality_tags));
+const hasSession = computed(() => useMemoFriendStore().chatFriendMap.has(props.friend.id));
 const maxVisible = 6
 
 const visibleTags = computed(() => {
@@ -64,6 +75,21 @@ const hiddenTagsCount = computed(() => {
 const handleClick = () => {
   if (props.friend.is_locked === 1) return
   emit('click', props.friend)
+}
+
+const handleChat = () => {
+  const sessionId = useMemoFriendStore().chatFriendMap.get(props.friend.id);
+  if (sessionId) {
+    router.push(`/memo/chat/${sessionId}`);
+    return;
+  }
+  createMemoSession(props.friend.id)
+    .then((session) => {
+      router.push(`/memo/chat/${session.id}`);
+    })
+    .catch(e => {
+      MessageUtil.error("创建聊天失败", e);
+    })
 }
 </script>
 

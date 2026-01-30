@@ -8,12 +8,16 @@ import {
 import {logError} from "@/lib/log.ts";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 
+interface VelesdbChunkPayload extends Record<string, any>{
+  content: string;
+}
+
 interface VelesdbChunk {
   id: number;
   // 内容
   content: string;
   // 元数据
-  payload: Record<string, any>;
+  payload: VelesdbChunkPayload;
 }
 
 class VelesdbWrap {
@@ -70,14 +74,14 @@ class VelesdbWrap {
     })
   }
 
-  async query(query: string, topK: number = 10) {
+  async query(query: string, topK: number = 10): Promise<Array<VelesdbChunkPayload>> {
     await this.getVelesdb();
     const res = await textSearch({
       collection: this.name,
       query: query,
       topK: topK,
     });
-    return res.results.map(r => r.payload)
+    return res.results.map(r => r.payload as VelesdbChunkPayload)
   }
 
   async delete(id: number) {

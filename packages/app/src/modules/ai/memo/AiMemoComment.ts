@@ -2,7 +2,7 @@ import type {MemoFriend} from "@/entity/memo";
 import type {MemoItemAdd} from "@/services/memo";
 import {memoFriendToPrompt} from "@/entity/memo/MemoFriend.ts";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
-import {useMemoFriendStore} from "@/store/MemoFriendStore.ts";
+import {useMemoFriendStore} from "@/store";
 import {MEMO_COMMENT_TOOL_SCHEMA} from "@/modules/ai/schema/MemoCommentSchema.ts";
 import OpenAI from "openai";
 

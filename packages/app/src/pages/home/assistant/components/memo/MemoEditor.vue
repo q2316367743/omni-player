@@ -109,7 +109,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
-import {useMemoFriendStore} from "@/store/MemoFriendStore.ts";
+import {useMemoFriendStore} from "@/store";
 import type { MemoItemType } from '@/entity/memo';
 import type { MemoFriend } from '@/entity/memo';
 

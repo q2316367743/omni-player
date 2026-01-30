@@ -5,7 +5,7 @@ import {group} from "@/util";
 import {chunkMemo} from "@/util/text/ChunkUtil.ts";
 import {useMemoVelesdb} from "@/lib/velesdb.ts";
 import {aiMemoAnalyzer} from "@/modules/ai/memo/AiMemoAnalyzer.ts";
-import {useMemoFriendStore} from "@/store/MemoFriendStore.ts";
+import {useMemoFriendStore} from "@/store";
 import {aiMemoComment} from "@/modules/ai/memo/AiMemoComment.ts";
 
 export interface MemoCommentView extends MemoComment {

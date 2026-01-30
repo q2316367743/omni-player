@@ -457,7 +457,7 @@ export function moodToStatus(mood: MemoFriendMood): 'online' | 'busy' {
  * @returns 格式化的提示词字符串
  */
 export function memoFriendToPrompt(friend: MemoFriend, options?: { includeSocialBehavior?: boolean }): string {
-  const {includeSocialBehavior = true} = options || {};
+  const {includeSocialBehavior = false} = options || {};
   const knowledgeScope = parseKnowledgeScope(friend.knowledge_scope);
   const tabooTopics = parseTabooTopics(friend.taboo_topics);
   const personalityTags = parsePersonalityTags(friend.personality_tags);

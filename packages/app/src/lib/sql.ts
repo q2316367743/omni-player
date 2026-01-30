@@ -53,7 +53,9 @@ export type TableName =
   | 'memo_layer_cognitive'
   | 'memo_layer_emotion'
   | 'memo_layer_persona'
-  | 'memo_friend';
+  | 'memo_friend'
+  | 'memo_session'
+  | 'memo_message';
 
 export class SqlWrapper {
 

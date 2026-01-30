@@ -50,7 +50,7 @@
 import { ref, onMounted } from 'vue'
 import MemoEditor from './MemoEditor.vue'
 import MemoItem from './MemoItem.vue'
-import { useMemoFriendStore } from '@/store/MemoFriendStore.ts'
+import { useMemoFriendStore } from '@/store'
 import { pageMemoItem, addMemoService, removeMemoService } from '@/services/memo/MemoItemService.ts'
 import type { MemoItemView } from '@/services/memo/MemoItemService.ts'
 import type { MemoFriend } from '@/entity/memo'

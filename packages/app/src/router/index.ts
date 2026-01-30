@@ -5,6 +5,7 @@ import {networkRouters} from "@/router/modules/network.ts";
 import {mpRouters} from "@/router/modules/mp";
 import {detailRouters} from "@/router/modules/detail.ts";
 import {adminRouters} from "@/router/modules/admin.ts";
+import {memoRouters} from "@/router/modules/memo.ts";
 // 引入路由
 
 export const router = createRouter({
@@ -16,7 +17,7 @@ export const router = createRouter({
       alias: '/home',
       component: () => import('@/pages/home/assistant/home-assistant.vue'),
     },
-    ...appRouters, ...adminRouters,
+    ...appRouters, ...adminRouters, ...memoRouters,
     ...mpRouters, ...mediaRouters, ...networkRouters, ...detailRouters
   ]
 });

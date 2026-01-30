@@ -1,6 +1,6 @@
 <template>
   <router-view v-slot="{ Component, route }">
-    <keep-alive :include="['FictionHome']">
+    <keep-alive :include="['NetworkHome', 'NetworkSearch']">
       <component :is="Component" :key="route.fullPath"/>
     </keep-alive>
   </router-view>
@@ -8,5 +8,4 @@
 <script lang="ts" setup>
 </script>
 <style scoped lang="less">
-
 </style>

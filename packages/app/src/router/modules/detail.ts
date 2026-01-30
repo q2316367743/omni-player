@@ -11,15 +11,6 @@ export const detailRouters: Array<RouteRecordRaw> = [{
     component: () => import('@/pages/subscribe/subscribe-info.vue')
   }]
 }, {
-  name: "Fiction",
-  path: "/fiction",
-  component: () => import('@/pages/fiction/ai-fiction.vue'),
-  children: [{
-    name: "FictionHome",
-    path: "home/:id",
-    component: () => import('@/pages/fiction/home/index.vue')
-  }]
-}, {
   name: "Screenplay",
   path: "/screenplay/:id",
   component: () => import("@/pages/mp/screenplay/chapter/screenplay-index.vue")

@@ -1,0 +1,229 @@
+.memo-chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--monica-warm-bg);
+  color: var(--monica-text-primary);
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  padding: var(--monica-spacing-md) var(--monica-spacing-lg);
+  background: linear-gradient(135deg, var(--monica-coral) 0%, var(--monica-coral-light) 100%);
+  color: white;
+  box-shadow: 0 2px 8px var(--monica-shadow);
+  z-index: 10;
+
+  .back-btn {
+    color: white;
+    margin-right: var(--monica-spacing-lg);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  }
+
+  .friend-info {
+    display: flex;
+    align-items: center;
+    flex: 1;
+
+    .friend-avatar-wrap {
+      position: relative;
+      margin-right: var(--monica-spacing-md);
+
+      .friend-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid white;
+      }
+
+      .friend-status {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid white;
+      }
+    }
+
+    .friend-details {
+      flex: 1;
+
+      .friend-name {
+        margin: 0;
+        font-size: var(--monica-font-lg);
+        font-weight: 600;
+        color: white;
+      }
+
+      .friend-personality {
+        margin: 4px 0 0;
+        font-size: var(--monica-font-sm);
+        color: rgba(255, 255, 255, 0.8);
+      }
+    }
+  }
+}
+
+.chat-messages {
+  flex: 1;
+  padding: var(--monica-spacing-lg);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+
+  .empty-state {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .empty-text {
+      color: var(--monica-text-tertiary);
+      font-size: var(--monica-font-md);
+    }
+  }
+
+  .message-wrapper {
+    width: 100%;
+    margin-bottom: var(--monica-spacing-lg);
+    display: flex;
+    align-items: flex-start;
+
+    &.user {
+      flex-direction: row-reverse;
+    }
+
+    &.assistant {
+      flex-direction: row;
+    }
+  }
+
+  .message-avatar {
+    margin: 0 var(--monica-spacing-sm);
+    flex-shrink: 0;
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  }
+
+  .message-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-width: 70vw;
+
+    &.user {
+      align-items: flex-end;
+    }
+
+    &.assistant {
+      align-items: flex-start;
+    }
+  }
+
+  .message {
+
+    &.user {
+      .message-bubble {
+        background: var(--monica-coral);
+        color: white;
+        border-radius: var(--monica-radius-xl) var(--monica-radius-sm) var(--monica-radius-xl) var(--monica-radius-xl);
+        border: 1px solid var(--monica-coral-light);
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+
+        .cherry-preview-container {
+          :deep(.cherry) {
+            --base-font-color: white;
+            --md-paragraph-color: white;
+            color: white;
+          }
+
+          :deep(.cherry) * {
+            color: white !important;
+          }
+        }
+      }
+    }
+
+    &.assistant {
+      .message-bubble {
+        background: var(--td-bg-color-container);
+        color: var(--monica-text-primary);
+        border-radius: var(--monica-radius-sm) var(--monica-radius-xl) var(--monica-radius-xl) var(--monica-radius-xl);
+        border: 1px solid var(--monica-border);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  .message-time {
+    font-size: var(--monica-font-xs);
+    opacity: 0.6;
+    margin-top: var(--monica-spacing-xs);
+  }
+
+  .message-wrapper.user .message-time {
+    text-align: right;
+  }
+
+  .message-wrapper.assistant .message-time {
+    text-align: left;
+  }
+
+  .typing-indicator {
+    align-self: flex-start;
+    display: flex;
+    gap: 4px;
+    padding: var(--monica-spacing-md);
+    background: transparent;
+    border-radius: var(--monica-radius-sm) var(--monica-radius-lg) var(--monica-radius-lg) var(--monica-radius-lg);
+
+    span {
+      width: 8px;
+      height: 8px;
+      background: var(--monica-coral-light);
+      border-radius: 50%;
+      animation: typing 1.4s infinite ease-in-out both;
+
+      &:nth-child(1) {
+        animation-delay: -0.32s;
+      }
+
+      &:nth-child(2) {
+        animation-delay: -0.16s;
+      }
+    }
+  }
+}
+
+.chat-input-area {
+  display: flex;
+  gap: var(--monica-spacing-md);
+  padding: var(--monica-spacing-md) var(--monica-spacing-lg);
+  background: var(--td-bg-color-container);
+  border-top: 1px solid var(--monica-border);
+  align-items: flex-end;
+
+  .send-btn {
+    min-width: 80px;
+  }
+}
+
+@keyframes typing {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}

@@ -36,7 +36,7 @@ const emit = defineEmits<{
 }>()
 
 
-const selectedPartner = ref<MemoFriend | null>(null)
+const selectedPartner = ref<MemoFriend>()
 
 const activeFriends = computed(() => {
   return useMemoFriendStore().friends.filter(f => f.is_active === 1)
@@ -48,7 +48,7 @@ const selectPartner = (partner: MemoFriend) => {
 }
 
 const closeDetail = () => {
-  selectedPartner.value = null
+  selectedPartner.value = undefined
 }
 </script>
 

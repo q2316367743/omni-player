@@ -40,6 +40,11 @@ const modelValue = defineModel({
   default: ''
 })
 const props = defineProps({
+  // 用于纯展示
+  value: {
+    type: String,
+    default: ''
+  },
   // 文件夹
   folder: {
     type: String,
@@ -59,7 +64,10 @@ const props = defineProps({
     default: "circle"
   }
 });
-const url = computed(() => /https?/.test(modelValue.value) ? modelValue.value : convertFileSrc(modelValue.value));
+const url = computed(() => {
+  const v = props.value || modelValue.value;
+  return /https?/.test(v) ? v : convertFileSrc(v);
+});
 const fileInput = ref<HTMLInputElement | null>(null);
 
 async function uploadAttachment(file: File) {

@@ -352,9 +352,26 @@ CREATE TABLE memo_session
     updated_at INTEGER NOT NULL DEFAULT 0,
 
     -- 和哪个人会话
-    friend_id  TEXT    NOT NULL DEFAULT ''
+    friend_id  TEXT    NOT NULL DEFAULT '',
+    status     TEXT    NOT NULL DEFAULT 'chat'
 );
 
 -- 创建索引以加速查询
 CREATE INDEX idx_memo_session_friend_id ON memo_session (friend_id);
 CREATE INDEX idx_memo_session_created_at ON memo_session (created_at);
+
+CREATE TABLE memo_message
+(
+
+    -- 主键
+    id         TEXT PRIMARY KEY,
+    created_at INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL DEFAULT 0,
+
+    session_id TEXT    NOT NULL DEFAULT '',
+    role       TEXT    NOT NULL DEFAULT '',
+    content    TEXT    NOT NULL DEFAULT ''
+);
+
+
+CREATE INDEX idx_memo_message_session_id ON memo_message (session_id);
