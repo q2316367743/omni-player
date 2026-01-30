@@ -2,10 +2,10 @@ import type {MemoChatSummary, MemoChatSummaryCore} from "@/entity/memo/MemoChatS
 import {useSql} from "@/lib/sql.ts";
 import {useMemoVelesdb} from "@/lib/velesdb.ts";
 
-export function listMemoChatSummary() {
+export function pageMemoChatSummary(pageNum: number, pageSize: number) {
   return useSql().query<MemoChatSummary>('memo_chat_summary')
     .orderByDesc('created_at')
-    .list();
+    .page(pageNum, pageSize);
 }
 
 export async function createMemoChatSummary(data: MemoChatSummaryCore) {

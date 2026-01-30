@@ -3,6 +3,9 @@ import type {BaseEntity} from "@/entity/BaseEntity.ts";
 export interface MemoChatSummaryCore {
 
   session_id: string;
+
+  friend_id: string;
+
   /**
    * 标题（给用户看），10 字以内诗意标题，如《雨夜谈孤独》
    */

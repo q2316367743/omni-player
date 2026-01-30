@@ -128,7 +128,7 @@ import {saveMemoMessage} from "@/services/memo/MemoMessageService.ts";
 import {completeMemoSession} from "@/services/memo/MemoSessionService.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {useMemoFriendStore} from "@/store";
-import type {MemoFriend, MemoMessage, MemoMessageCore, MemoSession} from "@/entity/memo";
+import type {MemoFriendView, MemoMessage, MemoMessageCore, MemoSession} from "@/entity/memo";
 import {getArchetypeText, moodToStatus} from "@/entity/memo/MemoFriend";
 import {aiMemoChat} from "@/modules/ai/memo/AiMemoChat.ts";
 import {aiMemoChatSummary} from "@/modules/ai/memo/AiMemoChatSummary.ts";
@@ -139,7 +139,7 @@ const route = useRoute();
 const router = useRouter();
 
 const session = shallowRef<MemoSession>();
-const friend = shallowRef<MemoFriend>();
+const friend = shallowRef<MemoFriendView>();
 const messages = ref<Array<MemoMessage>>([]);
 const inputMessage = ref('');
 const isLoading = ref(false);
@@ -289,6 +289,7 @@ async function handleEndChat() {
   try {
     summaryData.value = await aiMemoChatSummary({
       friend: friend.value,
+      sessionId: session.value!.id,
       messages: messages.value
     });
     showSummary.value = true;

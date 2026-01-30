@@ -11,6 +11,7 @@ import {formatDate} from "@/util/lang/FormatUtil.ts";
 interface AiMemoChatSummaryProp {
   // 谁
   friend: MemoFriendView;
+  sessionId: string;
   // 全部的聊天信息
   messages: Array<MemoMessage>;
 }
@@ -41,29 +42,33 @@ export async function aiMemoChatSummary(prop: AiMemoChatSummaryProp): Promise<Ch
   const messagesForAI: Array<OpenAI.Chat.ChatCompletionMessageParam> = [
     {
       role: "system",
-      content: `${prompt}\n\n【任务说明】\n你是用户的 AI 朋友，现在需要对你们之间的聊天记录进行总结和分析。请以朋友的身份，用你的人设和语言风格来完成以下任务：`
+      content: `${prompt}
+
+【任务说明】
+你是用户的 AI 朋友，现在需要对用户在聊天中对你说的内容进行总结和分析。
+重要：以下聊天记录全部是用户说的话，不是你说的。你是作为朋友在倾听和总结用户的表达。`
     },
     {
       role: "user",
       content: `【当前时间】
 ${formatDate(now)}
 
-【聊天记录】
+【用户在聊天中对你说的内容】
 ${chatContent}
 
 【必须完成的任务】
-请以朋友的身份对以上聊天记录进行分析，并按以下顺序通过工具调用完成任务：
+请以朋友的身份对以上用户说的话进行分析，并按以下顺序通过工具调用完成任务：
 
 【任务1：创建聊天总结】
 必须调用 create_chat_summary 工具，参数包括：
 - title：10字以内诗意标题，如《雨夜谈孤独》
-- summary：150字内，含关键洞察，用朋友的口吻总结，含情绪变化、核心议题
-- role_notes：以你的第一人称写日记，表达对这次对话的感受、共情或反思
+- summary：300-500字，详细总结用户表达的内容、情绪变化和核心议题，用朋友的口吻表达你的理解和共情
+- role_notes：以你的第一人称写日记，表达对这次倾听用户说话的感受、共情或反思
 
 【任务2：更新AI动态】
 必须调用 update_friend_dynamic 工具，参数包括：
 - friend_id：使用 "${friend.id}"
-- mood：根据聊天内容和你的感受选择心情，必须是 happy、concerned、playful、melancholy、excited 中的一个\n  - happy：开心、愉快、满足
+- mood：根据用户说的内容和你的感受选择心情，必须是 happy、concerned、playful、melancholy、excited 中的一个\n  - happy：开心、愉快、满足
   - concerned：关心、担忧、牵挂
   - playful：调皮、轻松、幽默
   - melancholy：忧郁、惆怅、感伤
@@ -71,7 +76,7 @@ ${chatContent}
 - last_interaction：使用 ${now}
 
 【任务3：更新用户人格】
-如果聊天内容中反映了用户的性格特质或行为模式，必须调用 add_persona 工具：
+如果用户说的话中反映了用户的性格特质或行为模式，必须调用 add_persona 工具：
 - trait_name：选择最相关的特质
   - openness：开放性 - 对新事物的接受度、创造力、想象力
   - conscientiousness：尽责性 - 计划性、自律性、责任感
@@ -81,18 +86,18 @@ ${chatContent}
   - resilience：弹性 - 面对困难时的恢复能力
   - curiosity：好奇心 - 探索欲、求知欲
   - optimism：乐观 - 积极心态、希望感
-- delta：根据聊天内容判断该特质的变化量（0-99）
+- delta：根据用户说的话判断该特质的变化量（0-99）
 - baseline_trait：判断用户该特质的基线水平（0-100）
 - confidence：你的判断置信度（0-99）
-- evidence_snippet：引用聊天记录中的原文作为证据
+- evidence_snippet：引用用户说的话中的原文作为证据
 - expire_at：设置过期时间，建议使用 ${now + 30 * 24 * 60 * 60 * 1000}（30天后）
 
 【重要规则】
 1. 必须按顺序调用工具：先 create_chat_summary，再 update_friend_dynamic，最后根据情况调用 add_persona
 2. create_chat_summary 和 update_friend_dynamic 是必须调用的
-3. add_persona 只有在聊天内容确实反映了用户人格特质时才调用
+3. add_persona 只有在用户说的话确实反映了用户人格特质时才调用
 4. 所有参数必须符合工具定义的要求
-5. 聊天总结要用朋友的口吻，符合你的人设和语言风格`
+5. 聊天总结要用朋友的口吻，总结用户表达的内容，符合你的人设和语言风格`
     }
   ];
 
@@ -115,8 +120,9 @@ ${chatContent}
   const toolHandlers = {
       create_chat_summary: async (args: any) => {
         await createMemoChatSummary({
-          session_id: friend.id,
+          session_id: prop.sessionId,
           title: args.title,
+          friend_id: friend.id,
           summary: args.summary,
           key_insights: JSON.stringify({}),
           ai_journal: args.role_notes
