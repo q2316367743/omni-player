@@ -15,8 +15,8 @@
           <p class="friend-personality">{{ getArchetypeText(friend.archetype) }}</p>
         </div>
       </div>
-      <t-popconfirm content="是否理解结束？结束后只能开启新的对话">
-        <t-button theme="danger" variant="outline" @click="handleBack" shape="round" >
+      <t-popconfirm content="是否理解结束？结束后只能开启新的对话" placement="bottom-right">
+        <t-button theme="danger" variant="outline" shape="round" >
           结束对话
         </t-button>
       </t-popconfirm>

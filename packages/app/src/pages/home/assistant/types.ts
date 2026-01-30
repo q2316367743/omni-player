@@ -11,7 +11,6 @@ export interface Memo {
   authorName: string
   authorAvatar: string
   content: string
-  mood: string
   time: string
   atPartner: Partner | null
   aiComment: {

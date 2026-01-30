@@ -52,7 +52,6 @@
               </div>
               <div class="timeline-card monica-card">
                 <div class="memo-header">
-                  <span class="memo-mood">{{ memo.mood }}</span>
                   <span v-if="memo.atPartner" class="memo-at">
                     @{{ memo.atPartner.name }}
                   </span>
@@ -100,7 +99,6 @@ interface Memo {
   date: string
   time: string
   content: string
-  mood: string
   atPartner: Partner | null
   aiComment: {
     name: string
@@ -194,7 +192,6 @@ const memos: Memo[] = [
     date: getTodayDate(),
     time: '14:30',
     content: '今天天气真好，心情也跟着变好了！工作效率特别高，完成了很多任务。',
-    mood: '😊',
     atPartner: null,
     aiComment: {
       name: '小莫',
@@ -209,7 +206,6 @@ const memos: Memo[] = [
     date: getTodayDate(),
     time: '10:15',
     content: '今天遇到了一个小挫折，但没关系，总结经验下次会更好。',
-    mood: '🤔',
     atPartner: {
       id: '1',
       name: '小莫',
@@ -228,7 +224,6 @@ const memos: Memo[] = [
     date: getDateBefore(1),
     time: '20:00',
     content: '晚上好，今天读了一本很有收获的书，学到了很多新知识。',
-    mood: '📚',
     atPartner: null,
     aiComment: null,
     likes: 2,
@@ -239,7 +234,6 @@ const memos: Memo[] = [
     date: getDateBefore(2),
     time: '09:00',
     content: '新的一周开始了！给自己定个小目标，这一周要读完这本书。',
-    mood: '💪',
     atPartner: {
       id: '4',
       name: '乐多',
@@ -258,7 +252,6 @@ const memos: Memo[] = [
     date: getDateBefore(3),
     time: '22:00',
     content: '忙碌的一天结束了，虽然有点累，但是很充实。晚安~',
-    mood: '😴',
     atPartner: null,
     aiComment: {
       name: '小暖',
@@ -294,8 +287,6 @@ const selectDate = (day: { fullDate: Date; isCurrentMonth: boolean; memoCount: n
 </script>
 
 <style scoped lang="less">
-@import '@/assets/style/monica.less';
-
 .diary-page {
   height: 100%;
   padding: var(--monica-spacing-lg);

@@ -74,7 +74,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import MemoHome from './components/memo/MemoHome.vue'
 import FriendPage from './components/friend/FriendPage.vue'
-import MomentsPage from './components/memo/MomentsPage.vue'
+import MomentsPage from './components/MomentsPage.vue'
 import DiaryPage from './components/DiaryPage.vue'
 import ToolsPage from './components/ToolsPage.vue'
 import MemoryPage from './components/memory/MemoryPage.vue'

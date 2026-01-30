@@ -82,7 +82,27 @@ const total = ref(0)
 
 const formatTime = (timestamp: number) => {
   const date = new Date(timestamp)
-  return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const memoDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+  const isToday = memoDate.getTime() === today.getTime()
+  const isThisYear = date.getFullYear() === now.getFullYear()
+  
+  const hours = date.getHours().toString().padStart(2, '0')
+  const minutes = date.getMinutes().toString().padStart(2, '0')
+  
+  if (isToday) {
+    return `${hours}:${minutes}`
+  } else if (isThisYear) {
+    const month = (date.getMonth() + 1).toString().padStart(2, '0')
+    const day = date.getDate().toString().padStart(2, '0')
+    return `${month}/${day} ${hours}:${minutes}`
+  } else {
+    const year = date.getFullYear()
+    const month = (date.getMonth() + 1).toString().padStart(2, '0')
+    const day = date.getDate().toString().padStart(2, '0')
+    return `${year}-${month}-${day} ${hours}:${minutes}`
+  }
 }
 
 const convertMemoItemViewToMemo = (item: MemoItemView, friendMap: Map<string, MemoFriend>): Memo => {
@@ -100,7 +120,6 @@ const convertMemoItemViewToMemo = (item: MemoItemView, friendMap: Map<string, Me
     authorName: '我',
     authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=me',
     content: item.content,
-    mood: '😊',
     time: formatTime(item.created_at),
     atPartner: atPartner ? {
       id: atPartner.id,

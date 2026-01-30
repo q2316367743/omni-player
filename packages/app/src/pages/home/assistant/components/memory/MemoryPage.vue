@@ -37,6 +37,7 @@ import EmotionSection from './EmotionSection.vue'
 import CognitiveSection from './CognitiveSection.vue'
 import BehaviorSection from './BehaviorSection.vue'
 import PersonaSection from './PersonaSection.vue'
+import MessageUtil from "@/util/model/MessageUtil.ts";
 
 const activeTab = ref('emotion')
 const emotionData = ref<MemoLayerEmotion[]>([])
@@ -57,8 +58,7 @@ const loadData = async () => {
     behaviorData.value = behaviors
     personaData.value = personas
   } catch (error) {
-    MessagePlugin.error('加载记忆数据失败')
-    console.error(error)
+    MessageUtil.error('加载记忆数据失败', error);
   }
 }
 

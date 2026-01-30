@@ -6,7 +6,6 @@
         <span class="memo-name">{{ memo.authorName }}</span>
       </div>
       <div class="memo-info">
-        <span class="memo-mood">{{ memo.mood }}</span>
         <span class="memo-time">{{ memo.time }}</span>
       </div>
     </div>
@@ -67,6 +66,8 @@ const emit = defineEmits<{
   comment: [memo: Memo]
   confirmDelete: [memo: Memo]
 }>()
+
+
 
 const handleDropdownClick = () => {
   MessageBoxUtil.confirm('确定要删除这条 memo 吗？', '确认删除').then(() => {

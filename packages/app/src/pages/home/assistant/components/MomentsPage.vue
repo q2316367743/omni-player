@@ -245,5 +245,5 @@ const postComment = (moment: Moment) => {
 </script>
 
 <style scoped lang="less">
-@import "less/MomentsPage.less";
+@import "memo/less/MomentsPage.less";
 </style>
