@@ -93,6 +93,7 @@ declare module 'vue' {
     TTree: typeof import('tdesign-vue-next')['Tree']
     UtoolsWebview: typeof import('./src/components/webview/UtoolsWebview.vue')['default']
     VerticalSplitPanel: typeof import('./src/components/common/VerticalSplitPanel.vue')['default']
+    XhAvatar: typeof import('./src/components/avatar/XhAvatar.vue')['default']
   }
 }
 
@@ -179,4 +180,5 @@ declare global {
   const TTree: typeof import('tdesign-vue-next')['Tree']
   const UtoolsWebview: typeof import('./src/components/webview/UtoolsWebview.vue')['default']
   const VerticalSplitPanel: typeof import('./src/components/common/VerticalSplitPanel.vue')['default']
+  const XhAvatar: typeof import('./src/components/avatar/XhAvatar.vue')['default']
 }

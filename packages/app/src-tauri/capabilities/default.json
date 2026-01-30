@@ -61,6 +61,10 @@
     "fs:allow-read-file",
     "fs:allow-remove",
     {
+      "identifier": "fs:allow-exists",
+      "allow": [{ "path": "$APPDATA/**/*" }]
+    },
+    {
       "identifier": "fs:allow-rename",
       "allow": [{ "path": "$APPDATA/**/*" }]
     },
