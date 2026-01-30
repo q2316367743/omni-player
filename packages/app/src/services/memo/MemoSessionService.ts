@@ -19,3 +19,10 @@ export function createMemoSession(friendId: string) {
     status: 'chat',
   });
 }
+
+export function completeMemoSession(id: string) {
+  return useSql().mapper<MemoSession>('memo_session')
+    .updateById(id, {
+      status: 'done',
+    })
+}

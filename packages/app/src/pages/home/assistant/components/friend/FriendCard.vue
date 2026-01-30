@@ -86,6 +86,7 @@ const handleChat = () => {
   createMemoSession(props.friend.id)
     .then((session) => {
       router.push(`/memo/chat/${session.id}`);
+      useMemoFriendStore().loadChatSession();
     })
     .catch(e => {
       MessageUtil.error("创建聊天失败", e);

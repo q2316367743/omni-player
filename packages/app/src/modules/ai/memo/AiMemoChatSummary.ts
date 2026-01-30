@@ -6,6 +6,7 @@ import {updateMemoFriendDynamic} from "@/services/memo/MemoFriendService.ts";
 import {addMemoLayerPersona, updateMemoLayerPersona} from "@/services/memo";
 import {handleStreamingToolCalls} from "@/modules/ai/utils/ToolCallHandler.ts";
 import type OpenAI from "openai";
+import {formatDate} from "@/util/lang/FormatUtil.ts";
 
 interface AiMemoChatSummaryProp {
   // 谁
@@ -14,7 +15,14 @@ interface AiMemoChatSummaryProp {
   messages: Array<MemoMessage>;
 }
 
-export async function aiMemoChatSummary(prop: AiMemoChatSummaryProp): Promise<void> {
+interface ChatSummaryResult {
+  title: string;
+  summary: string;
+  key_insights: any;
+  ai_journal: string;
+}
+
+export async function aiMemoChatSummary(prop: AiMemoChatSummaryProp): Promise<ChatSummaryResult> {
   const {friend, messages} = prop;
   // 获取 AI 的提示词
   const prompt = memoFriendToPrompt(friend);
@@ -25,7 +33,9 @@ export async function aiMemoChatSummary(prop: AiMemoChatSummaryProp): Promise<vo
 
   // 构建聊天记录内容
   const chatContent = messages
-    .map(msg => `[${new Date(msg.created_at).toISOString()}] ${msg.role === 'user' ? '用户' : 'AI'}: ${msg.content}`)
+    // 过滤用户消息
+    .filter(e => e.role === 'user')
+    .map(msg => `[${formatDate(msg.created_at)}] ${msg.content}`)
     .join('\n');
 
   const messagesForAI: Array<OpenAI.Chat.ChatCompletionMessageParam> = [
@@ -35,7 +45,7 @@ export async function aiMemoChatSummary(prop: AiMemoChatSummaryProp): Promise<vo
     },
     {
       role: "user",
-      content: `【当前时间】\n${new Date(now).toISOString()}\n\n【聊天记录】\n${chatContent}\n\n请以朋友的身份对以上聊天记录进行分析，并通过工具调用完成以下任务：\n1. 生成聊天记录的标题、详细总结和AI小记\n   - 标题：10字以内诗意标题，如《雨夜谈孤独》\n   - 总结：150字内，含关键洞察，用朋友的口吻总结，含情绪变化、核心议题\n   - AI小记：以你的第一人称写日记，表达对这次对话的感受、共情或反思\n2. 根据聊天内容，更新用户的四层人格数据（如果有相关信息）\n3. 更新你自己的动态数据，包括心情和最后交互时间\n   - 心情：必须是 happy、concerned、playful、melancholy、excited 中的一个\n\n重要规则：\n- 所有操作必须通过工具调用完成\n- 聊天总结要用朋友的口吻，符合你的人设和语言风格\n- 如果聊天内容中没有相关信息，可以不调用相应的工具`
+      content: `【当前时间】\n${formatDate(now)}\n\n【聊天记录】\n${chatContent}\n\n请以朋友的身份对以上聊天记录进行分析，并通过工具调用完成以下任务：\n1. 生成聊天记录的标题、详细总结和AI小记\n   - 标题：10字以内诗意标题，如《雨夜谈孤独》\n   - 总结：150字内，含关键洞察，用朋友的口吻总结，含情绪变化、核心议题\n   - AI小记：以你的第一人称写日记，表达对这次对话的感受、共情或反思\n2. 根据聊天内容，更新用户的四层人格数据（如果有相关信息）\n3. 更新你自己的动态数据，包括心情和最后交互时间\n   - 心情：必须是 happy、concerned、playful、melancholy、excited 中的一个\n\n重要规则：\n- 所有操作必须通过工具调用完成\n- 聊天总结要用朋友的口吻，符合你的人设和语言风格\n- 如果聊天内容中没有相关信息，可以不调用相应的工具`
     }
   ];
 
@@ -49,18 +59,28 @@ export async function aiMemoChatSummary(prop: AiMemoChatSummaryProp): Promise<vo
     ...({thinking: {type: 'disabled'}})
   });
 
-  if (!response) return;
+  if (!response) {
+    throw new Error('AI response is null');
+  }
+
+  let summaryResult: ChatSummaryResult | null = null;
 
   const toolHandlers = {
-    create_chat_summary: async (args: any) => {
-      await createMemoChatSummary({
-        session_id: friend.id,
-        title: args.title,
-        summary: args.summary,
-        key_insights: JSON.stringify({}),
-        ai_journal: args.role_notes
-      });
-    },
+      create_chat_summary: async (args: any) => {
+        await createMemoChatSummary({
+          session_id: friend.id,
+          title: args.title,
+          summary: args.summary,
+          key_insights: JSON.stringify({}),
+          ai_journal: args.role_notes
+        });
+        summaryResult = {
+          title: args.title,
+          summary: args.summary,
+          key_insights: {},
+          ai_journal: args.role_notes
+        };
+      },
     update_friend_dynamic: async (args: any) => {
       await updateMemoFriendDynamic(args.friend_id, {
         current_mood: args.mood,
@@ -91,4 +111,10 @@ export async function aiMemoChatSummary(prop: AiMemoChatSummaryProp): Promise<vo
   };
 
   await handleStreamingToolCalls(response, toolHandlers);
+
+  if (!summaryResult) {
+    throw new Error('Failed to create chat summary');
+  }
+
+  return summaryResult;
 }

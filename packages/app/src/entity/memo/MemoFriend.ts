@@ -1,5 +1,6 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {YesOrNo} from "@/global/YesOrNo.ts";
+import {formatDate} from "@/util/lang/FormatUtil.ts";
 
 export type MemoFriendGender = 'male' | 'female' | 'neutral' | 'unknown';
 
@@ -402,7 +403,7 @@ export function parseKnowledgeScope(scope: string): MemoFriendKnowledgeScope {
   try {
     return JSON.parse(scope || '{"domains":[],"blindspots":[]}') as MemoFriendKnowledgeScope;
   } catch {
-    return { domains: [], blindspots: [] };
+    return {domains: [], blindspots: []};
   }
 }
 
@@ -426,7 +427,7 @@ export function parseActiveHours(hours: string): MemoFriendActiveHours {
   try {
     return JSON.parse(hours || '{"start":0,"end":24}') as MemoFriendActiveHours;
   } catch {
-    return { start: 0, end: 24 };
+    return {start: 0, end: 24};
   }
 }
 
@@ -506,11 +507,11 @@ export function memoFriendToPrompt(friend: MemoFriend, options?: { includeSocial
 亲密度：${friend.intimacy_score}/100
 信任度：${friend.trust_level}/100
 对话次数：${friend.interaction_count}
-上次互动：${friend.last_interaction ? new Date(friend.last_interaction).toLocaleString('zh-CN') : '无'}
+上次互动：${friend.last_interaction ? formatDate(friend.last_interaction) : '无'}
 互动频率：${friend.conversation_frequency || '未知'}
-关系里程碑：${relationshipMilestones.length > 0 ? relationshipMilestones.map(m => `${m.event}（${new Date(m.date).toLocaleDateString('zh-CN')}）`).join('、') : '无'}
+关系里程碑：${relationshipMilestones.length > 0 ? relationshipMilestones.map(m => `${m.event}（${formatDate(m.date)}）`).join('、') : '无'}
 
 【当前情绪】
 情绪状态：${moodText}
-情绪持续时间：${friend.mood_expires_at ? `至 ${new Date(friend.mood_expires_at).toLocaleString('zh-CN')}` : '无限制'}${socialBehaviorSection}`;
+情绪持续时间：${friend.mood_expires_at ? `至 ${formatDate(friend.mood_expires_at)}` : '无限制'}${socialBehaviorSection}`;
 }

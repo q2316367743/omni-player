@@ -16,6 +16,7 @@ import {
 } from "@/services/memo";
 import {MEMO_TOOL_SCHEMA} from "@/modules/ai/schema/MemoSchema.ts";
 import type {MemoLayerSource} from "@/entity/memo";
+import {formatDate} from "@/util/lang/FormatUtil.ts";
 
 export interface AiMemoAnalyzerProp {
   memoContent: string;
@@ -82,7 +83,7 @@ export async function aiMemoAnalyzer(prop: AiMemoAnalyzerProp) {
       role: "user",
       content:
         `【当前时间】
-${new Date(now).toISOString()}
+${formatDate(now)}
 
 【Memo 内容】
 ${memoContent}
