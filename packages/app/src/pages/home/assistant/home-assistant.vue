@@ -24,7 +24,7 @@
           v-if="currentPage === 'home'"
           @at-partner="openPartnerSelector"
         />
-        <PartnerPage
+        <FriendPage
           v-else-if="currentPage === 'partner'"
           @chat="startChat"
         />
@@ -57,10 +57,10 @@
               class="selector-item"
               @click="selectPartner(partner)"
             >
-              <img :src="partner.avatar" class="selector-avatar" />
+              <img :src="partner.avatar ?? defaultAvatar" class="selector-avatar" />
               <div class="selector-info">
                 <span class="selector-name">{{ partner.name }}</span>
-                <span class="selector-desc">{{ partner.description }}</span>
+                <span class="selector-desc">{{ partner.personality_prompt }}</span>
               </div>
             </div>
           </div>
@@ -73,20 +73,14 @@
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import MemoHome from './components/memo/MemoHome.vue'
-import PartnerPage from './components/PartnerPage.vue'
+import FriendPage from './components/friend/FriendPage.vue'
 import MomentsPage from './components/memo/MomentsPage.vue'
 import DiaryPage from './components/DiaryPage.vue'
 import ToolsPage from './components/ToolsPage.vue'
 import MemoryPage from './components/memory/MemoryPage.vue'
 import {LocalName} from "@/global/LocalName.ts";
-
-interface Partner {
-  id: string
-  name: string
-  avatar: string
-  description: string
-  personality: string
-}
+import type { MemoFriend } from '@/entity/memo'
+import { useMemoFriendStore } from '@/store/MemoFriendStore'
 
 const navItems = [
   { id: 'home', label: 'Memo', icon: '📝' },
@@ -100,38 +94,11 @@ const navItems = [
 const currentPage = useSessionStorage(LocalName.PAGE_HOME_ASSISTANT_ACTIVE, 'home');
 const currentTime = ref('')
 const showPartnerSelector = ref(false)
-const selectedMemoPartner = ref<((partner: Partner) => void) | null>(null)
+const selectedMemoPartner = ref<((partner: MemoFriend) => void) | null>(null)
+const defaultAvatar = 'https://api.dicebear.com/7.x/personas/svg?seed=default'
 
-const partners = ref<Partner[]>([
-  {
-    id: '1',
-    name: '小莫',
-    avatar: 'https://api.dicebear.com/7.x/personas/svg?seed=monica',
-    description: '温暖贴心的生活助手',
-    personality: '温柔'
-  },
-  {
-    id: '2',
-    name: '阿卡',
-    avatar: 'https://api.dicebear.com/7.x/personas/svg?seed=arka',
-    description: '幽默风趣的聊天伙伴',
-    personality: '活泼'
-  },
-  {
-    id: '3',
-    name: '小暖',
-    avatar: 'https://api.dicebear.com/7.x/personas/svg?seed=xiaonuan',
-    description: '知心姐姐般的倾听者',
-    personality: '细腻'
-  },
-  {
-    id: '4',
-    name: '乐多',
-    avatar: 'https://api.dicebear.com/7.x/personas/svg?seed=ledo',
-    description: '充满能量的鼓励者',
-    personality: '乐观'
-  }
-])
+const { friends, loadFriends } = useMemoFriendStore()
+const partners = computed(() => friends.filter(f => f.is_active === 1))
 
 const updateTime = () => {
   const now = new Date()
@@ -143,12 +110,12 @@ const updateTime = () => {
 
 let timeTimer: number
 
-const openPartnerSelector = (callback: (partner: Partner) => void) => {
+const openPartnerSelector = (callback: (partner: MemoFriend) => void) => {
   selectedMemoPartner.value = callback
   showPartnerSelector.value = true
 }
 
-const selectPartner = (partner: Partner) => {
+const selectPartner = (partner: MemoFriend) => {
   if (selectedMemoPartner.value) {
     selectedMemoPartner.value(partner)
   }
@@ -156,13 +123,14 @@ const selectPartner = (partner: Partner) => {
   selectedMemoPartner.value = null
 }
 
-const startChat = (partner: Partner) => {
+const startChat = (partner: MemoFriend) => {
   console.log('Starting chat with:', partner.name)
 }
 
-onMounted(() => {
+onMounted(async () => {
   updateTime()
   timeTimer = window.setInterval(updateTime, 1000)
+  await loadFriends()
 })
 
 onUnmounted(() => {

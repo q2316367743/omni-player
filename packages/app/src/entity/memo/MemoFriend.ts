@@ -107,6 +107,11 @@ export interface MemoFriendStatic {
    */
   avatar: string;
 
+  /**
+   * 使用的模型
+   */
+  model: string;
+
 
   // ===== 基础人设层（静态，创建时设定） =====
 
@@ -307,6 +312,143 @@ export interface MemoFriend extends BaseEntity, MemoFriendStatic, MemoFriendDyna
 
 }
 
+export function getArchetypeText(archetype: MemoFriendArchetype): string {
+  const map: Record<MemoFriendArchetype, string> = {
+    caregiver: '照料者',
+    jester: '俏皮',
+    sage: '智者',
+    rebel: '叛逆者',
+    lover: '恋人',
+    explorer: '探索者',
+    ruler: '领导者',
+    everyman: '普通人'
+  };
+  return map[archetype];
+}
+
+export function getMoodText(mood: MemoFriendMood): string {
+  const map: Record<MemoFriendMood, string> = {
+    happy: '开心',
+    excited: '兴奋',
+    playful: '俏皮',
+    concerned: '担忧',
+    melancholy: '忧郁'
+  };
+  return map[mood];
+}
+
+export function getMemorySpanText(span: MemoFriendMemorySpan): string {
+  const map: Record<MemoFriendMemorySpan, string> = {
+    short: '短期记忆',
+    medium: '中期记忆',
+    long: '长期记忆'
+  };
+  return map[span];
+}
+
+export function getPostingStyleText(style: MemoFriendPostingStyle): string {
+  const map: Record<MemoFriendPostingStyle, string> = {
+    encouraging: '鼓励型',
+    teasing: '调侃型',
+    observational: '观察型',
+    poetic: '诗意型',
+    sarcastic: '讽刺型'
+  };
+  return map[style];
+}
+
+export function getRelationText(relation: MemoFriendRelation): string {
+  const map: Record<MemoFriendRelation, string> = {
+    friend: '朋友',
+    mentor: '导师',
+    peer: '同事',
+    caregiver: '照料者',
+    mystery: '神秘人',
+    teammate: '队友'
+  };
+  return map[relation];
+}
+
+export function getAgeRangeText(ageRange: MemoFriendAgeRange): string {
+  const map: Record<MemoFriendAgeRange, string> = {
+    teen: '青少年(13-18岁)',
+    young: '青年(19-25岁)',
+    middle: '中年(26-35岁)',
+    senior: '中老年(36-45岁)',
+    ageless: '老年(46岁以上)'
+  };
+  return map[ageRange];
+}
+
+export function getGenderText(gender: MemoFriendGender): string {
+  const map: Record<MemoFriendGender, string> = {
+    male: '男性',
+    female: '女性',
+    neutral: '中性',
+    unknown: '未知'
+  };
+  return map[gender];
+}
+
+export function parsePersonalityTags(tags: string): string[] {
+  try {
+    return JSON.parse(tags || '[]') as string[];
+  } catch {
+    return [];
+  }
+}
+
+export function parseKnowledgeScope(scope: string): MemoFriendKnowledgeScope {
+  try {
+    return JSON.parse(scope || '{"domains":[],"blindspots":[]}') as MemoFriendKnowledgeScope;
+  } catch {
+    return { domains: [], blindspots: [] };
+  }
+}
+
+export function parseTabooTopics(topics: string): string[] {
+  try {
+    return JSON.parse(topics || '[]') as string[];
+  } catch {
+    return [];
+  }
+}
+
+export function parseRelationshipMilestones(milestones: string): MemoFriendMilestone[] {
+  try {
+    return JSON.parse(milestones || '[]') as MemoFriendMilestone[];
+  } catch {
+    return [];
+  }
+}
+
+export function parseActiveHours(hours: string): MemoFriendActiveHours {
+  try {
+    return JSON.parse(hours || '{"start":0,"end":24}') as MemoFriendActiveHours;
+  } catch {
+    return { start: 0, end: 24 };
+  }
+}
+
+export function parseTriggerKeywords(keywords: string): string[] {
+  try {
+    return JSON.parse(keywords || '[]') as string[];
+  } catch {
+    return [];
+  }
+}
+
+export function moodToStatus(mood: MemoFriendMood): 'online' | 'busy' {
+  const map: Partial<Record<MemoFriendMood, 'online' | 'busy'>> = {
+    happy: 'online',
+    excited: 'online',
+    playful: 'online',
+    concerned: 'busy',
+    melancholy: 'busy'
+  };
+  return map[mood] || 'online';
+}
+
 /**
  * 将 MemoFriend 对象转换为 LLM 提示词
  * @param friend MemoFriend 对象
@@ -316,62 +458,19 @@ export interface MemoFriend extends BaseEntity, MemoFriendStatic, MemoFriendDyna
  */
 export function memoFriendToPrompt(friend: MemoFriend, options?: { includeSocialBehavior?: boolean }): string {
   const {includeSocialBehavior = true} = options || {};
-  const knowledgeScope = JSON.parse(friend.knowledge_scope || '{"domains":[],"blindspots":[]}') as MemoFriendKnowledgeScope;
-  const tabooTopics = JSON.parse(friend.taboo_topics || '[]') as string[];
-  const personalityTags = JSON.parse(friend.personality_tags || '[]') as string[];
-  const relationshipMilestones = JSON.parse(friend.relationship_milestones || '[]') as MemoFriendMilestone[];
-  const activeHours = JSON.parse(friend.active_hours || '{"start":0,"end":24}') as MemoFriendActiveHours;
-  const triggerKeywords = JSON.parse(friend.trigger_keywords || '[]') as string[];
+  const knowledgeScope = parseKnowledgeScope(friend.knowledge_scope);
+  const tabooTopics = parseTabooTopics(friend.taboo_topics);
+  const personalityTags = parsePersonalityTags(friend.personality_tags);
+  const relationshipMilestones = parseRelationshipMilestones(friend.relationship_milestones);
+  const activeHours = parseActiveHours(friend.active_hours);
+  const triggerKeywords = parseTriggerKeywords(friend.trigger_keywords);
 
-  const ageRangeText = {
-    teen: '青少年(13-18岁)',
-    young: '青年(19-25岁)',
-    middle: '中年(26-35岁)',
-    senior: '中老年(36-45岁)',
-    ageless: '老年(46岁以上)'
-  }[friend.age_range];
-
-  const relationText = {
-    friend: '朋友',
-    mentor: '导师',
-    peer: '同事',
-    caregiver: '照料者',
-    mystery: '神秘人',
-    teammate: '队友'
-  }[friend.relation];
-
-  const archetypeText = {
-    caregiver: '照料者',
-    jester: '骗子',
-    sage: '智者',
-    rebel: '叛逆者',
-    lover: '恋人',
-    explorer: '探索者',
-    ruler: '统治者',
-    everyman: '普通人'
-  }[friend.archetype];
-
-  const memorySpanText = {
-    short: '短期记忆',
-    medium: '中期记忆',
-    long: '长期记忆'
-  }[friend.memory_span];
-
-  const moodText = friend.current_mood ? {
-    happy: '开心',
-    concerned: '担忧',
-    playful: '俏皮',
-    melancholy: '忧郁',
-    excited: '兴奋'
-  }[friend.current_mood] : '无';
-
-  const postingStyleText = {
-    encouraging: '鼓励型',
-    teasing: '调侃型',
-    observational: '观察型',
-    poetic: '诗意型',
-    sarcastic: '讽刺型'
-  }[friend.posting_style];
+  const ageRangeText = getAgeRangeText(friend.age_range);
+  const relationText = getRelationText(friend.relation);
+  const archetypeText = getArchetypeText(friend.archetype);
+  const memorySpanText = getMemorySpanText(friend.memory_span);
+  const moodText = friend.current_mood ? getMoodText(friend.current_mood) : '无';
+  const postingStyleText = getPostingStyleText(friend.posting_style);
 
   const socialBehaviorSection = includeSocialBehavior ? `
 【朋友圈行为】

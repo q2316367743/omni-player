@@ -19,7 +19,9 @@ export interface MemoItemView extends MemoItem {
 }
 
 export async function pageMemoItem(pageNum: number, pageSize: number): Promise<PageResponse<MemoItemView>> {
-  const itemPage = await useSql().query<MemoItem>('memo_item').page(pageNum, pageSize);
+  const itemPage = await useSql().query<MemoItem>('memo_item')
+  .orderByDesc('created_at')
+  .page(pageNum, pageSize);
   if (itemPage.records.length === 0) {
     return {
       records: [],
