@@ -5,6 +5,7 @@ import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 import {useMemoFriendStore} from "@/store";
 import {MEMO_COMMENT_TOOL_SCHEMA} from "@/modules/ai/schema/MemoCommentSchema.ts";
 import OpenAI from "openai";
+import {handleNonStreamingToolCalls} from "@/modules/ai/utils/ToolCallHandler.ts";
 
 export interface AiMemoCommentProp {
   friend: MemoFriend;
@@ -76,67 +77,49 @@ ${memo.content}`
   const choice = response.choices[0];
   const comment = choice?.message?.content || '';
 
-  const toolCalls = choice?.message?.tool_calls;
-  if (toolCalls) {
-    for (const toolCall of toolCalls) {
-      const functionName = (toolCall as any).function.name;
-      let functionArguments;
-      try {
-        functionArguments = JSON.parse((toolCall as any).function.arguments || '{}');
-      } catch (e) {
-        console.error(`[Memo Comment AI] Error parsing function arguments, functionName: ${functionName}, arguments: ${(toolCall as any).function.arguments}, error: ${e}`);
-        continue;
-      }
+  const now = Date.now();
 
-      const now = Date.now();
-
-      switch (functionName) {
-        case 'update_intimacy': {
-          await updateFriendDynamic(friend.id, {
-            intimacy_score: Math.max(0, Math.min(100, friend.intimacy_score + functionArguments.delta))
-          });
-          break;
-        }
-        case 'update_trust': {
-          await updateFriendDynamic(friend.id, {
-            trust_level: Math.max(0, Math.min(100, friend.trust_level + functionArguments.delta))
-          });
-          break;
-        }
-        case 'update_mood': {
-          await updateFriendDynamic(friend.id, {
-            current_mood: functionArguments.mood,
-            mood_expires_at: now + functionArguments.duration_hours * 60 * 60 * 1000
-          });
-          break;
-        }
-        case 'add_milestone': {
-          const milestones = JSON.parse(friend.relationship_milestones || '[]');
-          milestones.push({
-            event: functionArguments.event,
-            date: now,
-            desc: functionArguments.desc
-          });
-          await updateFriendDynamic(friend.id, {
-            relationship_milestones: JSON.stringify(milestones)
-          });
-          break;
-        }
-        case 'update_unknown_memo_count': {
-          await updateFriendDynamic(friend.id, {
-            unknown_memo_count: friend.unknown_memo_count + functionArguments.delta
-          });
-          break;
-        }
-        case 'update_conversation_frequency': {
-          await updateFriendDynamic(friend.id, {
-            conversation_frequency: functionArguments.frequency
-          });
-          break;
-        }
-      }
+  const toolHandlers = {
+    update_intimacy: async (args: any) => {
+      await updateFriendDynamic(friend.id, {
+        intimacy_score: Math.max(0, Math.min(100, friend.intimacy_score + args.delta))
+      });
+    },
+    update_trust: async (args: any) => {
+      await updateFriendDynamic(friend.id, {
+        trust_level: Math.max(0, Math.min(100, friend.trust_level + args.delta))
+      });
+    },
+    update_mood: async (args: any) => {
+      await updateFriendDynamic(friend.id, {
+        current_mood: args.mood,
+        mood_expires_at: now + args.duration_hours * 60 * 60 * 1000
+      });
+    },
+    add_milestone: async (args: any) => {
+      const milestones = JSON.parse(friend.relationship_milestones || '[]');
+      milestones.push({
+        event: args.event,
+        date: now,
+        desc: args.desc
+      });
+      await updateFriendDynamic(friend.id, {
+        relationship_milestones: JSON.stringify(milestones)
+      });
+    },
+    update_unknown_memo_count: async (args: any) => {
+      await updateFriendDynamic(friend.id, {
+        unknown_memo_count: friend.unknown_memo_count + args.delta
+      });
+    },
+    update_conversation_frequency: async (args: any) => {
+      await updateFriendDynamic(friend.id, {
+        conversation_frequency: args.frequency
+      });
     }
-  }
+  };
+
+  await handleNonStreamingToolCalls(response, toolHandlers);
 
   return comment;
 }

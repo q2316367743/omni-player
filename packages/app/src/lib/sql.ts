@@ -55,7 +55,8 @@ export type TableName =
   | 'memo_layer_persona'
   | 'memo_friend'
   | 'memo_session'
-  | 'memo_message';
+  | 'memo_message'
+  | 'memo_chat_summary';
 
 export class SqlWrapper {
 

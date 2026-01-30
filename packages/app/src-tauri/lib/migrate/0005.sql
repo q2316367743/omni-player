@@ -362,7 +362,6 @@ CREATE INDEX idx_memo_session_created_at ON memo_session (created_at);
 
 CREATE TABLE memo_message
 (
-
     -- 主键
     id         TEXT PRIMARY KEY,
     created_at INTEGER NOT NULL DEFAULT 0,
@@ -375,3 +374,16 @@ CREATE TABLE memo_message
 
 
 CREATE INDEX idx_memo_message_session_id ON memo_message (session_id);
+
+CREATE TABLE memo_chat_summary
+(
+    -- 主键
+    id           TEXT PRIMARY KEY,
+    created_at   INTEGER NOT NULL DEFAULT 0,
+    updated_at   INTEGER NOT NULL DEFAULT 0,
+    session_id      TEXT    NOT NULL DEFAULT '',
+    title        TEXT    NOT NULL DEFAULT '',
+    summary      TEXT    NOT NULL DEFAULT '',
+    key_insights TEXT    NOT NULL DEFAULT '',
+    ai_journal   TEXT    NOT NULL DEFAULT ''
+);
