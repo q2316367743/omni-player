@@ -172,7 +172,6 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue'
 import {postAction} from '@/lib/http'
 import LoadingResult from '@/components/Result/LoadingResult.vue'
 import {LocalName} from "@/global/LocalName.ts";

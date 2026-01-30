@@ -144,7 +144,6 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, computed, onMounted} from 'vue'
 import type {AiRtRole, AiRtRoleType} from '@/entity/app/ai/roundtable'
 import {listAiRtRoleService} from '@/services/app/roundtable/AiRtRoleService'
 import {openRoundtableRoleAdd, openRoundtableRoleCxt} from '@/pages/app/ai/roundtable/func/RoundtableRoleEdit'

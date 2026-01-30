@@ -45,7 +45,7 @@ const list = computed(() => {
   return props.scenes.map(scene => {
     return {
       ...scene,
-      roles: props.roleAppearanceMap.getOrDefault(scene.id, []).map(e => props.roleMap.get(e.role_id)!),
+      roles: []
     }
   });
 });

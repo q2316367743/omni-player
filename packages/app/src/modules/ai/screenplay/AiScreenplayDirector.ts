@@ -63,7 +63,7 @@ export async function askAiScreenplayDirector(prop: AiScreenplayDirectorProp): P
   const beliefGroupMap = group(beliefs, 'role_id');
 
   const currentSceneRoleIds = new Set(roles.map(r => r.id));
-  const availableRoles = allRoles.filter((r: SpRole) => !currentSceneRoleIds.has(r.id) && r.type !== 'decision' && r.type !== 'narrator');
+  const availableRoles = allRoles.filter((r: SpRole) => !currentSceneRoleIds.has(r.id) && r.type !== 'narrator');
 
   const {model, personality} = director;
   const {aiSetting} = useSettingStore();

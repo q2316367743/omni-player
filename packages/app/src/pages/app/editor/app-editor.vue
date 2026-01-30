@@ -59,7 +59,6 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue';
 import {AddIcon, ChevronLeftIcon, FileIcon, ViewListIcon} from 'tdesign-icons-vue-next';
 import {APP_DATA_NOTE_PATH} from "@/global/Constants.ts";
 import {NoteFs, type NoteNode} from "./func/noteFs.ts";

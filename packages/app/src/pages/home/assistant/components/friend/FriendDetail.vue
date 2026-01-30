@@ -108,8 +108,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
-import type { MemoFriend } from '@/entity/memo'
+import type {MemoFriendView} from '@/entity/memo'
 import {
   getArchetypeText,
   getMoodText,
@@ -117,22 +116,21 @@ import {
   getGenderText,
   getAgeRangeText,
   getRelationText,
-  parsePersonalityTags,
   moodToStatus
 } from '@/entity/memo/MemoFriend'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
 import { useMemoFriendStore } from '@/store/MemoFriendStore'
 
 const props = defineProps<{
-  friend: MemoFriend
+  friend: MemoFriendView
 }>()
 
 const emit = defineEmits<{
   (e: 'close'): void
-  (e: 'update:friend', friend: MemoFriend): void
+  (e: 'update:friend', friend: MemoFriendView): void
 }>()
 
-const personalityTags = computed(() => parsePersonalityTags(props.friend.personality_tags))
+const personalityTags = computed(() => props.friend.personality_tags)
 
 const memoFriendStore = useMemoFriendStore()
 

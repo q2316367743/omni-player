@@ -3,7 +3,7 @@ export interface Partner {
   name: string
   avatar: string
   description: string
-  personality: string
+  personality: Array<string>
 }
 
 export interface Memo {

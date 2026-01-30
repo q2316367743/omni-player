@@ -57,7 +57,6 @@
 </template>
 
 <script setup lang="ts">
-import {ref, watch} from 'vue';
 import {DeleteIcon, MoreIcon, TagIcon} from 'tdesign-icons-vue-next';
 import type {Snippet} from '@/services/SnippetService';
 import {

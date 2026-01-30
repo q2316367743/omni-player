@@ -25,7 +25,6 @@ import {
 } from "@/services/screenplay";
 import {ScreenEngine} from "@/pages/mp/screenplay/chapter/ScreenEngine.ts";
 import ScreenplaySide from "@/pages/mp/screenplay/chapter/layout/ScreenplaySide.vue";
-import ScreenplayScene from "@/pages/mp/screenplay/chapter/layout/ScreenplayScene.vue";
 import ScreenplayDialogue from "@/pages/mp/screenplay/chapter/layout/ScreenplayDialogue.vue";
 import ScreenplayControl from "@/pages/mp/screenplay/chapter/layout/ScreenplayControl.vue";
 import MessageUtil from "@/util/model/MessageUtil.ts";

@@ -11,13 +11,13 @@
           <span class="date-text">{{ currentDate }}</span>
           <t-button theme="primary" variant="text" shape="square" @click="toSetting()">
             <template #icon>
-              <setting-icon />
+              <setting-icon/>
             </template>
           </t-button>
         </div>
       </div>
 
-      <MemoEditor @publish="handlePublishMemo" />
+      <MemoEditor @publish="handlePublishMemo"/>
     </div>
 
     <div class="today-memos">
@@ -47,14 +47,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
 import MemoEditor from './MemoEditor.vue'
 import MemoItem from './MemoItem.vue'
-import { useMemoFriendStore } from '@/store'
-import { pageMemoItem, addMemoService, removeMemoService } from '@/services/memo/MemoItemService.ts'
-import type { MemoItemView } from '@/services/memo/MemoItemService.ts'
-import type { MemoFriend } from '@/entity/memo'
-import type { Memo } from '../../types.ts'
+import {useMemoFriendStore} from '@/store'
+import {pageMemoItem, addMemoService, removeMemoService} from '@/services/memo/MemoItemService.ts'
+import type {MemoItemView} from '@/services/memo/MemoItemService.ts'
+import type {MemoFriendView} from '@/entity/memo'
+import type {Memo} from '../../types.ts'
 import {SettingIcon} from "tdesign-icons-vue-next";
 
 const router = useRouter();
@@ -87,10 +86,10 @@ const formatTime = (timestamp: number) => {
   const memoDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
   const isToday = memoDate.getTime() === today.getTime()
   const isThisYear = date.getFullYear() === now.getFullYear()
-  
+
   const hours = date.getHours().toString().padStart(2, '0')
   const minutes = date.getMinutes().toString().padStart(2, '0')
-  
+
   if (isToday) {
     return `${hours}:${minutes}`
   } else if (isThisYear) {
@@ -105,10 +104,10 @@ const formatTime = (timestamp: number) => {
   }
 }
 
-const convertMemoItemViewToMemo = (item: MemoItemView, friendMap: Map<string, MemoFriend>): Memo => {
+const convertMemoItemViewToMemo = (item: MemoItemView, friendMap: Map<string, MemoFriendView>): Memo => {
   const friendIds = item.friend_ids ? item.friend_ids.split(',').filter(Boolean) : []
   const atPartner = friendIds.length > 0 ? friendMap.get(friendIds[0]!) : null
-  
+
   const aiComment = item.comments.length > 0 ? {
     name: atPartner?.name ?? 'AI伙伴',
     avatar: atPartner?.avatar ?? 'https://api.dicebear.com/7.x/personas/svg?seed=monica',
@@ -138,9 +137,9 @@ const loadMemos = async () => {
   try {
     const result = await pageMemoItem(pageNum.value, pageSize.value)
     total.value = result.total
-    
+
     const friendMap = new Map(friendStore.friends.map(f => [f.id, f]))
-    
+
     todayMemos.value = result.records.map(item => convertMemoItemViewToMemo(item, friendMap))
   } catch (error) {
     console.error('Failed to load memos:', error)
@@ -161,7 +160,7 @@ const handlePublishMemo = async (data: { content: string; type: string; atFriend
       friend_ids: data.atFriends.join(','),
       consumed: 0
     })
-    
+
     await loadMemos()
   } catch (error) {
     console.error('Failed to publish memo:', error)

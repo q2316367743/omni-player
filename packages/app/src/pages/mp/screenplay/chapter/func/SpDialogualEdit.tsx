@@ -65,7 +65,7 @@ export function openSpDialogueAddNarrator(
             narrator,
             screenplay,
             scene,
-            roles: roles.filter(r => r.type !== 'narrator' && r.type !== 'decision'),
+            roles: roles.filter(r => r.type !== 'narrator'),
             dialogues: recentDialogues,
             roleMap,
             triggerReason: `用户推进剧情：${data.value.dialogue}`,

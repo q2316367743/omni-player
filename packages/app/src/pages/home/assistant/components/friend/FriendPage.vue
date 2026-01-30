@@ -27,24 +27,18 @@
 
 <script lang="ts" setup>
 import {useMemoFriendStore} from '@/store/MemoFriendStore'
-import type {MemoFriend} from '@/entity/memo'
+import type {MemoFriendView} from '@/entity/memo'
 import FriendDetail from './FriendDetail.vue'
 import FriendCard from './FriendCard.vue'
 
-const emit = defineEmits<{
-  (e: 'chat', partner: MemoFriend): void
-}>()
-
-
-const selectedPartner = ref<MemoFriend>()
+const selectedPartner = ref<MemoFriendView>()
 
 const activeFriends = computed(() => {
   return useMemoFriendStore().friends.filter(f => f.is_active === 1)
 })
 
-const selectPartner = (partner: MemoFriend) => {
+const selectPartner = (partner: MemoFriendView) => {
   selectedPartner.value = partner
-  emit('chat', partner)
 }
 
 const closeDetail = () => {

@@ -16,7 +16,6 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue';
 import type {SnippetMetaWithTag} from '@/services/SnippetService';
 import SnippetSidebar from './components/SnippetSidebar.vue';
 import SnippetContent from './components/SnippetContent.vue';

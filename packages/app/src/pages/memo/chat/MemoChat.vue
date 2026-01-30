@@ -124,7 +124,6 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, onMounted, ref, shallowRef} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {getMemoSession, listMemoMessage} from "@/services/memo";
 import {saveMemoMessage} from "@/services/memo/MemoMessageService.ts";

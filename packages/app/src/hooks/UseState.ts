@@ -1,5 +1,3 @@
-import type {Ref} from 'vue';
-
 export const useState = <T>(initial: T): [Ref<T>, (v: T) => void] => {
   const data = ref<T>(initial) as Ref<T>;
 

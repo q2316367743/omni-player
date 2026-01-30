@@ -3,7 +3,6 @@
 </template>
 <script lang="ts" setup>
 import Artplayer from 'artplayer';
-import {onMounted, onUnmounted, ref, shallowRef, useTemplateRef, watch} from 'vue';
 import {playFlv, playM3u8} from "@/lib/artplayer";
 
 const props = withDefaults(defineProps<{

@@ -37,11 +37,9 @@
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue'
-import type {MemoFriend} from '@/entity/memo'
+import type {MemoFriendView} from '@/entity/memo'
 import {
   getArchetypeText,
-  parsePersonalityTags,
   moodToStatus
 } from '@/entity/memo/MemoFriend'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
@@ -50,17 +48,17 @@ import {createMemoSession} from "@/services/memo";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 
 const props = defineProps<{
-  friend: MemoFriend
+  friend: MemoFriendView
   active?: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'click', friend: MemoFriend): void
+  (e: 'click', friend: MemoFriendView): void
 }>()
 
 const router = useRouter();
 
-const allTags = computed(() => parsePersonalityTags(props.friend.personality_tags));
+const allTags = computed(() => props.friend.personality_tags);
 const hasSession = computed(() => useMemoFriendStore().chatFriendMap.has(props.friend.id));
 const maxVisible = 6
 

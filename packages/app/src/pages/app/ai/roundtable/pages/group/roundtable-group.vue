@@ -82,7 +82,6 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, onMounted} from 'vue'
 import type {AiRtGroup} from '@/entity/app/ai/roundtable'
 import {listAiRtGroupService} from '@/services/app/roundtable'
 import {openRoundtableGroupCxt} from '@/pages/app/ai/roundtable/func/RoundtableGroupEdit'

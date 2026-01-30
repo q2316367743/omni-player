@@ -25,7 +25,6 @@
 </template>
 
 <script lang="ts" setup>
-import {MessagePlugin} from 'tdesign-vue-next'
 import {
   listActiveMemoLayerBehaviors,
   listActiveMemoLayerCognitive,

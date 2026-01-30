@@ -26,7 +26,6 @@
         />
         <FriendPage
           v-else-if="currentPage === 'partner'"
-          @chat="startChat"
         />
         <MomentsPage
           v-else-if="currentPage === 'moments'"
@@ -57,7 +56,7 @@
               class="selector-item"
               @click="selectPartner(partner)"
             >
-              <img :src="partner.avatar ?? defaultAvatar" class="selector-avatar" />
+              <XhAvatar :value="partner.avatar ?? defaultAvatar" class="selector-avatar" />
               <div class="selector-info">
                 <span class="selector-name">{{ partner.name }}</span>
                 <span class="selector-desc">{{ partner.personality_prompt }}</span>
@@ -79,7 +78,7 @@ import DiaryPage from './components/diary/DiaryPage.vue'
 import ToolsPage from './components/ToolsPage.vue'
 import MemoryPage from './components/memory/MemoryPage.vue'
 import {LocalName} from "@/global/LocalName.ts";
-import type { MemoFriend } from '@/entity/memo'
+import type {MemoFriendView} from '@/entity/memo'
 import { useMemoFriendStore } from '@/store/MemoFriendStore'
 
 const navItems = [
@@ -94,7 +93,7 @@ const navItems = [
 const currentPage = useSessionStorage(LocalName.PAGE_HOME_ASSISTANT_ACTIVE, 'home');
 const currentTime = ref('')
 const showPartnerSelector = ref(false)
-const selectedMemoPartner = ref<((partner: MemoFriend) => void) | null>(null)
+const selectedMemoPartner = ref<((partner: MemoFriendView) => void) | null>(null)
 const defaultAvatar = 'https://api.dicebear.com/7.x/personas/svg?seed=default'
 
 const { friends, loadFriends } = useMemoFriendStore()
@@ -110,21 +109,17 @@ const updateTime = () => {
 
 let timeTimer: number
 
-const openPartnerSelector = (callback: (partner: MemoFriend) => void) => {
+const openPartnerSelector = (callback: (partner: MemoFriendView) => void) => {
   selectedMemoPartner.value = callback
   showPartnerSelector.value = true
 }
 
-const selectPartner = (partner: MemoFriend) => {
+const selectPartner = (partner: MemoFriendView) => {
   if (selectedMemoPartner.value) {
     selectedMemoPartner.value(partner)
   }
   showPartnerSelector.value = false
   selectedMemoPartner.value = null
-}
-
-const startChat = (partner: MemoFriend) => {
-  console.log('Starting chat with:', partner.name)
 }
 
 onMounted(async () => {

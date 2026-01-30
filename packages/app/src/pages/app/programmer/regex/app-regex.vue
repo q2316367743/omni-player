@@ -120,7 +120,6 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, computed} from 'vue';
 import {HelpCircleIcon} from 'tdesign-icons-vue-next';
 import AppToolLayout from "@/components/PageLayout/AppToolLayout.vue";
 

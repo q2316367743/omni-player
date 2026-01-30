@@ -108,10 +108,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
 import {useMemoFriendStore} from "@/store";
-import type { MemoItemType } from '@/entity/memo';
-import type { MemoFriend } from '@/entity/memo';
+import type {MemoFriendView, MemoItemType} from '@/entity/memo';
 
 const emit = defineEmits<{
   (e: 'publish', data: { content: string; type: MemoItemType; atFriends: string[] }): void
@@ -129,7 +127,7 @@ const editorWrapperRef = ref<HTMLElement | null>(null)
 const showAtDropdown = ref(false)
 const atQuery = ref('')
 const selectedIndex = ref(0)
-const atFriends = ref<MemoFriend[]>([])
+const atFriends = ref<MemoFriendView[]>([])
 const dropdownPosition = ref({ top: '0px', left: '0px' })
 
 // 存储 @ 标签的位置信息
@@ -242,7 +240,7 @@ const handleKeydown = (e: KeyboardEvent) => {
 }
 
 // 选择 friend
-const selectFriend = (friend: MemoFriend) => {
+const selectFriend = (friend: MemoFriendView) => {
   if (!editorRef.value) return
   
   const selection = window.getSelection()

@@ -16,8 +16,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onUnmounted } from 'vue';
-
 interface Props {
   defaultTopHeight?: number;
   minTopHeight?: number;

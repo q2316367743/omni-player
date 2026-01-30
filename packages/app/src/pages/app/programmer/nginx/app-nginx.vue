@@ -53,7 +53,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed, watch } from 'vue'
 import { MessagePlugin } from 'tdesign-vue-next'
 import { type NginxConfig } from './types'
 import BasicConfig from './components/BasicConfig.vue'

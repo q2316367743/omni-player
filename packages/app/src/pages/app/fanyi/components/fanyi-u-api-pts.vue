@@ -271,7 +271,6 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, computed, onUnmounted} from 'vue'
 import LoadingResult from '@/components/Result/LoadingResult.vue'
 import {LocalName} from "@/global/LocalName.ts";
 
