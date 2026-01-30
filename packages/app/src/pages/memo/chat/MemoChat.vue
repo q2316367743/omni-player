@@ -3,6 +3,9 @@
     <!-- 顶部导航栏 -->
     <div class="chat-header" v-if="!showSummary">
       <t-button theme="default" variant="text" @click="handleBack" shape="round" class="back-btn">
+        <template #icon>
+          <chevron-left-icon />
+        </template>
         返回
       </t-button>
       <div class="friend-info" v-if="friend">
@@ -134,6 +137,7 @@ import {aiMemoChat} from "@/modules/ai/memo/AiMemoChat.ts";
 import {aiMemoChatSummary} from "@/modules/ai/memo/AiMemoChatSummary.ts";
 import type {AskToOpenAiAbort} from "@/modules/ai";
 import MarkdownPreview from "@/components/common/MarkdownPreview.vue";
+import {ChevronLeftIcon} from "tdesign-icons-vue-next";
 
 const route = useRoute();
 const router = useRouter();

@@ -22,7 +22,7 @@
               <div class="marker-dot"></div>
               <div class="marker-line"></div>
             </div>
-            <div class="timeline-card monica-card">
+            <div class="timeline-card monica-card" @click="handleSummaryClick(summary.id)">
               <h3 class="summary-title">{{ summary.title }}</h3>
               <p class="summary-text">{{ getTruncatedSummary(summary.summary) }}</p>
               <div v-if="summary.ai_journal" class="ai-comment">
@@ -57,11 +57,13 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import type { MemoChatSummary } from '@/entity/memo/MemoChatSummary.ts'
 import { pageMemoChatSummary } from '@/services/memo/MemoChatSummaryService.ts'
 import { useMemoFriendStore } from '@/store/MemoFriendStore.ts'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
 
+const router = useRouter()
 const summaries = ref<MemoChatSummary[]>([])
 const loading = ref(false)
 const hasMore = ref(true)
@@ -131,6 +133,10 @@ const getFriendName = (friendId: string) => {
 const getFriendAvatar = (friendId: string) => {
   const friend = friendStore.friendMap.get(friendId)
   return friend?.avatar || ''
+}
+
+const handleSummaryClick = (summaryId: string) => {
+  router.push(`/memo/summary/${summaryId}`)
 }
 
 onMounted(async () => {
@@ -251,6 +257,13 @@ onMounted(async () => {
 .timeline-card {
   flex: 1;
   padding: var(--monica-spacing-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timeline-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--monica-shadow);
 }
 
 .summary-title {

@@ -8,6 +8,10 @@ export function pageMemoChatSummary(pageNum: number, pageSize: number) {
     .page(pageNum, pageSize);
 }
 
+export function getMemoChatSummary(id: string) {
+  return useSql().query<MemoChatSummary>('memo_chat_summary').eq('id', id).get();
+}
+
 export async function createMemoChatSummary(data: MemoChatSummaryCore) {
   const now = Date.now();
   const summary = await useSql().mapper<MemoChatSummary>('memo_chat_summary').insert({

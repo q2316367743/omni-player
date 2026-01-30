@@ -10,5 +10,10 @@ export const memoRouters: Array<RouteRecordRaw> = [{
       path: "chat/:id",
       component: () => import('@/pages/memo/chat/MemoChat.vue')
     },
+    {
+      name: "MemoSummary",
+      path: "summary/:id",
+      component: () => import('@/pages/memo/summary/MemoSummary.vue')
+    },
   ]
 }]
