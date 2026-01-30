@@ -1,16 +1,22 @@
-import type {MemoFriend, MemoFriendDynamic, MemoFriendStatic} from "@/entity/memo";
+import {
+  type MemoFriendDynamic,
+  type MemoFriendStatic,
+  memoFriendToMemoFriendView,
+  type MemoFriendView
+} from "@/entity/memo";
 import {defineStore} from "pinia";
 import {listMemoFriend, updateMemoFriendStatic, updateMemoFriendDynamic} from "@/services/memo";
 import {loadMemoSessionIng} from "@/services/memo/MemoSessionService.ts";
 
 export const useMemoFriendStore = defineStore('memo-friend', () => {
-  const friends = ref(new Array<MemoFriend>());
-  const friendMap = ref(new Map<string, MemoFriend>());
+  const friends = ref(new Array<MemoFriendView>());
+  const friendMap = ref(new Map<string, MemoFriendView>());
   // 正在聊天的朋友，朋友 ID => session ID
   const chatFriendMap = ref(new Map<string, string>());
 
   async function loadFriends() {
-    friends.value = await listMemoFriend();
+    const res = await listMemoFriend();
+    friends.value = res.map(e => memoFriendToMemoFriendView(e))
     friendMap.value = new Map(friends.value.map(f => [f.id, f]));
   }
 

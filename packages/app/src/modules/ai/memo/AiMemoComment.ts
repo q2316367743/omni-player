@@ -1,4 +1,4 @@
-import type {MemoFriend} from "@/entity/memo";
+import type {MemoFriendView} from "@/entity/memo";
 import type {MemoItemAdd} from "@/services/memo";
 import {memoFriendToPrompt} from "@/entity/memo/MemoFriend.ts";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
@@ -8,7 +8,7 @@ import OpenAI from "openai";
 import {handleNonStreamingToolCalls} from "@/modules/ai/utils/ToolCallHandler.ts";
 
 export interface AiMemoCommentProp {
-  friend: MemoFriend;
+  friend: MemoFriendView;
   memo: MemoItemAdd;
 }
 
@@ -97,7 +97,7 @@ ${memo.content}`
       });
     },
     add_milestone: async (args: any) => {
-      const milestones = JSON.parse(friend.relationship_milestones || '[]');
+      const milestones = friend.relationship_milestones;
       milestones.push({
         event: args.event,
         date: now,

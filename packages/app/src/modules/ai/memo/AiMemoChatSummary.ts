@@ -1,4 +1,4 @@
-import {type MemoFriend, memoFriendToPrompt, type MemoMessage} from "@/entity/memo";
+import {memoFriendToPrompt, type MemoFriendView, type MemoMessage} from "@/entity/memo";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 import {CHAT_SUMMARY_TOOL_SCHEMA} from "@/modules/ai/schema/ChatSummarySchema.ts";
 import {createMemoChatSummary} from "@/services/memo/MemoChatSummaryService.ts";
@@ -10,7 +10,7 @@ import {formatDate} from "@/util/lang/FormatUtil.ts";
 
 interface AiMemoChatSummaryProp {
   // 谁
-  friend: MemoFriend;
+  friend: MemoFriendView;
   // 全部的聊天信息
   messages: Array<MemoMessage>;
 }

@@ -1,4 +1,4 @@
-import {type MemoFriend, memoFriendToPrompt, type MemoMessage} from "@/entity/memo";
+import {memoFriendToPrompt, type MemoFriendView, type MemoMessage} from "@/entity/memo";
 import {useMemoVelesdb} from "@/lib/velesdb.ts";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 import type {AskToOpenAiAbort} from "@/modules/ai";
@@ -10,7 +10,7 @@ import {
 import type OpenAI from "openai";
 
 export interface AiMemoChatProp {
-  friend: MemoFriend;
+  friend: MemoFriendView;
   chat: string;
   messages: Array<MemoMessage>;
   onStart?: () => Promise<void>;

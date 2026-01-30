@@ -439,6 +439,22 @@ export function parseTriggerKeywords(keywords: string): string[] {
   }
 }
 
+export function parseKnownMemoCategories(categories: string): string[] {
+  try {
+    return JSON.parse(categories || '[]') as string[];
+  } catch {
+    return [];
+  }
+}
+
+export function parseUnlockCondition(condition: string): any {
+  try {
+    return JSON.parse(condition || '{}');
+  } catch {
+    return {};
+  }
+}
+
 export function moodToStatus(mood: MemoFriendMood): 'online' | 'busy' {
   const map: Partial<Record<MemoFriendMood, 'online' | 'busy'>> = {
     happy: 'online',
@@ -450,21 +466,74 @@ export function moodToStatus(mood: MemoFriendMood): 'online' | 'busy' {
   return map[mood] || 'online';
 }
 
-/**
- * 将 MemoFriend 对象转换为 LLM 提示词
- * @param friend MemoFriend 对象
- * @param options 可选参数
- * @param options.includeSocialBehavior 是否包含朋友圈行为，默认为 true
- * @returns 格式化的提示词字符串
- */
-export function memoFriendToPrompt(friend: MemoFriend, options?: { includeSocialBehavior?: boolean }): string {
+export interface MemoFriendStaticView {
+  avatar: string;
+  model: string;
+  name: string;
+  gender: MemoFriendGender;
+  age_range: MemoFriendAgeRange;
+  age_exact: number;
+  occupation: string;
+  relation: MemoFriendRelation;
+  archetype: MemoFriendArchetype;
+  personality_prompt: string;
+  personality_tags: string[];
+  speaking_style: string;
+  background_story: string;
+  knowledge_scope: MemoFriendKnowledgeScope;
+  taboo_topics: string[];
+  memory_span: MemoFriendMemorySpan;
+  emotional_depth: number;
+  proactivity_level: number;
+  posting_style: MemoFriendPostingStyle;
+  trigger_keywords: string[];
+  active_hours: MemoFriendActiveHours;
+}
+
+export interface MemoFriendDynamicView {
+  intimacy_score: number;
+  trust_level: number;
+  interaction_count: number;
+  last_interaction: number;
+  conversation_frequency: string;
+  relationship_milestones: MemoFriendMilestone[];
+  known_memo_categories: string[];
+  unknown_memo_count: number;
+  current_mood: MemoFriendMood;
+  mood_expires_at: number;
+}
+
+export interface MemoFriendView extends MemoFriendStaticView, MemoFriendDynamicView {
+  id: string;
+  is_active: YesOrNo;
+  is_locked: YesOrNo;
+  unlock_condition: any;
+  sort_order: number;
+  version: number;
+}
+
+export function memoFriendToMemoFriendView(friend: MemoFriend): MemoFriendView {
+  return {
+    ...friend,
+    personality_tags: parsePersonalityTags(friend.personality_tags),
+    knowledge_scope: parseKnowledgeScope(friend.knowledge_scope),
+    taboo_topics: parseTabooTopics(friend.taboo_topics),
+    trigger_keywords: parseTriggerKeywords(friend.trigger_keywords),
+    active_hours: parseActiveHours(friend.active_hours),
+    relationship_milestones: parseRelationshipMilestones(friend.relationship_milestones),
+    known_memo_categories: parseKnownMemoCategories(friend.known_memo_categories),
+    unlock_condition: parseUnlockCondition(friend.unlock_condition)
+  };
+}
+
+export function memoFriendToPrompt(friend: MemoFriendView, options?: { includeSocialBehavior?: boolean }): string {
   const {includeSocialBehavior = false} = options || {};
-  const knowledgeScope = parseKnowledgeScope(friend.knowledge_scope);
-  const tabooTopics = parseTabooTopics(friend.taboo_topics);
-  const personalityTags = parsePersonalityTags(friend.personality_tags);
-  const relationshipMilestones = parseRelationshipMilestones(friend.relationship_milestones);
-  const activeHours = parseActiveHours(friend.active_hours);
-  const triggerKeywords = parseTriggerKeywords(friend.trigger_keywords);
+  const knowledgeScope = friend.knowledge_scope;
+  const tabooTopics = friend.taboo_topics;
+  const personalityTags = friend.personality_tags;
+  const relationshipMilestones = friend.relationship_milestones;
+  const activeHours = friend.active_hours;
+  const triggerKeywords = friend.trigger_keywords;
 
   const ageRangeText = getAgeRangeText(friend.age_range);
   const relationText = getRelationText(friend.relation);
