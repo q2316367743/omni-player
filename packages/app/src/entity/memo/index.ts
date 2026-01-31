@@ -8,4 +8,6 @@ export * from "./MemoLayerCognitive.ts";
 export * from "./MemoLayerEmotion.ts";
 export * from "./MemoLayerPersona.ts";
 export * from "./MemoSession.ts";
-export * from "./MemoMessage.ts"
+export * from "./MemoMessage.ts";
+export * from "./MemoPost.ts";
+export * from "./MemoPostComment.ts";

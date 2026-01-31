@@ -175,7 +175,12 @@ CREATE TABLE memo_friend
     sort_order              INTEGER NOT NULL DEFAULT 0,
 
     -- 人设版本（后期可升级）
-    version                 INTEGER NOT NULL DEFAULT 1
+    version                 INTEGER NOT NULL DEFAULT 1,
+    posting_triggers        text             default '["keyword"]' not null,
+    autopost_interval_hours integer          default 72 not null,
+    last_autopost_at        integer          default 0 not null,
+    state_trigger_condition text             default '' not null,
+    max_posts_per_week      integer          default 3 not null
 );
 
 -- 创建索引以加速查询
@@ -387,4 +392,27 @@ CREATE TABLE memo_chat_summary
     summary      TEXT    NOT NULL DEFAULT '',
     key_insights TEXT    NOT NULL DEFAULT '',
     ai_journal   TEXT    NOT NULL DEFAULT ''
+);
+
+CREATE TABLE memo_post
+(
+    id              TEXT PRIMARY KEY,
+    created_at      INTEGER NOT NULL DEFAULT 0,
+    updated_at      INTEGER NOT NULL DEFAULT 0,
+    friend_id       TEXT    NOT NULL DEFAULT '',
+    content         TEXT    NOT NULL DEFAULT '',
+    media_urls      TEXT    NOT NULL DEFAULT '',
+    location        TEXT    NOT NULL DEFAULT '',
+    triggered_by    TEXT    NOT NULL DEFAULT '',
+    trigger_keyword TEXT    NOT NULL DEFAULT ''
+);
+
+CREATE TABLE memo_post_comment
+(
+    id               TEXT PRIMARY KEY,
+    created_at       INTEGER NOT NULL DEFAULT 0,
+    updated_at       INTEGER NOT NULL DEFAULT 0,
+    post_id          TEXT    NOT NULL DEFAULT '',
+    friend_id        TEXT    NOT NULL DEFAULT '',
+    content          TEXT    NOT NULL DEFAULT ''
 );

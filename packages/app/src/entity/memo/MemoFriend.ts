@@ -75,6 +75,20 @@ export type MemoFriendMood = 'happy' | 'concerned' | 'playful' | 'melancholy' | 
 export type MemoFriendPostingStyle = 'encouraging' | 'teasing' | 'observational' | 'poetic' | 'sarcastic';
 
 /**
+ * 朋友圈触发方式
+ * - keyword: 关键词触发
+ * - periodic: 定期触发
+ * - state_based: 基于状态触发（如焦虑升高）
+ */
+export type MemoFriendPostingTrigger = 'keyword' | 'periodic' | 'state_based';
+
+export interface MemoFriendStateTriggerCondition {
+  trait: string,
+  operator: '>' | '>=' | '=' | '<=' | '<' | '!=',
+  threshold: number
+}
+
+/**
  * 知识域
  */
 export interface MemoFriendKnowledgeScope {
@@ -220,6 +234,39 @@ export interface MemoFriendStatic {
    * 活跃时间段（防止深夜发圈打扰）
    */
   active_hours: string;
+
+  /**
+   * 发圈策略类型（多选）
+   * - "keyword"：关键词触发（现有）
+   * - "periodic"：定期自主发圈
+   * - "state_based"：基于用户状态变化（如焦虑升高）
+   */
+  posting_triggers: string; // JSON: ["keyword", "periodic"]
+
+  /**
+   * 自主发圈周期（单位：小时）
+   * 例如 72 = 每3天最多1次（需配合 last_autopost_at）
+   * @example 72
+   */
+  autopost_interval_hours: number;
+
+  /**
+   * 最后一次自主发圈时间（用于限流）
+   */
+  last_autopost_at: number;
+
+  /**
+   * 用户状态触发条件（可选）
+   * 例如：{"trait": "anxiety", "operator": ">", "threshold": 70}
+   */
+  state_trigger_condition: string; // JSON
+
+  /**
+   * 发圈总频率上限（防刷屏）
+   * 例如：每7天最多3条（含触发+自主）
+   * @example 3
+   */
+  max_posts_per_week: number;
 }
 
 // 动态修改层
@@ -455,6 +502,11 @@ export function parseUnlockCondition(condition: string): any {
   }
 }
 
+export function parsePostingTriggers(posting_triggers:string) {
+  const res = JSON.parse(posting_triggers || '[]') as MemoFriendPostingTrigger[];
+  return Array.isArray(res) ? res : [];
+}
+
 export function moodToStatus(mood: MemoFriendMood): 'online' | 'busy' {
   const map: Partial<Record<MemoFriendMood, 'online' | 'busy'>> = {
     happy: 'online',
@@ -488,6 +540,11 @@ export interface MemoFriendStaticView {
   posting_style: MemoFriendPostingStyle;
   trigger_keywords: string[];
   active_hours: MemoFriendActiveHours;
+  posting_triggers: Array<MemoFriendPostingTrigger>;
+  autopost_interval_hours: number;
+  last_autopost_at: number;
+  state_trigger_condition?: MemoFriendStateTriggerCondition;
+  max_posts_per_week: number;
 }
 
 export interface MemoFriendDynamicView {
@@ -522,7 +579,9 @@ export function memoFriendToMemoFriendView(friend: MemoFriend): MemoFriendView {
     active_hours: parseActiveHours(friend.active_hours),
     relationship_milestones: parseRelationshipMilestones(friend.relationship_milestones),
     known_memo_categories: parseKnownMemoCategories(friend.known_memo_categories),
-    unlock_condition: parseUnlockCondition(friend.unlock_condition)
+    unlock_condition: parseUnlockCondition(friend.unlock_condition),
+    posting_triggers: parsePostingTriggers(friend.posting_triggers),
+    state_trigger_condition: friend.state_trigger_condition ? JSON.parse(friend.state_trigger_condition) : undefined
   };
 }
 
@@ -532,8 +591,6 @@ export function memoFriendToPrompt(friend: MemoFriendView, options?: { includeSo
   const tabooTopics = friend.taboo_topics;
   const personalityTags = friend.personality_tags;
   const relationshipMilestones = friend.relationship_milestones;
-  const activeHours = friend.active_hours;
-  const triggerKeywords = friend.trigger_keywords;
 
   const ageRangeText = getAgeRangeText(friend.age_range);
   const relationText = getRelationText(friend.relation);
@@ -544,9 +601,7 @@ export function memoFriendToPrompt(friend: MemoFriendView, options?: { includeSo
 
   const socialBehaviorSection = includeSocialBehavior ? `
 【朋友圈行为】
-发圈风格：${postingStyleText}
-触发关键词：${triggerKeywords.join('、') || '无'}
-活跃时间段：${activeHours.start}:00 - ${activeHours.end}:00` : '';
+发圈风格：${postingStyleText}` : '';
 
   return `【角色设定】
 姓名：${friend.name}
