@@ -8,6 +8,10 @@ import {
   getActiveMemoLayerEmotions, getActiveMemoLayerPersonas,
 } from "@/services/memo";
 import type OpenAI from "openai";
+import {logDebug} from "@/lib/log.ts";
+import {formatDate} from "@/util/lang/FormatUtil.ts";
+import {filterChatHistory} from "@/modules/ai/utils/ChatHistoryFilter.ts";
+
 
 export interface AiMemoChatProp {
   friend: MemoFriendView;
@@ -85,7 +89,15 @@ export async function aiMemoChat(props: AiMemoChatProp) {
     "无相关记忆";
 
   // 构建背景上下文
-  const backgroundContext = `本次会话主题：${sessionTopic}\n${personalityStatus.join('\n')}\n\n相关记忆：\n${ragContent}`;
+  const backgroundContext = `本次会话主题：${sessionTopic}
+${personalityStatus.join('\n')}
+
+相关记忆：
+${ragContent}
+
+当前时间：
+${formatDate(new Date())}
+`;
 
   chatMessages.push({
     role: "user",
@@ -93,24 +105,19 @@ export async function aiMemoChat(props: AiMemoChatProp) {
   });
 
   // 3. 最近对话历史
-  // 过滤并排序消息，只保留 user 和 assistant 角色，最多 6 条
-  const filteredMessages = messages
-    .filter(msg => msg.role === "user" || msg.role === "assistant")
-    .sort((a, b) => a.created_at - b.created_at)
-    .slice(-6);
+  const filteredMessages = filterChatHistory(chat, messages, {
+    followUpWindow: 8,   // 追问时保留8条（约4轮对话）
+    newTopicWindow: 3,   // 新话题只保留3条（约1-2轮）
+    defaultWindow: 6,    // 默认6条（约3轮）
+    compressLength: 60,  // 旧AI回复只留60字
+  });
 
   // 添加最近对话历史
   filteredMessages.forEach(msg => {
     chatMessages.push({
-      role: msg.role as 'user' | 'assistant',
+      role: msg.role,
       content: msg.content
     });
-  });
-
-  // 4. 当前用户消息
-  chatMessages.push({
-    role: "user",
-    content: chat
   });
 
   // 如果没有历史对话，添加一个提示让AI主动打招呼
@@ -122,6 +129,8 @@ export async function aiMemoChat(props: AiMemoChatProp) {
   }
 
   const client = useSettingStore().createAiClient();
+
+  logDebug("此次聊天内容", chatMessages);
 
   const response = await client.chat?.completions.create({
     model: friend.model,

@@ -8,11 +8,11 @@ export function listMemoMessage(sessionId:  string) {
     .list();
 }
 
-export function saveMemoMessage(data: MemoMessageCore) {
+export function saveMemoMessage(data: MemoMessageCore, created_at?: number) {
   const now = Date.now();
   return useSql().mapper<MemoMessage>('memo_message').insert({
     ...data,
-    created_at: now,
+    created_at: typeof created_at ==='undefined' ? now : created_at,
     updated_at: now,
   });
 }

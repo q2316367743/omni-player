@@ -74,7 +74,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   background: var(--monica-warm-bg);
-  padding: var(--monica-spacing-xl);
+  padding: 8px;
 }
 
 .page-header {
@@ -99,6 +99,10 @@ onMounted(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  :deep(.t-tab-panel) {
+    height: calc(100vh - 166px);
+    overflow-x: auto;
+  }
 }
 
 </style>

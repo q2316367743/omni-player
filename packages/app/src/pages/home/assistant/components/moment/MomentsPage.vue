@@ -8,7 +8,7 @@
     <div class="moments-feed local-scroll">
       <div v-for="moment in moments" :key="moment.id" class="moment-card monica-card w-600px mx-auto">
         <div class="moment-header">
-          <img :src="moment.author.avatar" class="moment-avatar" />
+          <XhAvatar :value="moment.author.avatar" class="moment-avatar" />
           <div class="moment-author-info">
             <span class="moment-author-name">{{ moment.author.name }}</span>
             <span class="moment-time">{{ moment.time }}</span>
@@ -245,5 +245,5 @@ const postComment = (moment: Moment) => {
 </script>
 
 <style scoped lang="less">
-@import "memo/less/MomentsPage.less";
+@import "../memo/less/MomentsPage.less";
 </style>

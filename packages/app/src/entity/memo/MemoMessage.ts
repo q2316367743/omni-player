@@ -6,7 +6,7 @@ export interface MemoMessageCore {
   // 所属会话
   session_id: string;
   // 角色
-  role: AiChatRole;
+  role: AiChatRole | 'summary';
   // 内容
   content: string;
 

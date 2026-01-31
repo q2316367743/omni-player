@@ -54,6 +54,7 @@
         </div>
       </div>
     </div>
+    <t-back-top container=".summary-content" />
   </div>
 </template>
 
