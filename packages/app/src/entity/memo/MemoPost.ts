@@ -1,4 +1,5 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
+import type {YesOrNo} from "@/global/YesOrNo.ts";
 
 export interface MemoPostCore {
 
@@ -24,6 +25,11 @@ export interface MemoPostCore {
    * 匹配到的关键字，只有 ai 自动发朋友圈时才有
    */
   trigger_keyword: string;
+
+  /**
+   * 是否喜欢
+   */
+  is_like: YesOrNo;
 }
 
 /**

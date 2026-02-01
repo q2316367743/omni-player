@@ -101,7 +101,8 @@ export async function createPostByKeyword(memo: MemoItemAdd) {
     media_urls: '',
     location: '',
     triggered_by: `/memo/${memo.friend_ids}`,
-    trigger_keyword: selectedCandidate.matchedKeyword
+    trigger_keyword: selectedCandidate.matchedKeyword,
+    is_like: 0
   });
 
   logInfo(`[CreatePostByKeyword] 朋友 ${selectedFriend.name} 朋友圈发布成功`);

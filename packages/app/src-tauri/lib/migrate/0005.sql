@@ -404,15 +404,16 @@ CREATE TABLE memo_post
     media_urls      TEXT    NOT NULL DEFAULT '',
     location        TEXT    NOT NULL DEFAULT '',
     triggered_by    TEXT    NOT NULL DEFAULT '',
-    trigger_keyword TEXT    NOT NULL DEFAULT ''
+    trigger_keyword TEXT    NOT NULL DEFAULT '',
+    is_like         INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE memo_post_comment
 (
-    id               TEXT PRIMARY KEY,
-    created_at       INTEGER NOT NULL DEFAULT 0,
-    updated_at       INTEGER NOT NULL DEFAULT 0,
-    post_id          TEXT    NOT NULL DEFAULT '',
-    friend_id        TEXT    NOT NULL DEFAULT '',
-    content          TEXT    NOT NULL DEFAULT ''
+    id         TEXT PRIMARY KEY,
+    created_at INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL DEFAULT 0,
+    post_id    TEXT    NOT NULL DEFAULT '',
+    friend_id  TEXT    NOT NULL DEFAULT '',
+    content    TEXT    NOT NULL DEFAULT ''
 );
