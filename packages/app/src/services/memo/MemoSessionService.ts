@@ -26,3 +26,14 @@ export function completeMemoSession(id: string) {
       status: 'done',
     })
 }
+
+/**
+ * 统计伙伴的聊天次数
+ * @param friendId 伙伴
+ * @returns 聊天次数
+ */
+export function countMemoSession(friendId: string) {
+  return useSql().query<MemoSession>('memo_session')
+    .eq('friend_id', friendId)
+    .count();
+}

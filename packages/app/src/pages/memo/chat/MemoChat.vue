@@ -124,7 +124,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getMemoSession, listMemoMessage } from "@/services/memo";
+import {completeMemoFriendSession, getMemoSession, listMemoMessage} from "@/services/memo";
 import { completeMemoSession } from "@/services/memo/MemoSessionService.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import { useMemoFriendStore } from "@/store";
@@ -303,7 +303,11 @@ async function handleEndChat() {
 
     if (session.value) {
       await completeMemoSession(session.value.id);
+      await completeMemoFriendSession(friend.value.id);
+      // 刷新 session 信息
       await useMemoFriendStore().loadChatSession();
+      // 刷新朋友信息
+      await useMemoFriendStore().loadFriends();
     }
   } catch (error) {
     console.error('总结失败:', error);
