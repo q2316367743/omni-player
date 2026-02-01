@@ -56,12 +56,3 @@ export function updateMemoPost(id: string, data: Partial<MemoPostCore>) {
       updated_at: Date.now()
     });
 }
-
-
-// AI 基于关键字触发
-
-// 基于时间检测触发
-
-// 基于特殊事件触发
-
-// 用户主动发送

@@ -90,6 +90,7 @@
 <script lang="ts" setup>
 import {pageMemoPost, updateMemoPost} from "@/services/memo/MemoPostService.ts";
 import {listMemoFriend} from "@/services/memo/MemoFriendService.ts";
+import {addMemoPostComment, listMemoPostComment} from "@/services/memo/MemoPostCommentService.ts";
 import {prettyBetweenTime} from "@/util/lang/FormatUtil.ts";
 import {captureMoment, previewMomentImage} from "@/util/share.ts";
 import type {MemoPostView} from "@/services/memo/MemoPostService.ts";
@@ -220,15 +221,30 @@ const handleShareMoment = async (moment: Moment) => {
   }
 }
 
-const postComment = (moment: Moment) => {
+const postComment = async (moment: Moment) => {
   if (!newComment.value.trim()) return
 
-  moment.comments.push({
-    id: Date.now().toString(),
-    author: '我',
-    content: newComment.value
-  })
-  newComment.value = ''
+  try {
+    await addMemoPostComment({
+      post_id: moment.id,
+      friend_id: '',
+      content: newComment.value
+    })
+
+    const comments = await listMemoPostComment(moment.id)
+    moment.comments = comments.map(comment => {
+      const commentFriend = comment.friend_id ? friendMap.value.get(comment.friend_id) : null
+      return {
+        id: comment.id,
+        author: commentFriend?.name || '我',
+        content: comment.content
+      }
+    })
+
+    newComment.value = ''
+  } catch (error) {
+    console.error('Failed to post comment:', error)
+  }
 }
 
 onMounted(() => {

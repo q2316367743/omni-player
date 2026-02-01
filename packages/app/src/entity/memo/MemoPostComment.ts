@@ -1,9 +1,7 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 
-/**
- * 评论
- */
-export interface MemoPostComment extends BaseEntity {
+export interface MemoPostCommentCore {
+
   post_id: string;
   /**
    * 朋友 ID，如果为空则代表是用户
@@ -14,5 +12,11 @@ export interface MemoPostComment extends BaseEntity {
    * 内容
    */
   content: string;
+}
+
+/**
+ * 评论
+ */
+export interface MemoPostComment extends BaseEntity, MemoPostCommentCore {
 
 }
