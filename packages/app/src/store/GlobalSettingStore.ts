@@ -4,10 +4,12 @@ import {buildGlobalSetting} from "@/entity/setting/GlobalSetting.ts";
 import {buildAiSetting} from "@/entity/setting/AiSetting.ts";
 import OpenAI from "openai";
 import {getTauriFetch} from "@/lib/http.ts";
+import {buildUserSetting} from "@/entity/setting/UserSetting.ts";
 
 export const useSettingStore = defineStore("setting", () => {
   const globalSetting = useLocalStorage(LocalName.KEY_SETTING_GLOBAL, buildGlobalSetting());
   const aiSetting = useLocalStorage(LocalName.KEY_SETTING_AI, buildAiSetting());
+  const userSetting = useLocalStorage(LocalName.KEY_SETTING_USER, buildUserSetting());
 
   const rssRefreshInterval = computed(() => {
     if (!globalSetting.value.rssRefreshInterval) return 15;
@@ -52,6 +54,7 @@ export const useSettingStore = defineStore("setting", () => {
     modelOptions,
     aiEnabled,
     defaultChatModel,
+    userSetting,
     createAiClient,
     supportThink
   }

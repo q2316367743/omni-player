@@ -20,6 +20,9 @@ export const LocalName = {
   // AI设置
   KEY_SETTING_AI: '/key/setting/ai',
 
+  // 用户设置
+  KEY_SETTING_USER: '/key/setting/user',
+
   // 订阅收起
   STORE_SUBSCRIBE_COLLAPSED: '/store/subscribe/collapsed',
 
