@@ -405,6 +405,17 @@ export function getPostingStyleText(style: MemoFriendPostingStyle): string {
   return map[style];
 }
 
+export function getPostingStyleDescription(style: MemoFriendPostingStyle): string {
+  const map: Record<MemoFriendPostingStyle, string> = {
+    encouraging: '温暖、积极、给予支持和力量，用正能量回应',
+    teasing: '幽默、轻松、带点小调皮，用玩笑的方式互动',
+    observational: '客观、冷静、有洞察力，从不同角度观察和思考',
+    poetic: '文艺、优美、富有想象力，用诗意的语言表达情感',
+    sarcastic: '犀利、反讽、带点黑色幽默，用反讽的方式表达观点'
+  };
+  return map[style];
+}
+
 export function getRelationText(relation: MemoFriendRelation): string {
   const map: Record<MemoFriendRelation, string> = {
     friend: '朋友',

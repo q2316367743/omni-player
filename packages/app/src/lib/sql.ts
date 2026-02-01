@@ -56,7 +56,9 @@ export type TableName =
   | 'memo_friend'
   | 'memo_session'
   | 'memo_message'
-  | 'memo_chat_summary';
+  | 'memo_chat_summary'
+  | 'memo_post'
+  | 'memo_post_comment';
 
 export class SqlWrapper {
 
@@ -66,9 +68,9 @@ export class SqlWrapper {
     // 将新的 SQL 调用追加到 Promise 链尾部
     if (this.db) return this.db;
     const path = await APP_DATA_DB_PATH();
-    logInfo("db path: ", path)
+    logInfo("[sql] db path: ", path)
     this.db = await Database.load(`sqlite:${path}`);
-    logInfo("db init success", this.db);
+    logInfo("[sql] db init success", this.db);
     return this.db;
   }
 
@@ -102,19 +104,19 @@ export class SqlWrapper {
   // 开启一个事务
   async beginTransaction<T = any>(callback: (sql: SqlWrapper) => Promise<T>): Promise<T> {
     try {
-      logDebug("begin transaction")
+      logDebug("[sql] begin transaction")
       await this.db!.execute(`BEGIN`);
       const r = await callback(this);
-      logDebug("commit transaction")
+      logDebug("[sql] commit transaction")
       await this.db!.execute(`COMMIT`);
       return r;
     } catch (e) {
-      logError("rollback transaction")
+      logError("[sql] rollback transaction")
       console.error(e)
       try {
         await this.db!.execute(`ROLLBACK`);
       } catch (err) {
-        logError("回滚失败");
+        logError("[sql] 回滚失败");
         console.error(err)
       }
       throw e;
@@ -146,21 +148,21 @@ export class SqlWrapper {
     // 获取 db
     await this.getDb();
 // 1. 检查 schema_version 表是否存在
-    logInfo("1. 检查 schema_version 表是否存在");
+    logInfo("[sql] 1. 检查 schema_version 表是否存在");
     const rows = await this.select<Array<{
       name: string
     }>>("SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version';");
     if (!rows || !rows.length) {
-      logInfo("表不存在，创建 schema_version 表");
+      logInfo("[sql] 表不存在，创建 schema_version 表");
       await this.execute("CREATE TABLE schema_version (version int PRIMARY KEY,applied_at DATETIME DEFAULT CURRENT_TIMESTAMP);");
     } else {
-      logInfo("表已存在，跳过创建");
+      logInfo("[sql] 表已存在，跳过创建");
     }
 
     // 2. 获取当前版本
-    logInfo("2. 获取当前版本");
+    logInfo("[sql] 2. 获取当前版本");
     const current = await this.getLatestVersion();
-    logInfo("当前版本: ", current);
+    logInfo("[sql] 当前版本: ", current);
     const pending = DB_MIGRATE_FILES
       .filter((m) => m.version > current)
       .sort((a, b) => a.version - b.version);
@@ -168,20 +170,20 @@ export class SqlWrapper {
     for (const {file, version} of pending) {
       const resourcePath = await resolveResource(file);
       const sql = await readTextFile(resourcePath);
-      logInfo("开始处理文件：", file, ",版本：", version);
+      logInfo("[sql] 开始处理文件：", file, ",版本：", version);
       await this.execute("BEGIN");
       try {
-        logInfo("执行sql文件");
+        logInfo("[sql] 执行sql文件");
         await this.execute(sql);
-        logInfo("插入版本");
+        logInfo("[sql] 插入版本");
         await this.execute(`INSERT INTO schema_version(version)
                             VALUES (${generatePlaceholders(1)})`, [version]);
-        logInfo("提交事务");
+        logInfo("[sql] 提交事务");
         await this.execute("COMMIT");
-        logInfo(`✅ migration ${file} applied`);
+        logInfo(`[sql] ✅ migration ${file} applied`);
       } catch (e) {
         await this.execute("ROLLBACK");
-        logError(`❌ migration ${file} failed`, e);
+        logError(`[sql] ❌ migration ${file} failed`, e);
         throw e;
       }
     }

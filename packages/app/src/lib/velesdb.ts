@@ -5,7 +5,7 @@ import {
   type PointInput, textSearch,
   upsert
 } from "@wiscale/tauri-plugin-velesdb";
-import {logError} from "@/lib/log.ts";
+import {logError, logInfo} from "@/lib/log.ts";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 
 interface VelesdbChunkPayload extends Record<string, any>{
@@ -95,6 +95,10 @@ class VelesdbWrap {
 }
 
 const memoVelesdb = new VelesdbWrap('memo');
+
+memoVelesdb.getVelesdb()
+  .then(() => logInfo("初始化 velesdb 成功"))
+  .catch(e => logError("初始化 velesdb 失败", e));
 
 export const useMemoVelesdb = () => {
   return memoVelesdb;

@@ -31,26 +31,26 @@ export class BaseMapper<T extends TableLike> {
     }
     const sql = `update ${this.tableName} set ${query.join(", ")} where id = ${generatePlaceholders(1, values.length)}`;
     const val = [...values, id];
-    logDebug("update sql:\t\t" + sql);
-    logDebug("update values:\t" + val);
+    logDebug("[sql] update sql:\t\t" + sql);
+    logDebug("[sql] update values:\t" + val);
     const r = await this.db.execute(sql, val);
-    logDebug("update result:\t" + r.rowsAffected);
+    logDebug("[sql] update result:\t" + r.rowsAffected);
   }
 
   async deleteById(id: string) {
     const sql = `delete from ${this.tableName} where id = ${generatePlaceholders(1)}`;
-    logDebug("delete sql:\t\t" + sql);
-    logDebug("delete values:\t" + id);
+    logDebug("[sql] delete sql:\t\t" + sql);
+    logDebug("[sql] delete values:\t" + id);
     const r = await this.db.execute(sql, [id]);
-    logDebug("delete result:\t" + r.rowsAffected);
+    logDebug("[sql] delete result:\t" + r.rowsAffected);
   }
 
   async deleteByIds(ids: Array<string>) {
     const sql = `delete from ${this.tableName} where id in (${generatePlaceholders(ids.length)})`;
-    logDebug("delete sql:\t\t" + sql);
-    logDebug("delete values:\t" + ids.join(", "));
+    logDebug("[sql] delete sql:\t\t" + sql);
+    logDebug("[sql] delete values:\t" + ids.join(", "));
     const r = await this.db.execute(sql, ids);
-    logDebug("delete result:\t" + r.rowsAffected);
+    logDebug("[sql] delete result:\t" + r.rowsAffected);
   }
 
   async insert(params: Partial<Omit<T, "id">>): Promise<T> {
@@ -66,10 +66,10 @@ export class BaseMapper<T extends TableLike> {
     )}) values (${generatePlaceholders(query.length + 1)})`;
     const id = useSnowflake().nextId();
     values.unshift(id)
-    logDebug("insert sql:\t\t" + sql);
-    logDebug("insert values:\t" + JSON.stringify(values));
+    logDebug("[sql] insert sql:\t\t" + sql);
+    logDebug("[sql] insert values:\t" + JSON.stringify(values));
     const r = await this.db.execute(sql, values);
-    logDebug("insert result:\t" + r.rowsAffected);
+    logDebug("[sql] insert result:\t" + r.rowsAffected);
     return {
       ...params,
       id
@@ -110,11 +110,11 @@ export class BaseMapper<T extends TableLike> {
             ", "
     )}) values ${valuePlaceholders}`;
 
-    logDebug("insertBatch sql:\t" + sql);
-    logDebug("insertBatch values:\t" + JSON.stringify(allValues));
+    logDebug("[sql] insertBatch sql:\t" + sql);
+    logDebug("[sql] insertBatch values:\t" + JSON.stringify(allValues));
 
     const r = await this.db.execute(sql, allValues);
-    logDebug("insertBatch result:\t" + r.rowsAffected);
+    logDebug("[sql] insertBatch result:\t" + r.rowsAffected);
 
     return ids;
   }
@@ -129,9 +129,9 @@ export class BaseMapper<T extends TableLike> {
     const sql = `insert into ${this.tableName} (${query.join(
             ", "
     )}) values (${generatePlaceholders(query.length)})`;
-    logDebug("insert sql:\t\t" + sql);
-    logDebug("insert values:\t" + JSON.stringify(values));
+    logDebug("[sql] insert sql:\t\t" + sql);
+    logDebug("[sql] insert values:\t" + JSON.stringify(values));
     const r = await this.db.execute(sql, values);
-    logDebug("insert result:\t" + r.rowsAffected);
+    logDebug("[sql] insert result:\t" + r.rowsAffected);
   }
 }

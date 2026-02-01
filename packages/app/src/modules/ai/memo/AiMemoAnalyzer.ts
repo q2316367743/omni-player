@@ -17,6 +17,7 @@ import {
 import {MEMO_TOOL_SCHEMA} from "@/modules/ai/schema/MemoSchema.ts";
 import type {MemoLayerSource} from "@/entity/memo";
 import {formatDate} from "@/util/lang/FormatUtil.ts";
+import {logDebug} from "@/lib/log.ts";
 
 export interface AiMemoAnalyzerProp {
   memoContent: string;
@@ -25,6 +26,7 @@ export interface AiMemoAnalyzerProp {
 }
 
 export async function aiMemoAnalyzer(prop: AiMemoAnalyzerProp) {
+  logDebug('[AiMemoAnalyzer] 开始进行 memo 的 AI 分析')
   const {memoContent, source, sourceId} = prop;
 
   const [behaviors, emotions, cognitives, personas] = await Promise.all([
@@ -104,6 +106,7 @@ ${personas.length > 0 ? personas.map(p => `  [${p.id}] 特质:${p.trait_name}, �
     }
   ];
 
+  logDebug('[AiMemoAnalyzer] 开始调用 OpenAI API')
   const response = await openAi.chat?.completions.create({
     model: aiSetting.memoAnalyzerModel,
     messages: messages,
@@ -114,6 +117,7 @@ ${personas.length > 0 ? personas.map(p => `  [${p.id}] 特质:${p.trait_name}, �
 
   const toolCallsMap = new Map<number, OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall>();
 
+  logDebug('[AiMemoAnalyzer] 开始处理 OpenAI API 返回的流数据')
   for await (const chunk of response) {
     const toolCalls = chunk.choices[0]?.delta.tool_calls;
     if (!toolCalls) continue;
@@ -152,6 +156,8 @@ ${personas.length > 0 ? personas.map(p => `  [${p.id}] 特质:${p.trait_name}, �
       source: source,
       source_id: sourceId
     };
+
+    logDebug(`[Memo AI] 调用工具 ${functionName}`, functionArguments);
 
     switch (functionName) {
       case 'add_behavior':
@@ -236,4 +242,5 @@ ${personas.length > 0 ? personas.map(p => `  [${p.id}] 特质:${p.trait_name}, �
         break;
     }
   }
+  logDebug('[AiMemoAnalyzer] OpenAI API 调用结束')
 }

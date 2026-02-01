@@ -1,13 +1,7 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 
-/**
- * 朋友圈
- *
- * 1. 用户发完 memo，有几触发 ai 朋友圈
- * 2. 用户聊完天，产生了总结，有几率触发 ai 朋友圈
- * 3. 用户可以主动发朋友圈
- */
-export interface MemoPost extends BaseEntity {
+export interface MemoPostCore {
+
   // 发布人，如果不存在则代表用户发送
   friend_id: string;
   // 朋友圈内容，支持 md
@@ -30,4 +24,14 @@ export interface MemoPost extends BaseEntity {
    * 匹配到的关键字，只有 ai 自动发朋友圈时才有
    */
   trigger_keyword: string;
+}
+
+/**
+ * 朋友圈
+ *
+ * 1. 用户发完 memo，有几触发 ai 朋友圈
+ * 2. 用户聊完天，产生了总结，有几率触发 ai 朋友圈
+ * 3. 用户可以主动发朋友圈
+ */
+export interface MemoPost extends BaseEntity, MemoPostCore {
 }

@@ -7,3 +7,7 @@ export * from "./MemoLayerPersonaService.ts";
 export * from "./MemoSessionService.ts";
 export * from "./MemoMessageService.ts";
 export * from "./MemoChatSummaryService.ts";
+export * from "./MemoPostService.ts";
+
+export * from "./post/CreatePostByKeyword.ts";
+

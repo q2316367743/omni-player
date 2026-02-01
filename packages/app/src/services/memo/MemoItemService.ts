@@ -7,6 +7,9 @@ import {useMemoVelesdb} from "@/lib/velesdb.ts";
 import {aiMemoAnalyzer} from "@/modules/ai/memo/AiMemoAnalyzer.ts";
 import {useMemoFriendStore} from "@/store";
 import {aiMemoComment} from "@/modules/ai/memo/AiMemoComment.ts";
+import {createPostByKeyword} from "@/services/memo/post/CreatePostByKeyword.ts";
+import {logDebug, logError} from "@/lib/log.ts";
+import MessageUtil from "@/util/model/MessageUtil.ts";
 
 export interface MemoCommentView extends MemoComment {
   reply: Array<MemoComment>;
@@ -77,9 +80,11 @@ export interface MemoItemAdd extends MemoItemCore {
  * @param data
  */
 export async function addMemoService(data: MemoItemAdd) {
+  logDebug('[MemoItemService] 开始新增 memo', data.type);
   let now = Date.now();
   // 先分段
   const chunks = chunkMemo(data.content);
+  logDebug('[MemoItemService] memo 内容分段完成', chunks.length);
   // 1. 新增 memo
   const newMemo = await useSql().mapper<MemoItem>('memo_item').insert({
     type: data.type,
@@ -88,6 +93,7 @@ export async function addMemoService(data: MemoItemAdd) {
     created_at: now,
     updated_at: now,
   });
+  logDebug('[MemoItemService] 新增 memo 成功', newMemo.id);
   // 2. 进行分块
   let index = 0;
   const chunkDbs = new Array<MemoChunk>();
@@ -104,22 +110,30 @@ export async function addMemoService(data: MemoItemAdd) {
     now += 1;
     chunkDbs.push(res);
   }
+  logDebug('[MemoItemService] memo 分块插入完成', chunkDbs.length);
   if (data.type !== "normal") {
     // 如果不是 normal 的话，就不需要向量化了
+    logDebug('[MemoItemService] 非 normal 类型，跳过向量化', data.type);
     return;
   }
   // 4. 向量化，存储向量
-  await useMemoVelesdb().addChunkBatch(chunkDbs.map(e => ({
-    id: e.created_at,
-    content: e.content,
-    payload: {
-      id: e.id,
+  try {
+    await useMemoVelesdb().addChunkBatch(chunkDbs.map(e => ({
+      id: e.created_at,
       content: e.content,
-      memo_id: e.memo_id,
-    }
-  })))
+      payload: {
+        id: e.id,
+        content: e.content,
+        memo_id: e.memo_id,
+      }
+    })))
+    logDebug('[MemoItemService] memo 向量化完成', chunkDbs.length);
+  }catch (e) {
+    logError('[MemoItemService] memo 向量化失败', e);
+  }
   // 5. 使用 AI 进行处理
   if (data.type === "normal") {
+    logDebug('[MemoItemService] 开始 AI 分析 memo', newMemo.id);
     aiMemoAnalyzer({
       memoContent: data.content,
       sourceId: newMemo.id,
@@ -129,6 +143,7 @@ export async function addMemoService(data: MemoItemAdd) {
       useSql().mapper<MemoItem>('memo_item').updateById(newMemo.id, {
         consumed: 1
       })
+      logDebug('[MemoItemService] AI 分析完成', newMemo.id);
     });
   }
   // 6. 如果 @ 了 AI，需要 AI 进行回复
@@ -152,6 +167,16 @@ export async function addMemoService(data: MemoItemAdd) {
         })
       })
     })
+  }
+
+  // 7. 基于关键字触发 AI 朋友圈
+  if (data.type === "normal") {
+    createPostByKeyword(data)
+      .then(() => logDebug('[MemoItemService] 基于关键字触发 AI 朋友圈成功'))
+      .catch(e => {
+        logError('[MemoItemService] 基于关键字触发 AI 朋友圈失败', e);
+        MessageUtil.error('基于关键字触发 AI 朋友圈失败', e);
+      });
   }
 }
 

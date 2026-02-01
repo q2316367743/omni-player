@@ -28,7 +28,7 @@
     <div class="memo-actions">
       <t-button theme="primary" variant="text" @click="handleComment">
         <template #icon>
-          <chat-message-icon />
+          <chat-message-icon/>
         </template>
         {{ memo.comments }}
       </t-button>
@@ -39,6 +39,12 @@
           </template>
         </t-button>
         <t-dropdown-menu>
+          <t-dropdown-item @click="handleTrigger()">
+            <template #prefix-icon>
+              <bug-icon/>
+            </template>
+            朋友圈「关键字」
+          </t-dropdown-item>
           <t-dropdown-item theme="error" @click="handleDropdownClick()">
             <template #prefix-icon>
               <delete-icon/>
@@ -54,7 +60,10 @@
 <script lang="ts" setup>
 import type {Memo} from '../../types.ts'
 import MessageBoxUtil from '@/util/model/MessageBoxUtil.tsx'
-import {ChatMessageIcon, DeleteIcon, MoreIcon} from "tdesign-icons-vue-next";
+import {BugIcon, ChatMessageIcon, DeleteIcon, MoreIcon} from "tdesign-icons-vue-next";
+import {createPostByKeyword} from "@/services/memo";
+import {logDebug, logError} from "@/lib/log.ts";
+import MessageUtil from "@/util/model/MessageUtil.ts";
 
 interface Props {
   memo: Memo
@@ -68,7 +77,6 @@ const emit = defineEmits<{
 }>()
 
 
-
 const handleDropdownClick = () => {
   MessageBoxUtil.confirm('确定要删除这条 memo 吗？', '确认删除').then(() => {
     emit('confirmDelete', props.memo)
@@ -79,6 +87,20 @@ const handleDropdownClick = () => {
 
 const handleComment = () => {
   emit('comment', props.memo)
+}
+
+const handleTrigger = () => {
+  createPostByKeyword({
+    type: 'normal',
+    friend_ids: '[]',
+    content: props.memo.content,
+    consumed: 1
+  })
+    .then(() => logDebug('[MemoItemService] 基于关键字触发 AI 朋友圈成功'))
+    .catch(e => {
+      logError('[MemoItemService] 基于关键字触发 AI 朋友圈失败', e);
+      MessageUtil.error('基于关键字触发 AI 朋友圈失败', e);
+    });
 }
 </script>
 

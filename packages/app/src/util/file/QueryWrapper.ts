@@ -140,10 +140,10 @@ export class QueryChain<T extends Record<string, any>, K extends keyof T = keyof
 
   async execQuery(db: SqlWrapper) {
     const sql = this.getSql();
-    logDebug("select sql\t\t:" + sql);
-    logDebug("select values\t:" + this.values);
+    logDebug("[sql] select sql\t\t:" + sql);
+    logDebug("[sql] select values\t:" + this.values);
     const list = await db.select<Array<T>>(sql, this.values);
-    logDebug("select result\t:" + list.length);
+    logDebug("[sql] select result\t:" + list.length);
     return list;
   }
 
@@ -172,10 +172,10 @@ export class QueryChain<T extends Record<string, any>, K extends keyof T = keyof
   async count(): Promise<number> {
     const sql = `select count(1) as \`total\`
                  from (${this.getSql()}) t`;
-    logDebug("select sql\t\t:" + sql);
-    logDebug("select values\t:" + this.values);
+    logDebug("[sql] select sql\t\t:" + sql);
+    logDebug("[sql] select values\t:" + this.values);
     const row = await this.db.select<Array<{ total: number }>>(sql, this.values);
-    logDebug("select result\t:" + stringifyJsonWithBigIntSupport(row));
+    logDebug("[sql] select result\t:" + stringifyJsonWithBigIntSupport(row));
     return row[0]!.total || 0;
   }
 
@@ -200,10 +200,10 @@ export class QueryChain<T extends Record<string, any>, K extends keyof T = keyof
     if (this.lastExpress.length > 0) {
       sql += " " + this.lastExpress.join(" ");
     }
-    logDebug("delete sql\t\t:" + sql);
-    logDebug("delete values\t:" + this.values);
+    logDebug("[sql] delete sql\t\t:" + sql);
+    logDebug("[sql] delete values\t:" + this.values);
     const r = await this.db.execute(sql, this.values);
-    logDebug("delete result:\t" + r.rowsAffected);
+    logDebug("[sql] delete result:\t" + r.rowsAffected);
   }
 
   async page(pageNum: number, pageSize: number): Promise<PageResponse<T>> {
