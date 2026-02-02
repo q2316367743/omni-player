@@ -32,12 +32,10 @@ export function openCreatePostDrawer(onSuccess?: () => void) {
         content: formData.value.content,
         media_urls: JSON.stringify(formData.value.media_urls),
         location: formData.value.location,
-        onFinally: () => {
-          MessageUtil.success('发布成功');
-          plugin.destroy?.();
-          onSuccess?.();
-        }
       });
+      MessageUtil.success('发布成功');
+      plugin.destroy?.();
+      onSuccess?.();
     } catch (error) {
       MessageUtil.error('发布失败', error);
     }

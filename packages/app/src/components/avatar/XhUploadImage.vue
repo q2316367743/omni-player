@@ -111,21 +111,30 @@ function removeImage(idx: number) {
 </script>
 
 <style scoped lang="less">
+@import "@/assets/style/monica.less";
+
 .xh-upload-image {
   .image-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: var(--monica-spacing-sm);
   }
 
   .image-item {
     position: relative;
-    border-radius: 8px;
+    border-radius: var(--monica-radius-md);
     overflow: hidden;
-    background-color: #f0f0f0;
+    background: var(--monica-warm-bg-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2px 8px var(--monica-shadow);
+    transition: all 0.2s ease;
+
+    &:hover {
+      box-shadow: 0 4px 16px var(--monica-shadow-strong);
+      transform: translateY(-2px);
+    }
 
     img {
       width: 100%;
@@ -139,14 +148,15 @@ function removeImage(idx: number) {
       right: 4px;
       width: 20px;
       height: 20px;
-      background-color: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.6);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       color: white;
-      transition: background-color 0.2s;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
       svg {
         width: 14px;
@@ -154,37 +164,53 @@ function removeImage(idx: number) {
       }
 
       &:hover {
-        background-color: rgba(0, 0, 0, 0.8);
+        background: var(--monica-coral);
+        transform: scale(1.1);
       }
     }
   }
 
   .upload-btn {
-    border: 2px dashed #d9d9d9;
-    border-radius: 8px;
+    border: 1px solid var(--monica-border);
+    border-radius: var(--monica-radius-md);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s;
-    color: #999;
-    background-color: #fafafa;
+    transition: all 0.2s ease;
+    color: var(--monica-text-tertiary);
+    background: var(--monica-warm-bg-secondary);
+    box-shadow: 0 2px 8px var(--monica-shadow);
 
     svg {
       width: 24px;
       height: 24px;
       margin-bottom: 4px;
+      color: var(--monica-text-tertiary);
+      transition: color 0.2s ease;
     }
 
     span {
-      font-size: 12px;
+      font-size: var(--monica-font-sm);
+      color: var(--monica-text-tertiary);
+      transition: color 0.2s ease;
     }
 
     &:hover {
-      border-color: #1890ff;
-      color: #1890ff;
-      background-color: #f0f9ff;
+      border-color: var(--monica-coral);
+      color: var(--monica-coral);
+      background: var(--monica-peach-light);
+      box-shadow: 0 4px 12px var(--monica-shadow-strong);
+      transform: translateY(-1px);
+
+      svg, span {
+        color: var(--monica-coral);
+      }
+    }
+
+    &:active {
+      transform: translateY(0);
     }
   }
 }

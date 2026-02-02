@@ -4,7 +4,7 @@
       <div class="memo-header">
         <div class="greeting">
           <span class="greeting-emoji">👋</span>
-          <span class="greeting-text">{{ greeting }},主人~</span>
+          <span class="greeting-text">{{ greeting }},{{ nickname }}~</span>
         </div>
         <div class="date-info">
           <span class="date-emoji">📅</span>
@@ -55,6 +55,7 @@ import type {MemoItemView} from '@/services/memo/MemoItemService.ts'
 import type {MemoFriendView} from '@/entity/memo'
 import type {Memo} from '../../types.ts'
 import {SettingIcon} from "tdesign-icons-vue-next";
+import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 
 const router = useRouter();
 
@@ -77,7 +78,9 @@ const todayMemos = ref<Memo[]>([])
 const loading = ref(false)
 const pageNum = ref(1)
 const pageSize = ref(20)
-const total = ref(0)
+const total = ref(0);
+
+const nickname = computed(() => useSettingStore().userSetting.nickname || '主人');
 
 const formatTime = (timestamp: number) => {
   const date = new Date(timestamp)

@@ -179,7 +179,7 @@ export interface MemoFriendStatic {
   age_exact: number;
 
   /**
-   * 昵称
+   * 如何称呼我
    */
   preferred_name: string;
 

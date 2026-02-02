@@ -12,7 +12,7 @@ export interface CreatePostByUserProp {
    * 朋友圈地理位置
    */
   location: string;
-  onFinally: () => void;
+  onFinally?: () => void;
 }
 
 export async function createPostByUser(prop: CreatePostByUserProp) {

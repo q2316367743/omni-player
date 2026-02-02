@@ -39,7 +39,11 @@
             </div>
             <div class="info-item">
               <span class="info-label">年龄</span>
-              <span class="info-value">{{ getAgeRangeText(friend.age_range) }}</span>
+              <span class="info-value">{{ getAgeRangeText(friend.age_range) }}{{ friend.age_exact ? `(${friend.age_exact}岁)` : '' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">如何称呼我</span>
+              <span class="info-value">{{ friend.preferred_name || '无' }}</span>
             </div>
             <div class="info-item">
               <span class="info-label">关系</span>
@@ -81,6 +85,10 @@
               <span class="info-label">知识盲区</span>
               <span class="info-value">{{ friend.knowledge_scope.blindspots.join('、') || '无' }}</span>
             </div>
+            <div class="info-item full-width">
+              <span class="info-label">禁忌话题</span>
+              <span class="info-value">{{ friend.taboo_topics.join('、') || '无' }}</span>
+            </div>
           </div>
         </div>
 
@@ -98,6 +106,40 @@
             <div class="param-item">
               <span class="param-label">主动性</span>
               <span class="param-value">{{ friend.proactivity_level }}/10</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4 class="section-title">朋友圈行为配置</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">发圈风格</span>
+              <span class="info-value">{{ getPostingStyleText(friend.posting_style) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">发圈周期</span>
+              <span class="info-value">{{ friend.autopost_interval_hours }}小时</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">每周上限</span>
+              <span class="info-value">{{ friend.max_posts_per_week }}条</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">活跃时段</span>
+              <span class="info-value">{{ friend.active_hours.start }}:00 - {{ friend.active_hours.end }}:00</span>
+            </div>
+            <div class="info-item full-width">
+              <span class="info-label">触发方式</span>
+              <span class="info-value">{{ getPostingTriggersText(friend.posting_triggers) }}</span>
+            </div>
+            <div class="info-item full-width">
+              <span class="info-label">触发关键词</span>
+              <span class="info-value">{{ friend.trigger_keywords.join('、') || '无' }}</span>
+            </div>
+            <div class="info-item full-width" v-if="friend.state_trigger_condition">
+              <span class="info-label">状态触发条件</span>
+              <span class="info-value">{{ getStateTriggerText(friend.state_trigger_condition) }}</span>
             </div>
           </div>
         </div>
@@ -135,8 +177,30 @@
               <span class="stat-value">{{ friend.conversation_frequency || '未知' }}</span>
             </div>
             <div class="stat-item">
+              <span class="stat-label">上次互动</span>
+              <span class="stat-value">{{ getTimeSinceLastInteraction(friend.last_interaction) }}</span>
+            </div>
+            <div class="stat-item">
               <span class="stat-label">未知memo</span>
               <span class="stat-value">{{ friend.unknown_memo_count }}</span>
+            </div>
+            <div class="stat-item full-width">
+              <span class="stat-label">已知memo分类</span>
+              <span class="stat-value">{{ friend.known_memo_categories.join('、') || '全部分类' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4 class="section-title">情绪状态</h4>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">当前情绪</span>
+              <span class="stat-value">{{ getMoodText(friend.current_mood) }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">情绪持续时间</span>
+              <span class="stat-value">{{ friend.mood_expires_at ? formatDate(friend.mood_expires_at) : '未设置' }}</span>
             </div>
           </div>
         </div>
@@ -165,7 +229,8 @@ import {
   getGenderText,
   getAgeRangeText,
   getRelationText,
-  moodToStatus
+  moodToStatus,
+  getPostingStyleText
 } from '@/entity/memo/MemoFriend'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
 import { useMemoFriendStore } from '@/store/MemoFriendStore'
@@ -190,6 +255,59 @@ async function handleAvatarUpdate(newAvatar: string) {
     ...props.friend,
     avatar: newAvatar
   })
+}
+
+function getPostingTriggersText(triggers: string[]): string {
+  const map: Record<string, string> = {
+    keyword: '关键词触发',
+    periodic: '定期触发',
+    state_based: '基于状态触发'
+  }
+  return triggers.map(t => map[t] || t).join('、') || '无'
+}
+
+function getStateTriggerText(condition: any): string {
+  if (!condition) return '无'
+  const operatorMap: Record<string, string> = {
+    '>': '大于',
+    '>=': '大于等于',
+    '=': '等于',
+    '<=': '小于等于',
+    '<': '小于',
+    '!=': '不等于'
+  }
+  return `${condition.trait} ${operatorMap[condition.operator] || condition.operator} ${condition.threshold}`
+}
+
+function getTimeSinceLastInteraction(lastInteraction: number): string {
+  if (!lastInteraction || lastInteraction <= 0) {
+    return '很久以前'
+  }
+
+  const now = Date.now()
+  let deltaMs = now - lastInteraction
+  if (deltaMs < 0) deltaMs = 0
+
+  const s = Math.floor(deltaMs / 1000)
+  if (s < 60) return '刚刚'
+
+  const m = Math.floor(s / 60)
+  if (m < 60) return `${m}分钟前`
+
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}小时前`
+
+  const d = Math.floor(h / 24)
+  if (d < 7) return `${d}天前`
+
+  const w = Math.floor(d / 7)
+  if (w < 5) return `${w}周前`
+
+  const mon = Math.floor(d / 30)
+  if (mon < 12) return `${mon}月前`
+
+  const y = Math.floor(d / 365)
+  return `${y}年前`
 }
 </script>
 
