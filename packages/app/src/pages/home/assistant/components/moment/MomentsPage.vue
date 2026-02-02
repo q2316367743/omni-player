@@ -96,7 +96,6 @@
 </template>
 
 <script lang="ts" setup>
-import {h} from 'vue'
 import {pageMemoPost, updateMemoPost} from "@/services/memo/MemoPostService.ts";
 import {listMemoFriend} from "@/services/memo/MemoFriendService.ts";
 import {addMemoPostComment, listMemoPostComment} from "@/services/memo/MemoPostCommentService.ts";
@@ -104,10 +103,7 @@ import {prettyBetweenTime} from "@/util/lang/FormatUtil.ts";
 import {captureMoment, previewMomentImage} from "@/util/share.ts";
 import type {MemoPostView} from "@/services/memo/MemoPostService.ts";
 import type {MemoFriend} from "@/entity/memo";
-import {DrawerPlugin, Form, FormItem, Input, Textarea} from "tdesign-vue-next";
-import XhUploadImage from "@/components/avatar/XhUploadImage.vue";
-import {createPostByUser} from "@/services/memo/post/CreatePostByUser.ts";
-import MessageUtil from "@/util/model/MessageUtil.ts";
+import {openCreatePostDrawer} from "./CreatePostDrawer.tsx";
 
 interface Moment {
   id: string
@@ -261,67 +257,9 @@ const postComment = async (moment: Moment) => {
 }
 
 const openCreatePost = () => {
-  const formData = ref({
-    content: '',
-    media_urls: [] as string[],
-    location: ''
-  })
-  
-  const plugin = DrawerPlugin({
-    header: '发布动态',
-    confirmBtn: '发布',
-    size: '600px',
-    default: () => h('div', { style: { padding: '24px' } }, [
-      h(Form, { data: formData.value }, () => [
-        h(FormItem, { label: '内容', labelAlign: 'top' }, () => [
-          h(Textarea, {
-            value: formData.value.content,
-            'onUpdate:value': (val: string) => { formData.value.content = val },
-            placeholder: '分享你的想法...',
-            autosize: { minRows: 4, maxRows: 8 },
-            maxlength: 500
-          })
-        ]),
-        h(FormItem, { label: '图片', labelAlign: 'top' }, () => [
-          h(XhUploadImage, {
-            modelValue: formData.value.media_urls,
-            'onUpdate:modelValue': (val: string[]) => { formData.value.media_urls = val },
-            size: 80,
-            maxCount: 9
-          })
-        ]),
-        h(FormItem, { label: '位置', labelAlign: 'top' }, () => [
-          h(Input, {
-            value: formData.value.location,
-            'onUpdate:value': (val: string) => { formData.value.location = val },
-            placeholder: '添加位置信息（可选）',
-            clearable: true
-          })
-        ])
-      ])
-    ]),
-    onConfirm: async () => {
-      if (!formData.value.content.trim() && formData.value.media_urls.length === 0) {
-        MessageUtil.warning('请输入内容或上传图片')
-        return
-      }
-      
-      try {
-        await createPostByUser({
-          content: formData.value.content,
-          media_urls: JSON.stringify(formData.value.media_urls),
-          location: formData.value.location,
-          onFinally: () => {
-            MessageUtil.success('发布成功')
-            plugin.destroy?.()
-            loadMoments(true)
-          }
-        })
-      } catch (error) {
-        MessageUtil.error('发布失败', error)
-      }
-    }
-  })
+  openCreatePostDrawer(() => {
+    loadMoments(true);
+  });
 }
 
 onMounted(() => {

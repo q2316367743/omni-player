@@ -6,6 +6,7 @@
 // biome-ignore lint: disable
 export {}
 declare global {
+  const DrawerPlugin: typeof import('tdesign-vue-next').DrawerPlugin
   const EffectScope: typeof import('vue').EffectScope
   const MessagePlugin: typeof import('tdesign-vue-next').MessagePlugin
   const asyncComputed: typeof import('@vueuse/core').asyncComputed
