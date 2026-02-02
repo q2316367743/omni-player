@@ -1,6 +1,6 @@
 <template>
-  <div class="partner-page" @scroll="handleScroll">
-    <div class="sticky-header" :class="{ 'scrolled': isScrolled }">
+  <div class="partner-page">
+    <div class="sticky-header">
       <h1 class="page-title">我的AI伙伴</h1>
       <p class="page-subtitle">选择一位伙伴，开始有趣的对话吧</p>
     </div>
@@ -34,7 +34,6 @@ import FriendDetail from './FriendDetail.vue'
 import FriendCard from './FriendCard.vue'
 
 const selectedPartner = ref<MemoFriendView>()
-const isScrolled = ref(false)
 
 const activeFriends = computed(() => {
   return useMemoFriendStore().friends.filter(f => f.is_active === 1)
@@ -46,11 +45,6 @@ const selectPartner = (partner: MemoFriendView) => {
 
 const closeDetail = () => {
   selectedPartner.value = undefined
-}
-
-const handleScroll = (e: Event) => {
-  const target = e.target as HTMLElement
-  isScrolled.value = target.scrollTop > 10
 }
 </script>
 

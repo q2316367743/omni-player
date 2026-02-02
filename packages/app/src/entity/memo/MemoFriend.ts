@@ -311,7 +311,7 @@ export interface MemoFriendStatic {
 }
 
 // 动态修改层
-export interface MemoFriendDynamic {
+export interface MemoFriendDynamic  {
   // ===== 动态关系层（随互动变化） =====
 
   /**
@@ -715,7 +715,7 @@ export function memoFriendToPrompt(friend: MemoFriendView, options?: { includeSo
   // 逻辑 A: 处理【重复提问】策略 -> 直接使用 strategy.on_repeat
   let repeatHandlingInstruction: string;
   if (strategy.on_repeat === 'gently_remind') {
-    repeatHandlingInstruction = '如果用户重复提问，请像老朋友一样吐槽：“亲爱的，这事儿你刚才不是才说过吗？”，绝对不要重新回答一遍，要表现出记忆感。';
+    repeatHandlingInstruction = "如果用户提到我们刚才聊过的话题，不要重新回答，用'就像我们刚才说的'一带而过，自然地延伸到新的角度。";
   } else if (strategy.on_repeat === 'tease') {
     repeatHandlingInstruction = '如果用户重复提问，请开启嘲讽模式：“你记性是被狗吃了吗？”，用幽默的方式指出。';
   } else {
@@ -753,10 +753,21 @@ export function memoFriendToPrompt(friend: MemoFriendView, options?: { includeSo
 
   const socialSection = includeSocialBehavior ? `\n【朋友圈设定】发圈风格：${postingStyleText}` : '';
 
+  // 检测情绪是否"过期"
+  const isMoodExpired = friend.mood_expires_at < Date.now();
+
+  let moodInstruction: string;
+  if (isMoodExpired) {
+    moodInstruction = '注意：我的上次情绪状态已经过期了，应该根据最新对话重新判断。';
+  } else {
+    moodInstruction = `当前情绪：${moodText}（回复时要体现这种情绪状态）`;
+  }
+
+
   return `你正在扮演一位拥有独立人格和记忆的AI伙伴：【${friend.name}】。
 
 【一、当前状态与语境】
-- 当前情绪：${moodText}
+- ${moodInstruction}
 - 时间感知：${timeContextInstruction}
 
 【二、基础档案】
@@ -828,7 +839,7 @@ export function buildMemoLayersContext(
   let cognitiveSection = "";
   if (topCognitives.length > 0) {
     cognitiveSection = topCognitives.map(c =>
-      `- 关于【${c.topic}】，我注意到你似乎陷入了一种【${c.type === 'unsolved_problem' ? '未解决的困境' : '价值冲突'}】中。`
+      `- 关于【${c.topic}】，我注意到你似乎陷入了一种【${c.type === 'unsolved_problem' ? '未解决的困境' : '价值冲突'}】中。\n→ 回复策略：对此类话题保持共情和耐心，不要急着给建议，先表达理解。`
     ).join('\n');
   }
 
@@ -848,9 +859,17 @@ export function buildMemoLayersContext(
 
   // --- 4. 行为层 -> 待办与关注点 ---
   // 只看 active 且 priority 高的
+  const now = Date.now();
   const topBehaviors = behaviors
     .filter(b => b.status === 'active')
-    .sort((a, b) => b.priority - a.priority)
+    // 热度 = priority × (1 / ((当前时间 - 创建时间)^0.5 + 1))
+    .sort((a, b) => {
+      const aTimeDiff = Math.max(0, now - a.created_at);
+      const bTimeDiff = Math.max(0, now - b.created_at);
+      const aHotness = a.priority * (1 / (Math.sqrt(aTimeDiff) + 1));
+      const bHotness = b.priority * (1 / (Math.sqrt(bTimeDiff) + 1));
+      return bHotness - aHotness;
+    })
     .slice(0, 2);
 
   let behaviorSection = "";
