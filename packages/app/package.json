@@ -40,7 +40,7 @@
     "@tauri-apps/plugin-updater": "~2",
     "@vueuse/core": "^14.1.0",
     "@vueuse/integrations": "^14.1.0",
-    "@wiscale/tauri-plugin-velesdb": "^1.1.1",
+    "@wiscale/tauri-plugin-velesdb": "^1.4.1",
     "@zumer/snapdom": "^2.0.1",
     "artplayer": "^5.3.0",
     "axios": "^1.13.2",

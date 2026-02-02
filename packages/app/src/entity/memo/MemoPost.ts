@@ -25,6 +25,9 @@ export interface MemoPostCore {
    * 匹配到的关键字，只有 ai 自动发朋友圈时才有
    */
   trigger_keyword: string;
+}
+
+export interface MemoPostUpdate extends MemoPostCore {
 
   /**
    * 是否喜欢
@@ -39,5 +42,6 @@ export interface MemoPostCore {
  * 2. 用户聊完天，产生了总结，有几率触发 ai 朋友圈
  * 3. 用户可以主动发朋友圈
  */
-export interface MemoPost extends BaseEntity, MemoPostCore {
+export interface MemoPost extends BaseEntity, MemoPostUpdate {
+
 }

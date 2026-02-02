@@ -48,7 +48,7 @@ pub fn run() {
             let app_data_dir = app.path().app_data_dir().expect("Failed to get app data dir");
             let velesdb_dir = app_data_dir.join("velesdb_data");
             std::fs::create_dir_all(&velesdb_dir).expect("Failed to create velesdb data directory");
-            app.handle().plugin(tauri_plugin_velesdb::init(velesdb_dir.to_str().unwrap()))?;
+            app.handle().plugin(tauri_plugin_velesdb::init_with_path(velesdb_dir.to_str().unwrap()))?;
 
             // 注册更新插件
             #[cfg(desktop)]

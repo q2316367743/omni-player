@@ -1,4 +1,4 @@
-import type {MemoPost, MemoPostComment, MemoPostCore} from "@/entity/memo";
+import type {MemoPost, MemoPostComment, MemoPostCore, MemoPostUpdate} from "@/entity/memo";
 import {useSql} from "@/lib/sql.ts";
 import type {PageResponse} from "@/global/PageResponse.ts";
 import {group} from "@/util";
@@ -44,12 +44,13 @@ export function createMemoPost(memoPost: MemoPostCore) {
   return useSql().mapper<MemoPost>('memo_post')
     .insert({
       ...memoPost,
+      is_like: 0,
       created_at: now,
       updated_at: now
     });
 }
 
-export function updateMemoPost(id: string, data: Partial<MemoPostCore>) {
+export function updateMemoPost(id: string, data: Partial<MemoPostUpdate>) {
   return useSql().mapper<MemoPost>('memo_post')
     .updateById(id, {
       ...data,

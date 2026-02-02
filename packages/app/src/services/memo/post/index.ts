@@ -4,3 +4,4 @@ export * from "./CreatePostByKeyword.ts";
 // 基于特殊事件触发
 
 // 由于朋友圈存在关键字，所以进行了评论
+export * from "./CreatePostComment.ts";

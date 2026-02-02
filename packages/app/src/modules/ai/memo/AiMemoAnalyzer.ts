@@ -45,11 +45,18 @@ export async function aiMemoAnalyzer(prop: AiMemoAnalyzerProp) {
 
   const now = Date.now();
 
+  const sourceTypeLabel = source === 'memo' ? '备忘录' : '朋友圈';
+  const sourceTypeDescription = source === 'memo' 
+    ? '备忘录是用户记录的个人想法、待办事项、感悟等私密内容'
+    : '朋友圈是用户分享的公开内容，可能包含生活动态、观点表达、社交互动等';
+
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     {
       role: "system",
       content:
-        `你是一个专业的心理分析助手，负责分析用户的 memo 内容并更新其四层心理模型。
+        `你是一个专业的心理分析助手，负责分析用户的${sourceTypeLabel}内容并更新其四层心理模型。
+
+${sourceTypeDescription}
 
 四层心理模型说明：
 1. 行为层（7-14天有效期）：待办事项、习惯线索、社交意图、回避行为、寻求行为
@@ -68,7 +75,8 @@ export async function aiMemoAnalyzer(prop: AiMemoAnalyzerProp) {
 8. update_persona - 更新现有的人格层记录
 
 重要规则：
-- 仔细分析 memo 内容，识别其中的行为、情绪、认知和人格特质信息
+- 仔细分析${sourceTypeLabel}内容，识别其中的行为、情绪、认知和人格特质信息
+- ${source === 'post' ? '朋友圈内容通常包含社交分享、生活动态、观点表达等，需要特别关注社交意图、情绪表达、价值观展示等方面' : '备忘录内容通常包含个人想法、待办事项、感悟等，需要特别关注行为意图、情绪状态、认知模式等方面'}
 - 优先更新现有记录（如果相关），再考虑添加新记录
 - 根据各层的有效期特点设置合适的 expire_at 时间戳
   * 行为层：7-14天（now + 7*24*60*60*1000 到 now + 14*24*60*60*1000）
@@ -79,7 +87,7 @@ export async function aiMemoAnalyzer(prop: AiMemoAnalyzerProp) {
 - 优先级、重要性、强度等数值范围为 0-9
 - 置信度范围为 0-99
 - delta 和 baseline_trait 范围为 0-100
-- 如果 memo 中没有相关信息，可以不调用任何工具`
+- 如果${sourceTypeLabel}中没有相关信息，可以不调用任何工具`
     },
     {
       role: "user",
@@ -87,7 +95,7 @@ export async function aiMemoAnalyzer(prop: AiMemoAnalyzerProp) {
         `【当前时间】
 ${formatDate(now)}
 
-【Memo 内容】
+【${sourceTypeLabel}内容】
 ${memoContent}
 
 【现有行为层记录】
@@ -102,7 +110,7 @@ ${cognitives.length > 0 ? cognitives.map(c => `  [${c.id}] 话题:${c.topic}, �
 【现有人格层记录】
 ${personas.length > 0 ? personas.map(p => `  [${p.id}] 特质:${p.trait_name}, 变化量:${p.delta}, 基线:${p.baseline_trait}, 置信度:${p.confidence}`).join("\n") : "  无"}
 
-请根据以上信息，分析 memo 内容并调用相应的工具更新四层心理模型。`
+请根据以上信息，分析${sourceTypeLabel}内容并调用相应的工具更新四层心理模型。`
     }
   ];
 

@@ -1,1 +1,1 @@
-export type MemoLayerSource = 'memo' | 'chat';
+export type MemoLayerSource = 'memo' | 'chat' | 'post';

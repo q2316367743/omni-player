@@ -32,7 +32,7 @@ tauri-plugin-shell = "2"
 tauri-plugin-store = "2"
 tauri-plugin-clipboard-manager = "2.3.2"
 
-tauri-plugin-velesdb = "0.1"
+tauri-plugin-velesdb = "1.1.1"
 
 [dependencies.tauri-plugin-sql]
 features = ["sqlite"] # or "postgres", or "mysql"

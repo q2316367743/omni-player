@@ -95,6 +95,7 @@ declare module 'vue' {
     UtoolsWebview: typeof import('./src/components/webview/UtoolsWebview.vue')['default']
     VerticalSplitPanel: typeof import('./src/components/common/VerticalSplitPanel.vue')['default']
     XhAvatar: typeof import('./src/components/avatar/XhAvatar.vue')['default']
+    XhUploadImage: typeof import('./src/components/avatar/XhUploadImage.vue')['default']
   }
 }
 
@@ -183,4 +184,5 @@ declare global {
   const UtoolsWebview: typeof import('./src/components/webview/UtoolsWebview.vue')['default']
   const VerticalSplitPanel: typeof import('./src/components/common/VerticalSplitPanel.vue')['default']
   const XhAvatar: typeof import('./src/components/avatar/XhAvatar.vue')['default']
+  const XhUploadImage: typeof import('./src/components/avatar/XhUploadImage.vue')['default']
 }
