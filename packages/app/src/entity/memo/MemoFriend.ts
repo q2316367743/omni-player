@@ -178,6 +178,11 @@ export interface MemoFriendStatic {
    */
   age_exact: number;
 
+  /**
+   * 昵称
+   */
+  preferred_name: string;
+
   // ===== 三维身份定位 =====
 
   /**
@@ -340,13 +345,6 @@ export interface MemoFriendDynamic {
    * 关系里程碑（JSON记录关键事件）
    */
   relationship_milestones: string;
-
-  /**
-   * 距离上次互动的描述（自然语言，由后端计算好）
-   * 例如："3天前"、"1个月前"、"刚刚"
-   * 直接喂给AI，让它产生"好久不见"或"你又来了"的感觉
-   */
-  time_since_last_interaction: string;
 
   // ===== 已知信息边界（隐私控制） =====
 
@@ -587,6 +585,7 @@ export interface MemoFriendStaticView {
   avatar: string;
   model: string;
   name: string;
+  preferred_name: string;
   gender: MemoFriendGender;
   age_range: MemoFriendAgeRange;
   age_exact: number;
@@ -620,7 +619,6 @@ export interface MemoFriendDynamicView {
   last_interaction: number;
   conversation_frequency: string;
   relationship_milestones: MemoFriendMilestone[];
-  time_since_last_interaction: string;
   known_memo_categories: string[];
   unknown_memo_count: number;
   current_mood: MemoFriendMood;
@@ -653,6 +651,43 @@ export function memoFriendToMemoFriendView(friend: MemoFriend): MemoFriendView {
   };
 }
 
+/**
+ * 获取时间间隔文本
+ * @param last_interaction 上次对话的时间戳
+ * @returns {string} 时间间隔文本，易于理解，例如刚刚，1分钟前，1小时前，1天前，1周前，1个月前，1年前
+ */
+function getTimeSinceLastInteraction(last_interaction: number): string {
+  // If no previous interaction recorded, return a placeholder indicating no recent interaction
+  if (!last_interaction || last_interaction <= 0) {
+    return '很久以前';
+  }
+
+  const now = Date.now();
+  let deltaMs = now - last_interaction;
+  if (deltaMs < 0) deltaMs = 0;
+
+  const s = Math.floor(deltaMs / 1000);
+  if (s < 60) return '刚刚';
+
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}分钟前`;
+
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}小时前`;
+
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d}天前`;
+
+  const w = Math.floor(d / 7);
+  if (w < 5) return `${w}周前`;
+
+  const mon = Math.floor(d / 30);
+  if (mon < 12) return `${mon}月前`;
+
+  const y = Math.floor(d / 365);
+  return `${y}年前`;
+}
+
 export function memoFriendToPrompt(friend: MemoFriendView, options?: { includeSocialBehavior?: boolean }): string {
   const {includeSocialBehavior = false} = options || {};
 
@@ -664,7 +699,8 @@ export function memoFriendToPrompt(friend: MemoFriendView, options?: { includeSo
 
   // 解析新增字段 (如果没有传，给默认值，保证逻辑不崩)
   const strategy = friend.conversation_strategy || {on_repeat: 'ignore', on_context_jump: 'answer_directly'};
-  const timeGapText = friend.time_since_last_interaction || '刚刚';
+  // 基于上次聊天时间计算
+  const timeGapText = getTimeSinceLastInteraction(friend.last_interaction);
 
   // 辅助文本函数调用
   const ageRangeText = getAgeRangeText(friend.age_range);
@@ -829,8 +865,7 @@ export function buildMemoLayersContext(
     return "";
   }
 
-  return `
-【你对我的深层观察】(基于最近的互动)
+  return `【你对我的深层观察】(基于最近的互动)
 ${emotionSection ? `【情绪感知】\n${emotionSection}\n` : ''}
 ${cognitiveSection ? `【核心关注】\n${cognitiveSection}\n` : ''}
 ${personaSection ? `【人格变化】\n${personaSection}\n` : ''}

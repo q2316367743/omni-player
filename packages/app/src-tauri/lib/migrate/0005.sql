@@ -59,13 +59,12 @@ CREATE TABLE memo_friend
 
     -- 名称
     name                    TEXT    NOT NULL DEFAULT '',
-
+    -- 昵称
+    preferred_name          TEXT    NOT NULL DEFAULT '',
     -- 性别
     gender                  TEXT    NOT NULL DEFAULT 'unknown',
-
     -- 心里年龄
     age_range               TEXT    NOT NULL DEFAULT 'young',
-
     -- 具体年龄，可选
     age_exact               INTEGER NOT NULL DEFAULT 0,
 
@@ -112,6 +111,9 @@ CREATE TABLE memo_friend
 
     -- 主动性（影响发朋友圈频率）
     proactivity_level       INTEGER NOT NULL DEFAULT 5,
+
+    -- 对话策略
+    conversation_strategy   TEXT    NOT NULL DEFAULT '',
 
     -- ===== 动态关系层（随互动变化） =====
 

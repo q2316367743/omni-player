@@ -33,6 +33,8 @@ export async function aiMemoChat(props: AiMemoChatProp) {
 
   // 获取 AI 的提示词
   const prompt = memoFriendToPrompt(friend);
+  // 获取我的提示词
+  const userPrompt = useSettingStore().userPrompt(friend);
   // 获取 rag 内容
   const rags = await useMemoVelesdb().query(chat);
   // 获取人格信息
@@ -64,6 +66,8 @@ export async function aiMemoChat(props: AiMemoChatProp) {
 
   // 构建背景上下文
   const backgroundContext = `本次会话主题：${sessionTopic}
+
+${userPrompt}
 
 ${buildMemoLayersContext(behaviors, cognitive, emotions, personas)}
 

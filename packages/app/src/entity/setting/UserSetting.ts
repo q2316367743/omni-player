@@ -1,3 +1,5 @@
+import type {MemoFriendView} from "@/entity/memo";
+
 export interface UserSetting {
   // 头像
   avatar: string;
@@ -17,6 +19,10 @@ export interface UserSetting {
   hobbies: Array<string>;
   // 个人简介
   bio: string;
+  // 社交关系
+  relationship_status: string;
+  // MBTI
+  mbti: string;
 }
 
 export function buildUserSetting(): UserSetting {
@@ -29,6 +35,21 @@ export function buildUserSetting(): UserSetting {
     city: '',
     hobbies: [],
     bio: '',
-    home: ''
+    home: '',
+    relationship_status: '',
+    mbti: ''
   }
+}
+
+export function userToPrompt(user: UserSetting, friend?: MemoFriendView) {
+  let name: string;
+  if (friend?.preferred_name) {
+    name = `我的名字叫[${user.nickname}]，你可以称呼我为[${friend.preferred_name}]`
+  }else {
+    name = `我的名字叫[${user.nickname}]`
+  }
+  return `【我的基本档案】
+- 称呼：${name}。
+- 社会状态：${user.relationship_status || '未知'}
+- MBTI：${user.mbti || '未知'}`;
 }
