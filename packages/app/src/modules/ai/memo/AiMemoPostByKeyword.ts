@@ -58,7 +58,7 @@ ${memo.content}
       model: friend.model,
       messages,
       stream: true,
-      ...({thinking: {type: 'disabled'}})
+      ...useSettingStore().disableThinkParam(friend.model)
     });
 
     const res = new Array<string>();

@@ -103,6 +103,10 @@
     &.assistant {
       flex-direction: row;
     }
+
+    &.error {
+      flex-direction: row;
+    }
   }
 
   .message-avatar {
@@ -164,6 +168,16 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
     }
+
+    &.error {
+      .message-bubble {
+        background: #fee2e2;
+        color: #dc2626;
+        border-radius: var(--monica-radius-sm) var(--monica-radius-xl) var(--monica-radius-xl) var(--monica-radius-xl);
+        border: 1px solid #fecaca;
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
+      }
+    }
   }
 
   .message-time {
@@ -177,6 +191,10 @@
   }
 
   .message-wrapper.assistant .message-time {
+    text-align: left;
+  }
+
+  .message-wrapper.error .message-time {
     text-align: left;
   }
 

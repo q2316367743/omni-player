@@ -47,6 +47,13 @@ export const useSettingStore = defineStore("setting", () => {
     });
   }
 
+  const disableThinkParam = (model: string) => {
+    if (supportThink(model)) {
+      return {thinking: {type: 'disabled'}}
+    }
+    return {};
+  }
+
   return {
     globalSetting,
     aiSetting,
@@ -57,6 +64,7 @@ export const useSettingStore = defineStore("setting", () => {
     userSetting,
     userPrompt,
     createAiClient,
-    supportThink
+    supportThink,
+    disableThinkParam
   }
 })

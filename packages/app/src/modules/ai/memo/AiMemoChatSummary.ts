@@ -108,7 +108,7 @@ ${chatContent}
     tool_choice: "auto",
     stream: true,
     // 禁用思考
-    ...({thinking: {type: 'disabled'}})
+    ...useSettingStore().disableThinkParam(friend.model)
   });
 
   if (!response) {

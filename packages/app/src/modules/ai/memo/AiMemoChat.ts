@@ -118,7 +118,7 @@ ${formatDate(new Date())}
     // temperature: assistant.temperature,
     // top_p: assistant.topP,
     // 禁用思考
-    ...({thinking: {type: 'disabled'}})
+    ...useSettingStore().disableThinkParam(friend.model)
   });
   await onStart?.();
   onAborted(response.controller);

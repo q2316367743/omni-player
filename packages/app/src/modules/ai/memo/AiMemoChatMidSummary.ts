@@ -69,7 +69,7 @@ ${chatContent}
     messages: messagesForAI,
     stream: false,
     // 禁用思考
-    ...({thinking: {type: 'disabled'}})
+    ...useSettingStore().disableThinkParam(friend.model)
   });
 
   if (!response || !response.choices || response.choices.length === 0) {

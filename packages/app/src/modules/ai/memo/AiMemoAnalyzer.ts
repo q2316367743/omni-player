@@ -120,7 +120,8 @@ ${personas.length > 0 ? personas.map(p => `  [${p.id}] 特质:${p.trait_name}, �
     messages: messages,
     tools: MEMO_TOOL_SCHEMA,
     tool_choice: "auto",
-    stream: true
+    stream: true,
+    ...useSettingStore().disableThinkParam(aiSetting.memoAnalyzerModel)
   });
 
   const toolCallsMap = new Map<number, OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall>();

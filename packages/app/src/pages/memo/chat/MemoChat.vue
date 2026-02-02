@@ -85,8 +85,11 @@
           <div v-if="msg.role === 'user'" class="message-avatar">
             <XhAvatar value="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=user%20avatar%20profile%20picture&image_size=square" alt="avatar" class="avatar" />
           </div>
+          <div v-if="msg.role === 'error'" class="message-avatar">
+            <XhAvatar value="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=error%20icon%20red%20warning&image_size=square" alt="avatar" class="avatar" />
+          </div>
           <div class="message-content-wrapper">
-            <div class="message">
+            <div class="message" :class="msg.role">
               <div class="message-bubble monica-card">
                 <MarkdownPreview :content="msg.content" />
               </div>
@@ -253,7 +256,24 @@ async function handleSend() {
       },
       onError: async (e) => {
         logError('[MemoChat] AI 回复错误', e);
-        MessageUtil.error('聊天出错，请重试');
+        const errorMessage = e?.message || '聊天出错，请重试';
+        MessageUtil.error(errorMessage);
+        const errorCreatedAt = Date.now();
+        const errorMessageObj: MemoMessage = {
+          id: (Date.now() + 2).toString(),
+          session_id: session.value!.id,
+          role: 'error',
+          content: errorMessage,
+          created_at: errorCreatedAt,
+          updated_at: errorCreatedAt,
+        };
+        messages.value.push(errorMessageObj);
+        scrollToBottom(messagesContainer.value);
+        debouncedSaveMessage({
+          session_id: session.value!.id,
+          role: 'error',
+          content: errorMessage,
+        }, errorCreatedAt);
       },
       onFinally: async () => {
         isLoading.value = false;
@@ -385,7 +405,24 @@ onMounted(async () => {
           },
           onError: async (e) => {
             logError('[MemoChat] AI 问候错误', e);
-            MessageUtil.error('聊天出错，请重试', e);
+            const errorMessage = e?.message || '聊天出错，请重试';
+            MessageUtil.error(errorMessage);
+            const errorCreatedAt = Date.now();
+            const errorMessageObj: MemoMessage = {
+              id: (Date.now() + 2).toString(),
+              session_id: session.value!.id,
+              role: 'error',
+              content: errorMessage,
+              created_at: errorCreatedAt,
+              updated_at: errorCreatedAt,
+            };
+            messages.value.push(errorMessageObj);
+            scrollToBottom(messagesContainer.value);
+            debouncedSaveMessage({
+              session_id: session.value!.id,
+              role: 'error',
+              content: errorMessage,
+            }, errorCreatedAt);
           },
           onFinally: async () => {
             isLoading.value = false;
