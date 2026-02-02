@@ -1,4 +1,4 @@
-import {memoFriendToPrompt, type MemoFriendView, type MemoMessage} from "@/entity/memo";
+import {buildMemoLayersContext, memoFriendToPrompt, type MemoFriendView, type MemoMessage} from "@/entity/memo";
 import {useMemoVelesdb} from "@/lib/velesdb.ts";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 import type {AskToOpenAiAbort} from "@/modules/ai";
@@ -56,32 +56,6 @@ export async function aiMemoChat(props: AiMemoChatProp) {
   // 构建会话主题（从最近的消息中提取或使用默认值）
   const sessionTopic = "日常对话";
 
-  // 构建四层人格状态描述
-  const personalityStatus = [];
-
-  // 情绪状态
-  if (emotions && emotions.length > 0) {
-    const emotionStr = emotions.map(e => `${e.emotion_type}(${Math.round(e.intensity * 100 / 9)}/100)`).join(', ');
-    personalityStatus.push(`你的情绪：${emotionStr}`);
-  }
-
-  // 认知状态
-  if (cognitive && cognitive.length > 0) {
-    const cognitiveStr = cognitive.map(c => `${c.topic}(${Math.round(c.importance * 100 / 9)}/100)`).join(', ');
-    personalityStatus.push(`你的认知：${cognitiveStr}`);
-  }
-
-  // 行为状态
-  if (behaviors && behaviors.length > 0) {
-    const behaviorStr = behaviors.map(b => `${b.behavior}(${Math.round(b.priority * 100 / 9)}/100)`).join(', ');
-    personalityStatus.push(`你的行为：${behaviorStr}`);
-  }
-
-  // 人格特质
-  if (personas && personas.length > 0) {
-    const personaStr = personas.map(p => `${p.trait_name}(${Math.round((p.baseline_trait + p.delta) * 100 / 9)}/100)`).join(', ');
-    personalityStatus.push(`你的人格：${personaStr}`);
-  }
 
   // 构建 RAG 内容
   const ragContent = rags && rags.length > 0 ?
@@ -90,7 +64,8 @@ export async function aiMemoChat(props: AiMemoChatProp) {
 
   // 构建背景上下文
   const backgroundContext = `本次会话主题：${sessionTopic}
-${personalityStatus.join('\n')}
+
+${buildMemoLayersContext(behaviors, cognitive, emotions, personas)}
 
 相关记忆：
 ${ragContent}

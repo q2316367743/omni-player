@@ -60,3 +60,9 @@ export interface MemoLayerBehaviorCore {
  */
 export interface MemoLayerBehavior extends BaseEntity, MemoLayerBehaviorCore {
 }
+
+const map: Record<string, string> = {'todo': '待办', 'habit_cue': '习惯养成', 'avoidance': '回避'};
+
+export function getBehaviorTypeLabel(type: MemoLayerBehaviorType): string {
+  return map[type] || type;
+}

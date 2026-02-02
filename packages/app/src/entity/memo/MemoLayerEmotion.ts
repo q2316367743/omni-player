@@ -38,11 +38,8 @@ export interface MemoLayerEmotion extends BaseEntity {
 
   /**
    * 情绪类型
-   * - 生气
-   * - 满足
-   * - 焦虑
    */
-  emotion_type: string;
+  emotion_type: MemoLayerEmotionType;
 
   /**
    * 强度，0~9
@@ -59,4 +56,21 @@ export interface MemoLayerEmotion extends BaseEntity {
    */
   expire_at: number;
 
+}
+
+
+const map: Record<string, string> = {
+  'anger': '生气',
+  'anxiety': '焦虑',
+  'joy': '开心',
+  'sadness': '悲伤',
+  'fear': '害怕',
+  'disgust': '厌恶',
+  'surprise': '惊讶',
+  'neutral': '中立'
+};
+
+// 辅助 Label 映射函数 (简化版)
+export function getEmotionLabel(type: MemoLayerEmotionType): string {
+  return map[type] || type;
 }

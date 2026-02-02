@@ -64,3 +64,18 @@ export interface MemoLayerPersona extends BaseEntity {
   expire_at: number;
 
 }
+
+const map: Record<MemoLayerPersonaName, string> = {
+  openness: '开放性',
+  conscientiousness: '尽责性',
+  extraversion: '外向性',
+  agreeableness: '友好的性',
+  neuroticism: '神经过敏性（神经质）',
+  resilience: '弹性',
+  curiosity: '好奇心',
+  optimism: '乐观'
+};
+
+export function getTraitLabel(name: MemoLayerPersonaName): string {
+  return map[name] || name;
+}
