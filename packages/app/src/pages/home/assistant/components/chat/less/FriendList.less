@@ -1,0 +1,136 @@
+.friend-list {
+  width: 280px;
+  background: var(--td-bg-color-container);
+  border-right: 1px solid var(--monica-border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.friend-list-header {
+  padding: var(--monica-spacing-md);
+  border-bottom: 1px solid var(--monica-border);
+}
+
+.friend-list-title {
+  font-size: var(--monica-font-lg);
+  font-weight: 600;
+  color: var(--monica-text-primary);
+  margin: 0 0 var(--monica-spacing-sm) 0;
+}
+
+.friend-list-search {
+  :deep(.t-input) {
+    background: var(--monica-warm-bg-secondary);
+    border-color: var(--monica-border);
+    border-radius: var(--monica-radius-sm);
+    
+    &:hover {
+      border-color: var(--monica-coral-light);
+    }
+    
+    &:focus-within {
+      border-color: var(--monica-coral);
+    }
+  }
+}
+
+.friend-list-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  padding: var(--monica-spacing-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid transparent;
+
+  &:hover {
+    background: var(--monica-warm-bg-secondary);
+  }
+
+  &.active {
+    background: var(--monica-coral-light);
+  }
+}
+
+.friend-avatar {
+  position: relative;
+  flex-shrink: 0;
+  margin-right: var(--monica-spacing-md);
+}
+
+.friend-status {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--td-bg-color-container);
+
+  &.online {
+    background: #10b981;
+  }
+
+  &.busy {
+    background: #f59e0b;
+  }
+}
+
+.friend-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.friend-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.friend-name {
+  font-size: var(--monica-font-md);
+  font-weight: 500;
+  color: var(--monica-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.friend-time {
+  font-size: var(--monica-font-xs);
+  color: var(--monica-text-tertiary);
+  flex-shrink: 0;
+  margin-left: var(--monica-spacing-sm);
+}
+
+.friend-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--monica-spacing-xs);
+}
+
+.friend-archetype {
+  font-size: var(--monica-font-xs);
+  color: var(--monica-coral);
+  flex-shrink: 0;
+}
+
+.friend-desc {
+  font-size: var(--monica-font-sm);
+  color: var(--monica-text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty-friends {
+  padding: var(--monica-spacing-xl);
+  text-align: center;
+  color: var(--monica-text-tertiary);
+}
