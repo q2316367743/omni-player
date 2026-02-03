@@ -2,13 +2,13 @@ import {
   type CollectionInfo,
   createCollection, deletePoints,
   getCollection,
-  type PointInput, textSearch,
+  type PointInput, textSearch, query, search, hybridSearch,
   upsert
 } from "@wiscale/tauri-plugin-velesdb";
 import {logError, logInfo} from "@/lib/log.ts";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 
-interface VelesdbChunkPayload extends Record<string, any>{
+export interface VelesdbChunkPayload extends Record<string, any>{
   content: string;
 }
 
@@ -80,6 +80,37 @@ class VelesdbWrap {
       collection: this.name,
       query: query,
       topK: topK,
+    });
+    return res.results.map(r => r.payload as VelesdbChunkPayload)
+  }
+
+  async vectorSearch(vector: number[], topK: number = 10): Promise<Array<VelesdbChunkPayload>> {
+    await this.getVelesdb();
+    const res = await search({
+      collection: this.name,
+      vector: vector,
+      topK: topK,
+    });
+    return res.results.map(r => r.payload as VelesdbChunkPayload)
+  }
+
+  async hybridSearchQuery(vector: number[], query: string, topK: number = 10, vectorWeight: number = 0.5): Promise<Array<VelesdbChunkPayload>> {
+    await this.getVelesdb();
+    const res = await hybridSearch({
+      collection: this.name,
+      vector: vector,
+      query: query,
+      topK: topK,
+      vectorWeight: vectorWeight,
+    });
+    return res.results.map(r => r.payload as VelesdbChunkPayload)
+  }
+
+  async executeSql(sql: string): Promise<Array<VelesdbChunkPayload>> {
+    await this.getVelesdb();
+    const res = await query({
+      query: sql,
+      params: {}
     });
     return res.results.map(r => r.payload as VelesdbChunkPayload)
   }
