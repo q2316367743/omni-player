@@ -20,8 +20,9 @@
 
     <div class="monica-content">
       <Transition name="monica-page" mode="out-in">
+        <ChatPage v-if="currentPage === 'chat'" />
         <MemoHome
-          v-if="currentPage === 'home'"
+          v-else-if="currentPage === 'home'"
           @at-partner="openPartnerSelector"
         />
         <FriendPage
@@ -80,8 +81,10 @@ import MemoryPage from './components/memory/MemoryPage.vue'
 import {LocalName} from "@/global/LocalName.ts";
 import type {MemoFriendView} from '@/entity/memo'
 import { useMemoFriendStore } from '@/store/MemoFriendStore'
+import ChatPage from "@/pages/home/assistant/components/chat/ChatPage.vue";
 
 const navItems = [
+  { id: 'chat', label: '消息', icon: '💬' },
   { id: 'home', label: 'Memo', icon: '📝' },
   { id: 'partner', label: '伙伴', icon: '👥' },
   { id: 'moments', label: '朋友圈', icon: '🌸' },
