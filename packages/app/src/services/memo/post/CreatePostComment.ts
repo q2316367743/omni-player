@@ -13,7 +13,7 @@ interface CandidateFriend {
 export async function createPostComment(post: MemoPost) {
   logDebug('[CreatePostComment] 开始基于关键字触发 AI 评论', post.content);
   
-  const {friends} = useMemoFriendStore();
+  const {friends, fetchFriend} = useMemoFriendStore();
   
   const now = Date.now();
   const currentHour = new Date(now).getHours();
@@ -62,8 +62,11 @@ export async function createPostComment(post: MemoPost) {
 
     logInfo(`[CreatePostComment] 朋友 ${friend.name} 开始生成评论，触发关键字: ${candidate.matchedKeyword}`);
 
+    const f = await fetchFriend(friend.id);
+
+
     const commentContent = await aiMemoPostComment({
-      friend,
+      friend: f!,
       post,
       keyword: candidate.matchedKeyword
     });

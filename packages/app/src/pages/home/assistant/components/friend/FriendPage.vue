@@ -29,17 +29,17 @@
 
 <script lang="ts" setup>
 import {useMemoFriendStore} from '@/store/MemoFriendStore'
-import type {MemoFriendView} from '@/entity/memo'
+import type {MemoFriendStaticView} from '@/entity/memo'
 import FriendDetail from './FriendDetail.vue'
 import FriendCard from './FriendCard.vue'
 
-const selectedPartner = ref<MemoFriendView>()
+const selectedPartner = ref<MemoFriendStaticView>()
 
 const activeFriends = computed(() => {
   return useMemoFriendStore().friends.filter(f => f.is_active === 1)
 })
 
-const selectPartner = (partner: MemoFriendView) => {
+const selectPartner = (partner: MemoFriendStaticView) => {
   selectedPartner.value = partner
 }
 

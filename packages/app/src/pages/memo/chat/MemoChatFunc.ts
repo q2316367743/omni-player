@@ -1,4 +1,4 @@
-import type {MemoFriendView, MemoMessage, MemoSession} from "@/entity/memo";
+import type {MemoFriendStaticView, MemoMessage, MemoSession} from "@/entity/memo";
 import {logDebug, logError} from "@/lib/log.ts";
 import {completeMemoFriendSession, completeMemoSession, getMemoSession, listMemoMessage} from "@/services/memo";
 import MessageUtil from "@/util/model/MessageUtil.ts";
@@ -14,7 +14,7 @@ import type {AskToOpenAiAbort} from "@/modules/ai";
 import {aiMemoChatSummary, type ChatSummaryResult} from "@/modules/ai/memo/AiMemoChatSummary.ts";
 
 export interface MemoChatFuncResult {
-  friend: Ref<MemoFriendView>;
+  friend: Ref<MemoFriendStaticView>;
   session: Ref<MemoSession>;
   messages: Ref<Array<MemoMessage>>;
   summaryData: Ref<ChatSummaryResult | undefined>;
@@ -59,7 +59,7 @@ export async function memoChatFunc(sessionId: string): Promise<MemoChatFuncResul
     logError('[MemoChat] 朋友不存在', {friendId: session.value?.friend_id});
     return Promise.reject(new Error("朋友不存在"));
   }
-  const friend = ref<MemoFriendView>(f);
+  const friend = ref<MemoFriendStaticView>(f);
   logDebug('[MemoChat] 朋友信息已获取', {friendId: friend.value.id, friendName: friend.value.name});
 
   // 获取聊天记录
@@ -74,6 +74,7 @@ export async function memoChatFunc(sessionId: string): Promise<MemoChatFuncResul
     messagesContainer.value = container;
 
     scrollToBottom(container);
+    const f = await useMemoFriendStore().fetchFriend(friend.value.id);
 
     if (messages.value.length === 0) {
       logDebug('[MemoChat] 首次对话，开始初始化 AI 问候');
@@ -82,7 +83,7 @@ export async function memoChatFunc(sessionId: string): Promise<MemoChatFuncResul
       try {
         let assistantMessageContent = '';
         await aiMemoChat({
-          friend: friend.value,
+          friend: f!,
           chat: '',
           messages: messages.value,
           onStart: async () => {
@@ -157,11 +158,12 @@ export async function memoChatFunc(sessionId: string): Promise<MemoChatFuncResul
     if (!content || isLoading.value || !friend.value || !session.value) return;
 
     logDebug('[MemoChat] 开始发送消息', { contentLength: content.length });
+    const f = await useMemoFriendStore().fetchFriend(friend.value.id);
 
     // 检查是否需要中间总结（在发送用户消息之前）
     const midSummaryTriggered = await checkAndTriggerMidSummary({
       messages: messages.value,
-      friend: friend.value,
+      friend: f!,
       sessionId: session.value.id,
       isGenerating: isGeneratingMidSummary,
     });
@@ -203,8 +205,9 @@ export async function memoChatFunc(sessionId: string): Promise<MemoChatFuncResul
 
     try {
       let assistantMessageContent = '';
+      const f = await useMemoFriendStore().fetchFriend(friend.value.id);
       await aiMemoChat({
-        friend: friend.value,
+        friend: f!,
         chat: content,
         messages: messages.value,
         onStart: async () => {
@@ -283,8 +286,9 @@ export async function memoChatFunc(sessionId: string): Promise<MemoChatFuncResul
 
     isEnding.value = true;
     try {
+      const f = await useMemoFriendStore().fetchFriend(friend.value.id);
       summaryData.value = await aiMemoChatSummary({
-        friend: friend.value,
+        friend: f!,
         sessionId: session.value!.id,
         messages: messages.value,
       });

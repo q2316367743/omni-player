@@ -52,7 +52,7 @@ import MemoItem from './MemoItem.vue'
 import {useMemoFriendStore} from '@/store'
 import {pageMemoItem, addMemoService, removeMemoService} from '@/services/memo/MemoItemService.ts'
 import type {MemoItemView} from '@/services/memo/MemoItemService.ts'
-import type {MemoFriendView} from '@/entity/memo'
+import type {MemoFriendStaticView} from '@/entity/memo'
 import type {Memo} from '../../types.ts'
 import {SettingIcon} from "tdesign-icons-vue-next";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
@@ -108,7 +108,7 @@ const formatTime = (timestamp: number) => {
   }
 }
 
-const convertMemoItemViewToMemo = (item: MemoItemView, friendMap: Map<string, MemoFriendView>): Memo => {
+const convertMemoItemViewToMemo = (item: MemoItemView, friendMap: Map<string, MemoFriendStaticView>): Memo => {
   const friendIds = item.friend_ids ? item.friend_ids.split(',').filter(Boolean) : []
   const atPartner = friendIds.length > 0 ? friendMap.get(friendIds[0]!) : null
 

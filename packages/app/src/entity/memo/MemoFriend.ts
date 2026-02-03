@@ -582,6 +582,12 @@ export function parseConversationStrategy(strategy: string) {
 }
 
 export interface MemoFriendStaticView {
+  id: string;
+  is_active: YesOrNo;
+  is_locked: YesOrNo;
+  unlock_condition: any;
+  sort_order: number;
+  version: number;
   avatar: string;
   model: string;
   name: string;
@@ -626,12 +632,6 @@ export interface MemoFriendDynamicView {
 }
 
 export interface MemoFriendView extends MemoFriendStaticView, MemoFriendDynamicView {
-  id: string;
-  is_active: YesOrNo;
-  is_locked: YesOrNo;
-  unlock_condition: any;
-  sort_order: number;
-  version: number;
 }
 
 export function memoFriendToMemoFriendView(friend: MemoFriend): MemoFriendView {

@@ -12,7 +12,7 @@ interface CandidateFriend {
 export async function createPostByKeyword(memo: MemoItemAdd) {
   logDebug('[CreatePostByKeyword] 开始基于关键字触发 AI 朋友圈', memo.content);
   
-  const {friends} = useMemoFriendStore();
+  const {friends, fetchFriend} = useMemoFriendStore();
   
   const now = Date.now();
   const currentHour = new Date(now).getHours();
@@ -83,9 +83,11 @@ export async function createPostByKeyword(memo: MemoItemAdd) {
 
   logInfo(`[CreatePostByKeyword] 选择朋友 ${selectedFriend.name} 发朋友圈，触发关键字: ${selectedCandidate.matchedKeyword}`);
 
+  const f = await fetchFriend(selectedFriend.id);
+
   const postContent = await aiMemoPostByKeyword({
     memo,
-    friend: selectedFriend
+    friend: f!
   });
 
   logDebug(`[CreatePostByKeyword] 生成朋友圈内容: ${postContent}`);

@@ -5,6 +5,10 @@ export function listMemoFriend() {
   return useSql().query<MemoFriend>('memo_friend').list();
 }
 
+export function getMemoFriend(id: string) {
+  return useSql().query<MemoFriend>('memo_friend').eq('id', id).first();
+}
+
 export function updateMemoFriendStatic(id: string, data: Partial<MemoFriendStatic>) {
   return useSql().mapper<MemoFriend>('memo_friend').updateById(id, data);
 }

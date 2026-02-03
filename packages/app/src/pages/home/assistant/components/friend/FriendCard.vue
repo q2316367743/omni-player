@@ -6,8 +6,6 @@
   >
     <div class="partner-avatar-wrap">
       <XhAvatar :value="friend.avatar" :size="80" shape="circle"/>
-      <div class="partner-status" :class="moodToStatus(friend.current_mood)"></div>
-      <div v-if="friend.is_locked === 1" class="locked-badge">🔒</div>
     </div>
     <h3 class="partner-name">{{ friend.name }}</h3>
     <p class="partner-personality">{{ getArchetypeText(friend.archetype) }}</p>
@@ -18,16 +16,6 @@
         <span class="partner-tag more-tag">+{{ hiddenTagsCount }}</span>
       </t-tooltip>
     </div>
-    <div class="partner-stats">
-      <div class="stat">
-        <span class="stat-value">{{ friend.trust_level }}</span>
-        <span class="stat-label">信任度</span>
-      </div>
-      <div class="stat">
-        <span class="stat-value">{{ friend.intimacy_score }}</span>
-        <span class="stat-label">亲密度</span>
-      </div>
-    </div>
     <div class="partner-action">
       <t-button theme="primary" shape="round" @click.stop="handleChat">
         {{ hasSession ? '继续聊天' : '开始聊天' }}
@@ -37,23 +25,20 @@
 </template>
 
 <script lang="ts" setup>
-import type {MemoFriendView} from '@/entity/memo'
-import {
-  getArchetypeText,
-  moodToStatus
-} from '@/entity/memo/MemoFriend'
+import type {MemoFriendStaticView} from '@/entity/memo'
+import {getArchetypeText} from '@/entity/memo'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
 import {useMemoFriendStore} from "@/store";
 import {createMemoSession} from "@/services/memo";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 
 const props = defineProps<{
-  friend: MemoFriendView
+  friend: MemoFriendStaticView
   active?: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'click', friend: MemoFriendView): void
+  (e: 'click', friend: MemoFriendStaticView): void
 }>()
 
 const router = useRouter();

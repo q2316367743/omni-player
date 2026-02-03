@@ -50,7 +50,7 @@
                   @click="selectFriend(friend)"
                   @mouseenter="selectedIndex = index"
                 >
-                  <img :src="friend.avatar" class="at-dropdown-avatar" />
+                  <XhAvatar :src="friend.avatar" class="at-dropdown-avatar" />
                   <div class="at-dropdown-info">
                     <span class="at-dropdown-name">{{ friend.name }}</span>
                     <span class="at-dropdown-desc">{{ friend.relation || friend.archetype }}</span>
@@ -109,7 +109,7 @@
 
 <script lang="ts" setup>
 import {useMemoFriendStore} from "@/store";
-import type {MemoFriendView, MemoItemType} from '@/entity/memo';
+import type {MemoFriendStaticView, MemoItemType} from '@/entity/memo';
 
 const emit = defineEmits<{
   (e: 'publish', data: { content: string; type: MemoItemType; atFriends: string[] }): void
@@ -127,7 +127,7 @@ const editorWrapperRef = ref<HTMLElement | null>(null)
 const showAtDropdown = ref(false)
 const atQuery = ref('')
 const selectedIndex = ref(0)
-const atFriends = ref<MemoFriendView[]>([])
+const atFriends = ref<MemoFriendStaticView[]>([])
 const dropdownPosition = ref({ top: '0px', left: '0px' })
 
 // 存储 @ 标签的位置信息
@@ -240,7 +240,7 @@ const handleKeydown = (e: KeyboardEvent) => {
 }
 
 // 选择 friend
-const selectFriend = (friend: MemoFriendView) => {
+const selectFriend = (friend: MemoFriendStaticView) => {
   if (!editorRef.value) return
   
   const selection = window.getSelection()

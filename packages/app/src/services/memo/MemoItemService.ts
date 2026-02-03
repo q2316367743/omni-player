@@ -151,21 +151,23 @@ export async function addMemoService(data: MemoItemAdd) {
     // 存在 @
     const friendIds = data.friend_ids.split(",");
     friendIds.forEach((friendId) => {
-      const {friendMap} = useMemoFriendStore();
+      const {friendMap, fetchFriend} = useMemoFriendStore();
       const friend = friendMap.get(friendId);
       if (!friend) return;
-      aiMemoComment({
-        friend,
-        memo: data
-      }).then(comment => {
-        useSql().mapper<MemoComment>('memo_comment').insert({
-          memo_id: newMemo.id,
-          content: comment,
-          created_at: now,
-          updated_at: now,
-          friend_id: friendId
-        })
-      })
+      fetchFriend(friendId).then(f => {
+        aiMemoComment({
+          friend: f!,
+          memo: data
+        }).then(comment => {
+          useSql().mapper<MemoComment>('memo_comment').insert({
+            memo_id: newMemo.id,
+            content: comment,
+            created_at: now,
+            updated_at: now,
+            friend_id: friendId
+          });
+        });
+      });
     })
   }
 

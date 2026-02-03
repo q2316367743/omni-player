@@ -1,23 +1,27 @@
 <template>
   <div class="friend-detail">
-    <div class="detail-header">
-      <div class="detail-avatar-wrap">
-        <XhAvatar 
-          :model-value="friend.avatar" 
-          :size="64" 
-          shape="circle" 
-          :editable="true"
-          folder="memo/friend"
-          @update:model-value="handleAvatarUpdate"
-        />
-        <div class="detail-status" :class="moodToStatus(friend.current_mood)"></div>
-      </div>
-      <div class="detail-title">
-        <h2 class="detail-name">{{ friend.name }}</h2>
-        <span class="detail-archetype">{{ getArchetypeText(friend.archetype) }}</span>
-      </div>
-      <button class="detail-close-btn" @click="$emit('close')">×</button>
+    <div v-if="loading" class="loading-state">
+      <p>加载中...</p>
     </div>
+    <template v-else>
+      <div class="detail-header">
+        <div class="detail-avatar-wrap">
+          <XhAvatar 
+            :model-value="friend.avatar" 
+            :size="64" 
+            shape="circle" 
+            :editable="true"
+            folder="memo/friend"
+            @update:model-value="handleAvatarUpdate"
+          />
+          <div class="detail-status" :class="moodToStatus(friend.current_mood)"></div>
+        </div>
+        <div class="detail-title">
+          <h2 class="detail-name">{{ friend.name }}</h2>
+          <span class="detail-archetype">{{ getArchetypeText(friend.archetype) }}</span>
+        </div>
+        <button class="detail-close-btn" @click="$emit('close')">×</button>
+      </div>
 
     <div class="detail-content local-scroll">
       <div class="data-block static-block">
@@ -217,11 +221,12 @@
         </div>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
 <script lang="ts" setup>
-import type {MemoFriendView} from '@/entity/memo'
+import type {MemoFriendStaticView, MemoFriendView} from '@/entity/memo'
 import {
   getArchetypeText,
   getMoodText,
@@ -237,24 +242,44 @@ import { useMemoFriendStore } from '@/store/MemoFriendStore'
 import { formatDate } from '@/util/lang/DateUtil.ts'
 
 const props = defineProps<{
-  friend: MemoFriendView
+  friend: MemoFriendStaticView
 }>()
 
-const emit = defineEmits<{
+defineEmits<{
   (e: 'close'): void
-  (e: 'update:friend', friend: MemoFriendView): void
 }>()
-
-const personalityTags = computed(() => props.friend.personality_tags)
 
 const memoFriendStore = useMemoFriendStore()
 
+const fullFriend = ref<MemoFriendView | undefined>()
+const loading = ref(true)
+
+watch(() => props.friend.id, async (newId) => {
+  if (newId) {
+    loading.value = true
+    fullFriend.value = await memoFriendStore.fetchFriend(newId)
+    loading.value = false
+  }
+}, { immediate: true })
+
+const friend = computed<MemoFriendView>(() => fullFriend.value || {
+  ...props.friend,
+  intimacy_score: 0,
+  trust_level: 0,
+  interaction_count: 0,
+  last_interaction: 0,
+  conversation_frequency: '',
+  relationship_milestones: [],
+  known_memo_categories: [],
+  unknown_memo_count: 0,
+  current_mood: 'happy',
+  mood_expires_at: 0
+})
+
+const personalityTags = computed(() => friend.value.personality_tags)
+
 async function handleAvatarUpdate(newAvatar: string) {
   await memoFriendStore.updateFriendStatic(props.friend.id, { avatar: newAvatar })
-  emit('update:friend', {
-    ...props.friend,
-    avatar: newAvatar
-  })
 }
 
 function getPostingTriggersText(triggers: string[]): string {

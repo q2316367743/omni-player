@@ -71,7 +71,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted } from 'vue'
 import MemoHome from './components/memo/MemoHome.vue'
 import FriendPage from './components/friend/FriendPage.vue'
 import MomentsPage from './components/moment/MomentsPage.vue'
@@ -79,7 +78,7 @@ import DiaryPage from './components/diary/DiaryPage.vue'
 import ToolsPage from './components/ToolsPage.vue'
 import MemoryPage from './components/memory/MemoryPage.vue'
 import {LocalName} from "@/global/LocalName.ts";
-import type {MemoFriendView} from '@/entity/memo'
+import type {MemoFriendStaticView} from '@/entity/memo'
 import { useMemoFriendStore } from '@/store/MemoFriendStore'
 import ChatPage from "@/pages/home/assistant/components/chat/ChatPage.vue";
 
@@ -93,10 +92,10 @@ const navItems = [
   { id: 'tools', label: '工具', icon: '🧰' }
 ]
 
-const currentPage = useSessionStorage(LocalName.PAGE_HOME_ASSISTANT_ACTIVE, 'home');
+const currentPage = useSessionStorage(LocalName.PAGE_HOME_ASSISTANT_ACTIVE, 'chat');
 const currentTime = ref('')
 const showPartnerSelector = ref(false)
-const selectedMemoPartner = ref<((partner: MemoFriendView) => void) | null>(null)
+const selectedMemoPartner = ref<((partner: MemoFriendStaticView) => void) | null>(null)
 const defaultAvatar = 'https://api.dicebear.com/7.x/personas/svg?seed=default'
 
 const { friends, loadFriends } = useMemoFriendStore()
@@ -112,12 +111,12 @@ const updateTime = () => {
 
 let timeTimer: number
 
-const openPartnerSelector = (callback: (partner: MemoFriendView) => void) => {
+const openPartnerSelector = (callback: (partner: MemoFriendStaticView) => void) => {
   selectedMemoPartner.value = callback
   showPartnerSelector.value = true
 }
 
-const selectPartner = (partner: MemoFriendView) => {
+const selectPartner = (partner: MemoFriendStaticView) => {
   if (selectedMemoPartner.value) {
     selectedMemoPartner.value(partner)
   }

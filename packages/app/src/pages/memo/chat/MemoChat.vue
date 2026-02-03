@@ -11,7 +11,6 @@
       <div class="friend-info" v-if="friend">
         <div class="friend-avatar-wrap">
           <XhAvatar :value="friend.avatar" alt="avatar" class="friend-avatar" />
-          <div class="friend-status" :class="moodToStatus(friend.current_mood)"></div>
         </div>
         <div class="friend-details">
           <h3 class="friend-name">{{ friend.name }}</h3>
@@ -128,7 +127,7 @@
 
 <script lang="ts" setup>
 import MarkdownPreview from "@/components/common/MarkdownPreview.vue";
-import { getArchetypeText, moodToStatus } from "@/entity/memo/MemoFriend";
+import { getArchetypeText } from "@/entity/memo/MemoFriend";
 import { ChevronLeftIcon } from "tdesign-icons-vue-next";
 import type {MemoChatFuncResult} from "@/pages/memo/chat/MemoChatFunc.ts";
 import {formatDate} from "@/util/lang/DateUtil.ts";
