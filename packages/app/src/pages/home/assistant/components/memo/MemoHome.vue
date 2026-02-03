@@ -4,7 +4,7 @@
       <div class="memo-header">
         <div class="greeting">
           <span class="greeting-emoji">👋</span>
-          <span class="greeting-text">{{ greeting }},{{ nickname }}~</span>
+          <span class="greeting-text">{{ greeting }},{{ userNickname }}~</span>
         </div>
         <div class="date-info">
           <span class="date-emoji">📅</span>
@@ -80,7 +80,8 @@ const pageNum = ref(1)
 const pageSize = ref(20)
 const total = ref(0);
 
-const nickname = computed(() => useSettingStore().userSetting.nickname || '主人');
+const userNickname = computed(() => useSettingStore().userNickname);
+const userAvatar = computed(() => useSettingStore().userAvatar);
 
 const formatTime = (timestamp: number) => {
   const date = new Date(timestamp)
@@ -119,8 +120,8 @@ const convertMemoItemViewToMemo = (item: MemoItemView, friendMap: Map<string, Me
 
   return {
     id: item.id,
-    authorName: '我',
-    authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=me',
+    authorName: userNickname.value,
+    authorAvatar: userAvatar.value,
     content: item.content,
     time: formatTime(item.created_at),
     atPartner: atPartner ? {

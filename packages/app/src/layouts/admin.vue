@@ -10,6 +10,7 @@
             <t-menu-item value="/admin/global-setting">全局设置</t-menu-item>
             <t-menu-item value="/admin/ai-setting">AI 设置</t-menu-item>
             <t-menu-item value="/admin/user-setting">用户设置</t-menu-item>
+            <t-menu-item value="/admin/dev-setting">开发者设置</t-menu-item>
           </t-menu>
         </t-aside>
         <t-content class="overflow-auto">

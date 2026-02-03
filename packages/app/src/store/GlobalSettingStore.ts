@@ -6,11 +6,13 @@ import OpenAI from "openai";
 import {getTauriFetch} from "@/lib/http.ts";
 import {buildUserSetting, userToPrompt} from "@/entity/setting/UserSetting.ts";
 import type {MemoFriendView} from "@/entity/memo";
+import {buildDevSetting} from "@/entity/setting/DevSetting.ts";
 
 export const useSettingStore = defineStore("setting", () => {
   const globalSetting = useLocalStorage(LocalName.KEY_SETTING_GLOBAL, buildGlobalSetting());
   const aiSetting = useLocalStorage(LocalName.KEY_SETTING_AI, buildAiSetting());
   const userSetting = useLocalStorage(LocalName.KEY_SETTING_USER, buildUserSetting());
+  const devSetting = useLocalStorage(LocalName.KEY_SETTING_DEV, buildDevSetting());
 
   const rssRefreshInterval = computed(() => {
     if (!globalSetting.value.rssRefreshInterval) return 15;
@@ -27,6 +29,11 @@ export const useSettingStore = defineStore("setting", () => {
       value: m
     }))
   });
+  const debug = computed(() => devSetting.value.debug);
+  const userAvatar = computed(() => userSetting.value.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=me');
+  const userNickname = computed(() => userSetting.value.nickname || '主人');
+
+
   const userPrompt = (friend?: MemoFriendView) => userToPrompt(userSetting.value, friend);
 
   /**
@@ -62,6 +69,10 @@ export const useSettingStore = defineStore("setting", () => {
     aiEnabled,
     defaultChatModel,
     userSetting,
+    devSetting,
+    debug,
+    userAvatar,
+    userNickname,
     userPrompt,
     createAiClient,
     supportThink,

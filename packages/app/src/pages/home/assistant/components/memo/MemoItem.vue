@@ -2,7 +2,7 @@
   <div class="memo-item monica-card">
     <div class="memo-meta">
       <div class="memo-author">
-        <img :src="memo.authorAvatar" class="memo-avatar monica-avatar" :alt="memo.authorName"/>
+        <XhAvatar :value="memo.authorAvatar" class="memo-avatar monica-avatar" :alt="memo.authorName"/>
         <span class="memo-name">{{ memo.authorName }}</span>
       </div>
       <div class="memo-info">
@@ -39,7 +39,7 @@
           </template>
         </t-button>
         <t-dropdown-menu>
-          <t-dropdown-item @click="handleTrigger()">
+          <t-dropdown-item v-if="debug" @click="handleTrigger()">
             <template #prefix-icon>
               <bug-icon/>
             </template>
@@ -64,6 +64,7 @@ import {BugIcon, ChatMessageIcon, DeleteIcon, MoreIcon} from "tdesign-icons-vue-
 import {createPostByKeyword} from "@/services/memo";
 import {logDebug, logError} from "@/lib/log.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
+import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 
 interface Props {
   memo: Memo
@@ -76,6 +77,7 @@ const emit = defineEmits<{
   confirmDelete: [memo: Memo]
 }>()
 
+const debug = computed(() => useSettingStore().debug);
 
 const handleDropdownClick = () => {
   MessageBoxUtil.confirm('确定要删除这条 memo 吗？', '确认删除').then(() => {

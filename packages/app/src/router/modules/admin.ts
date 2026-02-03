@@ -17,5 +17,9 @@ export const adminRouters: Array<RouteRecordRaw> = [{
     name: '用户设置',
     path: 'user-setting',
     component: () => import('@/pages/admin/user-setting/UserSetting.vue')
+  }, {
+    name: '开发者设置',
+    path: 'dev-setting',
+    component: () => import('@/pages/admin/dev-setting/dev-setting.vue')
   }]
 }]
