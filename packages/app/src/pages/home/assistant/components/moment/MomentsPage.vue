@@ -99,7 +99,7 @@
 import {pageMemoPost, updateMemoPost} from "@/services/memo/MemoPostService.ts";
 import {listMemoFriend} from "@/services/memo/MemoFriendService.ts";
 import {addMemoPostComment, listMemoPostComment} from "@/services/memo/MemoPostCommentService.ts";
-import {prettyBetweenTime} from "@/util/lang/FormatUtil.ts";
+import {prettyBetweenTime} from "@/util/lang/DateUtil.ts";
 import {captureMoment, previewMomentImage} from "@/util/share.ts";
 import type {MemoPostView} from "@/services/memo/MemoPostService.ts";
 import type {MemoFriend} from "@/entity/memo";

@@ -67,7 +67,7 @@
 <script lang="ts" setup>
 import {type FeedWrapper, getFeedContent, getFeedContentDefault} from "@/services/FeedService.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
-import {formatDate} from "@/util/lang/FormatUtil.ts";
+import {formatDate} from "@/util/lang/DateUtil.ts";
 import EmptyResult from "@/components/Result/EmptyResult.vue";
 import {openUrl} from "@tauri-apps/plugin-opener";
 import {previewImages} from "@/pages/subscribe/func/previewImages.tsx";

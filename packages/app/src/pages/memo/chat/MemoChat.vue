@@ -94,7 +94,7 @@
                 <MarkdownPreview :content="msg.content" />
               </div>
             </div>
-            <span class="message-time">{{ formatTime(msg.created_at) }}</span>
+            <span class="message-time">{{ formatDate(msg.created_at) }}</span>
           </div>
         </div>
         <div v-if="isLoading" class="typing-indicator">
@@ -116,7 +116,7 @@
       <t-button 
         theme="primary" 
         shape="round" 
-        @click="handleSend"
+        @click="sendMessage"
         :disabled="isLoading || !inputMessage.trim()"
         class="send-btn"
       >
@@ -127,172 +127,32 @@
 </template>
 
 <script lang="ts" setup>
-import {completeMemoFriendSession, getMemoSession, listMemoMessage} from "@/services/memo";
-import { completeMemoSession } from "@/services/memo/MemoSessionService.ts";
-import MessageUtil from "@/util/model/MessageUtil.ts";
-import { useMemoFriendStore } from "@/store";
-import type { MemoFriendView, MemoMessage, MemoSession } from "@/entity/memo";
-import { getArchetypeText, moodToStatus } from "@/entity/memo/MemoFriend";
-import { aiMemoChat } from "@/modules/ai/memo/AiMemoChat.ts";
-import { aiMemoChatSummary } from "@/modules/ai/memo/AiMemoChatSummary.ts";
-import type { AskToOpenAiAbort } from "@/modules/ai";
 import MarkdownPreview from "@/components/common/MarkdownPreview.vue";
+import { getArchetypeText, moodToStatus } from "@/entity/memo/MemoFriend";
 import { ChevronLeftIcon } from "tdesign-icons-vue-next";
-import {
-  createDebouncedSaveMessage,
-  formatTime,
-  scrollToBottom,
-  checkAndTriggerMidSummary,
-  generateUserMessageTimestamp,
-} from "./utils";
-import { logDebug, logError } from "@/lib/log";
+import type {MemoChatFuncResult} from "@/pages/memo/chat/MemoChatFunc.ts";
+import {formatDate} from "@/util/lang/DateUtil.ts";
 
-const route = useRoute();
 const router = useRouter();
 
-const session = shallowRef<MemoSession>();
-const friend = shallowRef<MemoFriendView>();
-const messages = ref<Array<MemoMessage>>([]);
+const prop = defineProps({
+  context: {
+    type: Object as PropType<MemoChatFuncResult>,
+    required: true
+  }
+});
+
 const inputMessage = ref('');
-const isLoading = ref(false);
 const messagesContainer = ref<HTMLElement>();
-const abortController = ref<AskToOpenAiAbort>();
 
-const isEnding = ref(false);
-const showSummary = ref(false);
+const {friend,messages,isLoading,isEnding,showSummary, summaryData, init,handleEndChat, handleSend} = prop.context;
+
 const showAiJournal = ref(false);
-const summaryData = ref<{ title: string; summary: string; key_insights: any; ai_journal: string } | null>(null);
-
-// 中间总结相关
-const isGeneratingMidSummary = ref(false);
-
-// 防抖保存消息
-const debouncedSaveMessage = createDebouncedSaveMessage();
 
 // 处理发送消息
-async function handleSend() {
-  const content = inputMessage.value.trim();
-  if (!content || isLoading.value || !friend.value || !session.value) return;
-
-  logDebug('[MemoChat] 开始发送消息', { contentLength: content.length });
-
-  // 检查是否需要中间总结（在发送用户消息之前）
-  const midSummaryTriggered = await checkAndTriggerMidSummary({
-    messages: messages.value,
-    friend: friend.value,
-    sessionId: session.value.id,
-    isGenerating: isGeneratingMidSummary,
-  });
-
-  if (midSummaryTriggered) {
-    logDebug('[MemoChat] 中间总结已触发并完成');
-  }
-
-  // 清空输入框
+async function sendMessage() {
+  handleSend(inputMessage.value);
   inputMessage.value = '';
-
-  // 生成用户消息的 created_at：确保在 summary 之后
-  const userCreatedAt = generateUserMessageTimestamp(messages.value);
-
-  // 添加用户消息
-  const userMessage: MemoMessage = {
-    id: Date.now().toString(),
-    session_id: session.value.id,
-    role: 'user',
-    content,
-    created_at: userCreatedAt,
-    updated_at: userCreatedAt,
-  };
-  messages.value.push(userMessage);
-  scrollToBottom(messagesContainer.value);
-
-  logDebug('[MemoChat] 用户消息已添加到本地', { createdAt: userCreatedAt });
-
-  // 保存用户消息
-  debouncedSaveMessage(
-    {
-      session_id: session.value.id,
-      role: 'user',
-      content,
-    },
-    userCreatedAt
-  );
-
-  // 开始 AI 回复
-  isLoading.value = true;
-  logDebug('[MemoChat] 开始调用 AI 回复');
-
-  try {
-    let assistantMessageContent = '';
-    await aiMemoChat({
-      friend: friend.value,
-      chat: content,
-      messages: messages.value,
-      onStart: async () => {
-        logDebug('[MemoChat] AI 回复开始');
-      },
-      onAborted: (controller) => {
-        abortController.value = controller;
-      },
-      onMessage: async (data) => {
-        assistantMessageContent += data;
-        // 实时更新消息内容
-        const lastMessage = messages.value[messages.value.length - 1];
-        if (lastMessage && lastMessage.role === 'assistant') {
-          lastMessage.content = assistantMessageContent;
-        } else {
-          // 添加新的助手消息
-          const assistantMessage: MemoMessage = {
-            id: (Date.now() + 1).toString(),
-            session_id: session.value!.id,
-            role: 'assistant',
-            content: assistantMessageContent,
-            created_at: Date.now(),
-            updated_at: Date.now(),
-          };
-          messages.value.push(assistantMessage);
-        }
-        scrollToBottom(messagesContainer.value);
-      },
-      onError: async (e) => {
-        logError('[MemoChat] AI 回复错误', e);
-        const errorMessage = e?.message || '聊天出错，请重试';
-        MessageUtil.error(errorMessage);
-        const errorCreatedAt = Date.now();
-        const errorMessageObj: MemoMessage = {
-          id: (Date.now() + 2).toString(),
-          session_id: session.value!.id,
-          role: 'error',
-          content: errorMessage,
-          created_at: errorCreatedAt,
-          updated_at: errorCreatedAt,
-        };
-        messages.value.push(errorMessageObj);
-        scrollToBottom(messagesContainer.value);
-        debouncedSaveMessage({
-          session_id: session.value!.id,
-          role: 'error',
-          content: errorMessage,
-        }, errorCreatedAt);
-      },
-      onFinally: async () => {
-        isLoading.value = false;
-        logDebug('[MemoChat] AI 回复完成', { contentLength: assistantMessageContent.length });
-        // 保存助手消息
-        if (assistantMessageContent) {
-          debouncedSaveMessage({
-            session_id: session.value!.id,
-            role: 'assistant',
-            content: assistantMessageContent,
-          });
-        }
-      },
-    });
-  } catch (error) {
-    logError('[MemoChat] 发送消息失败', error);
-    MessageUtil.error('发送失败，请重试', error);
-    isLoading.value = false;
-  }
 }
 
 // 处理返回
@@ -305,152 +165,10 @@ function toggleAiJournal() {
   showAiJournal.value = !showAiJournal.value;
 }
 
-// 处理结束对话
-async function handleEndChat() {
-  if (!friend.value || messages.value.length === 0) {
-    MessageUtil.warning('暂无聊天记录可总结');
-    return;
-  }
+onMounted(() => {
+  init(messagesContainer.value);
+})
 
-  isEnding.value = true;
-  try {
-    summaryData.value = await aiMemoChatSummary({
-      friend: friend.value,
-      sessionId: session.value!.id,
-      messages: messages.value,
-    });
-    showSummary.value = true;
-
-    if (session.value) {
-      await completeMemoSession(session.value.id);
-      await completeMemoFriendSession(friend.value.id);
-      // 刷新 session 信息
-      await useMemoFriendStore().loadChatSession();
-      // 刷新朋友信息
-      await useMemoFriendStore().loadFriends();
-    }
-  } catch (error) {
-    console.error('总结失败:', error);
-    MessageUtil.error('总结失败，请重试');
-  } finally {
-    isEnding.value = false;
-  }
-}
-
-onMounted(async () => {
-  logDebug('[MemoChat] 组件挂载，开始初始化', { sessionId: route.params.id });
-
-  try {
-    // 获取 session
-    session.value = await getMemoSession(route.params.id as string);
-    if (!session.value) {
-      logError('[MemoChat] 会话不存在', { sessionId: route.params.id });
-      router.back();
-      MessageUtil.error('会话不存在');
-      return;
-    }
-    logDebug('[MemoChat] 会话已获取', { sessionId: session.value.id });
-
-    // 获取朋友
-    friend.value = useMemoFriendStore().friends.find((e) => e.id === session.value?.friend_id);
-    if (!friend.value) {
-      logError('[MemoChat] 朋友不存在', { friendId: session.value?.friend_id });
-      router.back();
-      MessageUtil.error('朋友不存在');
-      return;
-    }
-    logDebug('[MemoChat] 朋友信息已获取', { friendId: friend.value.id, friendName: friend.value.name });
-
-    // 获取聊天记录
-    messages.value = await listMemoMessage(session.value.id);
-    logDebug('[MemoChat] 聊天记录已加载', { messageCount: messages.value.length });
-
-    scrollToBottom(messagesContainer.value);
-
-    if (messages.value.length === 0) {
-      logDebug('[MemoChat] 首次对话，开始初始化 AI 问候');
-      // 第一次，需要直接获取
-      isLoading.value = true;
-      try {
-        let assistantMessageContent = '';
-        await aiMemoChat({
-          friend: friend.value,
-          chat: '',
-          messages: messages.value,
-          onStart: async () => {
-            logDebug('[MemoChat] AI 问候开始');
-          },
-          onAborted: (controller) => {
-            abortController.value = controller;
-          },
-          onMessage: async (data) => {
-            assistantMessageContent += data;
-            // 实时更新消息内容
-            const lastMessage = messages.value[messages.value.length - 1];
-            if (lastMessage && lastMessage.role === 'assistant') {
-              lastMessage.content = assistantMessageContent;
-            } else {
-              // 添加新的助手消息
-              const assistantMessage: MemoMessage = {
-                id: Date.now().toString(),
-                session_id: session.value!.id,
-                role: 'assistant',
-                content: assistantMessageContent,
-                created_at: Date.now(),
-                updated_at: Date.now(),
-              };
-              messages.value.push(assistantMessage);
-            }
-            scrollToBottom(messagesContainer.value);
-          },
-          onError: async (e) => {
-            logError('[MemoChat] AI 问候错误', e);
-            const errorMessage = e?.message || '聊天出错，请重试';
-            MessageUtil.error(errorMessage);
-            const errorCreatedAt = Date.now();
-            const errorMessageObj: MemoMessage = {
-              id: (Date.now() + 2).toString(),
-              session_id: session.value!.id,
-              role: 'error',
-              content: errorMessage,
-              created_at: errorCreatedAt,
-              updated_at: errorCreatedAt,
-            };
-            messages.value.push(errorMessageObj);
-            scrollToBottom(messagesContainer.value);
-            debouncedSaveMessage({
-              session_id: session.value!.id,
-              role: 'error',
-              content: errorMessage,
-            }, errorCreatedAt);
-          },
-          onFinally: async () => {
-            isLoading.value = false;
-            logDebug('[MemoChat] AI 问候完成', { contentLength: assistantMessageContent.length });
-            // 保存助手消息
-            if (assistantMessageContent) {
-              debouncedSaveMessage({
-                session_id: session.value!.id,
-                role: 'assistant',
-                content: assistantMessageContent,
-              });
-            }
-          },
-        });
-      } catch (error) {
-        logError('[MemoChat] 初始化聊天失败', error);
-        MessageUtil.error('初始化聊天失败，请重试');
-        isLoading.value = false;
-      }
-    }
-
-    logDebug('[MemoChat] 组件初始化完成');
-  } catch (e) {
-    logError('[MemoChat] 初始化失败', e);
-    MessageUtil.error('初始化失败', e);
-    router.back();
-  }
-});
 </script>
 
 <style scoped lang="less">

@@ -39,14 +39,6 @@ export function createDebouncedSaveMessage(wait: number = 1000) {
 }
 
 /**
- * 格式化时间戳为时间字符串
- */
-export function formatTime(timestamp: number): string {
-  const date = new Date(timestamp);
-  return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-}
-
-/**
  * 滚动元素到底部
  */
 export function scrollToBottom(element: HTMLElement | undefined) {

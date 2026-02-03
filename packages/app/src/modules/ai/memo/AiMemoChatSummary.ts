@@ -6,7 +6,7 @@ import {updateMemoFriendDynamic} from "@/services/memo/MemoFriendService.ts";
 import {addMemoLayerPersona, updateMemoLayerPersona} from "@/services/memo";
 import {handleStreamingToolCalls} from "@/modules/ai/utils/ToolCallHandler.ts";
 import type OpenAI from "openai";
-import {formatDate} from "@/util/lang/FormatUtil.ts";
+import {formatDate} from "@/util/lang/DateUtil.ts";
 
 interface AiMemoChatSummaryProp {
   // 谁
@@ -16,7 +16,7 @@ interface AiMemoChatSummaryProp {
   messages: Array<MemoMessage>;
 }
 
-interface ChatSummaryResult {
+export interface ChatSummaryResult {
   title: string;
   summary: string;
   key_insights: any;
@@ -105,7 +105,7 @@ ${chatContent}
     model: friend.model,
     messages: messagesForAI,
     tools: CHAT_SUMMARY_TOOL_SCHEMA,
-    tool_choice: "auto",
+    tool_choice: "required",
     stream: true,
     // 禁用思考
     ...useSettingStore().disableThinkParam(friend.model)

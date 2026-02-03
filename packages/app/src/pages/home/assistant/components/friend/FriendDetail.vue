@@ -234,7 +234,7 @@ import {
 } from '@/entity/memo/MemoFriend'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
 import { useMemoFriendStore } from '@/store/MemoFriendStore'
-import { formatDate } from '@/util/lang/FormatUtil'
+import { formatDate } from '@/util/lang/DateUtil.ts'
 
 const props = defineProps<{
   friend: MemoFriendView

@@ -1,6 +1,6 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {YesOrNo} from "@/global/YesOrNo.ts";
-import {formatDate} from "@/util/lang/FormatUtil.ts";
+import {formatDate, getTimeSinceLastInteraction} from "@/util/lang/DateUtil.ts";
 import {logError} from "@/lib/log.ts";
 import {
   getBehaviorTypeLabel,
@@ -649,43 +649,6 @@ export function memoFriendToMemoFriendView(friend: MemoFriend): MemoFriendView {
     state_trigger_condition: friend.state_trigger_condition ? JSON.parse(friend.state_trigger_condition) : undefined,
     conversation_strategy: parseConversationStrategy(friend.conversation_strategy),
   };
-}
-
-/**
- * 获取时间间隔文本
- * @param last_interaction 上次对话的时间戳
- * @returns {string} 时间间隔文本，易于理解，例如刚刚，1分钟前，1小时前，1天前，1周前，1个月前，1年前
- */
-function getTimeSinceLastInteraction(last_interaction: number): string {
-  // If no previous interaction recorded, return a placeholder indicating no recent interaction
-  if (!last_interaction || last_interaction <= 0) {
-    return '很久以前';
-  }
-
-  const now = Date.now();
-  let deltaMs = now - last_interaction;
-  if (deltaMs < 0) deltaMs = 0;
-
-  const s = Math.floor(deltaMs / 1000);
-  if (s < 60) return '刚刚';
-
-  const m = Math.floor(s / 60);
-  if (m < 60) return `${m}分钟前`;
-
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}小时前`;
-
-  const d = Math.floor(h / 24);
-  if (d < 7) return `${d}天前`;
-
-  const w = Math.floor(d / 7);
-  if (w < 5) return `${w}周前`;
-
-  const mon = Math.floor(d / 30);
-  if (mon < 12) return `${mon}月前`;
-
-  const y = Math.floor(d / 365);
-  return `${y}年前`;
 }
 
 export function memoFriendToPrompt(friend: MemoFriendView, options?: { includeSocialBehavior?: boolean }): string {

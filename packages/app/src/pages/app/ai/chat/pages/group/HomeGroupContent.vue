@@ -83,7 +83,7 @@ import {activeKey} from "@/pages/app/ai/chat/model";
 import {onRemoveChat, onRemoveGroup, onRenameChat, onRenameGroup} from "@/pages/app/ai/chat/components/HomeContext";
 import {chatMove} from "@/pages/app/ai/chat/components/ChatMove";
 import {openAddAiChatGroupDialog} from "@/pages/app/ai/chat/modal/AddAiChatGroup";
-import {formatDate} from "@/util/lang/FormatUtil.ts";
+import {formatDate} from "@/util/lang/DateUtil.ts";
 import type {AiChatGroup, AiChatItem} from "@/entity/app/ai/chat";
 import {
   getAiChatGroupService,

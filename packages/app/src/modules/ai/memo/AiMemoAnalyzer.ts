@@ -16,7 +16,7 @@ import {
 } from "@/services/memo";
 import {MEMO_TOOL_SCHEMA} from "@/modules/ai/schema/MemoSchema.ts";
 import type {MemoLayerSource} from "@/entity/memo";
-import {formatDate} from "@/util/lang/FormatUtil.ts";
+import {formatDate} from "@/util/lang/DateUtil.ts";
 import {logDebug} from "@/lib/log.ts";
 
 export interface AiMemoAnalyzerProp {

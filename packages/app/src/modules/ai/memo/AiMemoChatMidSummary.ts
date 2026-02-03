@@ -1,7 +1,7 @@
 import {memoFriendToPrompt, type MemoFriendView, type MemoMessage} from "@/entity/memo";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 import type OpenAI from "openai";
-import {formatDate} from "@/util/lang/FormatUtil.ts";
+import {formatDate} from "@/util/lang/DateUtil.ts";
 import {logDebug} from "@/lib/log.ts";
 
 export interface AiMemoChatMidSummaryProp {

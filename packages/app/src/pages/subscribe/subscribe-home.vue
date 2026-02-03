@@ -77,7 +77,7 @@ import {listFeed, refreshFeed} from "@/services/FeedService.ts";
 import type {FeedItem, SubscribeItem} from "@/entity/subscribe";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {getSubscribe} from "@/services";
-import {formatDate} from "@/util/lang/FormatUtil.ts";
+import {formatDate} from "@/util/lang/DateUtil.ts";
 import {HomeIcon} from "tdesign-icons-vue-next";
 
 const route = useRoute();

@@ -86,7 +86,7 @@ import {
   listReleaseVersionService
 } from "@/services/release";
 import {AddIcon, CheckIcon} from "tdesign-icons-vue-next";
-import {formatDate} from "@/util/lang/FormatUtil.ts";
+import {formatDate} from "@/util/lang/DateUtil.ts";
 import {openReleaseDeployInfo} from "@/pages/app/programmer/release/func/ReleaseDeployInfo.tsx";
 import {map} from "@/util";
 import {openReleaseDeployAdd} from "@/pages/app/programmer/release/func/ReleaseDeployEdit.tsx";

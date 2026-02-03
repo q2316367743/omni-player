@@ -9,7 +9,7 @@ import {
 } from "@/services/memo";
 import type OpenAI from "openai";
 import {logDebug} from "@/lib/log.ts";
-import {formatDate} from "@/util/lang/FormatUtil.ts";
+import {formatDate} from "@/util/lang/DateUtil.ts";
 import {filterChatHistory} from "@/modules/ai/utils/ChatHistoryFilter.ts";
 
 

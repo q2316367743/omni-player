@@ -4,7 +4,7 @@ import {debounce} from "es-toolkit";
 import './HomeChatSearch.less';
 import type {AiChatItem} from "@/entity/app/ai/chat";
 import {activeKey, autoHideCollapsed} from "@/pages/app/ai/chat/model.ts";
-import {formatDate} from "@/util/lang/FormatUtil.ts";
+import {formatDate} from "@/util/lang/DateUtil.ts";
 import {searchAiChatItemService} from "@/services/app/chat";
 
 

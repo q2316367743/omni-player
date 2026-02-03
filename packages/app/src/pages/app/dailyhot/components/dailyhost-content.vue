@@ -46,7 +46,7 @@
 import {openUrl} from "@tauri-apps/plugin-opener";
 import {TimeIcon} from "tdesign-icons-vue-next";
 import MessageUtil from "@/util/model/MessageUtil.ts";
-import {formatDate, prettyBetweenTime} from "@/util/lang/FormatUtil.ts";
+import {formatDate, prettyBetweenTime} from "@/util/lang/DateUtil.ts";
 import {useNewsService} from "@/modules/news/NewsFactory.ts";
 import type {NewItem} from "@/modules/news/INewsService.ts";
 
