@@ -1,20 +1,20 @@
-import type {MemoChatSummary, MemoChatSummaryCore} from "@/entity/memo/MemoChatSummary.ts";
+import type {MemoSessionSummary, MemoChatSummaryCore} from "@/entity/memo/MemoSessionSummary.ts";
 import {useSql} from "@/lib/sql.ts";
 import {useMemoVelesdb} from "@/lib/velesdb.ts";
 
 export function pageMemoChatSummary(pageNum: number, pageSize: number) {
-  return useSql().query<MemoChatSummary>('memo_chat_summary')
+  return useSql().query<MemoSessionSummary>('memo_session_summary')
     .orderByDesc('created_at')
     .page(pageNum, pageSize);
 }
 
 export function getMemoChatSummary(id: string) {
-  return useSql().query<MemoChatSummary>('memo_chat_summary').eq('id', id).get();
+  return useSql().query<MemoSessionSummary>('memo_session_summary').eq('id', id).get();
 }
 
 export async function createMemoChatSummary(data: MemoChatSummaryCore) {
   const now = Date.now();
-  const summary = await useSql().mapper<MemoChatSummary>('memo_chat_summary').insert({
+  const summary = await useSql().mapper<MemoSessionSummary>('memo_session_summary').insert({
     ...data,
     created_at: now,
     updated_at: now

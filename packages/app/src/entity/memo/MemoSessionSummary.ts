@@ -24,5 +24,5 @@ export interface MemoChatSummaryCore {
   ai_journal: string;
 }
 
-export interface MemoChatSummary extends BaseEntity, MemoChatSummaryCore {
+export interface MemoSessionSummary extends BaseEntity, MemoChatSummaryCore {
 }

@@ -64,7 +64,7 @@ import {getMemoChatSummary} from '@/services/memo/MemoChatSummaryService';
 import {listMemoMessage} from '@/services/memo/MemoMessageService';
 import XhAvatar from '@/components/avatar/XhAvatar.vue';
 import MarkdownPreview from '@/components/common/MarkdownPreview.vue';
-import type {MemoChatSummary} from '@/entity/memo/MemoChatSummary';
+import type {MemoSessionSummary} from '@/entity/memo/MemoSessionSummary.ts';
 import type {MemoMessage} from '@/entity/memo';
 import {ChevronLeftIcon} from "tdesign-icons-vue-next";
 import {useMemoFriendStore} from "@/store";
@@ -72,7 +72,7 @@ import {useMemoFriendStore} from "@/store";
 const route = useRoute();
 const router = useRouter();
 
-const summary = ref<MemoChatSummary>();
+const summary = ref<MemoSessionSummary>();
 const messages = ref<MemoMessage[]>([]);
 
 const friend = computed(() => summary.value?.friend_id ? useMemoFriendStore().friendMap.get(summary.value?.friend_id) : undefined);

@@ -56,7 +56,7 @@ export type TableName =
   | 'memo_friend'
   | 'memo_session'
   | 'memo_message'
-  | 'memo_chat_summary'
+  | 'memo_session_summary'
   | 'memo_post'
   | 'memo_post_comment';
 

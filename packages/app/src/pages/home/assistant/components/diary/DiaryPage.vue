@@ -56,13 +56,13 @@
 </template>
 
 <script lang="ts" setup>
-import type { MemoChatSummary } from '@/entity/memo/MemoChatSummary.ts'
+import type { MemoSessionSummary } from '@/entity/memo/MemoSessionSummary.ts'
 import { pageMemoChatSummary } from '@/services/memo/MemoChatSummaryService.ts'
 import { useMemoFriendStore } from '@/store/MemoFriendStore.ts'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
 
 const router = useRouter()
-const summaries = ref<MemoChatSummary[]>([])
+const summaries = ref<MemoSessionSummary[]>([])
 const loading = ref(false)
 const hasMore = ref(true)
 const currentPage = ref(1)

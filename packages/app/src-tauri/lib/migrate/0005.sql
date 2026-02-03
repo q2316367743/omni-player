@@ -382,7 +382,7 @@ CREATE TABLE memo_message
 
 CREATE INDEX idx_memo_message_session_id ON memo_message (session_id);
 
-CREATE TABLE memo_chat_summary
+CREATE TABLE memo_session_summary
 (
     -- 主键
     id           TEXT PRIMARY KEY,
