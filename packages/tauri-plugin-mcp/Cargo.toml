@@ -1,0 +1,20 @@
+[package]
+name = "tauri-plugin-mcp"
+version = "0.1.0"
+authors = [ "You" ]
+description = ""
+edition = "2021"
+rust-version = "1.77.2"
+exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules"]
+links = "tauri-plugin-mcp"
+
+[dependencies]
+tauri = { version = "2.9.5" }
+serde = "1.0"
+serde_json = "1.0"
+thiserror = "2"
+rmcp = { version = "0.14.0", features = ["server", "client", "transport-child-process"] }
+tokio = { version = "1", features = ["full"] }
+
+[build-dependencies]
+tauri-plugin = { version = "2.5.2", features = ["build"] }
