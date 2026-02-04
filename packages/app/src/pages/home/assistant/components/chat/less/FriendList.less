@@ -8,15 +8,18 @@
 }
 
 .friend-list-header {
-  padding: var(--monica-spacing-md);
+  padding: var(--monica-spacing-sm);
   border-bottom: 1px solid var(--monica-border);
+  display: flex;
+  justify-content: space-between;
+  height: 40px;
+  align-items: center;
 }
 
 .friend-list-title {
   font-size: var(--monica-font-lg);
   font-weight: 600;
   color: var(--monica-text-primary);
-  margin: 0 0 var(--monica-spacing-sm) 0;
 }
 
 .friend-list-search {
@@ -54,6 +57,9 @@
 
   &.active {
     background: var(--monica-coral-light);
+    .friend-desc {
+      color: var(--td-text-color-anti);
+    }
   }
 }
 
