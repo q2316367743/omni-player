@@ -16,8 +16,6 @@
         v-model="inputContent"
         placeholder="输入消息..."
         :autosize="{ minRows: 1, maxRows: 4 }"
-        @keydown.enter.exact.prevent="handleSend"
-        @keydown.enter.shift.exact="handleNewLine"
       />
       <t-button
         class="send-button"

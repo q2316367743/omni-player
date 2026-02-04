@@ -1,4 +1,4 @@
-import type {MemoSessionSummary, MemoChatSummaryCore} from "@/entity/memo/MemoSessionSummary.ts";
+import type {MemoSessionSummary, MemoSessionSummaryCore} from "@/entity/memo/MemoSessionSummary.ts";
 import {useSql} from "@/lib/sql.ts";
 import {useMemoVelesdb} from "@/lib/velesdb.ts";
 
@@ -12,7 +12,7 @@ export function getMemoChatSummary(id: string) {
   return useSql().query<MemoSessionSummary>('memo_session_summary').eq('id', id).get();
 }
 
-export async function createMemoChatSummary(data: MemoChatSummaryCore) {
+export async function createMemoChatSummary(data: MemoSessionSummaryCore) {
   const now = Date.now();
   const summary = await useSql().mapper<MemoSessionSummary>('memo_session_summary').insert({
     ...data,

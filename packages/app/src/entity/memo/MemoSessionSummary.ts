@@ -1,6 +1,6 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 
-export interface MemoChatSummaryCore {
+export interface MemoSessionSummaryCore {
 
   session_id: string;
 
@@ -24,5 +24,5 @@ export interface MemoChatSummaryCore {
   ai_journal: string;
 }
 
-export interface MemoSessionSummary extends BaseEntity, MemoChatSummaryCore {
+export interface MemoSessionSummary extends BaseEntity, MemoSessionSummaryCore {
 }
