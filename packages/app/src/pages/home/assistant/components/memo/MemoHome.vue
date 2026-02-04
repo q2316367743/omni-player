@@ -9,11 +9,6 @@
         <div class="date-info">
           <span class="date-emoji">📅</span>
           <span class="date-text">{{ currentDate }}</span>
-          <t-button theme="primary" variant="text" shape="square" @click="toSetting()">
-            <template #icon>
-              <setting-icon/>
-            </template>
-          </t-button>
         </div>
       </div>
 
@@ -56,8 +51,6 @@ import type {MemoFriendStaticView} from '@/entity/memo'
 import type {Memo} from '../../types.ts'
 import {SettingIcon} from "tdesign-icons-vue-next";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
-
-const router = useRouter();
 
 const greetings = ['早上好', '下午好', '晚上好', '夜深了']
 const mood = new Date().getHours()
@@ -184,9 +177,6 @@ const deleteMemo = async (memo: Memo) => {
   }
 }
 
-const toSetting = () => {
-  router.push('/admin/global-setting')
-}
 </script>
 
 <style scoped lang="less">

@@ -2,12 +2,20 @@
   <div class="p-8px overflow-auto">
     <t-card>
       <template #actions>
-        <t-button theme="primary" @click="handleAdd">
-          <template #icon>
-            <add-icon/>
-          </template>
-          新增 MCP
-        </t-button>
+        <t-space>
+          <t-button theme="default" variant="outline" @click="handleViewToolCalls">
+            <template #icon>
+              <view-list-icon />
+            </template>
+            查看工具调用
+          </t-button>
+          <t-button theme="primary" @click="handleAdd">
+            <template #icon>
+              <add-icon/>
+            </template>
+            新增 MCP
+          </t-button>
+        </t-space>
       </template>
 
       <t-table
@@ -206,6 +214,79 @@
         </t-form-item>
       </t-form>
     </t-drawer>
+
+    <t-drawer
+      v-model:visible="toolCallsDrawerVisible"
+      header="MCP 工具调用"
+      size="large"
+      :footer="false"
+    >
+      <div class="tool-calls-container">
+        <t-loading :loading="toolCallsLoading" size="large">
+          <div v-if="!toolCallsLoading && toolCalls.length === 0" class="empty-state">
+            <t-empty description="暂无工具调用数据" />
+          </div>
+          <div v-else class="tool-calls-list">
+            <div
+              v-for="(tool, index) in toolCalls"
+              :key="index"
+              class="tool-call-item"
+            >
+              <div class="tool-call-header">
+                <t-tag size="small" theme="primary">{{ tool.id }}</t-tag>
+                <span class="tool-name">{{ tool.name }}</span>
+              </div>
+              <div class="tool-call-description">{{ tool.description }}</div>
+              
+              <div v-if="tool.required && tool.required.length > 0" class="tool-call-section">
+                <div class="section-title">必要参数</div>
+                <t-tag v-for="param in tool.required" :key="param" size="small" theme="warning">
+                  {{ param }}
+                </t-tag>
+              </div>
+
+              <div v-if="tool.parameters && Object.keys(tool.parameters).length > 0" class="tool-call-section">
+                <div class="section-title">参数定义</div>
+                <t-collapse>
+                  <t-collapse-panel
+                    v-for="(schema, key) in tool.parameters"
+                    :key="key"
+                    :header="key"
+                    :value="key"
+                  >
+                    <MonacoEditor
+                      :model-value="formatJson(schema)"
+                      language="json"
+                      :readonly="true"
+                      height="200px"
+                    />
+                  </t-collapse-panel>
+                </t-collapse>
+              </div>
+
+              <div v-if="tool.requestBody && Object.keys(tool.requestBody).length > 0" class="tool-call-section">
+                <div class="section-title">响应体定义</div>
+                <t-collapse>
+                  <t-collapse-panel
+                    v-for="(schema, key) in tool.requestBody"
+                    :key="`response-${key}`"
+                    :header="key"
+                    :value="`response-${key}`"
+                  >
+                    <MonacoEditor
+                      :model-value="formatJson(schema)"
+                      language="json"
+                      :readonly="true"
+                      height="200px"
+                    />
+                  </t-collapse-panel>
+                </t-collapse>
+              </div>
+            </div>
+          </div>
+        </t-loading>
+      </div>
+    </t-drawer>
   </div>
 </template>
 
@@ -213,15 +294,20 @@
 import {storeToRefs} from "pinia";
 import {useMcpSettingStore} from "@/store/McpSettingStore.ts";
 import type {McpSettingView, McpSettingViewCore} from "@/entity/setting";
-import {AddIcon, CheckIcon, CloseIcon} from "tdesign-icons-vue-next";
+import {AddIcon, CheckIcon, CloseIcon, ViewListIcon} from "tdesign-icons-vue-next";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import type {FormInstanceFunctions, FormRule} from "tdesign-vue-next";
+import {getToolCalls, type McpToolCall} from "@tauri-apps/plugin-mcp";
+import MonacoEditor from "@/components/common/MonacoEditor.vue";
 
 const mcpSettingStore = useMcpSettingStore();
 const {mcps} = storeToRefs(mcpSettingStore);
 
 const loading = ref(false);
 const dialogVisible = ref(false);
+const toolCallsDrawerVisible = ref(false);
+const toolCallsLoading = ref(false);
+const toolCalls = ref<McpToolCall[]>([]);
 const isEdit = ref(false);
 const submitting = ref(false);
 const formRef = ref<FormInstanceFunctions>();
@@ -246,6 +332,14 @@ const rules: Record<string, FormRule[]> = {
   command: [{required: true, message: '请输入命令'}]
 };
 
+function formatJson(data: any): string {
+  try {
+    return JSON.stringify(data, null, 2);
+  } catch {
+    return JSON.stringify(data);
+  }
+}
+
 const columns = computed(() => [
   {
     title: '标签',
@@ -261,21 +355,6 @@ const columns = computed(() => [
     title: '描述',
     colKey: 'description',
     ellipsis: true
-  },
-  {
-    title: '命令',
-    colKey: 'command',
-    width: 120
-  },
-  {
-    title: '参数',
-    colKey: 'args',
-    width: 180
-  },
-  {
-    title: '环境变量',
-    colKey: 'env',
-    width: 200
   },
   {
     title: '启用',
@@ -380,6 +459,18 @@ function handleParseJson() {
   }
 }
 
+async function handleViewToolCalls() {
+  toolCallsDrawerVisible.value = true;
+  toolCallsLoading.value = true;
+  try {
+    toolCalls.value = await getToolCalls();
+  } catch (e) {
+    MessageUtil.error('加载工具调用失败', e);
+  } finally {
+    toolCallsLoading.value = false;
+  }
+}
+
 async function handleSubmit() {
   const valid = await formRef.value?.validate();
   if (valid !== true) return;
@@ -471,6 +562,60 @@ onMounted(() => {
     font-size: 12px;
     color: var(--td-text-color-secondary);
     overflow-x: auto;
+  }
+}
+
+.tool-calls-container {
+  .empty-state {
+    padding: 40px 0;
+  }
+
+  .tool-calls-list {
+    .tool-call-item {
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid var(--td-component-border);
+      border-radius: 8px;
+      background: var(--td-bg-color-container);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .tool-call-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+
+        .tool-name {
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--td-text-color-primary);
+        }
+      }
+
+      .tool-call-description {
+        margin-bottom: 16px;
+        color: var(--td-text-color-secondary);
+        line-height: 1.6;
+      }
+
+      .tool-call-section {
+        margin-bottom: 16px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .section-title {
+          font-size: 13px;
+          font-weight: 600;
+          color: var(--td-text-color-primary);
+          margin-bottom: 8px;
+        }
+      }
+    }
   }
 }
 </style>

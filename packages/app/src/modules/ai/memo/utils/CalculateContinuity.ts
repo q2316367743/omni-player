@@ -18,6 +18,7 @@ interface ContextContinuityScore {
  * @param input 输入内容
  */
 function calculateSimilarity(content: string, input: string) {
+  console.log('calculateSimilarity', content, input)
   return 0.5;
 }
 
@@ -25,6 +26,7 @@ function detectIntent(input: string): 'continue' | 'new_topic' | 'ambiguous' {
   // 1. 询问用户明示意图
   // 2. 尝试解析用户意图
   // 3. 模糊意图时，询问用户是否继续
+  console.log('detectIntent', input)
   return 'continue';
 }
 
