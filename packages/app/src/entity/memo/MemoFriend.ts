@@ -827,8 +827,8 @@ export function buildMemoLayersContext(
     .filter(b => b.status === 'active')
     // 热度 = priority × (1 / ((当前时间 - 创建时间)^0.5 + 1))
     .sort((a, b) => {
-      const aTimeDiff = Math.max(0, now - a.created_at);
-      const bTimeDiff = Math.max(0, now - b.created_at);
+      const aTimeDiff = Math.max(0, now - a.updated_at);
+      const bTimeDiff = Math.max(0, now - b.updated_at);
       const aHotness = a.priority * (1 / (Math.sqrt(aTimeDiff) + 1));
       const bHotness = b.priority * (1 / (Math.sqrt(bTimeDiff) + 1));
       return bHotness - aHotness;
