@@ -13,7 +13,7 @@ export interface MCPItem {
   name: string;
   command: string;
   args: Array<string>;
-  evn: Record<string, string>
+  env: Record<string, string>
 }
 
 /**
@@ -21,7 +21,7 @@ export interface MCPItem {
  * @param items
  */
 export async function add(items: Array<MCPItem>) {
-  await invoke('plugin:mcp:add', { items });
+  await invoke('plugin:mcp|add', { items });
 }
 
 /**
@@ -29,7 +29,7 @@ export async function add(items: Array<MCPItem>) {
  * @param ids
  */
 export async function remove(ids: Array<string>) {
-  await invoke('plugin:mcp:remove', { ids });
+  await invoke('plugin:mcp|remove', { ids });
 }
 
 export interface McpToolCall {

@@ -355,10 +355,10 @@
           "markdownDescription": "Denies the remove command without any pre-configured scope."
         },
         {
-          "description": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-add`\n- `allow-remove`\n- `allow-list`\n- `allow-execute_tool_call`\n- `allow-get_tool_calls`",
+          "description": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-add`\n- `allow-remove`\n- `allow-list`\n- `allow-execute-tool-call`\n- `allow-get-tool-calls`",
           "type": "string",
           "const": "default",
-          "markdownDescription": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-add`\n- `allow-remove`\n- `allow-list`\n- `allow-execute_tool_call`\n- `allow-get_tool_calls`"
+          "markdownDescription": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-add`\n- `allow-remove`\n- `allow-list`\n- `allow-execute-tool-call`\n- `allow-get-tool-calls`"
         }
       ]
     }

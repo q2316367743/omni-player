@@ -4,13 +4,14 @@
       <div class="font-semibold">管理后台</div>
     </template>
     <template #content>
-      <t-layout class="h-full">
+      <t-layout style="height: calc(100vh - 57px)">
         <t-aside>
           <t-menu v-model="value" class="h-full" @change="onChange">
             <t-menu-item value="/admin/global-setting">全局设置</t-menu-item>
             <t-menu-item value="/admin/ai-setting">AI 设置</t-menu-item>
             <t-menu-item value="/admin/user-setting">用户设置</t-menu-item>
             <t-menu-item value="/admin/dev-setting">开发者设置</t-menu-item>
+            <t-menu-item value="/admin/mcp-setting">MCP 设置</t-menu-item>
           </t-menu>
         </t-aside>
         <t-content class="overflow-auto">

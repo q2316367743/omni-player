@@ -20,7 +20,7 @@ pub struct MCPItem {
   pub name: String,
   pub command: String,
   pub args: Vec<String>,
-  #[serde(rename = "evn")]
+  #[serde(rename = "env")]
   pub env: std::collections::HashMap<String, String>,
 }
 

@@ -7,8 +7,8 @@ Default permissions for the plugin
 - `allow-add`
 - `allow-remove`
 - `allow-list`
-- `allow-execute_tool_call`
-- `allow-get_tool_calls`
+- `allow-execute-tool-call`
+- `allow-get-tool-calls`
 
 ## Permission Table
 

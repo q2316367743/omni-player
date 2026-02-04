@@ -55,8 +55,8 @@ const slot = defineSlots<{
     position: absolute;
     top: 57px;
     left: 0;
-    width: 100%;
-    height: calc(100vh - 57px);
+    right: 0;
+    bottom: 0;
     transform: scale(1);
     overflow-y: auto;
     overflow-x: hidden;

@@ -6,7 +6,7 @@
 <script lang="ts" setup>
 import {setupRefreshFeedTask} from "@/modules/subscribe/RefreshFeedTask.ts";
 import {logError, logInfo} from "@/lib/log.ts";
-import {useMemoFriendStore} from "@/store";
+import {useMcpSettingStore, useMemoFriendStore} from "@/store";
 
 // 注册定时刷新任务
 setupRefreshFeedTask()
@@ -19,6 +19,7 @@ setupRefreshFeedTask()
 // 获取全部 memo 好友
 useMemoFriendStore().loadFriends();
 useMemoFriendStore().loadChatSession();
+useMcpSettingStore().fetchMcps();
 </script>
 <style scoped lang="less">
 .app-content {
