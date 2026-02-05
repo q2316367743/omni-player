@@ -11,4 +11,5 @@ export * from "./MemoSession.ts";
 export * from "./MemoMessage.ts";
 export * from "./MemoPost.ts";
 export * from "./MemoPostComment.ts";
-export * from "./MemoChat.ts"
+export * from "./MemoChat.ts";
+export * from "./MemoChatSummary.ts";
