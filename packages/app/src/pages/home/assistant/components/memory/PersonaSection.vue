@@ -49,6 +49,21 @@
           <span class="source-label">{{ item.source === 'memo' ? '📝 Memo' : '💬 聊天' }}</span>
           <span class="created-time">{{ formatTime(item.created_at) }}</span>
         </div>
+        <div class="persona-actions">
+          <t-dropdown trigger="click">
+            <t-button size="small" variant="text" shape="square">
+              <template #icon><t-icon name="more" /></template>
+            </t-button>
+            <t-dropdown-menu>
+              <t-dropdown-item @click="openSetExpireDialog(item)">
+                {{ isExpired(item) ? '设置过期时间' : '修改过期时间' }}
+              </t-dropdown-item>
+              <t-dropdown-item v-if="!isExpired(item)" @click="openExtendExpireDialog(item)">
+                延长过期时间
+              </t-dropdown-item>
+            </t-dropdown-menu>
+          </t-dropdown>
+        </div>
       </div>
     </div>
   </div>
@@ -56,12 +71,14 @@
 
 <script lang="ts" setup>
 import type { MemoLayerPersona } from '@/entity/memo'
+import { openSetExpireDialog as openSetExpireDialogFn, openExtendExpireDialog as openExtendExpireDialogFn } from './MemoExpireDialog'
 
 interface Props {
   data: MemoLayerPersona[]
 }
 
 defineProps<Props>()
+const emit = defineEmits(['refresh'])
 
 const isExpired = (item: MemoLayerPersona) => {
   return Date.now() > item.expire_at
@@ -112,6 +129,14 @@ const formatTime = (timestamp: number) => {
     minute: '2-digit'
   })
 }
+
+const openSetExpireDialog = (item: MemoLayerPersona) => {
+  openSetExpireDialogFn(item.id, item.expire_at, isExpired(item), item.created_at, () => emit('refresh'), 'persona' as const)
+}
+
+const openExtendExpireDialog = (item: MemoLayerPersona) => {
+  openExtendExpireDialogFn(item.id, () => emit('refresh'), 'persona' as const)
+}
 </script>
 
 <style scoped lang="less">
@@ -157,6 +182,7 @@ const formatTime = (timestamp: number) => {
 .persona-card {
   padding: var(--monica-spacing-lg);
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .persona-card.expired {
@@ -176,6 +202,7 @@ const formatTime = (timestamp: number) => {
   gap: var(--monica-spacing-sm);
   margin-bottom: var(--monica-spacing-md);
   flex-wrap: wrap;
+  padding-right: 40px;
 }
 
 .trait-badge {
@@ -253,6 +280,12 @@ const formatTime = (timestamp: number) => {
   align-items: center;
   padding-top: var(--monica-spacing-md);
   border-top: 1px solid var(--monica-border);
+}
+
+.persona-actions {
+  position: absolute;
+  top: var(--monica-spacing-md);
+  right: var(--monica-spacing-md);
 }
 
 .source-label {

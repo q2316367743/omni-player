@@ -51,6 +51,21 @@
           <span class="source-label">{{ item.source === 'memo' ? '📝 Memo' : '💬 聊天' }}</span>
           <span class="created-time">{{ formatTime(item.created_at) }}</span>
         </div>
+        <div class="behavior-actions">
+          <t-dropdown trigger="click">
+            <t-button size="small" variant="text" shape="square">
+              <template #icon><t-icon name="more" /></template>
+            </t-button>
+            <t-dropdown-menu>
+              <t-dropdown-item @click="openSetExpireDialog(item)">
+                {{ isExpired(item) ? '设置过期时间' : '设为过期' }}
+              </t-dropdown-item>
+              <t-dropdown-item v-if="!isExpired(item)" @click="openExtendExpireDialog(item)">
+                延长过期时间
+              </t-dropdown-item>
+            </t-dropdown-menu>
+          </t-dropdown>
+        </div>
       </div>
     </div>
   </div>
@@ -58,12 +73,14 @@
 
 <script lang="ts" setup>
 import type { MemoLayerBehavior } from '@/entity/memo'
+import { openSetExpireDialog as openSetExpireDialogFn, openExtendExpireDialog as openExtendExpireDialogFn } from './MemoExpireDialog'
 
 interface Props {
   data: MemoLayerBehavior[]
 }
 
 defineProps<Props>()
+const emit = defineEmits(['refresh'])
 
 const isExpired = (item: MemoLayerBehavior) => {
   return Date.now() > item.expire_at
@@ -136,6 +153,14 @@ const formatTime = (timestamp: number) => {
     minute: '2-digit'
   })
 }
+
+const openSetExpireDialog = (item: MemoLayerBehavior) => {
+  openSetExpireDialogFn(item.id, item.expire_at, isExpired(item), item.created_at, () => emit('refresh'), 'behavior' as const)
+}
+
+const openExtendExpireDialog = (item: MemoLayerBehavior) => {
+  openExtendExpireDialogFn(item.id, () => emit('refresh'), 'behavior' as const)
+}
 </script>
 
 <style scoped lang="less">
@@ -181,6 +206,7 @@ const formatTime = (timestamp: number) => {
 .behavior-card {
   padding: var(--monica-spacing-lg);
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .behavior-card.expired {
@@ -201,6 +227,7 @@ const formatTime = (timestamp: number) => {
   gap: var(--monica-spacing-sm);
   margin-bottom: var(--monica-spacing-md);
   flex-wrap: wrap;
+  padding-right: 40px;
 }
 
 .type-tag,
@@ -254,6 +281,12 @@ const formatTime = (timestamp: number) => {
   align-items: center;
   padding-top: var(--monica-spacing-md);
   border-top: 1px solid var(--monica-border);
+}
+
+.behavior-actions {
+  position: absolute;
+  top: var(--monica-spacing-md);
+  right: var(--monica-spacing-md);
 }
 
 .source-label {

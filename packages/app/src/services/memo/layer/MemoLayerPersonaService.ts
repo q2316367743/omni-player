@@ -32,3 +32,19 @@ export function listActiveMemoLayerPersonas() {
     .list();
 }
 
+export function setExpireTime(id: string, expireAt: number) {
+  const now = Date.now();
+  return useSql().mapper<MemoLayerPersona>('memo_layer_persona').updateById(id, {
+    expire_at: expireAt,
+    updated_at: now
+  });
+}
+
+export function extendExpireTime(id: string, additionalDays: number) {
+  const now = Date.now();
+  return useSql().mapper<MemoLayerPersona>('memo_layer_persona').updateById(id, {
+    expire_at: now + (additionalDays * 24 * 60 * 60 * 1000),
+    updated_at: now
+  });
+}
+

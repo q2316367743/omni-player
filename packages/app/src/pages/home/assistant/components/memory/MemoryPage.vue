@@ -8,16 +8,16 @@
     <div class="memory-content monica-card">
       <t-tabs v-model="activeTab" >
         <t-tab-panel value="emotion" label="情绪层">
-          <EmotionSection :data="emotionData"/>
+          <EmotionSection :data="emotionData" @refresh="loadData"/>
         </t-tab-panel>
         <t-tab-panel value="cognitive" label="认知层">
-          <CognitiveSection :data="cognitiveData"/>
+          <CognitiveSection :data="cognitiveData" @refresh="loadData"/>
         </t-tab-panel>
         <t-tab-panel value="behavior" label="行为层">
-          <BehaviorSection :data="behaviorData"/>
+          <BehaviorSection :data="behaviorData" @refresh="loadData"/>
         </t-tab-panel>
         <t-tab-panel value="persona" label="人格层">
-          <PersonaSection :data="personaData"/>
+          <PersonaSection :data="personaData" @refresh="loadData"/>
         </t-tab-panel>
       </t-tabs>
     </div>

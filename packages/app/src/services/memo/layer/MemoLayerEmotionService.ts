@@ -32,3 +32,19 @@ export function listActiveMemoLayerEmotions() {
     .orderByDesc('expire_at')
     .list();
 }
+
+export function setExpireTime(id: string, expireAt: number) {
+  const now = Date.now();
+  return useSql().mapper<MemoLayerEmotion>('memo_layer_emotion').updateById(id, {
+    expire_at: expireAt,
+    updated_at: now
+  });
+}
+
+export function extendExpireTime(id: string, additionalDays: number) {
+  const now = Date.now();
+  return useSql().mapper<MemoLayerEmotion>('memo_layer_emotion').updateById(id, {
+    expire_at: now + (additionalDays * 24 * 60 * 60 * 1000),
+    updated_at: now
+  });
+}
