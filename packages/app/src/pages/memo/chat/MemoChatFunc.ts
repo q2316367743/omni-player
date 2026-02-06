@@ -4,14 +4,12 @@ import {completeMemoFriendSession, completeMemoSession, getMemoSession, listMemo
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import {useMemoFriendStore} from "@/store";
 import {
-  checkAndTriggerMidSummary,
   createDebouncedSaveMessage,
   generateUserMessageTimestamp,
   scrollToBottom
 } from "@/pages/memo/chat/utils.ts";
-import {aiMemoChat} from "@/modules/ai/memo/AiMemoChat.ts";
+import {aiMemoSession, aiMemoSessionSummary, type ChatSummaryResult} from "@/modules/ai/memo";
 import type {AskToOpenAiAbort} from "@/modules/ai";
-import {aiMemoChatSummary, type ChatSummaryResult} from "@/modules/ai/memo/AiMemoChatSummary.ts";
 
 export interface MemoChatFuncResult {
   friend: Ref<MemoFriendStaticView>;
@@ -82,7 +80,7 @@ export async function memoChatFunc(sessionId: string): Promise<MemoChatFuncResul
       isLoading.value = true;
       try {
         let assistantMessageContent = '';
-        await aiMemoChat({
+        await aiMemoSession({
           friend: f!,
           chat: '',
           messages: messages.value,
@@ -158,19 +156,6 @@ export async function memoChatFunc(sessionId: string): Promise<MemoChatFuncResul
     if (!content || isLoading.value || !friend.value || !session.value) return;
 
     logDebug('[MemoChat] 开始发送消息', { contentLength: content.length });
-    const f = await useMemoFriendStore().fetchFriend(friend.value.id);
-
-    // 检查是否需要中间总结（在发送用户消息之前）
-    const midSummaryTriggered = await checkAndTriggerMidSummary({
-      messages: messages.value,
-      friend: f!,
-      sessionId: session.value.id,
-      isGenerating: isGeneratingMidSummary,
-    });
-
-    if (midSummaryTriggered) {
-      logDebug('[MemoChat] 中间总结已触发并完成');
-    }
 
     // 生成用户消息的 created_at：确保在 summary 之后
     const userCreatedAt = generateUserMessageTimestamp(messages.value);
@@ -206,7 +191,7 @@ export async function memoChatFunc(sessionId: string): Promise<MemoChatFuncResul
     try {
       let assistantMessageContent = '';
       const f = await useMemoFriendStore().fetchFriend(friend.value.id);
-      await aiMemoChat({
+      await aiMemoSession({
         friend: f!,
         chat: content,
         messages: messages.value,
@@ -287,7 +272,7 @@ export async function memoChatFunc(sessionId: string): Promise<MemoChatFuncResul
     isEnding.value = true;
     try {
       const f = await useMemoFriendStore().fetchFriend(friend.value.id);
-      summaryData.value = await aiMemoChatSummary({
+      summaryData.value = await aiMemoSessionSummary({
         friend: f!,
         sessionId: session.value!.id,
         messages: messages.value,

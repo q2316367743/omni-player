@@ -1,7 +1,6 @@
-import {countMemoPostForWeek, type MemoItemAdd} from "@/services/memo";
+import {createMemoPost, countMemoPostForWeek, type MemoItemAdd} from "@/services/memo";
 import {useMemoFriendStore} from "@/store";
-import {aiMemoPostByKeyword} from "@/modules/ai/memo/AiMemoPostByKeyword.ts";
-import {createMemoPost} from "@/services/memo/MemoPostService.ts";
+import {aiMemoPostByKeyword} from "@/modules/ai/memo";
 import {logDebug, logInfo, logError} from "@/lib/log.ts";
 
 interface CandidateFriend {

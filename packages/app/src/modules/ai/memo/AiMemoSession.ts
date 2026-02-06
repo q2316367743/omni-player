@@ -10,7 +10,6 @@ import {
 import type OpenAI from "openai";
 import {logDebug} from "@/lib/log.ts";
 import {formatDate} from "@/util/lang/DateUtil.ts";
-import {filterChatHistory} from "@/modules/ai/utils/ChatHistoryFilter.ts";
 
 
 export interface AiMemoChatProp {
@@ -28,7 +27,7 @@ export interface AiMemoChatProp {
 /**
  * 聊天
  */
-export async function aiMemoChat(props: AiMemoChatProp) {
+export async function aiMemoSession(props: AiMemoChatProp) {
   const {friend, chat, messages, onStart, onAborted, onMessage, onFinally, onError} = props;
 
   // 获取 AI 的提示词
@@ -83,24 +82,17 @@ ${formatDate(new Date())}
     content: backgroundContext
   });
 
-  // 3. 最近对话历史
-  const filteredMessages = filterChatHistory(chat, messages, {
-    followUpWindow: 8,   // 追问时保留8条（约4轮对话）
-    newTopicWindow: 3,   // 新话题只保留3条（约1-2轮）
-    defaultWindow: 6,    // 默认6条（约3轮）
-    compressLength: 60,  // 旧AI回复只留60字
-  });
-
   // 添加最近对话历史
-  filteredMessages.forEach(msg => {
-    chatMessages.push({
-      role: msg.role,
-      content: msg.content
-    });
+  messages.forEach(msg => {
+    if (msg.role === "assistant" || msg.role === "user" || msg.role === "system")
+      chatMessages.push({
+        role: msg.role,
+        content: msg.content
+      });
   });
 
   // 如果没有历史对话，添加一个提示让AI主动打招呼
-  if (filteredMessages.length === 0) {
+  if (messages.length === 0) {
     chatMessages.push({
       role: "system",
       content: "这是与用户的第一次对话，请根据你的人设主动打招呼，表达友好，并引导用户开始对话。"

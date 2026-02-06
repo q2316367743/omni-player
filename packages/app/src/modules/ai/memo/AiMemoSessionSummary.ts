@@ -23,7 +23,7 @@ export interface ChatSummaryResult {
   ai_journal: string;
 }
 
-export async function aiMemoChatSummary(prop: AiMemoChatSummaryProp): Promise<ChatSummaryResult> {
+export async function aiMemoSessionSummary(prop: AiMemoChatSummaryProp): Promise<ChatSummaryResult> {
   const {friend, messages} = prop;
   // 获取 AI 的提示词
   const prompt = memoFriendToPrompt(friend);

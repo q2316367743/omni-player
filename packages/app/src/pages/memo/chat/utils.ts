@@ -1,7 +1,6 @@
 import { nextTick } from 'vue';
 import type { MemoMessage, MemoMessageCore } from '@/entity/memo';
 import { saveMemoMessage } from '@/services/memo/MemoMessageService';
-import { aiMemoChatMidSummary } from '@/modules/ai/memo/AiMemoChatMidSummary';
 import type { MemoFriendView } from '@/entity/memo';
 import { logDebug, logError } from '@/lib/log';
 
@@ -131,103 +130,6 @@ export interface MidSummaryResult {
   summaryMessage?: MemoMessage;
 }
 
-/**
- * 执行中间总结
- */
-export async function executeMidSummary(
-  context: MidSummaryContext
-): Promise<MidSummaryResult> {
-  const { messages, friend, sessionId, isGenerating } = context;
-
-  if (isGenerating.value) {
-    logDebug('[MidSummary] 正在生成中，跳过本次请求');
-    return { success: false };
-  }
-
-  isGenerating.value = true;
-  logDebug('[MidSummary] 开始执行中间总结', { sessionId });
-
-  try {
-    const messagesToSummarize = getMessagesToSummarize(messages);
-
-    logDebug('[MidSummary] 调用 AI 生成总结', {
-      messageCount: messagesToSummarize.length,
-      friendId: friend.id,
-    });
-
-    // 调用中间总结 AI
-    const result = await aiMemoChatMidSummary({
-      friend,
-      messages: messagesToSummarize,
-    });
-
-    // 生成 created_at：取当前最后一条消息的时间戳 + 1
-    const lastMessage = messages[messages.length - 1];
-    const summaryCreatedAt = lastMessage ? lastMessage.created_at + 1 : Date.now();
-
-    logDebug('[MidSummary] AI 总结生成完成', {
-      summaryLength: result.summary.length,
-      summaryCreatedAt,
-    });
-
-    // 保存 summary 消息（使用传入的 created_at 确保顺序）
-    await saveMemoMessage(
-      {
-        session_id: sessionId,
-        role: 'summary',
-        content: result.summary,
-      },
-      summaryCreatedAt
-    );
-
-    logDebug('[MidSummary] 总结消息已保存到数据库');
-
-    // 构建 summary 消息对象
-    const summaryMessage: MemoMessage = {
-      id: Date.now().toString(),
-      session_id: sessionId,
-      role: 'summary',
-      content: result.summary,
-      created_at: summaryCreatedAt,
-      updated_at: summaryCreatedAt,
-    };
-
-    logDebug('[MidSummary] 中间总结流程完成');
-
-    return {
-      success: true,
-      summaryMessage,
-    };
-  } catch (error) {
-    logError('[MidSummary] 生成中间总结失败', error);
-    return { success: false };
-  } finally {
-    isGenerating.value = false;
-  }
-}
-
-/**
- * 检查并触发中间总结（完整流程）
- */
-export async function checkAndTriggerMidSummary(
-  context: MidSummaryContext
-): Promise<boolean> {
-  logDebug('[MidSummary] 检查并触发中间总结');
-
-  if (!shouldTriggerMidSummary(context.messages)) {
-    return false;
-  }
-
-  const result = await executeMidSummary(context);
-  if (result.success && result.summaryMessage) {
-    context.messages.push(result.summaryMessage);
-    logDebug('[MidSummary] 总结消息已添加到本地列表', {
-      newMessageCount: context.messages.length,
-    });
-  }
-
-  return result.success;
-}
 
 /**
  * 生成用户消息的 created_at
