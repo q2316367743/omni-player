@@ -35,20 +35,22 @@
       />
     </div>
 
-    <ChatInput @send="handleSend" />
+    <ChatInput 
+      @send="handleSend"
+      :support-think="supportThink"
+      :think-enabled="thinkEnabled"
+      :is-loading="isLoading"
+      @toggle-think="handleToggleThink"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
+import {useSettingStore} from '@/store'
 import type {MemoFriendStaticView} from '@/entity/memo'
-import {
-  getArchetypeText,
-  getGenderText,
-  getAgeRangeText,
-  getRelationText,
-  getMemorySpanText,
-  getPostingStyleText
-} from '@/entity/memo/MemoFriend'
+import {listMemoChatTimestamp, saveMemoChat} from '@/services/memo/chat'
+import {aiMemoChat} from '@/modules/ai/memo'
+import {debounce} from '@/pages/memo/chat/utils'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
 import MessageBubble from './MessageBubble.vue'
 import ChatInput from './ChatInput.vue'
@@ -56,25 +58,121 @@ import ChatFriendStaticDetail from "@/pages/home/assistant/components/chat/ChatF
 
 const props = defineProps<{
   friend: MemoFriendStaticView
-  messages: Array<{
-    id: string
-    sender: 'user' | 'friend'
-    content: string
-    timestamp: number
-  }>
 }>()
 
-const emit = defineEmits<{
-  (e: 'send', content: string): void
-}>()
-
+const settingStore = useSettingStore()
 const messagesContainer = ref<HTMLElement>()
+const isLoading = ref(false)
+const thinkEnabled = ref(false)
 
-const handleSend = (content: string) => {
-  emit('send', content)
+const supportThink = computed(() => {
+  return settingStore.supportThink(props.friend.model)
+})
+
+const messages = ref<Array<{
+  id: string
+  sender: 'user' | 'friend'
+  content: Array<{ type: 'text' | 'think', content: string }>
+  timestamp: number
+}>>([])
+
+const createDebouncedSave = debounce(async (chatData: any) => {
+  try {
+    await saveMemoChat(chatData)
+  } catch (error) {
+    console.error('保存消息失败:', error)
+  }
+}, 1000)
+
+const loadHistoryMessages = async () => {
+  try {
+    const historyChats = await listMemoChatTimestamp(props.friend.id, Date.now(), 50)
+    messages.value = historyChats.map(chat => ({
+      id: chat.id,
+      sender: chat.role === 'user' ? 'user' : 'friend',
+      content: chat.content,
+      timestamp: chat.created_at
+    }))
+  } catch (error) {
+    console.error('加载历史消息失败:', error)
+    messages.value = []
+  }
 }
 
-watch(() => props.messages.length, () => {
+const handleSend = async (content: string) => {
+  const userMessage = {
+    id: Date.now().toString(),
+    sender: 'user' as const,
+    content: [{ type: 'text' as const, content }],
+    timestamp: Date.now()
+  }
+
+  messages.value.push(userMessage)
+
+  createDebouncedSave({
+    friend_id: props.friend.id,
+    role: 'user',
+    content: userMessage.content,
+    compression_level: 0,
+    token_count: content.length
+  })
+
+  try {
+    isLoading.value = true
+
+    const assistantMessage = reactive({
+      id: (Date.now() + 1).toString(),
+      sender: 'friend' as const,
+      content: [] as Array<{ type: 'text' | 'think', content: string }>,
+      timestamp: Date.now()
+    })
+
+    messages.value.push(assistantMessage)
+
+    await aiMemoChat({
+      friend: props.friend,
+      think: thinkEnabled.value,
+      onMessage: async (msg) => {
+        const lastContent = assistantMessage.content[assistantMessage.content.length - 1]
+        if (lastContent && lastContent.type === msg.type) {
+          lastContent.content += msg.content
+        } else {
+          assistantMessage.content.push({ type: msg.type, content: msg.content })
+        }
+      }
+    })
+
+    createDebouncedSave({
+      friend_id: props.friend.id,
+      role: 'assistant',
+      content: assistantMessage.content,
+      compression_level: 0,
+      token_count: assistantMessage.content.reduce((sum, c) => sum + c.content.length, 0)
+    })
+  } catch (error) {
+    console.error('发送消息失败:', error)
+    const errorMessage = {
+      id: (Date.now() + 2).toString(),
+      sender: 'friend' as const,
+      content: [{ type: 'text' as const, content: '发送失败，请重试' }],
+      timestamp: Date.now()
+    }
+    messages.value.push(errorMessage)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const handleToggleThink = () => {
+  thinkEnabled.value = !thinkEnabled.value
+}
+
+watch(() => props.friend.id, async () => {
+  thinkEnabled.value = false
+  await loadHistoryMessages()
+}, { immediate: true })
+
+watch(() => messages.value.length, () => {
   nextTick(() => {
     if (messagesContainer.value) {
       messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight

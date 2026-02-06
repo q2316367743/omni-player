@@ -12,7 +12,7 @@ import {logDebug} from "@/lib/log.ts";
 import {formatDate} from "@/util/lang/DateUtil.ts";
 
 
-export interface AiMemoChatProp {
+export interface AiMemoSessionProp {
   friend: MemoFriendView;
   chat: string;
   messages: Array<MemoMessage>;
@@ -27,7 +27,7 @@ export interface AiMemoChatProp {
 /**
  * 聊天
  */
-export async function aiMemoSession(props: AiMemoChatProp) {
+export async function aiMemoSession(props: AiMemoSessionProp) {
   const {friend, chat, messages, onStart, onAborted, onMessage, onFinally, onError} = props;
 
   // 获取 AI 的提示词

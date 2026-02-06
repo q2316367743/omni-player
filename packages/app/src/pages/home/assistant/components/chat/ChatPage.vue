@@ -8,8 +8,6 @@
     <ChatArea
       v-if="selectedFriend"
       :friend="selectedFriend"
-      :messages="currentMessages"
-      @send="handleSendMessage"
     />
     <div v-else class="empty-chat">
       <div class="empty-content">
@@ -22,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import {useMemoFriendStore} from '@/store/MemoFriendStore'
+import {useMemoFriendStore} from '@/store'
 import type {MemoFriendStaticView} from '@/entity/memo'
 import FriendList from './FriendList.vue'
 import ChatArea from './ChatArea.vue'
@@ -36,67 +34,12 @@ const selectedFriend = computed(() => {
   return friends.value.find(f => f.id === selectedFriendId.value)
 })
 
-const currentMessages = ref<Array<{
-  id: string
-  sender: 'user' | 'friend'
-  content: string
-  timestamp: number
-}>>([])
-
 const handleSelectFriend = (friend: MemoFriendStaticView) => {
   if (selectedFriendId.value === friend.id) {
     selectedFriendId.value = undefined
-    currentMessages.value = []
   } else {
     selectedFriendId.value = friend.id
-    loadMockMessages()
   }
-}
-
-const loadMockMessages = () => {
-  currentMessages.value = [
-    {
-      id: '1',
-      sender: 'friend',
-      content: '你好呀！很高兴见到你~',
-      timestamp: Date.now() - 3600000
-    },
-    {
-      id: '2',
-      sender: 'user',
-      content: '你好！今天过得怎么样？',
-      timestamp: Date.now() - 3500000
-    },
-    {
-      id: '3',
-      sender: 'friend',
-      content: '今天还不错呢，阳光很好，心情也很棒！你呢？',
-      timestamp: Date.now() - 3400000
-    }
-  ]
-}
-
-const handleSendMessage = (content: string) => {
-  if (!selectedFriend.value) return
-
-  const userMessage = {
-    id: Date.now().toString(),
-    sender: 'user' as const,
-    content,
-    timestamp: Date.now()
-  }
-
-  currentMessages.value.push(userMessage)
-
-  setTimeout(() => {
-    const friendMessage = {
-      id: (Date.now() + 1).toString(),
-      sender: 'friend' as const,
-      content: `收到！"${content}" 是个很有趣的话题呢~`,
-      timestamp: Date.now()
-    }
-    currentMessages.value.push(friendMessage)
-  }, 1000)
 }
 
 onMounted(() => {

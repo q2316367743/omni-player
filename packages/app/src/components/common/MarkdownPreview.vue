@@ -167,6 +167,7 @@ onBeforeUnmount(() => {
   :deep(.cherry-previewer) {
     border: none !important;
     background-color: transparent !important;
+    padding: 16px !important;
   }
 }
 </style>

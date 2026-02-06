@@ -11,4 +11,5 @@ export * from "./MemoPostService.ts";
 export * from "./MemoPostCommentService.ts";
 
 export * from "./post";
+export * from "./chat";
 

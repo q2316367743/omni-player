@@ -12,7 +12,15 @@ export interface MemoChatContentThink {
   content: string;
 }
 // 调阅 SKILL 技能
+export interface MemoChatContentSkill {
+  type: 'skill',
+}
 // 调用 mcp 功能
+export interface MemoChatContentMcp {
+  type: 'mcp',
+  // 调用的 mcp 名称
+  content: string;
+}
 
 export type MemoChatContent = MemoChatContentText | MemoChatContentThink;
 
@@ -54,4 +62,18 @@ export interface MemoChatCoreView {
 
 }
 export interface MemoChatView extends BaseEntity, MemoChatCoreView {
+}
+
+export function memoChatToView(memoChat: MemoChat): MemoChatView {
+  return {
+    ...memoChat,
+    content: JSON.parse(memoChat.content) as Array<MemoChatContent>
+  } as MemoChatView;
+}
+
+export function memoChatCoreFromView(view: MemoChatCoreView): MemoChatCore {
+  return {
+    ...view,
+    content: JSON.stringify(view.content)
+  } as MemoChatCore;
 }

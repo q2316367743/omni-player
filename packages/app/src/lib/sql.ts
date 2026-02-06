@@ -59,7 +59,9 @@ export type TableName =
   | 'memo_session_summary'
   | 'memo_post'
   | 'memo_post_comment'
-  | 'mcp_setting';
+  | 'mcp_setting'
+  | 'memo_chat'
+  | 'memo_chat_summary';
 
 export class SqlWrapper {
 

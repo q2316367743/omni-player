@@ -433,3 +433,34 @@ CREATE TABLE mcp_setting
     command     TEXT    NOT NULL DEFAULT '',
     env         TEXT    NOT NULL DEFAULT ''
 );
+
+create TABLE memo_chat
+(
+    id                     TEXT PRIMARY KEY,
+    created_at             INTEGER NOT NULL DEFAULT 0,
+    updated_at             INTEGER NOT NULL DEFAULT 0,
+    friend_id              TEXT    NOT NULL DEFAULT '',
+    role                   TEXT    NOT NULL DEFAULT '',
+    content                TEXT    NOT NULL DEFAULT '',
+    compression_level      INTEGER NOT NULL DEFAULT 0,
+    archived_to_summary_id TEXT    NOT NULL DEFAULT '',
+    token_count            INTEGER NOT NULL DEFAULT 0
+);
+
+create INDEX idx_memo_chat_friend_id ON memo_chat (friend_id);
+
+create TABLE memo_chat_summary
+(
+    id               TEXT PRIMARY KEY,
+    created_at       INTEGER NOT NULL DEFAULT 0,
+    updated_at       INTEGER NOT NULL DEFAULT 0,
+    friend_id        TEXT    NOT NULL DEFAULT '',
+    level            INTEGER NOT NULL DEFAULT 0,
+    start_time       INTEGER NOT NULL DEFAULT 0,
+    end_time         INTEGER NOT NULL DEFAULT 0,
+    content          TEXT    NOT NULL DEFAULT '',
+    layer_operations TEXT    NOT NULL DEFAULT '',
+    trigger_reason   TEXT    NOT NULL DEFAULT ''
+);
+
+create INDEX idx_memo_chat_summary_friend_id ON memo_chat_summary (friend_id);
