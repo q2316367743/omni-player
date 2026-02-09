@@ -33,6 +33,7 @@ export async function setupChatL1Summary() {
         end_time: messages[messages.length - 1]?.created_at || 0,
         content: summary,
         layer_operations: [],
+        archived_to_l2_id: '',
         trigger_reason: 'setup'
       });
       // 2. 修改消息信息

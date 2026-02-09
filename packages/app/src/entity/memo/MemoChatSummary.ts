@@ -49,6 +49,11 @@ export interface MemoChatSummaryCoreView {
   // 内容
   content: string;          // 自然语言总结（给AI看的上下文）
 
+  /**
+   * 当 level 是 1 时有效，此时此对象指向了 l2 的 id
+   */
+  archived_to_l2_id: string;
+
   // 关键：不存四层数据，只存"操作记录"
   // 实际四层数据在各自表里，通过 tool_call 写入
   layer_operations: Array<MemoChatSummaryLayerOperations>;
