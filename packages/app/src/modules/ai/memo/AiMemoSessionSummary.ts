@@ -1,7 +1,7 @@
 import {memoFriendToPrompt, type MemoFriendView, type MemoMessage} from "@/entity/memo";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 import {CHAT_SUMMARY_TOOL_SCHEMA} from "@/modules/ai/schema/ChatSummarySchema.ts";
-import {createMemoChatSummary} from "@/services/memo/MemoChatSummaryService.ts";
+import {createMemoChatSummary} from "@/services/memo/MemoSessionSummaryService.ts";
 import {updateMemoFriendDynamic} from "@/services/memo/MemoFriendService.ts";
 import {addMemoLayerPersona, updateMemoLayerPersona} from "@/services/memo";
 import {handleStreamingToolCalls} from "@/modules/ai/utils/ToolCallHandler.ts";

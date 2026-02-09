@@ -57,7 +57,7 @@
 
 <script lang="ts" setup>
 import type { MemoSessionSummary } from '@/entity/memo/MemoSessionSummary.ts'
-import { pageMemoChatSummary } from '@/services/memo/MemoChatSummaryService.ts'
+import { pageMemoChatSummary } from '@/services/memo/MemoSessionSummaryService.ts'
 import { useMemoFriendStore } from '@/store/MemoFriendStore.ts'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
 

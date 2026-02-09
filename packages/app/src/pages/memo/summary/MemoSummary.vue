@@ -60,7 +60,7 @@
 
 <script lang="ts" setup>
 import {useRoute, useRouter} from 'vue-router';
-import {getMemoChatSummary} from '@/services/memo/MemoChatSummaryService';
+import {getMemoChatSummary} from '@/services/memo/MemoSessionSummaryService.ts';
 import {listMemoMessage} from '@/services/memo/MemoMessageService';
 import XhAvatar from '@/components/avatar/XhAvatar.vue';
 import MarkdownPreview from '@/components/common/MarkdownPreview.vue';

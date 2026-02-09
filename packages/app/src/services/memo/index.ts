@@ -6,7 +6,7 @@ export * from "./layer/MemoLayerEmotionService.ts";
 export * from "./layer/MemoLayerPersonaService.ts";
 export * from "./MemoSessionService.ts";
 export * from "./MemoMessageService.ts";
-export * from "./MemoChatSummaryService.ts";
+export * from "./MemoSessionSummaryService.ts";
 export * from "./MemoPostService.ts";
 export * from "./MemoPostCommentService.ts";
 

@@ -82,7 +82,7 @@ export class SqlWrapper {
   /**
    * 串行执行 SQL 命令，确保同一时间只有一个查询在运行
    */
-  async execute(query: string, bindValues?: unknown[]): Promise<QueryResult> {
+  private async execute(query: string, bindValues?: unknown[]): Promise<QueryResult> {
     // 封装当前操作为一个函数
     const operation = () => this.db!.execute(query, bindValues);
 
@@ -104,33 +104,11 @@ export class SqlWrapper {
     return result;
   }
 
-  // 开启一个事务
-  async beginTransaction<T = any>(callback: (sql: SqlWrapper) => Promise<T>): Promise<T> {
-    try {
-      logDebug("[sql] begin transaction")
-      await this.db!.execute(`BEGIN`);
-      const r = await callback(this);
-      logDebug("[sql] commit transaction")
-      await this.db!.execute(`COMMIT`);
-      return r;
-    } catch (e) {
-      logError("[sql] rollback transaction")
-      console.error(e)
-      try {
-        await this.db!.execute(`ROLLBACK`);
-      } catch (err) {
-        logError("[sql] 回滚失败");
-        console.error(err)
-      }
-      throw e;
-    }
-  }
-
   async select<T>(query: string, bindValues?: unknown[]): Promise<T> {
     return this.db!.select<T>(query, bindValues);
   }
 
-  async getLatestVersion() {
+  private async getLatestVersion() {
     const rows =
       await this.select<Array<{
         version: number
@@ -198,6 +176,28 @@ export class SqlWrapper {
 
   mapper<T extends TableLike>(tableName: TableName) {
     return new BaseMapper<T>(tableName, this);
+  }
+
+  // 开启一个事务
+  async beginTransaction<T = any>(callback: (sql: SqlWrapper) => Promise<T>): Promise<T> {
+    try {
+      logDebug("[sql] begin transaction")
+      await this.db!.execute(`BEGIN`);
+      const r = await callback(this);
+      logDebug("[sql] commit transaction")
+      await this.db!.execute(`COMMIT`);
+      return r;
+    } catch (e) {
+      logError("[sql] rollback transaction")
+      console.error(e)
+      try {
+        await this.db!.execute(`ROLLBACK`);
+      } catch (err) {
+        logError("[sql] 回滚失败");
+        console.error(err)
+      }
+      throw e;
+    }
   }
 
 }
