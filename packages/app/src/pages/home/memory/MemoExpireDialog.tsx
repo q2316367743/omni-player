@@ -1,9 +1,9 @@
 import {DialogPlugin, Form, FormItem, DatePicker, InputNumber} from "tdesign-vue-next";
 import type {DateValue} from "tdesign-vue-next";
-import {setExpireTime as setEmotionExpireTime, extendExpireTime as extendEmotionExpireTime} from "@/services/memo/layer/MemoLayerEmotionService";
-import {setExpireTime as setCognitiveExpireTime, extendExpireTime as extendCognitiveExpireTime} from "@/services/memo/layer/MemoLayerCognitiveService";
-import {setExpireTime as setBehaviorExpireTime, extendExpireTime as extendBehaviorExpireTime} from "@/services/memo/layer/MemoLayerBehaviorService";
-import {setExpireTime as setPersonaExpireTime, extendExpireTime as extendPersonaExpireTime} from "@/services/memo/layer/MemoLayerPersonaService";
+import {setExpireTime as setEmotionExpireTime, extendExpireTime as extendEmotionExpireTime} from "@/services/memo/layer/MemoLayerEmotionService.ts";
+import {setExpireTime as setCognitiveExpireTime, extendExpireTime as extendCognitiveExpireTime} from "@/services/memo/layer/MemoLayerCognitiveService.ts";
+import {setExpireTime as setBehaviorExpireTime, extendExpireTime as extendBehaviorExpireTime} from "@/services/memo/layer/MemoLayerBehaviorService.ts";
+import {setExpireTime as setPersonaExpireTime, extendExpireTime as extendPersonaExpireTime} from "@/services/memo/layer/MemoLayerPersonaService.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 
 export function openSetExpireDialog(id: string, currentExpireAt: number, isExpired: boolean, createdAt: number, onUpdate: () => void, layer: 'emotion' | 'cognitive' | 'behavior' | 'persona' = 'emotion') {

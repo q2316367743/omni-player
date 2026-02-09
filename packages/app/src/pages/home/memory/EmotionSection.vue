@@ -53,7 +53,7 @@
 
 <script lang="ts" setup>
 import type { MemoLayerEmotion } from '@/entity/memo'
-import { openSetExpireDialog as openSetExpireDialogFn, openExtendExpireDialog as openExtendExpireDialogFn } from './MemoExpireDialog'
+import { openSetExpireDialog as openSetExpireDialogFn, openExtendExpireDialog as openExtendExpireDialogFn } from './MemoExpireDialog.tsx'
 
 interface Props {
   data: MemoLayerEmotion[]

@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts" setup>
-import type {Memo} from '../../types.ts'
+import type {Memo} from '../assistant/types.ts'
 import MessageBoxUtil from '@/util/model/MessageBoxUtil.tsx'
 import {BugIcon, ChatMessageIcon, DeleteIcon, MoreIcon} from "tdesign-icons-vue-next";
 import {createPostByKeyword} from "@/services/memo";

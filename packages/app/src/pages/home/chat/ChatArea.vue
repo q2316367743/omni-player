@@ -52,11 +52,11 @@ import {useSettingStore} from '@/store'
 import type {MemoFriendStaticView} from '@/entity/memo'
 import {listMemoChatTimestamp, saveMemoChat} from '@/services/memo/chat'
 import {aiMemoChat, setupChatL2Summary} from '@/modules/ai/memo'
-import {debounce} from '@/pages/memo/chat/utils'
+import {debounce} from '@/pages/memo/chat/utils.ts'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
 import MessageBubble from './MessageBubble.vue'
 import ChatInput from './ChatInput.vue'
-import ChatFriendStaticDetail from "@/pages/home/assistant/components/chat/ChatFriendStaticDetail.vue";
+import ChatFriendStaticDetail from "@/pages/home/chat/ChatFriendStaticDetail.vue";
 import {updateMemoFriendDynamic} from "@/services/memo";
 import {triggerChatL1Summary} from "@/modules/ai/memo/summary/TriggerChatL1Summary.ts";
 import {logDebug, logError} from "@/lib/log.ts";
@@ -185,7 +185,9 @@ const handleToggleThink = () => {
 }
 
 const handleToggleSummary = () => {
-  summaryLoading.value = true
+  if (summaryLoading.value) return;
+  MessageUtil.info('正在触发 L2 总结，请稍候...');
+  summaryLoading.value = true;
   setupChatL2Summary(props.friend, '用户主动触发')
     .then(() => {
       MessageUtil.success('触发 L2 总结成功');
@@ -214,5 +216,5 @@ watch(() => messages.value.length, () => {
 </script>
 
 <style scoped lang="less">
-@import './less/ChatArea.less';
+@import 'less/ChatArea.less';
 </style>

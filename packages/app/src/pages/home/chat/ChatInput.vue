@@ -79,5 +79,5 @@ const handleToggleSummary = () => {
 </script>
 
 <style scoped lang="less">
-@import './less/ChatInput.less';
+@import 'less/ChatInput.less';
 </style>

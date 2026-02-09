@@ -1,0 +1,80 @@
+<template>
+  <div class="monica-container">
+    <div class="monica-nav">
+      <div class="nav-menu">
+        <div
+          v-for="item in navItems"
+          :key="item.id"
+          class="nav-item"
+          :class="{ active: currentPage === item.id }"
+          @click="currentPage = item.id"
+        >
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-label">{{ item.label }}</span>
+        </div>
+      </div>
+      <div class="nav-time">
+        <t-dropdown trigger="click">
+          <t-button theme="primary" variant="text" shape="square">
+            <template #icon>
+              <view-list-icon/>
+            </template>
+          </t-button>
+          <t-dropdown-menu>
+            <t-dropdown-item @click="toSetting">
+              <template #prefix-icon>
+                <setting-icon/>
+              </template>
+              设置
+            </t-dropdown-item>
+          </t-dropdown-menu>
+        </t-dropdown>
+      </div>
+    </div>
+
+    <div class="monica-content">
+      <Transition name="monica-page" mode="out-in">
+        <router-view v-slot="{ Component, route }">
+          <keep-alive :include="[]">
+            <component :is="Component" :key="route.fullPath"/>
+          </keep-alive>
+        </router-view>
+      </Transition>
+    </div>
+
+  </div>
+</template>
+
+<script lang="ts" setup>
+import {LocalName} from "@/global/LocalName.ts";
+import {SettingIcon, ViewListIcon} from "tdesign-icons-vue-next";
+
+
+const router = useRouter();
+
+const navItems = [
+  {id: 'chat', label: '消息', icon: '💬'},
+  {id: 'memo', label: 'Memo', icon: '📝'},
+  {id: 'friend', label: '伙伴', icon: '👥'},
+  {id: 'moment', label: '朋友圈', icon: '🌸'},
+  {id: 'diary', label: '日记', icon: '📅'},
+  {id: 'memory', label: '记忆', icon: '🧠'},
+  {id: 'tool', label: '工具', icon: '🧰'}
+]
+
+const currentPage = useSessionStorage(LocalName.PAGE_HOME_ASSISTANT_ACTIVE, 'chat');
+
+watch(currentPage, val => {
+  router.push(`/home/${val}`)
+}, {
+  immediate: true
+})
+
+const toSetting = () => {
+  router.push('/admin/global-setting')
+}
+</script>
+
+<style scoped lang="less">
+@import 'index.less';
+</style>

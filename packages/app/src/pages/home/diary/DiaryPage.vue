@@ -144,5 +144,5 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="less">
-@import "./DiaryPage.less";
+@import "DiaryPage.less";
 </style>

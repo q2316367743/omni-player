@@ -236,9 +236,9 @@ import {
   getRelationText,
   moodToStatus,
   getPostingStyleText
-} from '@/entity/memo/MemoFriend'
+} from '@/entity/memo/MemoFriend.ts'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
-import { useMemoFriendStore } from '@/store/MemoFriendStore'
+import { useMemoFriendStore } from '@/store/MemoFriendStore.ts'
 import { formatDate } from '@/util/lang/DateUtil.ts'
 
 const props = defineProps<{

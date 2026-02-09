@@ -48,7 +48,7 @@ import {useMemoFriendStore} from '@/store'
 import {pageMemoItem, addMemoService, removeMemoService} from '@/services/memo/MemoItemService.ts'
 import type {MemoItemView} from '@/services/memo/MemoItemService.ts'
 import type {MemoFriendStaticView} from '@/entity/memo'
-import type {Memo} from '../../types.ts'
+import type {Memo} from '../assistant/types.ts'
 import {SettingIcon} from "tdesign-icons-vue-next";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 

@@ -1,62 +1,64 @@
 <template>
-  <div class="persona-section local-scroll">
+  <div class="behavior-section local-scroll">
     <div v-if="data.length === 0" class="empty-state">
-      <span class="empty-icon">🎭</span>
-      <p class="empty-text">暂无人格记录</p>
-      <p class="empty-hint">记录你的人格特质变化</p>
+      <span class="empty-icon">🎯</span>
+      <p class="empty-text">暂无行为记录</p>
+      <p class="empty-hint">记录你的行为，培养好习惯</p>
     </div>
-    <div v-else class="persona-list">
+    <div v-else class="behavior-list">
       <div
         v-for="item in data"
         :key="item.id"
-        class="persona-card monica-card"
+        class="behavior-card monica-card"
         :class="{ expired: isExpired(item) }"
       >
-        <div class="persona-header">
-          <span class="trait-badge">{{ getTraitLabel(item.trait_name) }}</span>
+        <div class="behavior-header">
           <t-tag
-            :theme="getDeltaTheme(item.delta)"
+            :theme="getTypeTheme(item.type)"
             size="small"
-            class="delta-tag"
+            class="type-tag"
           >
-            {{ item.delta > 0 ? '+' : '' }}{{ item.delta }}
+            {{ getTypeLabel(item.type) }}
           </t-tag>
           <t-tag
-            :theme="getConfidenceTheme(item.confidence)"
+            :theme="getPriorityTheme(item.priority)"
             size="small"
-            class="confidence-tag"
+            class="priority-tag"
           >
-            置信度 {{ item.confidence }}%
+            优先级 {{ item.priority }}/9
+          </t-tag>
+          <t-tag
+            :theme="getStatusTheme(item.status)"
+            size="small"
+            class="status-tag"
+          >
+            {{ getStatusLabel(item.status) }}
           </t-tag>
           <span class="expire-time">{{ getExpireText(item.expire_at) }}</span>
         </div>
-        <div class="persona-body">
-          <div class="baseline-section">
-            <span class="baseline-label">基线水平：</span>
-            <t-progress
-            :percentage="item.baseline_trait"
-            :label="true"
-            :show-info="true"
-            size="small"
-          />
+        <div class="behavior-body">
+          <p class="behavior-text">{{ item.behavior }}</p>
+          <div v-if="item.deadline > 0" class="deadline-section">
+            <span class="deadline-label">截止时间：</span>
+            <span class="deadline-value">{{ formatTime(item.deadline) }}</span>
           </div>
-          <div v-if="item.evidence_snippet" class="evidence-section">
-            <span class="evidence-label">证据片段：</span>
-            <p class="evidence-text">{{ item.evidence_snippet }}</p>
+          <div v-if="item.reminder > 0" class="reminder-section">
+            <span class="reminder-label">提醒时间：</span>
+            <span class="reminder-value">{{ formatTime(item.reminder) }}</span>
           </div>
         </div>
-        <div class="persona-footer">
+        <div class="behavior-footer">
           <span class="source-label">{{ item.source === 'memo' ? '📝 Memo' : '💬 聊天' }}</span>
           <span class="created-time">{{ formatTime(item.created_at) }}</span>
         </div>
-        <div class="persona-actions">
+        <div class="behavior-actions">
           <t-dropdown trigger="click">
             <t-button size="small" variant="text" shape="square">
               <template #icon><t-icon name="more" /></template>
             </t-button>
             <t-dropdown-menu>
               <t-dropdown-item @click="openSetExpireDialog(item)">
-                {{ isExpired(item) ? '设置过期时间' : '修改过期时间' }}
+                {{ isExpired(item) ? '设置过期时间' : '设为过期' }}
               </t-dropdown-item>
               <t-dropdown-item v-if="!isExpired(item)" @click="openExtendExpireDialog(item)">
                 延长过期时间
@@ -70,44 +72,66 @@
 </template>
 
 <script lang="ts" setup>
-import type { MemoLayerPersona } from '@/entity/memo'
-import { openSetExpireDialog as openSetExpireDialogFn, openExtendExpireDialog as openExtendExpireDialogFn } from './MemoExpireDialog'
+import type { MemoLayerBehavior } from '@/entity/memo'
+import { openSetExpireDialog as openSetExpireDialogFn, openExtendExpireDialog as openExtendExpireDialogFn } from './MemoExpireDialog.tsx'
 
 interface Props {
-  data: MemoLayerPersona[]
+  data: MemoLayerBehavior[]
 }
 
 defineProps<Props>()
 const emit = defineEmits(['refresh'])
 
-const isExpired = (item: MemoLayerPersona) => {
+const isExpired = (item: MemoLayerBehavior) => {
   return Date.now() > item.expire_at
 }
 
-const getTraitLabel = (trait: string) => {
-  const labels: Record<string, string> = {
-    openness: '开放性',
-    conscientiousness: '尽责性',
-    extraversion: '外向性',
-    agreeableness: '友好性',
-    neuroticism: '神经质',
-    resilience: '弹性',
-    curiosity: '好奇心',
-    optimism: '乐观'
+const getTypeTheme = (type: string): 'default' | 'primary' | 'warning' | 'danger' | 'success' => {
+  const themes: Record<string, 'default' | 'primary' | 'warning' | 'danger' | 'success'> = {
+    todo: 'primary',
+    habit_cue: 'success',
+    social_intent: 'warning',
+    avoidance: 'danger',
+    seeking: 'default'
   }
-  return labels[trait] || trait
+  return themes[type] || 'default'
 }
 
-const getDeltaTheme = (delta: number): 'default' | 'primary' | 'warning' | 'danger' | 'success' => {
-  if (delta > 10) return 'success'
-  if (delta < -10) return 'danger'
+const getTypeLabel = (type: string) => {
+  const labels: Record<string, string> = {
+    todo: '待办',
+    habit_cue: '习惯提示',
+    social_intent: '社交意图',
+    avoidance: '回避',
+    seeking: '寻求'
+  }
+  return labels[type] || type
+}
+
+const getPriorityTheme = (priority: number): 'default' | 'primary' | 'warning' | 'danger' | 'success' => {
+  if (priority >= 7) return 'danger'
+  if (priority >= 4) return 'warning'
   return 'default'
 }
 
-const getConfidenceTheme = (confidence: number): 'default' | 'primary' | 'warning' | 'danger' | 'success' => {
-  if (confidence >= 80) return 'success'
-  if (confidence >= 50) return 'warning'
-  return 'default'
+const getStatusTheme = (status: string): 'default' | 'primary' | 'warning' | 'danger' | 'success' => {
+  const themes: Record<string, 'default' | 'primary' | 'warning' | 'danger' | 'success'> = {
+    active: 'success',
+    completed: 'default',
+    snoozed: 'warning',
+    expired: 'danger'
+  }
+  return themes[status] || 'default'
+}
+
+const getStatusLabel = (status: string) => {
+  const labels: Record<string, string> = {
+    active: '进行中',
+    completed: '已完成',
+    snoozed: '已推迟',
+    expired: '已过期'
+  }
+  return labels[status] || status
 }
 
 const getExpireText = (expireAt: number) => {
@@ -130,19 +154,19 @@ const formatTime = (timestamp: number) => {
   })
 }
 
-const openSetExpireDialog = (item: MemoLayerPersona) => {
-  openSetExpireDialogFn(item.id, item.expire_at, isExpired(item), item.created_at, () => emit('refresh'), 'persona' as const)
+const openSetExpireDialog = (item: MemoLayerBehavior) => {
+  openSetExpireDialogFn(item.id, item.expire_at, isExpired(item), item.created_at, () => emit('refresh'), 'behavior' as const)
 }
 
-const openExtendExpireDialog = (item: MemoLayerPersona) => {
-  openExtendExpireDialogFn(item.id, () => emit('refresh'), 'persona' as const)
+const openExtendExpireDialog = (item: MemoLayerBehavior) => {
+  openExtendExpireDialogFn(item.id, () => emit('refresh'), 'behavior' as const)
 }
 </script>
 
 <style scoped lang="less">
 @import '@/assets/style/monica.less';
 
-.persona-section {
+.behavior-section {
   height: 100%;
   overflow-y: auto;
   padding: var(--monica-spacing-sm);
@@ -173,30 +197,31 @@ const openExtendExpireDialog = (item: MemoLayerPersona) => {
   color: var(--monica-text-tertiary);
 }
 
-.persona-list {
+.behavior-list {
   display: flex;
   flex-direction: column;
   gap: var(--monica-spacing-md);
 }
 
-.persona-card {
+.behavior-card {
   padding: var(--monica-spacing-lg);
   transition: all 0.3s ease;
   position: relative;
 }
 
-.persona-card.expired {
+.behavior-card.expired {
   opacity: 0.5;
   text-decoration: line-through;
   background: var(--monica-warm-bg-secondary);
 }
 
-.persona-card.expired .trait-badge,
-.persona-card.expired .evidence-text {
+.behavior-card.expired .behavior-text,
+.behavior-card.expired .deadline-value,
+.behavior-card.expired .reminder-value {
   color: var(--monica-text-tertiary);
 }
 
-.persona-header {
+.behavior-header {
   display: flex;
   align-items: center;
   gap: var(--monica-spacing-sm);
@@ -205,17 +230,9 @@ const openExtendExpireDialog = (item: MemoLayerPersona) => {
   padding-right: 40px;
 }
 
-.trait-badge {
-  font-size: var(--monica-font-lg);
-  font-weight: 600;
-  color: var(--monica-text-primary);
-  background: var(--monica-coral-light);
-  padding: 4px 12px;
-  border-radius: var(--monica-radius-sm);
-}
-
-.delta-tag,
-.confidence-tag {
+.type-tag,
+.priority-tag,
+.status-tag {
   margin-left: var(--monica-spacing-sm);
 }
 
@@ -228,53 +245,37 @@ const openExtendExpireDialog = (item: MemoLayerPersona) => {
   margin-left: auto;
 }
 
-.persona-body {
+.behavior-body {
   margin-bottom: var(--monica-spacing-md);
 }
 
-.baseline-section {
+.behavior-text {
+  font-size: var(--monica-font-md);
+  color: var(--monica-text-primary);
+  line-height: 1.6;
+  margin: 0 0 var(--monica-spacing-sm) 0;
+}
+
+.deadline-section,
+.reminder-section {
   display: flex;
   align-items: center;
   gap: var(--monica-spacing-sm);
-  margin-bottom: var(--monica-spacing-md);
-}
-
-.baseline-label {
   font-size: var(--monica-font-sm);
-  color: var(--monica-text-secondary);
-  font-weight: 500;
-  white-space: nowrap;
-  min-width: 80px;
 }
 
-.baseline-section :deep(.t-progress) {
-  flex: 1;
-}
-
-.evidence-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--monica-spacing-xs);
-}
-
-.evidence-label {
-  font-size: var(--monica-font-sm);
+.deadline-label,
+.reminder-label {
   color: var(--monica-text-secondary);
   font-weight: 500;
 }
 
-.evidence-text {
-  font-size: var(--monica-font-sm);
+.deadline-value,
+.reminder-value {
   color: var(--monica-text-primary);
-  line-height: 1.6;
-  margin: 0;
-  padding: var(--monica-spacing-sm);
-  background: var(--monica-warm-bg-secondary);
-  border-radius: var(--monica-radius-sm);
-  border-left: 3px solid var(--monica-coral);
 }
 
-.persona-footer {
+.behavior-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -282,7 +283,7 @@ const openExtendExpireDialog = (item: MemoLayerPersona) => {
   border-top: 1px solid var(--monica-border);
 }
 
-.persona-actions {
+.behavior-actions {
   position: absolute;
   top: var(--monica-spacing-md);
   right: var(--monica-spacing-md);

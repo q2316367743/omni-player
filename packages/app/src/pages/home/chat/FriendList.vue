@@ -60,5 +60,5 @@ const handleClick = (friend: MemoFriendStaticView) => {
 </script>
 
 <style scoped lang="less">
-@import './less/FriendList.less';
+@import 'less/FriendList.less';
 </style>

@@ -48,5 +48,5 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
-@import './less/ChatPage.less';
+@import 'less/ChatPage.less';
 </style>

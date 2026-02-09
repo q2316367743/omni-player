@@ -6,6 +6,7 @@ import {mpRouters} from "@/router/modules/mp";
 import {detailRouters} from "@/router/modules/detail.ts";
 import {adminRouters} from "@/router/modules/admin.ts";
 import {memoRouters} from "@/router/modules/memo.ts";
+import {homeRouters} from "@/router/modules/home.ts";
 // 引入路由
 
 export const router = createRouter({
@@ -14,9 +15,9 @@ export const router = createRouter({
     {
       name: "首页",
       path: '/',
-      alias: '/home',
-      component: () => import('@/pages/home/assistant/home-assistant.vue'),
+      redirect: '/home/chat',
     },
+    ...homeRouters,
     ...appRouters, ...adminRouters, ...memoRouters,
     ...mpRouters, ...mediaRouters, ...networkRouters, ...detailRouters
   ]

@@ -1,53 +1,62 @@
 <template>
-  <div class="cognitive-section local-scroll">
+  <div class="persona-section local-scroll">
     <div v-if="data.length === 0" class="empty-state">
-      <span class="empty-icon">🧠</span>
-      <p class="empty-text">暂无认知记录</p>
-      <p class="empty-hint">记录你的思考，发现认知模式</p>
+      <span class="empty-icon">🎭</span>
+      <p class="empty-text">暂无人格记录</p>
+      <p class="empty-hint">记录你的人格特质变化</p>
     </div>
-    <div v-else class="cognitive-list">
+    <div v-else class="persona-list">
       <div
         v-for="item in data"
         :key="item.id"
-        class="cognitive-card monica-card"
+        class="persona-card monica-card"
         :class="{ expired: isExpired(item) }"
       >
-        <div class="cognitive-header">
-          <span class="topic-badge">{{ item.topic }}</span>
+        <div class="persona-header">
+          <span class="trait-badge">{{ getTraitLabel(item.trait_name) }}</span>
           <t-tag
-            :theme="getTypeTheme(item.type)"
+            :theme="getDeltaTheme(item.delta)"
             size="small"
-            class="type-tag"
+            class="delta-tag"
           >
-            {{ getTypeLabel(item.type) }}
+            {{ item.delta > 0 ? '+' : '' }}{{ item.delta }}
           </t-tag>
           <t-tag
-            :theme="getImportanceTheme(item.importance)"
+            :theme="getConfidenceTheme(item.confidence)"
             size="small"
-            class="importance-tag"
+            class="confidence-tag"
           >
-            重要性 {{ item.importance }}/9
+            置信度 {{ item.confidence }}%
           </t-tag>
           <span class="expire-time">{{ getExpireText(item.expire_at) }}</span>
         </div>
-        <div class="cognitive-body">
-          <div class="distortion-section">
-            <span class="distortion-label">认知扭曲：</span>
-            <span class="distortion-value">{{ item.cognitive_distortion }}</span>
+        <div class="persona-body">
+          <div class="baseline-section">
+            <span class="baseline-label">基线水平：</span>
+            <t-progress
+            :percentage="item.baseline_trait"
+            :label="true"
+            :show-info="true"
+            size="small"
+          />
+          </div>
+          <div v-if="item.evidence_snippet" class="evidence-section">
+            <span class="evidence-label">证据片段：</span>
+            <p class="evidence-text">{{ item.evidence_snippet }}</p>
           </div>
         </div>
-        <div class="cognitive-footer">
+        <div class="persona-footer">
           <span class="source-label">{{ item.source === 'memo' ? '📝 Memo' : '💬 聊天' }}</span>
           <span class="created-time">{{ formatTime(item.created_at) }}</span>
         </div>
-        <div class="cognitive-actions">
+        <div class="persona-actions">
           <t-dropdown trigger="click">
             <t-button size="small" variant="text" shape="square">
               <template #icon><t-icon name="more" /></template>
             </t-button>
             <t-dropdown-menu>
               <t-dropdown-item @click="openSetExpireDialog(item)">
-                {{ isExpired(item) ? '设置过期时间' : '设为过期' }}
+                {{ isExpired(item) ? '设置过期时间' : '修改过期时间' }}
               </t-dropdown-item>
               <t-dropdown-item v-if="!isExpired(item)" @click="openExtendExpireDialog(item)">
                 延长过期时间
@@ -61,45 +70,43 @@
 </template>
 
 <script lang="ts" setup>
-import type { MemoLayerCognitive } from '@/entity/memo'
-import { openSetExpireDialog as openSetExpireDialogFn, openExtendExpireDialog as openExtendExpireDialogFn } from './MemoExpireDialog'
+import type { MemoLayerPersona } from '@/entity/memo'
+import { openSetExpireDialog as openSetExpireDialogFn, openExtendExpireDialog as openExtendExpireDialogFn } from './MemoExpireDialog.tsx'
 
 interface Props {
-  data: MemoLayerCognitive[]
+  data: MemoLayerPersona[]
 }
 
 defineProps<Props>()
 const emit = defineEmits(['refresh'])
 
-const isExpired = (item: MemoLayerCognitive) => {
+const isExpired = (item: MemoLayerPersona) => {
   return Date.now() > item.expire_at
 }
 
-const getTypeTheme = (type: string): 'default' | 'primary' | 'warning' | 'danger' | 'success' => {
-  const themes: Record<string, 'default' | 'primary' | 'warning' | 'danger' | 'success'> = {
-    value_conflict: 'danger',
-    unsolved_problem: 'warning',
-    growth_need: 'success',
-    relationship_issue: 'warning',
-    existential: 'default'
-  }
-  return themes[type] || 'default'
-}
-
-const getTypeLabel = (type: string) => {
+const getTraitLabel = (trait: string) => {
   const labels: Record<string, string> = {
-    value_conflict: '价值观冲突',
-    unsolved_problem: '未解决问题',
-    growth_need: '成长需求',
-    relationship_issue: '关系问题',
-    existential: '存在性思考'
+    openness: '开放性',
+    conscientiousness: '尽责性',
+    extraversion: '外向性',
+    agreeableness: '友好性',
+    neuroticism: '神经质',
+    resilience: '弹性',
+    curiosity: '好奇心',
+    optimism: '乐观'
   }
-  return labels[type] || type
+  return labels[trait] || trait
 }
 
-const getImportanceTheme = (importance: number) => {
-  if (importance >= 7) return 'danger'
-  if (importance >= 4) return 'warning'
+const getDeltaTheme = (delta: number): 'default' | 'primary' | 'warning' | 'danger' | 'success' => {
+  if (delta > 10) return 'success'
+  if (delta < -10) return 'danger'
+  return 'default'
+}
+
+const getConfidenceTheme = (confidence: number): 'default' | 'primary' | 'warning' | 'danger' | 'success' => {
+  if (confidence >= 80) return 'success'
+  if (confidence >= 50) return 'warning'
   return 'default'
 }
 
@@ -123,19 +130,19 @@ const formatTime = (timestamp: number) => {
   })
 }
 
-const openSetExpireDialog = (item: MemoLayerCognitive) => {
-  openSetExpireDialogFn(item.id, item.expire_at, isExpired(item), item.created_at, () => emit('refresh'), 'cognitive' as const)
+const openSetExpireDialog = (item: MemoLayerPersona) => {
+  openSetExpireDialogFn(item.id, item.expire_at, isExpired(item), item.created_at, () => emit('refresh'), 'persona' as const)
 }
 
-const openExtendExpireDialog = (item: MemoLayerCognitive) => {
-  openExtendExpireDialogFn(item.id, () => emit('refresh'), 'cognitive' as const)
+const openExtendExpireDialog = (item: MemoLayerPersona) => {
+  openExtendExpireDialogFn(item.id, () => emit('refresh'), 'persona' as const)
 }
 </script>
 
 <style scoped lang="less">
 @import '@/assets/style/monica.less';
 
-.cognitive-section {
+.persona-section {
   height: 100%;
   overflow-y: auto;
   padding: var(--monica-spacing-sm);
@@ -166,30 +173,30 @@ const openExtendExpireDialog = (item: MemoLayerCognitive) => {
   color: var(--monica-text-tertiary);
 }
 
-.cognitive-list {
+.persona-list {
   display: flex;
   flex-direction: column;
   gap: var(--monica-spacing-md);
 }
 
-.cognitive-card {
+.persona-card {
   padding: var(--monica-spacing-lg);
   transition: all 0.3s ease;
   position: relative;
 }
 
-.cognitive-card.expired {
+.persona-card.expired {
   opacity: 0.5;
   text-decoration: line-through;
   background: var(--monica-warm-bg-secondary);
 }
 
-.cognitive-card.expired .topic-badge,
-.cognitive-card.expired .distortion-value {
+.persona-card.expired .trait-badge,
+.persona-card.expired .evidence-text {
   color: var(--monica-text-tertiary);
 }
 
-.cognitive-header {
+.persona-header {
   display: flex;
   align-items: center;
   gap: var(--monica-spacing-sm);
@@ -198,7 +205,7 @@ const openExtendExpireDialog = (item: MemoLayerCognitive) => {
   padding-right: 40px;
 }
 
-.topic-badge {
+.trait-badge {
   font-size: var(--monica-font-lg);
   font-weight: 600;
   color: var(--monica-text-primary);
@@ -207,8 +214,8 @@ const openExtendExpireDialog = (item: MemoLayerCognitive) => {
   border-radius: var(--monica-radius-sm);
 }
 
-.type-tag,
-.importance-tag {
+.delta-tag,
+.confidence-tag {
   margin-left: var(--monica-spacing-sm);
 }
 
@@ -221,30 +228,53 @@ const openExtendExpireDialog = (item: MemoLayerCognitive) => {
   margin-left: auto;
 }
 
-.cognitive-body {
+.persona-body {
   margin-bottom: var(--monica-spacing-md);
 }
 
-.distortion-section {
+.baseline-section {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--monica-spacing-sm);
+  margin-bottom: var(--monica-spacing-md);
 }
 
-.distortion-label {
+.baseline-label {
   font-size: var(--monica-font-sm);
   color: var(--monica-text-secondary);
   font-weight: 500;
   white-space: nowrap;
+  min-width: 80px;
 }
 
-.distortion-value {
-  font-size: var(--monica-font-md);
+.baseline-section :deep(.t-progress) {
+  flex: 1;
+}
+
+.evidence-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--monica-spacing-xs);
+}
+
+.evidence-label {
+  font-size: var(--monica-font-sm);
+  color: var(--monica-text-secondary);
+  font-weight: 500;
+}
+
+.evidence-text {
+  font-size: var(--monica-font-sm);
   color: var(--monica-text-primary);
   line-height: 1.6;
+  margin: 0;
+  padding: var(--monica-spacing-sm);
+  background: var(--monica-warm-bg-secondary);
+  border-radius: var(--monica-radius-sm);
+  border-left: 3px solid var(--monica-coral);
 }
 
-.cognitive-footer {
+.persona-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -252,7 +282,7 @@ const openExtendExpireDialog = (item: MemoLayerCognitive) => {
   border-top: 1px solid var(--monica-border);
 }
 
-.cognitive-actions {
+.persona-actions {
   position: absolute;
   top: var(--monica-spacing-md);
   right: var(--monica-spacing-md);

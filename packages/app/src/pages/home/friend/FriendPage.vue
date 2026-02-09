@@ -261,7 +261,7 @@
 </template>
 
 <script lang="ts" setup>
-import {useMemoFriendStore} from '@/store/MemoFriendStore'
+import {useMemoFriendStore} from '@/store/MemoFriendStore.ts'
 import type {MemoFriendStaticView, MemoFriendView} from '@/entity/memo'
 import {useFuse} from '@vueuse/integrations/useFuse'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
@@ -274,7 +274,7 @@ import {
   getRelationText,
   moodToStatus,
   getPostingStyleText
-} from '@/entity/memo/MemoFriend'
+} from '@/entity/memo/MemoFriend.ts'
 import { formatDate } from '@/util/lang/DateUtil.ts'
 
 const searchQuery = ref('')

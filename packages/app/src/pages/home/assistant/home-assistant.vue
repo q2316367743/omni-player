@@ -85,13 +85,13 @@
 </template>
 
 <script lang="ts" setup>
-import MemoHome from './components/memo/MemoHome.vue'
-import FriendPage from './components/friend/FriendPage.vue'
-import MomentsPage from './components/moment/MomentsPage.vue'
-import DiaryPage from './components/diary/DiaryPage.vue'
-import ToolsPage from './components/ToolsPage.vue'
-import MemoryPage from './components/memory/MemoryPage.vue'
-import ChatPage from "@/pages/home/assistant/components/chat/ChatPage.vue";
+import MemoHome from '@/pages/home/memo/MemoHome.vue'
+import FriendPage from '@/pages/home/friend/FriendPage.vue'
+import MomentsPage from '@/pages/home/moment/MomentsPage.vue'
+import DiaryPage from '@/pages/home/diary/DiaryPage.vue'
+import ToolsPage from '@/pages/home/tool/ToolsPage.vue'
+import MemoryPage from '@/pages/home/memory/MemoryPage.vue'
+import ChatPage from "@/pages/home/chat/ChatPage.vue";
 import {LocalName} from "@/global/LocalName.ts";
 import type {MemoFriendStaticView} from '@/entity/memo'
 import {useMemoFriendStore} from '@/store/MemoFriendStore'

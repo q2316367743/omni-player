@@ -54,5 +54,5 @@ const isFirstTextAfterThinking = computed(() => {
 </script>
 
 <style scoped lang="less">
-@import './less/MessageBubble.less';
+@import 'less/MessageBubble.less';
 </style>
