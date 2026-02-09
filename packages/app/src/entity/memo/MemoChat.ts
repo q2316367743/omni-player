@@ -35,13 +35,13 @@ export interface MemoChatCore {
   compression_level: 0 | 1 | 2;  // 0=原始 1=短总结归档 2=长总结归档
 
   // 如果已被总结，指向总结ID（用于追溯）
-  archived_to_summary_id?: string;
-
-  // 轻量元数据（无需复杂索引）
-  token_count: number;
+  archived_to_summary_id: string;
 }
 
 export interface MemoChat extends BaseEntity, MemoChatCore {
+
+  // 轻量元数据（无需复杂索引）
+  token_count: number;
 }
 export interface MemoChatCoreView {
 
@@ -55,13 +55,13 @@ export interface MemoChatCoreView {
   compression_level: 0 | 1 | 2;  // 0=原始 1=短总结归档 2=长总结归档
 
   // 如果已被总结，指向总结ID（用于追溯）
-  archived_to_summary_id?: string;
-
-  // 轻量元数据（无需复杂索引）
-  token_count: number;
+  archived_to_summary_id: string;
 
 }
 export interface MemoChatView extends BaseEntity, MemoChatCoreView {
+
+  // 轻量元数据（无需复杂索引）
+  token_count: number;
 }
 
 export function memoChatToView(memoChat: MemoChat): MemoChatView {

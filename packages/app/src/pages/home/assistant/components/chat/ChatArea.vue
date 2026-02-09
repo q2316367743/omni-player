@@ -56,6 +56,8 @@ import MessageBubble from './MessageBubble.vue'
 import ChatInput from './ChatInput.vue'
 import ChatFriendStaticDetail from "@/pages/home/assistant/components/chat/ChatFriendStaticDetail.vue";
 import {updateMemoFriendDynamic} from "@/services/memo";
+import {triggerChatL1Summary} from "@/modules/ai/memo/summary/TriggerChatL1Summary.ts";
+import {logDebug, logError} from "@/lib/log.ts";
 
 const props = defineProps<{
   friend: MemoFriendStaticView
@@ -116,7 +118,7 @@ const handleSend = async (content: string) => {
     role: 'user',
     content: userMessage.content,
     compression_level: 0,
-    token_count: content.length
+    archived_to_summary_id: ''
   });
   // 更新最近聊天时间
   await updateMemoFriendDynamic(props.friend.id, {
@@ -165,7 +167,12 @@ const handleSend = async (content: string) => {
     }
     messages.value.push(errorMessage)
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
+    triggerChatL1Summary(props.friend).then(() => {
+      logDebug("[ChatArea] 触发 L1 总结完成")
+    }).catch(e => {
+      logError("[ChatArea] 触发 L1 总结失败", e)
+    })
   }
 }
 

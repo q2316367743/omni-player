@@ -1,12 +1,13 @@
 <template>
   <div class="abs-0 overflow-hidden">
-    <router-view />
+    <router-view/>
   </div>
 </template>
 <script lang="ts" setup>
 import {setupRefreshFeedTask} from "@/modules/subscribe/RefreshFeedTask.ts";
 import {logError, logInfo} from "@/lib/log.ts";
 import {useMcpSettingStore, useMemoFriendStore} from "@/store";
+import {setupChatL1Summary} from "@/modules/ai/memo/summary/SetupChatL1Summary.ts";
 
 // 注册定时刷新任务
 setupRefreshFeedTask()
@@ -17,7 +18,10 @@ setupRefreshFeedTask()
 //   .catch(e => logError("注册窗口隐藏事件失败", e))
 
 // 获取全部 memo 好友
-useMemoFriendStore().loadFriends();
+useMemoFriendStore().loadFriends().then(async () => {
+  // 好友初始化完毕
+  await setupChatL1Summary();
+});
 useMemoFriendStore().loadChatSession();
 useMcpSettingStore().fetchMcps();
 </script>

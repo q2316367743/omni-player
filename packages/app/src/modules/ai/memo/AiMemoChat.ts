@@ -102,8 +102,6 @@ ${formatDate(now)}`;
 
   logInfo('[AiMemoChat] 开始调用 AI', { model: friend.model, messageCount: messages.length });
 
-  console.log('历史消息', messages)
-
   const response = await client.chat.completions.create({
     model: friend.model,
     messages,
