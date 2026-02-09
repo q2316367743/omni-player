@@ -40,7 +40,9 @@
       :support-think="supportThink"
       :think-enabled="thinkEnabled"
       :is-loading="isLoading"
+      :summary-loading="summaryLoading"
       @toggle-think="handleToggleThink"
+      @toggle-summary="handleToggleSummary"
     />
   </div>
 </template>
@@ -49,7 +51,7 @@
 import {useSettingStore} from '@/store'
 import type {MemoFriendStaticView} from '@/entity/memo'
 import {listMemoChatTimestamp, saveMemoChat} from '@/services/memo/chat'
-import {aiMemoChat} from '@/modules/ai/memo'
+import {aiMemoChat, setupChatL2Summary} from '@/modules/ai/memo'
 import {debounce} from '@/pages/memo/chat/utils'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
 import MessageBubble from './MessageBubble.vue'
@@ -58,6 +60,7 @@ import ChatFriendStaticDetail from "@/pages/home/assistant/components/chat/ChatF
 import {updateMemoFriendDynamic} from "@/services/memo";
 import {triggerChatL1Summary} from "@/modules/ai/memo/summary/TriggerChatL1Summary.ts";
 import {logDebug, logError} from "@/lib/log.ts";
+import MessageUtil from "@/util/model/MessageUtil.ts";
 
 const props = defineProps<{
   friend: MemoFriendStaticView
@@ -67,6 +70,7 @@ const settingStore = useSettingStore()
 const messagesContainer = ref<HTMLElement>()
 const isLoading = ref(false)
 const thinkEnabled = ref(false)
+const summaryLoading = ref(false)
 
 const supportThink = computed(() => {
   return settingStore.supportThink(props.friend.model)
@@ -178,6 +182,20 @@ const handleSend = async (content: string) => {
 
 const handleToggleThink = () => {
   thinkEnabled.value = !thinkEnabled.value
+}
+
+const handleToggleSummary = () => {
+  summaryLoading.value = true
+  setupChatL2Summary(props.friend, '用户主动触发')
+    .then(() => {
+      MessageUtil.success('触发 L2 总结成功');
+    })
+    .catch(e => {
+      MessageUtil.error('触发 L2 总结失败', e);
+    })
+    .finally(() => {
+    summaryLoading.value = false
+  })
 }
 
 watch(() => props.friend.id, async () => {

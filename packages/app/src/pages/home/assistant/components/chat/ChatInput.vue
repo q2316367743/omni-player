@@ -9,7 +9,7 @@
         :theme="thinkEnabled ? 'primary' : 'default'"
         @click="handleToggleThink"
       >
-        <t-icon name="lightbulb"/>
+        <lightbulb-icon/>
       </t-button>
       <t-button variant="text" shape="circle" size="small">
         <image-icon/>
@@ -21,7 +21,7 @@
         <fact-check-icon/>
       </t-button>
       <div class="ml-auto mr-24px">
-        <t-button variant="outline" size="small">
+        <t-button variant="outline" size="small" :loading="summaryLoading" @click="handleToggleSummary()">
           总结
         </t-button>
       </div>
@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts" setup>
-import {FactCheckIcon, FolderIcon, ImageIcon} from "tdesign-icons-vue-next";
+import {FactCheckIcon, FolderIcon, ImageIcon, LightbulbIcon} from "tdesign-icons-vue-next";
 
 const inputContent = ref('')
 
@@ -53,11 +53,13 @@ defineProps<{
   supportThink: boolean
   thinkEnabled: boolean
   isLoading: boolean
+  summaryLoading: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'send', content: string): void
   (e: 'toggleThink'): void
+  (e: 'toggleSummary'): void
 }>()
 
 const handleSend = () => {
@@ -70,6 +72,9 @@ const handleSend = () => {
 
 const handleToggleThink = () => {
   emit('toggleThink')
+}
+const handleToggleSummary = () => {
+  emit('toggleSummary')
 }
 </script>
 
