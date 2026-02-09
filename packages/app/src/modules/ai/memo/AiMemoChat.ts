@@ -4,7 +4,7 @@ import {
   type MemoFriendStaticView,
   memoFriendToPrompt
 } from "@/entity/memo";
-import {listMemoChatSummaryLast, listMemoChatUnSummary} from "@/services/memo/chat";
+import {getMemoChatSummaryLast, listMemoChatUnSummary} from "@/services/memo/chat";
 import {useMemoFriendStore, useSettingStore} from "@/store";
 import {
   getActiveMemoLayerBehaviors, getActiveMemoLayerCognitive, getActiveMemoLayerEmotions,
@@ -31,7 +31,7 @@ export async function aiMemoChat(prop: AiMemoChatProp) {
   const messages: Array<OpenAI.Chat.ChatCompletionMessageParam> = [];
 
   // TODO: 此处需要修复
-  const chatSummary = await listMemoChatSummaryLast(friend.id);
+  const chatSummary = await getMemoChatSummaryLast(friend.id);
   logDebug('[AiMemoChat] 查询到上次对话总结', chatSummary ? {
     summaryId: chatSummary.id,
     createdAt: chatSummary.created_at

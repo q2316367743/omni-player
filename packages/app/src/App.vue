@@ -7,7 +7,7 @@
 import {setupRefreshFeedTask} from "@/modules/subscribe/RefreshFeedTask.ts";
 import {logError, logInfo} from "@/lib/log.ts";
 import {useMcpSettingStore, useMemoFriendStore} from "@/store";
-import {setupChatL1Summary} from "@/modules/ai/memo/summary/SetupChatL1Summary.ts";
+import {setupChatL1Summary} from "@/modules/ai/memo";
 
 // 注册定时刷新任务
 setupRefreshFeedTask()
@@ -20,7 +20,9 @@ setupRefreshFeedTask()
 // 获取全部 memo 好友
 useMemoFriendStore().loadFriends().then(async () => {
   // 好友初始化完毕
-  await setupChatL1Summary();
+  await Promise.all([
+    setupChatL1Summary(),
+  ])
 });
 useMemoFriendStore().loadChatSession();
 useMcpSettingStore().fetchMcps();

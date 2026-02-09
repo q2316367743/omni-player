@@ -1,6 +1,6 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 
-export interface MemoChatSummaryLayerOperations {
+export interface MemoChatSummaryLayerOperation {
   operation_id: string;   // 追溯用
   timestamp: number;
 }
@@ -21,6 +21,12 @@ export interface MemoChatSummaryCore {
    * 当 level 是 1 时有效，此时此对象指向了 l2 的 id
    */
   archived_to_l2_id: string;
+
+  /**
+   * AI 小记（给心留痕），AI 第一人称日记，表达共情或反思
+   * > 只有 level = 2 时有效
+   */
+  ai_journal: string;
 
   // 关键：不存四层数据，只存"操作记录"
   // 实际四层数据在各自表里，通过 tool_call 写入
@@ -54,9 +60,15 @@ export interface MemoChatSummaryCoreView {
    */
   archived_to_l2_id: string;
 
+  /**
+   * AI 小记（给心留痕），AI 第一人称日记，表达共情或反思
+   * > 只有 level = 2 时有效
+   */
+  ai_journal: string;
+
   // 关键：不存四层数据，只存"操作记录"
   // 实际四层数据在各自表里，通过 tool_call 写入
-  layer_operations: Array<MemoChatSummaryLayerOperations>;
+  layer_operations: Array<MemoChatSummaryLayerOperation>;
 
   // 触发信息
   trigger_reason: string;

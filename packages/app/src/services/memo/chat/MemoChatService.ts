@@ -43,6 +43,19 @@ export async function listMemoChatUnSummary(friendId: string) {
 }
 
 /**
+ * 获取全部未总结的聊天记录，处于处理中
+ * @param friendId
+ */
+export async function listMemoChatUnSummaryIng(friendId: string) {
+  const res = await useSql().query<MemoChat>('memo_chat')
+    .eq('friend_id', friendId)
+    .eq('compression_level', 3)
+    .orderByAsc('created_at')
+    .list();
+  return res.map(memoChatToView);
+}
+
+/**
  * 获取指定好友的置顶时间前的指定数量对话，如果数量小于 limit，则代表到顶了
  * @param friendId 好友ID
  * @param createdAt 创建时间

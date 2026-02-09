@@ -50,7 +50,8 @@ export async function triggerChatL1Summary(friend: MemoFriendStaticView) {
       content: summary,
       layer_operations: [],
       archived_to_l2_id: '',
-      trigger_reason: `trigger|hitCount:${hitCount ? 'true' : 'false'}|hitTime:${hitTime ? 'true' : 'false'}|hitLength:${hitLength ? 'true' : 'false'}`
+      trigger_reason: `trigger|hitCount:${hitCount ? 'true' : 'false'}|hitTime:${hitTime ? 'true' : 'false'}|hitLength:${hitLength ? 'true' : 'false'}`,
+      ai_journal: ''
     });
     // 2. 修改消息信息
     logDebug('[TriggerChatL1Summary] 修改消息信息', friend.id, messages.length)
