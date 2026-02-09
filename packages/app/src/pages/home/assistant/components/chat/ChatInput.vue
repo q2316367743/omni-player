@@ -1,25 +1,30 @@
 <template>
   <div class="chat-input-area">
     <div class="input-toolbar">
-      <t-button 
-        v-if="supportThink" 
-        variant="text" 
-        shape="circle" 
+      <t-button
+        v-if="supportThink"
+        variant="text"
+        shape="circle"
         size="small"
         :theme="thinkEnabled ? 'primary' : 'default'"
         @click="handleToggleThink"
       >
-        <t-icon name="lightbulb" />
+        <t-icon name="lightbulb"/>
       </t-button>
       <t-button variant="text" shape="circle" size="small">
-        <t-icon name="image" />
+        <image-icon/>
       </t-button>
       <t-button variant="text" shape="circle" size="small">
-        <t-icon name="folder" />
+        <folder-icon/>
       </t-button>
       <t-button variant="text" shape="circle" size="small">
-        <t-icon name="emoji" />
+        <fact-check-icon/>
       </t-button>
+      <div class="ml-auto mr-24px">
+        <t-button variant="outline" size="small">
+          总结
+        </t-button>
+      </div>
     </div>
     <div class="input-wrapper">
       <t-textarea
@@ -33,13 +38,15 @@
         :disabled="!inputContent.trim() || isLoading"
         @click="handleSend"
       >
-        <t-icon name="send" />
+        <t-icon name="send"/>
       </t-button>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import {FactCheckIcon, FolderIcon, ImageIcon} from "tdesign-icons-vue-next";
+
 const inputContent = ref('')
 
 defineProps<{
