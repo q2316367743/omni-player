@@ -56,13 +56,13 @@
 </template>
 
 <script lang="ts" setup>
-import type { MemoSessionSummary } from '@/entity/memo/MemoSessionSummary.ts'
-import { pageMemoChatSummary } from '@/services/memo/MemoSessionSummaryService.ts'
+import type { DiaryItem } from '@/services/memo/MemoSessionSummaryService.ts'
+import { pageDiaryItems } from '@/services/memo/MemoSessionSummaryService.ts'
 import { useMemoFriendStore } from '@/store/MemoFriendStore.ts'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
 
 const router = useRouter()
-const summaries = ref<MemoSessionSummary[]>([])
+const summaries = ref<DiaryItem[]>([])
 const loading = ref(false)
 const hasMore = ref(true)
 const currentPage = ref(1)
@@ -76,7 +76,7 @@ const loadSummaries = async (page: number) => {
   
   loading.value = true
   try {
-    const result = await pageMemoChatSummary(page, pageSize)
+    const result = await pageDiaryItems(page, pageSize)
     if (result.records && result.records.length > 0) {
       if (page === 1) {
         summaries.value = result.records
