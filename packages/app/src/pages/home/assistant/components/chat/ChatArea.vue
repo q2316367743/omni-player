@@ -3,22 +3,22 @@
     <div class="chat-header">
       <t-popup trigger="click" placement="bottom-left" :showArrow="true">
         <div class="chat-header-left">
-          <XhAvatar :value="friend.avatar" :size="40" shape="circle" />
+          <XhAvatar :value="friend.avatar" :size="40" shape="circle"/>
           <div class="chat-header-info">
             <h3 class="chat-header-name">{{ friend.name }}</h3>
             <p class="chat-header-status">在线</p>
           </div>
         </div>
         <template #content>
-          <ChatFriendStaticDetail :friend="friend" />
+          <ChatFriendStaticDetail :friend="friend"/>
         </template>
       </t-popup>
       <div class="chat-header-actions">
         <t-button variant="text" shape="circle">
-          <t-icon name="phone" />
+          <t-icon name="phone"/>
         </t-button>
         <t-button variant="text" shape="circle">
-          <t-icon name="ellipsis" />
+          <t-icon name="ellipsis"/>
         </t-button>
       </div>
     </div>
@@ -35,7 +35,7 @@
       />
     </div>
 
-    <ChatInput 
+    <ChatInput
       @send="handleSend"
       :support-think="supportThink"
       :think-enabled="thinkEnabled"
@@ -55,6 +55,7 @@ import XhAvatar from '@/components/avatar/XhAvatar.vue'
 import MessageBubble from './MessageBubble.vue'
 import ChatInput from './ChatInput.vue'
 import ChatFriendStaticDetail from "@/pages/home/assistant/components/chat/ChatFriendStaticDetail.vue";
+import {updateMemoFriendDynamic} from "@/services/memo";
 
 const props = defineProps<{
   friend: MemoFriendStaticView
@@ -103,19 +104,24 @@ const handleSend = async (content: string) => {
   const userMessage = {
     id: Date.now().toString(),
     sender: 'user' as const,
-    content: [{ type: 'text' as const, content }],
+    content: [{type: 'text' as const, content}],
     timestamp: Date.now()
   }
 
   messages.value.push(userMessage)
 
-  createDebouncedSave({
+  // 保存用户消息不需要防抖
+  await saveMemoChat({
     friend_id: props.friend.id,
     role: 'user',
     content: userMessage.content,
     compression_level: 0,
     token_count: content.length
-  })
+  });
+  // 更新最近聊天时间
+  await updateMemoFriendDynamic(props.friend.id, {
+    last_interaction: Date.now()
+  });
 
   try {
     isLoading.value = true
@@ -137,7 +143,7 @@ const handleSend = async (content: string) => {
         if (lastContent && lastContent.type === msg.type) {
           lastContent.content += msg.content
         } else {
-          assistantMessage.content.push({ type: msg.type, content: msg.content })
+          assistantMessage.content.push({type: msg.type, content: msg.content})
         }
       }
     })
@@ -154,7 +160,7 @@ const handleSend = async (content: string) => {
     const errorMessage = {
       id: (Date.now() + 2).toString(),
       sender: 'friend' as const,
-      content: [{ type: 'text' as const, content: '发送失败，请重试' }],
+      content: [{type: 'text' as const, content: '发送失败，请重试'}],
       timestamp: Date.now()
     }
     messages.value.push(errorMessage)
@@ -170,7 +176,7 @@ const handleToggleThink = () => {
 watch(() => props.friend.id, async () => {
   thinkEnabled.value = false
   await loadHistoryMessages()
-}, { immediate: true })
+}, {immediate: true})
 
 watch(() => messages.value.length, () => {
   nextTick(() => {
@@ -178,7 +184,7 @@ watch(() => messages.value.length, () => {
       messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
     }
   })
-}, { flush: 'post' })
+}, {flush: 'post'})
 
 </script>
 

@@ -327,7 +327,7 @@ export interface MemoFriendDynamic  {
   // ==== 数据统计（每次聊天结束更新） ====
 
   /**
-   * 对话次数
+   * 对话次数/仅限私聊
    */
   interaction_count: number;
 

@@ -62,3 +62,24 @@ export function getTimeSinceLastInteraction(last_interaction: number): string {
   const y = Math.floor(d / 365);
   return `${y}年前`;
 }
+
+/**
+ * 美化聊天时间
+ * - 今天：HH:mm
+ * - 本年：MM-DD HH:mm
+ * - 否则：YYYY-MM-DD HH:mm
+ * @param timestamp
+ */
+export function prettyMessageDate(timestamp: string | number | Date) {
+  const date = dayjs(timestamp);
+  const now = dayjs();
+  const isToday = date.isSame(now, 'day');
+  if (isToday) {
+    return date.format('HH:mm');
+  }
+  const isThisYear = date.isSame(now, 'year');
+  if (isThisYear) {
+    return date.format('MM-DD HH:mm');
+  }
+  return date.format('YYYY-MM-DD HH:mm');
+}

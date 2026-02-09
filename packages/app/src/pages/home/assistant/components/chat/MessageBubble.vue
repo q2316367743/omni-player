@@ -21,7 +21,7 @@
           <div v-else>{{ content.content }}</div>
         </div>
       </template>
-      <span class="message-time">{{ formatTime(message.timestamp) }}</span>
+      <span class="message-time">{{ prettyMessageDate(message.timestamp) }}</span>
     </div>
   </div>
 </template>
@@ -30,6 +30,8 @@
 import type {MemoFriendStaticView} from '@/entity/memo'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
 import MarkdownPreview from '@/components/common/MarkdownPreview.vue'
+import {useSettingStore} from "@/store";
+import {prettyMessageDate} from "@/util/lang/DateUtil.ts";
 
 const props = defineProps<{
   message: {
@@ -41,7 +43,7 @@ const props = defineProps<{
   friend: MemoFriendStaticView
 }>()
 
-const userAvatar = 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'
+const userAvatar = computed(() => useSettingStore().userAvatar);
 
 const isFirstTextAfterThinking = computed(() => {
   const firstTextIndex = props.message.content.findIndex(c => c.type === 'text')
@@ -49,12 +51,6 @@ const isFirstTextAfterThinking = computed(() => {
   return firstTextIndex > -1 && lastThinkIndex > -1 && firstTextIndex > lastThinkIndex
 })
 
-const formatTime = (timestamp: number) => {
-  const date = new Date(timestamp)
-  const hours = date.getHours().toString().padStart(2, '0')
-  const minutes = date.getMinutes().toString().padStart(2, '0')
-  return `${hours}:${minutes}`
-}
 </script>
 
 <style scoped lang="less">
