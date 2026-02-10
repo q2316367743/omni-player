@@ -70,7 +70,7 @@ export function pageMemoChatSummary(pageNum: number, pageSize: number) {
     .page(pageNum, pageSize);
 }
 
-export async function getMemoChatSummary(id: string) {
+export async function getMemoSessionSummary(id: string) {
   return useSql().query<MemoSessionSummary>('memo_session_summary').eq('id', id).get();
 }
 

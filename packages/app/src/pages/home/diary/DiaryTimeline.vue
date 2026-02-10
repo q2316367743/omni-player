@@ -5,7 +5,7 @@
       <div class="marker-dot"></div>
       <div class="marker-line"></div>
     </div>
-    <div class="timeline-card monica-card" @click="handleSummaryClick(summary.id)">
+    <div class="timeline-card monica-card" @click="handleSummaryClick(summary)">
       <h3 class="summary-title">{{ summary.title }}</h3>
       <p class="summary-text">{{ getTruncatedSummary(summary.summary) }}</p>
       <div v-if="summary.ai_journal" class="ai-comment">
@@ -34,8 +34,8 @@ defineProps({
 const router = useRouter();
 const friendStore = useMemoFriendStore();
 
-const handleSummaryClick = (summaryId: string) => {
-  router.push(`/memo/summary/${summaryId}`)
+const handleSummaryClick = (summary: DiaryItem) => {
+  router.push(`/memo/summary/${summary.source}/${summary.id}`)
 }
 const getTruncatedSummary = (text: string) => {
   if (!text) return ''

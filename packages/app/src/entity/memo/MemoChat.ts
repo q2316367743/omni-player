@@ -32,7 +32,7 @@ export interface MemoChatCore {
   content: string;           // 内容
 
   // 压缩标记
-  compression_level: 0 | 1 | 2 | 3;  // 0=原始 1=短总结归档 2=长总结归档 3=处理中
+  compression_level: 0 | 1 | 2;  // 0=原始 1=短总结归档 2=长总结归档
 
   // 如果已被总结，指向总结ID（用于追溯）
   archived_to_summary_id: string;
@@ -76,4 +76,11 @@ export function memoChatCoreFromView(view: MemoChatCoreView): MemoChatCore {
     ...view,
     content: JSON.stringify(view.content)
   } as MemoChatCore;
+}
+
+export interface MemoChatItemView {
+  id: string
+  sender: 'user' | 'friend'
+  content: Array<MemoChatContent>
+  timestamp: number
 }

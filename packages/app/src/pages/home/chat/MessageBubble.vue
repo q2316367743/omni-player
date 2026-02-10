@@ -27,19 +27,14 @@
 </template>
 
 <script lang="ts" setup>
-import type {MemoFriendStaticView} from '@/entity/memo'
+import type {MemoChatItemView, MemoFriendStaticView} from '@/entity/memo'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
 import MarkdownPreview from '@/components/common/MarkdownPreview.vue'
 import {useSettingStore} from "@/store";
 import {prettyMessageDate} from "@/util/lang/DateUtil.ts";
 
 const props = defineProps<{
-  message: {
-    id: string
-    sender: 'user' | 'friend'
-    content: Array<{ type: 'text' | 'think', content: string }>
-    timestamp: number
-  }
+  message: MemoChatItemView
   friend: MemoFriendStaticView
 }>()
 

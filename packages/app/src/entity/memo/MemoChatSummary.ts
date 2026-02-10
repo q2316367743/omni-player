@@ -77,3 +77,10 @@ export interface MemoChatSummaryCoreView {
 
 export interface MemoChatSummaryView extends BaseEntity, MemoChatSummaryCoreView {
 }
+
+export function memoChatSummaryToView(data: MemoChatSummary): MemoChatSummaryView {
+  return {
+    ...data,
+    layer_operations: JSON.parse(data.layer_operations)
+  }
+}

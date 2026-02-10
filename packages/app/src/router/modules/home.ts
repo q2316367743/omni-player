@@ -16,7 +16,7 @@ export const homeRouters: Array<RouteRecordRaw> = [{
   },{
     name: 'HomeFriend',
     path: 'friend',
-    component: () => import('@/pages/home/chat/ChatPage.vue')
+    component: () => import('@/pages/home/friend/FriendPage.vue')
   },{
     name: 'HomeMemory',
     path: 'memory',

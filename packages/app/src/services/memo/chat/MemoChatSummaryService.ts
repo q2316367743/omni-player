@@ -1,4 +1,4 @@
-import type {MemoChatSummary, MemoChatSummaryCoreView} from "@/entity/memo";
+import {type MemoChatSummary, type MemoChatSummaryCoreView, memoChatSummaryToView} from "@/entity/memo";
 import {useSql} from "@/lib/sql.ts";
 
 /**
@@ -12,6 +12,10 @@ export function getMemoChatSummaryLast(friendId: string, level = 1) {
     .eq('level', level)
     .orderByDesc('created_at')
     .get()
+}
+
+export async function getMemoChatSummary(id: string) {
+  return useSql().query<MemoChatSummary>('memo_chat_summary').eq('id', id).get().then(e => e ? memoChatSummaryToView(e) : undefined);
 }
 
 export function listMemoChatSummaryL1UnSummary(friendId: string) {

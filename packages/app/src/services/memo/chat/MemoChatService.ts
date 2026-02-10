@@ -8,7 +8,6 @@ import {
 } from "@/entity/memo";
 
 
-
 export function saveMemoChat(data: MemoChatCoreView) {
   const now = Date.now();
   return useSql().mapper<MemoChat>('memo_chat')
@@ -44,12 +43,12 @@ export async function listMemoChatUnSummary(friendId: string) {
 
 /**
  * 获取全部未总结的聊天记录，处于处理中
- * @param friendId
  */
-export async function listMemoChatUnSummaryIng(friendId: string) {
+export async function listMemoChatBetween(friendId: string, startTime: number, endTime: number) {
   const res = await useSql().query<MemoChat>('memo_chat')
     .eq('friend_id', friendId)
-    .eq('compression_level', 3)
+    .ge('created_at', startTime)
+    .le('created_at', endTime)
     .orderByAsc('created_at')
     .list();
   return res.map(memoChatToView);
@@ -116,7 +115,7 @@ export function getMemoChatFirstUnSummary(friendId: string) {
  * @return  数量
  */
 export async function getMemoChatTotalCountUnSummary(friendId: string): Promise<number> {
-  const items =  await useSql().query<MemoChat>('memo_chat')
+  const items = await useSql().query<MemoChat>('memo_chat')
     .select('token_count')
     .eq('friend_id', friendId)
     .eq('compression_level', 0)
