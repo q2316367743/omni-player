@@ -129,15 +129,17 @@ const handleSend = async (content: string) => {
     last_interaction: Date.now()
   });
 
+
+  const assistantMessage = reactive({
+    id: (Date.now() + 1).toString(),
+    sender: 'friend' as const,
+    content: [] as Array<{ type: 'text' | 'think', content: string }>,
+    timestamp: Date.now()
+  })
+
   try {
     isLoading.value = true
 
-    const assistantMessage = reactive({
-      id: (Date.now() + 1).toString(),
-      sender: 'friend' as const,
-      content: [] as Array<{ type: 'text' | 'think', content: string }>,
-      timestamp: Date.now()
-    })
 
     messages.value.push(assistantMessage)
 
@@ -151,16 +153,11 @@ const handleSend = async (content: string) => {
         } else {
           assistantMessage.content.push({type: msg.type, content: msg.content})
         }
+
       }
     })
 
-    createDebouncedSave({
-      friend_id: props.friend.id,
-      role: 'assistant',
-      content: assistantMessage.content,
-      compression_level: 0,
-      token_count: assistantMessage.content.reduce((sum, c) => sum + c.content.length, 0)
-    })
+
   } catch (error) {
     console.error('发送消息失败:', error)
     const errorMessage = {
@@ -172,6 +169,14 @@ const handleSend = async (content: string) => {
     messages.value.push(errorMessage)
   } finally {
     isLoading.value = false;
+    // 无论成功或者失败都要保存
+    createDebouncedSave({
+      friend_id: props.friend.id,
+      role: 'assistant',
+      content: assistantMessage.content,
+      compression_level: 0,
+      token_count: assistantMessage.content.reduce((sum, c) => sum + c.content.length, 0)
+    })
     triggerChatL1Summary(props.friend).then(() => {
       logDebug("[ChatArea] 触发 L1 总结完成")
     }).catch(e => {
