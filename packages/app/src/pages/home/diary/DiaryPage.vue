@@ -12,28 +12,7 @@
       </div>
       <div class="timeline-content local-scroll" ref="scrollContainer" @scroll="handleScroll">
         <TransitionGroup name="timeline-item" tag="div" class="timeline">
-          <div
-            v-for="summary in summaries"
-            :key="summary.id"
-            class="timeline-item"
-          >
-            <div class="timeline-time">{{ formatTime(summary.created_at) }}</div>
-            <div class="timeline-marker">
-              <div class="marker-dot"></div>
-              <div class="marker-line"></div>
-            </div>
-            <div class="timeline-card monica-card" @click="handleSummaryClick(summary.id)">
-              <h3 class="summary-title">{{ summary.title }}</h3>
-              <p class="summary-text">{{ getTruncatedSummary(summary.summary) }}</p>
-              <div v-if="summary.ai_journal" class="ai-comment">
-                <div class="ai-header">
-                  <XhAvatar :value="getFriendAvatar(summary.friend_id)" :size="24" shape="circle" />
-                  <span class="ai-name">{{ getFriendName(summary.friend_id) }}</span>
-                </div>
-                <p class="ai-text">{{ getTruncatedSummary(summary.ai_journal) }}</p>
-              </div>
-            </div>
-          </div>
+          <DiaryTimeline v-for="summary in summaries" :key="summary.id" :summary="summary"/>
         </TransitionGroup>
 
         <div v-if="loading" class="loading-more">
@@ -56,12 +35,11 @@
 </template>
 
 <script lang="ts" setup>
-import type { DiaryItem } from '@/services/memo/MemoSessionSummaryService.ts'
-import { pageDiaryItems } from '@/services/memo/MemoSessionSummaryService.ts'
-import { useMemoFriendStore } from '@/store/MemoFriendStore.ts'
-import XhAvatar from '@/components/avatar/XhAvatar.vue'
+import type {DiaryItem} from '@/services/memo/MemoSessionSummaryService.ts'
+import {pageDiaryItems} from '@/services/memo/MemoSessionSummaryService.ts'
+import {useMemoFriendStore} from '@/store/MemoFriendStore.ts'
+import DiaryTimeline from "@/pages/home/diary/DiaryTimeline.vue";
 
-const router = useRouter()
 const summaries = ref<DiaryItem[]>([])
 const loading = ref(false)
 const hasMore = ref(true)
@@ -73,7 +51,7 @@ const friendStore = useMemoFriendStore()
 
 const loadSummaries = async (page: number) => {
   if (loading.value || !hasMore.value) return
-  
+
   loading.value = true
   try {
     const result = await pageDiaryItems(page, pageSize)
@@ -96,45 +74,14 @@ const loadSummaries = async (page: number) => {
 
 const handleScroll = () => {
   if (!scrollContainer.value || loading.value || !hasMore.value) return
-  
-  const { scrollTop, scrollHeight, clientHeight } = scrollContainer.value
+
+  const {scrollTop, scrollHeight, clientHeight} = scrollContainer.value
   const threshold = 50
-  
+
   if (scrollTop + clientHeight >= scrollHeight - threshold) {
     currentPage.value++
     loadSummaries(currentPage.value)
   }
-}
-
-const formatTime = (timestamp: number) => {
-  const date = new Date(timestamp)
-  return date.toLocaleDateString('zh-CN', {
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-const getTruncatedSummary = (text: string) => {
-  if (!text) return ''
-  const lines = text.split('\n')
-  if (lines.length <= 3) return text
-  return lines.slice(0, 3).join('\n') + '...'
-}
-
-const getFriendName = (friendId: string) => {
-  const friend = friendStore.friendMap.get(friendId)
-  return friend?.name || 'AI'
-}
-
-const getFriendAvatar = (friendId: string) => {
-  const friend = friendStore.friendMap.get(friendId)
-  return friend?.avatar || ''
-}
-
-const handleSummaryClick = (summaryId: string) => {
-  router.push(`/memo/summary/${summaryId}`)
 }
 
 onMounted(async () => {
@@ -144,5 +91,5 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="less">
-@import "DiaryPage.less";
+@import "less/DiaryPage.less";
 </style>

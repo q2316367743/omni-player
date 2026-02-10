@@ -1,4 +1,5 @@
 import type {MemoSessionSummary, MemoSessionSummaryCore} from "@/entity/memo/MemoSessionSummary.ts";
+import type {MemoChatSummary} from "@/entity/memo";
 import {useSql} from "@/lib/sql.ts";
 import {useMemoVelesdb} from "@/lib/velesdb.ts";
 
@@ -49,7 +50,7 @@ export async function pageDiaryItems(pageNum: number, pageSize: number) {
       SELECT id FROM memo_session_summary
       UNION ALL
       SELECT id FROM memo_chat_summary WHERE level = 2
-    )
+    ) as mssimcsi
   `;
   
   const countResult = await useSql().select<Array<{ total: number }>>(countSql);
@@ -69,8 +70,12 @@ export function pageMemoChatSummary(pageNum: number, pageSize: number) {
     .page(pageNum, pageSize);
 }
 
-export function getMemoChatSummary(id: string) {
+export async function getMemoChatSummary(id: string) {
   return useSql().query<MemoSessionSummary>('memo_session_summary').eq('id', id).get();
+}
+
+export async function getMemoChatSummaryById(id: string) {
+  return useSql().query<MemoChatSummary>('memo_chat_summary').eq('id', id).get();
 }
 
 export async function createMemoChatSummary(data: MemoSessionSummaryCore) {
