@@ -1,21 +1,29 @@
 import OpenAI from "openai";
 import type {AiMcpResult, AiMcpWrapper} from "@/modules/ai/mcp";
+import {logDebug, logError, logInfo} from "@/lib/log.ts";
 
 export interface ToolCallHandlerResult {
-  // 思考内容
   think: string;
-  // 内容
   content: string;
-  // 工具调用结果
-  toolResults: Map<string, AiMcpResult | undefined>
+  toolResults: Array<{
+    id: string;
+    functionName: string;
+    args: any;
+    result: any;
+  }>;
 }
 
-/**
- * 工具调用处理器
- * @param response 响应流
- * @param toolHandlers 工具处理器
- * @return 工具调用结果
- */
+export interface ToolCallHandlerProp {
+  client: OpenAI;
+  model: string;
+  messages: Array<OpenAI.Chat.ChatCompletionMessageParam>;
+  toolHandlers: Array<AiMcpWrapper>;
+  tools: Array<OpenAI.Chat.Completions.ChatCompletionTool>;
+  thinkParam?: Record<string, any>;
+  maxIterations?: number;
+  onToolCall?: (result: AiMcpResult) => void;
+}
+
 export async function handleStreamingToolCalls(
   response: AsyncIterable<OpenAI.Chat.Completions.ChatCompletionChunk>,
   toolHandlers: Array<AiMcpWrapper>
@@ -25,7 +33,6 @@ export async function handleStreamingToolCalls(
   const thinks = new Array<string>();
   const contents = new Array<string>();
 
-  // 接收流数据
   for await (const chunk of response) {
     const toolCalls = chunk.choices[0]?.delta.tool_calls;
     const reasoning_content = (chunk.choices[0]?.delta as any)?.reasoning_content;
@@ -53,20 +60,223 @@ export async function handleStreamingToolCalls(
     });
   }
 
-  const res = new Map<string, AiMcpResult | undefined>();
+  const toolResults: ToolCallHandlerResult['toolResults'] = [];
 
-  // 处理工具调用
   const list = Array.from(toolCallsMap.values());
-  for (let i = 0; i < list.length; i++) {
-    const toolCall = list[i];
-    await executeToolCall(toolCall, toolHandlers, res);
+  for (const toolCall of list) {
+    const result = await executeToolCall(toolCall, toolHandlers);
+    if (result) {
+      toolResults.push({
+        id: toolCall.id,
+        functionName: result.functionName,
+        args: result.args,
+        result: result.result
+      });
+    }
   }
 
   return {
     think: thinks.join(''),
     content: contents.join(''),
-    toolResults: res
+    toolResults
   };
+}
+
+export async function handleToolCallsWithLoop(prop: ToolCallHandlerProp): Promise<ToolCallHandlerResult> {
+  const {
+    client,
+    model,
+    messages,
+    toolHandlers,
+    tools,
+    thinkParam = {},
+    maxIterations = 10,
+    onToolCall
+  } = prop;
+
+  const finalResult: ToolCallHandlerResult = {
+    think: '',
+    content: '',
+    toolResults: []
+  };
+
+  let iteration = 0;
+  let shouldContinue = true;
+
+  while (shouldContinue && iteration < maxIterations) {
+    iteration++;
+    logInfo('[ToolCallHandler] 开始迭代', {iteration, maxIterations});
+
+    try {
+      const response = await client.chat.completions.create({
+        model,
+        messages,
+        tools: tools.length > 0 ? tools : undefined,
+        tool_choice: tools.length > 0 ? 'auto' : undefined,
+        stream: true,
+        ...thinkParam
+      });
+
+      const iterationResult = await processStreamResponse(response, toolHandlers);
+
+      finalResult.think += iterationResult.think;
+      finalResult.content += iterationResult.content;
+      finalResult.toolResults.push(...iterationResult.toolCalls);
+
+      if (iterationResult.toolCalls.length > 0) {
+        const assistantMessage: OpenAI.Chat.ChatCompletionAssistantMessageParam = {
+          role: 'assistant',
+          content: iterationResult.content || null,
+          tool_calls: iterationResult.toolCalls.map(tc => ({
+            id: tc.id,
+            type: 'function' as const,
+            function: {
+              name: tc.functionName,
+              arguments: JSON.stringify(tc.args)
+            }
+          }))
+        };
+        messages.push(assistantMessage);
+
+        for (const toolCall of iterationResult.toolCalls) {
+          if (onToolCall) {
+            onToolCall({
+              functionName: toolCall.functionName,
+              args: toolCall.args,
+              result: toolCall.result
+            });
+          }
+
+          const toolMessage: OpenAI.Chat.ChatCompletionToolMessageParam = {
+            role: 'tool',
+            tool_call_id: toolCall.id,
+            content: JSON.stringify(toolCall.result)
+          };
+          messages.push(toolMessage);
+        }
+
+        logDebug('[ToolCallHandler] 工具调用完成，继续迭代', {
+          toolCallCount: iterationResult.toolCalls.length
+        });
+      } else {
+        shouldContinue = false;
+        logInfo('[ToolCallHandler] 无工具调用，结束迭代');
+      }
+    } catch (e) {
+      logError('[ToolCallHandler] 迭代出错', {iteration, error: e});
+      shouldContinue = false;
+    }
+  }
+
+  if (iteration >= maxIterations) {
+    logInfo('[ToolCallHandler] 达到最大迭代次数', {maxIterations});
+  }
+
+  return finalResult;
+}
+
+interface StreamIterationResult {
+  thinkContent: string;
+  content: string;
+  toolCalls: Array<{
+    id: string;
+    functionName: string;
+    args: any;
+    result: any;
+  }>;
+}
+
+async function processStreamResponse(
+  response: AsyncIterable<OpenAI.Chat.Completions.ChatCompletionChunk>,
+  toolHandlers: Array<AiMcpWrapper>
+): Promise<StreamIterationResult> {
+  const result: StreamIterationResult = {
+    thinkContent: '',
+    content: '',
+    toolCalls: []
+  };
+
+  const toolCallsMap = new Map<number, {
+    id: string;
+    functionName: string;
+    arguments: string;
+  }>();
+
+  for await (const chunk of response) {
+    const delta = chunk.choices[0]?.delta;
+    if (!delta) continue;
+
+    const reasoningContent = (delta as any)?.reasoning_content;
+    const content = delta.content;
+    const toolCalls = delta.tool_calls;
+
+    if (reasoningContent) {
+      result.thinkContent += reasoningContent;
+    }
+
+    if (content) {
+      result.content += content;
+    }
+
+    if (toolCalls) {
+      for (const toolCall of toolCalls) {
+        const index = toolCall.index;
+        if (index === undefined) continue;
+
+        const existing = toolCallsMap.get(index);
+        if (existing) {
+          if (toolCall.id) existing.id = toolCall.id;
+          if (toolCall.function?.name) existing.functionName = toolCall.function.name;
+          if (toolCall.function?.arguments) existing.arguments += toolCall.function.arguments;
+        } else {
+          toolCallsMap.set(index, {
+            id: toolCall.id || '',
+            functionName: toolCall.function?.name || '',
+            arguments: toolCall.function?.arguments || ''
+          });
+        }
+      }
+    }
+  }
+
+  for (const [, toolCall] of toolCallsMap) {
+    let args: any = {};
+    try {
+      args = JSON.parse(toolCall.arguments || '{}');
+    } catch (e) {
+      logError('[ToolCallHandler] 解析工具参数失败', {
+        functionName: toolCall.functionName,
+        arguments: toolCall.arguments
+      });
+      continue;
+    }
+
+    let toolResult: any = null;
+    for (const handler of toolHandlers) {
+      if (handler.check(toolCall.functionName)) {
+        try {
+          const mcpResult: AiMcpResult = await handler.execute(toolCall.functionName, args);
+          toolResult = mcpResult.result;
+        } catch (e) {
+          logError('[ToolCallHandler] 工具执行失败', {
+            functionName: toolCall.functionName,
+            error: e
+          });
+          toolResult = {error: e instanceof Error ? e.message : '工具执行失败'};
+        }
+        break;
+      }
+    }
+
+    result.toolCalls.push({
+      id: toolCall.id,
+      functionName: toolCall.functionName,
+      args,
+      result: toolResult
+    });
+  }
+
+  return result;
 }
 
 export async function handleNonStreamingToolCalls(
@@ -85,7 +295,7 @@ export async function handleNonStreamingToolCalls(
 async function executeToolCall(
   toolCall: any,
   toolHandlers: Array<AiMcpWrapper>,
-  map: Map<string, AiMcpResult | undefined>
+  map?: Map<string, AiMcpResult | undefined>
 ): Promise<AiMcpResult | undefined> {
   const functionCall = toolCall.function;
   if (!functionCall) return;
@@ -100,10 +310,11 @@ async function executeToolCall(
 
   for (const toolHandler of toolHandlers) {
     if (toolHandler.check(functionName)) {
-      const r =  await toolHandler.execute(functionName, functionArguments);
-      map.set(toolCall.id, r)
+      const r = await toolHandler.execute(functionName, functionArguments);
+      if (map) {
+        map.set(toolCall.id, r);
+      }
+      return r;
     }
   }
-
 }
-

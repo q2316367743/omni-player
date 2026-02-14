@@ -6,12 +6,12 @@ import {
 } from "@/entity/memo";
 import {useMemoFriendStore, useSettingStore} from "@/store";
 import type OpenAI from "openai";
-import {logDebug, logError} from "@/lib/log";
+import {logDebug, logError, logInfo} from "@/lib/log";
 import {
   getMemoChatSummaryLast,
   listMemoChatSummaryL1UnSummary, saveMemoChatSummary,
 } from "@/services/memo/chat";
-import {handleStreamingToolCalls} from "@/modules/ai/utils/ToolCallHandler.ts";
+import {handleToolCallsWithLoop} from "@/modules/ai/utils/ToolCallHandler.ts";
 import {formatDate} from "@/util/lang/DateUtil.ts";
 import {useSql} from "@/lib/sql.ts";
 import {type AiMcpWrapper, SelfMcp} from "@/modules/ai/mcp";
@@ -28,13 +28,15 @@ export interface L2SummaryResult {
   start_time: number;
   end_time: number;
   l1Summaries: Array<MemoChatSummary>;
+  l2RecordId?: string;
 }
 
 export class ChatSummaryMcp implements AiMcpWrapper {
   private readonly friend: MemoFriendStaticView;
   private readonly firstL1: MemoChatSummary;
   private readonly lastL1: MemoChatSummary;
-
+  private l2RecordId: string | null = null;
+  private summaryData: { title: string; summary: string; ai_journal: string } | null = null;
 
   constructor(friend: MemoFriendStaticView, firstL1: MemoChatSummary, lastL1: MemoChatSummary) {
     this.friend = friend;
@@ -51,14 +53,14 @@ export class ChatSummaryMcp implements AiMcpWrapper {
         parameters: {
           type: "object",
           properties: {
-            title: {type: "string", description: "聊天记录的标题，10字以内诗意标题"},
-            summary: {type: "string", description: "聊天记录的详细总结，150字内，含关键洞察"},
+            title: {type: "string", description: "聊天记录的标题，15字以内诗意标题"},
+            summary: {type: "string", description: "聊天记录的详细总结，500-800字，含关键洞察"},
             role_notes: {type: "string", description: "AI小记，第一人称日记，表达共情或反思"}
           },
           required: ["title", "summary", "role_notes"]
         }
       }
-    }]
+    }];
   }
 
   check(functionName: string): boolean {
@@ -66,8 +68,6 @@ export class ChatSummaryMcp implements AiMcpWrapper {
   }
 
   async execute(functionName: string, args: any) {
-
-    // 执行创建程序
     const l2Record = await saveMemoChatSummary({
       friend_id: this.friend.id,
       level: 2,
@@ -79,6 +79,13 @@ export class ChatSummaryMcp implements AiMcpWrapper {
       layer_operations: [],
       trigger_reason: 'L2定期总结'
     });
+
+    this.l2RecordId = l2Record.id;
+    this.summaryData = {
+      title: args.title,
+      summary: args.summary,
+      ai_journal: args.role_notes
+    };
 
     return {
       functionName,
@@ -93,21 +100,24 @@ export class ChatSummaryMcp implements AiMcpWrapper {
     };
   }
 
+  getL2RecordId(): string | null {
+    return this.l2RecordId;
+  }
+
+  getSummaryData(): { title: string; summary: string; ai_journal: string } | null {
+    return this.summaryData;
+  }
 }
 
-/**
- * 长对话总结
- * > 长期线性变化的自然语言记录
- * @return 总结信息
- */
 export async function aiMemoChatL2Summary(prop: AiMemoChatL2SummaryProp): Promise<L2SummaryResult> {
   try {
     const {friend} = prop;
     const {createAiClient, disableThinkParam} = useSettingStore();
 
-
     const l1Summaries = await listMemoChatSummaryL1UnSummary(friend.id);
-    if (l1Summaries.length === 0) return Promise.reject(new Error('没有需要总结的 L1 数据'))
+    if (l1Summaries.length === 0) {
+      return Promise.reject(new Error('没有需要总结的 L1 数据'));
+    }
 
     const now = Date.now();
 
@@ -116,20 +126,6 @@ export async function aiMemoChatL2Summary(prop: AiMemoChatL2SummaryProp): Promis
     const l2Summary = await getMemoChatSummaryLast(friend.id, 2);
     const start_time = l1Summaries[0]!.start_time;
     const end_time = l1Summaries[l1Summaries.length - 1]!.end_time;
-
-
-    if (l1Summaries.length === 0) {
-      logDebug('[L2Summary] 没有需要总结的 L1 数据');
-      return {
-        title: '',
-        summary: '',
-        ai_journal: '',
-        operations: [],
-        start_time,
-        end_time,
-        l1Summaries
-      };
-    }
 
     const client = createAiClient();
 
@@ -170,46 +166,23 @@ ${l1Content}
 【任务2：更新 AI 动态】
 必须调用 self_update_friend_dynamic 工具，参数包括：
 - friend_id：使用 "${friend.id}"
-- mood：根据用户长期的表现和你的感受选择心情，必须是 happy、concerned、playful、melancholy、excited 中的一个\n  - happy：开心、愉快、满足
-  - concerned：关心、担忧、牵挂
-  - playful：调皮、轻松、幽默
-  - melancholy：忧郁、惆怅、感伤
-  - excited：兴奋、激动、期待
+- mood：根据用户长期的表现和你的感受选择心情，必须是 happy、concerned、playful、melancholy、excited 中的一个
 - last_interaction：使用 ${now}
 
 【任务3：更新用户四层人格数据】
 根据用户长期对话中反映的性格特质变化，调用相应的工具：
 - self_add_persona：添加新的人格层记录
-  - trait_name：选择最相关的特质
-    - openness：开放性 - 对新事物的接受度、创造力、想象力
-    - conscientiousness：尽责性 - 计划性、自律性、责任感
-    - extraversion：外向性 - 社交活跃度、表达欲、能量水平
-    - agreeableness：友好的性 - 合作性、同理心、包容度
-    - neuroticism：神经过敏性 - 情绪稳定性、焦虑程度
-    - resilience：弹性 - 面对困难时的恢复能力
-    - curiosity：好奇心 - 探索欲、求知欲
-    - optimism：乐观 - 积极心态、希望感
+  - trait_name：选择最相关的特质（openness、conscientiousness、extraversion、agreeableness、neuroticism、resilience、curiosity、optimism）
   - delta：根据用户长期表现判断该特质的变化量（0-99）
   - baseline_trait：判断用户该特质的基线水平（0-100）
   - confidence：你的判断置信度（0-99）
   - evidence_snippet：引用相关时间段总结中的原文作为证据
   - expire_at：设置过期时间，建议使用 ${now + 90 * 24 * 60 * 60 * 1000}（90天后）
 
-- self_update_persona：更新现有的人格层记录（如果发现之前的判断需要调整）
-  - id：要更新的人格记录ID
-  - delta：新的变化量
-  - baseline_trait：新的基线水平
-  - confidence：新的置信度
-  - expire_at：新的过期时间
-
 【重要规则】
-1. 必须按顺序调用工具：先 create_chat_summary，再 update_friend_dynamic，最后根据情况调用 add_persona 或 update_persona
+1. 必须按顺序调用工具：先 create_chat_summary，再 update_friend_dynamic，最后根据情况调用 add_persona
 2. create_chat_summary 和 update_friend_dynamic 是必须调用的
-3. add_persona/update_persona 只有在用户长期对话中确实反映了人格特质变化时才调用
-4. 可以调用多次 add_persona/update_persona 来更新不同的人格特质
-5. 所有参数必须符合工具定义的要求
-6. L2 总结要体现长期视角，关注变化趋势和成长轨迹，符合你的人设和语言风格
-7. 注意每个时间段的时间信息，理解用户在不同阶段的状态变化`
+3. L2 总结要体现长期视角，关注变化趋势和成长轨迹，符合你的人设和语言风格`
       }
     ];
 
@@ -217,39 +190,49 @@ ${l1Content}
 
     const firstL1 = l1Summaries[0]!;
     const lastL1 = l1Summaries[l1Summaries.length - 1]!;
+    const chatSummaryMcp = new ChatSummaryMcp(friend, firstL1, lastL1);
     const handlers: Array<AiMcpWrapper> = [
       new SelfMcp(friend.id),
-      new ChatSummaryMcp(friend, firstL1, lastL1)
-    ]
+      chatSummaryMcp
+    ];
 
-    const response = await client.chat.completions.create({
+    const tools = handlers.flatMap(e => e.getSchema());
+
+    const result = await handleToolCallsWithLoop({
+      client,
       model: friend.model,
       messages: messagesForAI,
-      tools: handlers.flatMap(e => e.getSchema()),
-      tool_choice: "required",
-      stream: true,
-      ...disableThinkParam(friend.model)
+      toolHandlers: handlers,
+      tools,
+      thinkParam: disableThinkParam(friend.model),
+      maxIterations: 10
     });
 
-    if (!response) {
-      return Promise.reject(new Error('AI response is null'));
-    }
+    const l2RecordId = chatSummaryMcp.getL2RecordId();
+    const summaryData = chatSummaryMcp.getSummaryData();
 
-    let l2Result: L2SummaryResult | null = null;
-    const layerOperations: Array<MemoChatSummaryLayerOperation> = [];
-
-
-    await handleStreamingToolCalls(response, handlers);
-
-
-    await updateL1Summaries(l1Summaries.map(s => s.id), l2Record.id);
-
-    if (!l2Result) {
+    if (!l2RecordId || !summaryData) {
+      logError('[L2Summary] 未创建 L2 总结记录');
       return Promise.reject(new Error('Failed to create L2 summary'));
     }
 
-    logDebug('[L2Summary] L2 总结完成');
-    return l2Result;
+    await updateL1Summaries(l1Summaries.map(s => s.id), l2RecordId);
+
+    logInfo('[L2Summary] L2 总结完成', {
+      l2RecordId,
+      toolCallCount: result.toolResults.length
+    });
+
+    return {
+      title: summaryData.title,
+      summary: summaryData.summary,
+      ai_journal: summaryData.ai_journal,
+      operations: [],
+      start_time,
+      end_time,
+      l1Summaries,
+      l2RecordId
+    };
 
   } catch (error) {
     logError('[L2Summary] L2 总结失败', error);
