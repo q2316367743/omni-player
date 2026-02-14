@@ -29,11 +29,11 @@ export interface MemoChatCore {
   friend_id: string;         // AI伴侣ID
 
   // 内容
-  role: AiChatRole;
+  role: AiChatRole | 'summary';
   content: string;           // 内容
 
   // 压缩标记
-  compression_level: 0 | 1 | 2;  // 0=原始 1=短总结归档 2=长总结归档
+  compression_level: 0 | 1 | 2 | 3;  // 0=原始 1=短总结归档 2=长总结归档 3=处理中
 
   // 如果已被总结，指向总结ID（用于追溯）
   archived_to_summary_id: string;
@@ -49,7 +49,7 @@ export interface MemoChatCoreView {
   friend_id: string;         // AI伴侣ID
 
   // 内容
-  role: AiChatRole;
+  role: AiChatRole | 'summary';
   content: Array<MemoChatContent>;           // 内容
 
   // 压缩标记
@@ -81,7 +81,7 @@ export function memoChatCoreFromView(view: MemoChatCoreView): MemoChatCore {
 
 export interface MemoChatItemView {
   id: string
-  sender: 'user' | 'friend'
+  sender: AiChatRole | 'summary'
   content: Array<MemoChatContent>
   timestamp: number
 }

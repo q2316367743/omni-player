@@ -6,55 +6,62 @@ import {
   updateMemoLayerPersona
 } from "@/services/memo";
 
-export class SelfMcp implements AiMcpWrapper {
+export class SelfPersonaMcp implements AiMcpWrapper {
 
   private readonly friendId: string;
-
-  private  toolHandlers: Record<string, (args: any) => Promise<void>> = {
-    self_update_friend_dynamic: async (args: any) => {
-      await updateMemoFriendDynamic(this.friendId, {
-        current_mood: args.mood,
-        last_interaction: args.last_interaction
-      });
-    },
-    self_add_persona: async (args: any) => {
-      await addMemoLayerPersona({
-        source: 'chat',
-        source_id: this.friendId,
-        trait_name: args.trait_name,
-        delta: args.delta,
-        baseline_trait: args.baseline_trait,
-        confidence: args.confidence,
-        evidence_snippet: args.evidence_snippet || '',
-        expire_at: args.expire_at
-      });
-    },
-    self_update_persona: async (args: any) => {
-      if (!args.id) return;
-      await updateMemoLayerPersona(args.id, {
-        delta: args.delta,
-        baseline_trait: args.baseline_trait,
-        confidence: args.confidence,
-        expire_at: args.expire_at
-      });
-    }
-  };
 
   constructor(friendId: string) {
     this.friendId = friendId;
   }
 
-
   check(functionName: string): boolean {
-    return functionName.startsWith('self');
+    return functionName === 'self_update_friend_dynamic' ||
+      functionName === 'self_add_persona' ||
+      functionName === 'self_update_persona';
   }
 
   async execute(functionName: string, args: any): Promise<any> {
-    const handler = this.toolHandlers[functionName];
-    if (handler) {
-      return handler(args);
+    let result: any;
+
+    switch (functionName) {
+      case 'self_update_friend_dynamic':
+        await updateMemoFriendDynamic(this.friendId, {
+          current_mood: args.mood,
+          last_interaction: args.last_interaction
+        });
+        result = {success: true};
+        break;
+      case 'self_add_persona':
+        await addMemoLayerPersona({
+          source: 'chat',
+          source_id: this.friendId,
+          trait_name: args.trait_name,
+          delta: args.delta,
+          baseline_trait: args.baseline_trait,
+          confidence: args.confidence,
+          evidence_snippet: args.evidence_snippet || '',
+          expire_at: args.expire_at
+        });
+        result = {success: true};
+        break;
+      case 'self_update_persona':
+        if (!args.id) {
+          result = {success: false, error: 'id is required'};
+        } else {
+          await updateMemoLayerPersona(args.id, {
+            delta: args.delta,
+            baseline_trait: args.baseline_trait,
+            confidence: args.confidence,
+            expire_at: args.expire_at
+          });
+          result = {success: true};
+        }
+        break;
+      default:
+        return Promise.reject(new Error(`无效的函数名：${functionName}`));
     }
-    return Promise.reject(new Error(`无效的函数名：${functionName}`));
+
+    return {functionName, args, result};
   }
 
   getSchema(): Array<OpenAI.Chat.Completions.ChatCompletionTool> {
@@ -122,5 +129,4 @@ export class SelfMcp implements AiMcpWrapper {
       }
     ];
   }
-
 }

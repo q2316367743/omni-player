@@ -65,7 +65,7 @@ const friend = computed(() => summary.value?.friend_id ? useMemoFriendStore().fr
 
 const data = computed<Array<MemoChatItemView>>(() => messages.value.map(chat => ({
   id: chat.id,
-  sender: chat.role === 'user' ? 'user' : 'friend',
+  sender: chat.role,
   content: chat.content,
   timestamp: chat.created_at
 })))

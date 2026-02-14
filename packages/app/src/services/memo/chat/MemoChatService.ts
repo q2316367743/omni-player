@@ -29,13 +29,14 @@ export function updateMemoChat(id: string, data: Partial<MemoChatCore>) {
 }
 
 /**
- * 获取全部未总结的聊天记录
+ * 获取全部未总结的聊天记录，且是有意义的
  * @param friendId
  */
 export async function listMemoChatUnSummary(friendId: string) {
   const res = await useSql().query<MemoChat>('memo_chat')
     .eq('friend_id', friendId)
     .eq('compression_level', 0)
+    .in('role', ['user', 'system', 'assistant'])
     .orderByAsc('created_at')
     .list();
   return res.map(memoChatToView);

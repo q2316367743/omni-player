@@ -61,6 +61,7 @@ import {updateMemoFriendDynamic} from "@/services/memo";
 import {triggerChatL1Summary} from "@/modules/ai/memo/summary/TriggerChatL1Summary.ts";
 import {logDebug, logError} from "@/lib/log.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
+import type {AiChatRole} from "@/global/CommonType.ts";
 
 const props = defineProps<{
   friend: MemoFriendStaticView
@@ -78,7 +79,7 @@ const supportThink = computed(() => {
 
 const messages = ref<Array<{
   id: string
-  sender: 'user' | 'friend'
+  sender: AiChatRole | 'summary'
   content: Array<MemoChatContent>
   timestamp: number
 }>>([])
@@ -96,7 +97,7 @@ const loadHistoryMessages = async () => {
     const historyChats = await listMemoChatTimestamp(props.friend.id, Date.now(), 50)
     messages.value = historyChats.map(chat => ({
       id: chat.id,
-      sender: chat.role === 'user' ? 'user' : 'friend',
+      sender: chat.role,
       content: chat.content,
       timestamp: chat.created_at
     }))
@@ -132,7 +133,7 @@ const handleSend = async (content: string) => {
 
   const assistantMessage = reactive({
     id: (Date.now() + 1).toString(),
-    sender: 'friend' as const,
+    sender: 'assistant' as const,
     content: [] as Array<MemoChatContent>,
     timestamp: Date.now()
   })
@@ -165,7 +166,7 @@ const handleSend = async (content: string) => {
     console.error('发送消息失败:', error)
     const errorMessage = {
       id: (Date.now() + 2).toString(),
-      sender: 'friend' as const,
+      sender: 'assistant' as const,
       content: [{type: 'text' as const, content: '发送失败，请重试'}],
       timestamp: Date.now()
     }
@@ -203,10 +204,11 @@ const handleToggleSummary = async () => {
     summaryLoading.value = true;
     MessageUtil.info('正在触发总结，请稍候...');
     logDebug("[ChatArea] 触发 L1 总结")
-    await triggerChatL1SummaryActive(props.friend, "主动触发");
+    await triggerChatL1SummaryActive(props.friend, "主动触发", true);
     logDebug("[ChatArea] 触发 L2 总结")
     await setupChatL2Summary(props.friend, '用户主动触发')
     MessageUtil.success('触发总结成功');
+    await loadHistoryMessages();
   } catch (e) {
     MessageUtil.error('触发总结失败', e);
     logDebug('[ChatArea] 触发总结失败', e)

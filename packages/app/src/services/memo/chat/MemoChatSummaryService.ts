@@ -45,3 +45,31 @@ export function updateMemoChatSummary(id: string, data: Partial<MemoChatSummaryC
     updated_at: now
   });
 }
+
+export function listMemoChatSummaryByTimeRange(
+  friendId: string,
+  level: 1 | 2,
+  startTime: number,
+  endTime: number
+) {
+  return useSql().query<MemoChatSummary>('memo_chat_summary')
+    .eq('friend_id', friendId)
+    .eq('level', level)
+    .ge('start_time', startTime)
+    .le('end_time', endTime)
+    .orderByAsc('start_time')
+    .list();
+}
+
+export function listMemoChatSummaryRecent(
+  friendId: string,
+  level: 1 | 2,
+  limit: number = 5
+) {
+  return useSql().query<MemoChatSummary>('memo_chat_summary')
+    .eq('friend_id', friendId)
+    .eq('level', level)
+    .orderByDesc('created_at')
+    .lastSql(`LIMIT ${limit}`)
+    .list();
+}

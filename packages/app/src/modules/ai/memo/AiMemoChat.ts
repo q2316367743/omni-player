@@ -4,7 +4,7 @@ import {
   type MemoFriendStaticView,
   memoFriendToPrompt
 } from "@/entity/memo";
-import {getMemoChatSummaryLast, listMemoChatUnSummary} from "@/services/memo/chat";
+import {listMemoChatUnSummary} from "@/services/memo/chat";
 import {useMemoFriendStore, useSettingStore} from "@/store";
 import {
   getActiveMemoLayerBehaviors, getActiveMemoLayerCognitive, getActiveMemoLayerEmotions,
@@ -14,7 +14,7 @@ import {formatDate, getTimeSinceLastInteraction} from "@/util/lang/DateUtil.ts";
 import type OpenAI from "openai";
 import {logDebug, logInfo} from "@/lib/log.ts";
 import {aguiHandler, type AguiEvent} from "@/modules/ai/utils/AguiHandler.ts";
-import {SelfMcp} from "@/modules/ai/mcp";
+import {SelfPersonaMcp, SelfSummaryMcp, SelfUserProfileMcp} from "@/modules/ai/mcp";
 import {McpPluginWrapper} from "@/modules/ai/mcp/impl/McpPluginWrapper.ts";
 
 export interface AiMemoChatProp {
@@ -31,12 +31,6 @@ export async function aiMemoChat(prop: AiMemoChatProp) {
   logInfo('[AiMemoChat] 开始聊天', {friendId: friend.id, friendName: friend.name, think: prop.think});
 
   const messages: Array<OpenAI.Chat.ChatCompletionMessageParam> = [];
-
-  const chatSummary = await getMemoChatSummaryLast(friend.id);
-  logDebug('[AiMemoChat] 查询到上次对话总结', chatSummary ? {
-    summaryId: chatSummary.id,
-    createdAt: chatSummary.created_at
-  } : '无');
 
   const chats = await listMemoChatUnSummary(friend.id);
   logDebug('[AiMemoChat] 查询到未总结的聊天记录', {count: chats.length});
@@ -72,16 +66,6 @@ ${formatDate(now)}`;
     content: systemPrompt
   });
 
-  if (chatSummary) {
-    const startTime = getTimeSinceLastInteraction(chatSummary.start_time);
-    const endTime = getTimeSinceLastInteraction(chatSummary.end_time);
-    messages.push({
-      role: "system",
-      content: `【上次对话总结】[${startTime} - ${endTime}]\n${chatSummary.content}`
-    });
-    logDebug('[AiMemoChat] 添加上次对话总结到消息', {startTime, endTime});
-  }
-
   let validChatCount = 0;
   chats.forEach(chat => {
     if (chat.role !== 'system' && chat.role !== 'user' && chat.role !== 'assistant') {
@@ -106,12 +90,14 @@ ${formatDate(now)}`;
 
   const client = createAiClient();
 
-  const selfMcp = new SelfMcp(friend.id);
+  const selfPersonaMcp = new SelfPersonaMcp(friend.id);
+  const selfSummaryMcp = new SelfSummaryMcp(friend.id);
+  const selfUserProfileMcp = new SelfUserProfileMcp();
   const mcpPluginWrapper = new McpPluginWrapper();
   await mcpPluginWrapper.refreshToolSchemas();
 
-  const toolHandlers = [selfMcp, mcpPluginWrapper];
-  const tools = [...selfMcp.getSchema(), ...mcpPluginWrapper.getSchema()];
+  const toolHandlers = [selfPersonaMcp, selfSummaryMcp, selfUserProfileMcp, mcpPluginWrapper];
+  const tools = [...selfPersonaMcp.getSchema(), ...selfSummaryMcp.getSchema(), ...selfUserProfileMcp.getSchema(), ...mcpPluginWrapper.getSchema()];
 
   logInfo('[AiMemoChat] 开始调用 AI Agent', {
     model: friend.model,

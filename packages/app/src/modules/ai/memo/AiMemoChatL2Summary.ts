@@ -14,10 +14,12 @@ import {
 import {handleToolCallsWithLoop} from "@/modules/ai/utils/ToolCallHandler.ts";
 import {formatDate} from "@/util/lang/DateUtil.ts";
 import {useSql} from "@/lib/sql.ts";
-import {type AiMcpWrapper, SelfMcp} from "@/modules/ai/mcp";
+import {type AiMcpWrapper, SelfPersonaMcp} from "@/modules/ai/mcp";
+import {saveMemoChat} from "@/services/memo/chat/MemoChatService.ts";
 
 export interface AiMemoChatL2SummaryProp {
   friend: MemoFriendStaticView;
+  trigger_reason?: string;
 }
 
 export interface L2SummaryResult {
@@ -35,13 +37,15 @@ export class ChatSummaryMcp implements AiMcpWrapper {
   private readonly friend: MemoFriendStaticView;
   private readonly firstL1: MemoChatSummary;
   private readonly lastL1: MemoChatSummary;
+  private readonly triggerReason: string;
   private l2RecordId: string | null = null;
   private summaryData: { title: string; summary: string; ai_journal: string } | null = null;
 
-  constructor(friend: MemoFriendStaticView, firstL1: MemoChatSummary, lastL1: MemoChatSummary) {
+  constructor(friend: MemoFriendStaticView, firstL1: MemoChatSummary, lastL1: MemoChatSummary, triggerReason: string = 'L2定期总结') {
     this.friend = friend;
     this.firstL1 = firstL1;
     this.lastL1 = lastL1;
+    this.triggerReason = triggerReason;
   }
 
   getSchema(): Array<OpenAI.Chat.Completions.ChatCompletionTool> {
@@ -77,7 +81,7 @@ export class ChatSummaryMcp implements AiMcpWrapper {
       archived_to_l2_id: '',
       ai_journal: args.role_notes,
       layer_operations: [],
-      trigger_reason: 'L2定期总结'
+      trigger_reason: this.triggerReason
     });
 
     this.l2RecordId = l2Record.id;
@@ -190,9 +194,9 @@ ${l1Content}
 
     const firstL1 = l1Summaries[0]!;
     const lastL1 = l1Summaries[l1Summaries.length - 1]!;
-    const chatSummaryMcp = new ChatSummaryMcp(friend, firstL1, lastL1);
+    const chatSummaryMcp = new ChatSummaryMcp(friend, firstL1, lastL1, prop.trigger_reason);
     const handlers: Array<AiMcpWrapper> = [
-      new SelfMcp(friend.id),
+      new SelfPersonaMcp(friend.id),
       chatSummaryMcp
     ];
 
@@ -217,6 +221,16 @@ ${l1Content}
     }
 
     await updateL1Summaries(l1Summaries.map(s => s.id), l2RecordId);
+
+    await saveMemoChat({
+      friend_id: friend.id,
+      role: 'summary',
+      content: [
+        {type: 'text', content: `【${summaryData.title}】\n${summaryData.summary}`}
+      ],
+      compression_level: 0,
+      archived_to_summary_id: l2RecordId
+    });
 
     logInfo('[L2Summary] L2 总结完成', {
       l2RecordId,

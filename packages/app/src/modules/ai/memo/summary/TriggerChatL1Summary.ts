@@ -31,11 +31,18 @@ export async function triggerChatL1Summary(friend: MemoFriendStaticView) {
   logDebug("[TriggerChatL1Summary] 辅助触发 B", friend.id, hitLength);
 
   if (hitCount && (hitTime || hitLength)) {
-    await triggerChatL1SummaryActive(friend, `自动触发|hitCount:${hitCount ? 'true' : 'false'}|hitTime:${hitTime ? 'true' : 'false'}|hitLength:${hitLength ? 'true' : 'false'}`)
+    await triggerChatL1SummaryActive(
+      friend,
+      `自动触发|hitCount:${hitCount ? 'true' : 'false'}|hitTime:${hitTime ? 'true' : 'false'}|hitLength:${hitLength ? 'true' : 'false'}`,
+      false);
   }
 }
 
-export async function triggerChatL1SummaryActive(friend: MemoFriendStaticView, trigger_reason: string) {
+export async function triggerChatL1SummaryActive(
+  friend: MemoFriendStaticView,
+  trigger_reason: string,
+  ing: boolean
+) {
   // 触发总结
   logDebug("[TriggerChatL1Summary] 触发 L1 总结", friend.id);
   // 归档范围：最早的 (stats.count - 10) 条
@@ -45,6 +52,13 @@ export async function triggerChatL1SummaryActive(friend: MemoFriendStaticView, t
     friend: friend,
     messages: messages
   });
+  if (ing) {
+    for (const message of messages) {
+      await updateMemoChat(message.id, {
+        compression_level: 3,
+      });
+    }
+  }
   // 1. 插入总结
   logDebug('[TriggerChatL1Summary] 插入总结', friend.id)
   const {id: summaryId} = await saveMemoChatSummary({
