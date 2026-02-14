@@ -15,14 +15,15 @@ export interface MemoChatContentThink {
 export interface MemoChatContentSkill {
   type: 'skill',
 }
-// 调用 mcp 功能
+
 export interface MemoChatContentMcp {
   type: 'mcp',
-  // 调用的 mcp 名称
-  content: string;
+  toolName: string;
+  args: any;
+  result: any;
 }
 
-export type MemoChatContent = MemoChatContentText | MemoChatContentThink;
+export type MemoChatContent = MemoChatContentText | MemoChatContentThink | MemoChatContentSkill | MemoChatContentMcp;
 
 export interface MemoChatCore {
   friend_id: string;         // AI伴侣ID

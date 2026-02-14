@@ -31,35 +31,39 @@ export async function triggerChatL1Summary(friend: MemoFriendStaticView) {
   logDebug("[TriggerChatL1Summary] 辅助触发 B", friend.id, hitLength);
 
   if (hitCount && (hitTime || hitLength)) {
-    // 触发总结
-    logDebug("[TriggerChatL1Summary] 触发 L1 总结", friend.id);
-    // 归档范围：最早的 (stats.count - 10) 条
-    const messages = await listMemoChatAscUnSummary(friendId);
-    if (messages.length === 0) return;
-    const summary = await aiMemoChatL1Summary({
-      friend: friend,
-      messages: messages
+    await triggerChatL1SummaryActive(friend, `自动触发|hitCount:${hitCount ? 'true' : 'false'}|hitTime:${hitTime ? 'true' : 'false'}|hitLength:${hitLength ? 'true' : 'false'}`)
+  }
+}
+
+export async function triggerChatL1SummaryActive(friend: MemoFriendStaticView, trigger_reason: string) {
+  // 触发总结
+  logDebug("[TriggerChatL1Summary] 触发 L1 总结", friend.id);
+  // 归档范围：最早的 (stats.count - 10) 条
+  const messages = await listMemoChatAscUnSummary(friend.id);
+  if (messages.length === 0) return;
+  const summary = await aiMemoChatL1Summary({
+    friend: friend,
+    messages: messages
+  });
+  // 1. 插入总结
+  logDebug('[TriggerChatL1Summary] 插入总结', friend.id)
+  const {id: summaryId} = await saveMemoChatSummary({
+    friend_id: friend.id,
+    level: 1,
+    start_time: messages[0]?.created_at || 0,
+    end_time: messages[messages.length - 1]?.created_at || 0,
+    content: summary,
+    layer_operations: [],
+    archived_to_l2_id: '',
+    trigger_reason,
+    ai_journal: ''
+  });
+  // 2. 修改消息信息
+  logDebug('[TriggerChatL1Summary] 修改消息信息', friend.id, messages.length)
+  for (const message of messages) {
+    await updateMemoChat(message.id, {
+      compression_level: 1,
+      archived_to_summary_id: summaryId
     });
-    // 1. 插入总结
-    logDebug('[TriggerChatL1Summary] 插入总结', friend.id)
-    const {id: summaryId} = await saveMemoChatSummary({
-      friend_id: friend.id,
-      level: 1,
-      start_time: messages[0]?.created_at || 0,
-      end_time: messages[messages.length - 1]?.created_at || 0,
-      content: summary,
-      layer_operations: [],
-      archived_to_l2_id: '',
-      trigger_reason: `trigger|hitCount:${hitCount ? 'true' : 'false'}|hitTime:${hitTime ? 'true' : 'false'}|hitLength:${hitLength ? 'true' : 'false'}`,
-      ai_journal: ''
-    });
-    // 2. 修改消息信息
-    logDebug('[TriggerChatL1Summary] 修改消息信息', friend.id, messages.length)
-    for (const message of messages) {
-      await updateMemoChat(message.id, {
-        compression_level: 1,
-        archived_to_summary_id: summaryId
-      });
-    }
   }
 }

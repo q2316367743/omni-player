@@ -49,9 +49,9 @@
 
 <script lang="ts" setup>
 import {useSettingStore} from '@/store'
-import type {MemoFriendStaticView} from '@/entity/memo'
+import type {MemoChatContent, MemoFriendStaticView} from '@/entity/memo'
 import {listMemoChatTimestamp, saveMemoChat} from '@/services/memo/chat'
-import {aiMemoChat, setupChatL2Summary} from '@/modules/ai/memo'
+import {aiMemoChat, setupChatL2Summary, triggerChatL1SummaryActive} from '@/modules/ai/memo'
 import {debounce} from '@/pages/memo/chat/utils.ts'
 import XhAvatar from '@/components/avatar/XhAvatar.vue'
 import MessageBubble from './MessageBubble.vue'
@@ -79,7 +79,7 @@ const supportThink = computed(() => {
 const messages = ref<Array<{
   id: string
   sender: 'user' | 'friend'
-  content: Array<{ type: 'text' | 'think', content: string }>
+  content: Array<MemoChatContent>
   timestamp: number
 }>>([])
 
@@ -133,7 +133,7 @@ const handleSend = async (content: string) => {
   const assistantMessage = reactive({
     id: (Date.now() + 1).toString(),
     sender: 'friend' as const,
-    content: [] as Array<{ type: 'text' | 'think', content: string }>,
+    content: [] as Array<MemoChatContent>,
     timestamp: Date.now()
   })
 
@@ -147,13 +147,16 @@ const handleSend = async (content: string) => {
       friend: props.friend,
       think: thinkEnabled.value,
       onMessage: async (msg) => {
-        const lastContent = assistantMessage.content[assistantMessage.content.length - 1]
-        if (lastContent && lastContent.type === msg.type) {
-          lastContent.content += msg.content
-        } else {
-          assistantMessage.content.push({type: msg.type, content: msg.content})
+        if (msg.type === 'text' || msg.type === 'think') {
+          const lastContent = assistantMessage.content[assistantMessage.content.length - 1]
+          if (lastContent && lastContent.type === msg.type) {
+            (lastContent as any).content += msg.content
+          } else {
+            assistantMessage.content.push({type: msg.type, content: msg.content} as MemoChatContent)
+          }
+        } else if (msg.type === 'mcp') {
+          assistantMessage.content.push(msg)
         }
-
       }
     })
 
@@ -175,7 +178,12 @@ const handleSend = async (content: string) => {
       role: 'assistant',
       content: assistantMessage.content,
       compression_level: 0,
-      token_count: assistantMessage.content.reduce((sum, c) => sum + c.content.length, 0)
+      token_count: assistantMessage.content.reduce((sum, c) => {
+        if (c.type === 'text' || c.type === 'think') {
+          return sum + c.content.length
+        }
+        return sum
+      }, 0)
     })
     triggerChatL1Summary(props.friend).then(() => {
       logDebug("[ChatArea] 触发 L1 总结完成")
@@ -189,20 +197,22 @@ const handleToggleThink = () => {
   thinkEnabled.value = !thinkEnabled.value
 }
 
-const handleToggleSummary = () => {
+const handleToggleSummary = async () => {
   if (summaryLoading.value) return;
-  MessageUtil.info('正在触发 L2 总结，请稍候...');
-  summaryLoading.value = true;
-  setupChatL2Summary(props.friend, '用户主动触发')
-    .then(() => {
-      MessageUtil.success('触发 L2 总结成功');
-    })
-    .catch(e => {
-      MessageUtil.error('触发 L2 总结失败', e);
-    })
-    .finally(() => {
+  try {
+    summaryLoading.value = true;
+    MessageUtil.info('正在触发总结，请稍候...');
+    logDebug("[ChatArea] 触发 L1 总结")
+    await triggerChatL1SummaryActive(props.friend, "主动触发");
+    logDebug("[ChatArea] 触发 L2 总结")
+    await setupChatL2Summary(props.friend, '用户主动触发')
+    MessageUtil.success('触发总结成功');
+  } catch (e) {
+    MessageUtil.error('触发总结失败', e);
+    logDebug('[ChatArea] 触发总结失败', e)
+  } finally {
     summaryLoading.value = false
-  })
+  }
 }
 
 watch(() => props.friend.id, async () => {

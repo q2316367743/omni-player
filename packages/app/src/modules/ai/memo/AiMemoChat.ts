@@ -10,10 +10,12 @@ import {
   getActiveMemoLayerBehaviors, getActiveMemoLayerCognitive, getActiveMemoLayerEmotions,
   getActiveMemoLayerPersonas
 } from "@/services/memo";
-// import {CHAT_SUMMARY_TOOL_SCHEMA} from "@/modules/ai/schema/ChatSummarySchema.ts";
 import {formatDate, getTimeSinceLastInteraction} from "@/util/lang/DateUtil.ts";
 import type OpenAI from "openai";
 import {logDebug, logInfo} from "@/lib/log.ts";
+import {aguiHandler, type AguiEvent} from "@/modules/ai/utils/AguiHandler.ts";
+import {SelfMcp} from "@/modules/ai/mcp";
+import {McpPluginWrapper} from "@/modules/ai/mcp/impl/McpPluginWrapper.ts";
 
 export interface AiMemoChatProp {
   friend: MemoFriendStaticView;
@@ -30,7 +32,6 @@ export async function aiMemoChat(prop: AiMemoChatProp) {
 
   const messages: Array<OpenAI.Chat.ChatCompletionMessageParam> = [];
 
-  // TODO: 此处需要修复
   const chatSummary = await getMemoChatSummaryLast(friend.id);
   logDebug('[AiMemoChat] 查询到上次对话总结', chatSummary ? {
     summaryId: chatSummary.id,
@@ -105,28 +106,59 @@ ${formatDate(now)}`;
 
   const client = createAiClient();
 
-  logInfo('[AiMemoChat] 开始调用 AI', {model: friend.model, messageCount: messages.length});
+  const selfMcp = new SelfMcp(friend.id);
+  const mcpPluginWrapper = new McpPluginWrapper();
+  await mcpPluginWrapper.refreshToolSchemas();
 
-  const response = await client.chat.completions.create({
+  const toolHandlers = [selfMcp, mcpPluginWrapper];
+  const tools = [...selfMcp.getSchema(), ...mcpPluginWrapper.getSchema()];
+
+  logInfo('[AiMemoChat] 开始调用 AI Agent', {
     model: friend.model,
-    messages,
-    // tools: CHAT_SUMMARY_TOOL_SCHEMA,
-    // tool_choice: "required",
-    stream: true,
-    ...thinkParam(friend.model, prop.think)
+    messageCount: messages.length,
+    toolCount: tools.length
   });
 
-  let chunkCount = 0;
-  for await (const chunk of response) {
-    chunkCount++;
-    const reasoning_content = (chunk.choices[0]?.delta as any)?.reasoning_content;
-    const content = chunk.choices[0]?.delta?.content;
-    if (content) {
-      await onMessage({type: 'text', content});
-    } else if (reasoning_content) {
-      await onMessage({type: 'think', content: reasoning_content});
+  const handleAguiEvent = async (event: AguiEvent) => {
+    switch (event.type) {
+      case 'think':
+        await onMessage({type: 'think', content: event.content});
+        break;
+      case 'text':
+        await onMessage({type: 'text', content: event.content});
+        break;
+      case 'tool_call_start':
+        logDebug('[AiMemoChat] 工具调用开始', {toolName: event.toolName});
+        break;
+      case 'tool_call_result':
+        await onMessage({
+          type: 'mcp',
+          toolName: event.toolName,
+          args: event.args,
+          result: event.result
+        });
+        break;
+      case 'error':
+        logDebug('[AiMemoChat] 错误', {message: event.message});
+        break;
     }
-  }
+  };
 
-  logInfo('[AiMemoChat] 聊天完成', {totalChunks: chunkCount});
+  const result = await aguiHandler({
+    client,
+    model: friend.model,
+    messages,
+    tools,
+    toolHandlers,
+    think: prop.think,
+    thinkParam,
+    maxIterations: 5,
+    onEvent: handleAguiEvent
+  });
+
+  logInfo('[AiMemoChat] 聊天完成', {
+    contentLength: result.content.length,
+    thinkLength: result.thinkContent.length,
+    toolCallCount: result.toolCalls.length
+  });
 }

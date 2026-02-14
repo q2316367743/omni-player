@@ -9,15 +9,12 @@ import type OpenAI from "openai";
 import {logDebug, logError} from "@/lib/log";
 import {
   getMemoChatSummaryLast,
-  listMemoChatSummaryL1UnSummary,
-  saveMemoChatSummary,
+  listMemoChatSummaryL1UnSummary, saveMemoChatSummary,
 } from "@/services/memo/chat";
-import {updateMemoFriendDynamic} from "@/services/memo/MemoFriendService.ts";
-import {addMemoLayerPersona, updateMemoLayerPersona} from "@/services/memo";
 import {handleStreamingToolCalls} from "@/modules/ai/utils/ToolCallHandler.ts";
-import {CHAT_SUMMARY_TOOL_SCHEMA} from "@/modules/ai/schema/ChatSummarySchema.ts";
 import {formatDate} from "@/util/lang/DateUtil.ts";
 import {useSql} from "@/lib/sql.ts";
+import {type AiMcpWrapper, SelfMcp} from "@/modules/ai/mcp";
 
 export interface AiMemoChatL2SummaryProp {
   friend: MemoFriendStaticView;
@@ -31,6 +28,71 @@ export interface L2SummaryResult {
   start_time: number;
   end_time: number;
   l1Summaries: Array<MemoChatSummary>;
+}
+
+export class ChatSummaryMcp implements AiMcpWrapper {
+  private readonly friend: MemoFriendStaticView;
+  private readonly firstL1: MemoChatSummary;
+  private readonly lastL1: MemoChatSummary;
+
+
+  constructor(friend: MemoFriendStaticView, firstL1: MemoChatSummary, lastL1: MemoChatSummary) {
+    this.friend = friend;
+    this.firstL1 = firstL1;
+    this.lastL1 = lastL1;
+  }
+
+  getSchema(): Array<OpenAI.Chat.Completions.ChatCompletionTool> {
+    return [{
+      type: "function",
+      function: {
+        name: "create_chat_summary",
+        description: "创建聊天记录的总结，包括标题、总结内容和AI小记",
+        parameters: {
+          type: "object",
+          properties: {
+            title: {type: "string", description: "聊天记录的标题，10字以内诗意标题"},
+            summary: {type: "string", description: "聊天记录的详细总结，150字内，含关键洞察"},
+            role_notes: {type: "string", description: "AI小记，第一人称日记，表达共情或反思"}
+          },
+          required: ["title", "summary", "role_notes"]
+        }
+      }
+    }]
+  }
+
+  check(functionName: string): boolean {
+    return functionName === 'create_chat_summary';
+  }
+
+  async execute(functionName: string, args: any) {
+
+    // 执行创建程序
+    const l2Record = await saveMemoChatSummary({
+      friend_id: this.friend.id,
+      level: 2,
+      start_time: this.firstL1.start_time,
+      end_time: this.lastL1.end_time,
+      content: args.summary,
+      archived_to_l2_id: '',
+      ai_journal: args.role_notes,
+      layer_operations: [],
+      trigger_reason: 'L2定期总结'
+    });
+
+    return {
+      functionName,
+      args,
+      result: {
+        title: args.title,
+        summary: args.summary,
+        ai_journal: args.role_notes,
+        l2RecordId: l2Record.id,
+        operation_id: `create_l2_${l2Record.id}`,
+      }
+    };
+  }
+
 }
 
 /**
@@ -106,7 +168,7 @@ ${l1Content}
 - role_notes：以你的第一人称写日记，表达对这段长期陪伴用户的感受、观察和反思
 
 【任务2：更新 AI 动态】
-必须调用 update_friend_dynamic 工具，参数包括：
+必须调用 self_update_friend_dynamic 工具，参数包括：
 - friend_id：使用 "${friend.id}"
 - mood：根据用户长期的表现和你的感受选择心情，必须是 happy、concerned、playful、melancholy、excited 中的一个\n  - happy：开心、愉快、满足
   - concerned：关心、担忧、牵挂
@@ -117,7 +179,7 @@ ${l1Content}
 
 【任务3：更新用户四层人格数据】
 根据用户长期对话中反映的性格特质变化，调用相应的工具：
-- add_persona：添加新的人格层记录
+- self_add_persona：添加新的人格层记录
   - trait_name：选择最相关的特质
     - openness：开放性 - 对新事物的接受度、创造力、想象力
     - conscientiousness：尽责性 - 计划性、自律性、责任感
@@ -133,7 +195,7 @@ ${l1Content}
   - evidence_snippet：引用相关时间段总结中的原文作为证据
   - expire_at：设置过期时间，建议使用 ${now + 90 * 24 * 60 * 60 * 1000}（90天后）
 
-- update_persona：更新现有的人格层记录（如果发现之前的判断需要调整）
+- self_update_persona：更新现有的人格层记录（如果发现之前的判断需要调整）
   - id：要更新的人格记录ID
   - delta：新的变化量
   - baseline_trait：新的基线水平
@@ -153,10 +215,17 @@ ${l1Content}
 
     logDebug('[L2Summary] 开始接收 AI 流式响应');
 
+    const firstL1 = l1Summaries[0]!;
+    const lastL1 = l1Summaries[l1Summaries.length - 1]!;
+    const handlers: Array<AiMcpWrapper> = [
+      new SelfMcp(friend.id),
+      new ChatSummaryMcp(friend, firstL1, lastL1)
+    ]
+
     const response = await client.chat.completions.create({
       model: friend.model,
       messages: messagesForAI,
-      tools: CHAT_SUMMARY_TOOL_SCHEMA,
+      tools: handlers.flatMap(e => e.getSchema()),
       tool_choice: "required",
       stream: true,
       ...disableThinkParam(friend.model)
@@ -169,81 +238,11 @@ ${l1Content}
     let l2Result: L2SummaryResult | null = null;
     const layerOperations: Array<MemoChatSummaryLayerOperation> = [];
 
-    const toolHandlers = {
-      create_chat_summary: async (args: any) => {
-        const firstL1 = l1Summaries[0]!;
-        const lastL1 = l1Summaries[l1Summaries.length - 1]!;
-        const l2Record = await saveMemoChatSummary({
-          friend_id: friend.id,
-          level: 2,
-          start_time: firstL1.start_time,
-          end_time: lastL1.end_time,
-          content: args.summary,
-          archived_to_l2_id: '',
-          ai_journal: args.role_notes,
-          layer_operations: [],
-          trigger_reason: 'L2定期总结'
-        });
 
-        layerOperations.push({
-          operation_id: `create_l2_${l2Record.id}`,
-          timestamp: now
-        });
+    await handleStreamingToolCalls(response, handlers);
 
-        l2Result = {
-          title: args.title,
-          summary: args.summary,
-          ai_journal: args.role_notes,
-          operations: layerOperations,
-          start_time,
-          end_time,
-          l1Summaries
-        };
 
-        await updateL1Summaries(l1Summaries.map(s => s.id), l2Record.id);
-      },
-      update_friend_dynamic: async (args: any) => {
-        await updateMemoFriendDynamic(args.friend_id, {
-          current_mood: args.mood,
-          last_interaction: args.last_interaction
-        });
-        layerOperations.push({
-          operation_id: `update_dynamic_${args.friend_id}`,
-          timestamp: now
-        });
-      },
-      add_persona: async (args: any) => {
-        const personaId = await addMemoLayerPersona({
-          source: 'chat',
-          source_id: friend.id,
-          trait_name: args.trait_name,
-          delta: args.delta,
-          baseline_trait: args.baseline_trait,
-          confidence: args.confidence,
-          evidence_snippet: args.evidence_snippet || '',
-          expire_at: args.expire_at
-        });
-        layerOperations.push({
-          operation_id: `add_persona_${personaId}`,
-          timestamp: now
-        });
-      },
-      update_persona: async (args: any) => {
-        if (!args.id) return;
-        await updateMemoLayerPersona(args.id, {
-          delta: args.delta,
-          baseline_trait: args.baseline_trait,
-          confidence: args.confidence,
-          expire_at: args.expire_at
-        });
-        layerOperations.push({
-          operation_id: `update_persona_${args.id}`,
-          timestamp: now
-        });
-      }
-    };
-
-    await handleStreamingToolCalls(response, toolHandlers);
+    await updateL1Summaries(l1Summaries.map(s => s.id), l2Record.id);
 
     if (!l2Result) {
       return Promise.reject(new Error('Failed to create L2 summary'));
