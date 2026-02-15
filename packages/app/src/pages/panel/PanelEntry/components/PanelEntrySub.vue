@@ -20,7 +20,10 @@
         </t-button>
       </div>
     </div>
-    <div class="sub-grid-wrapper">
+    <div
+      class="sub-grid-wrapper"
+      @wheel="handleWheel"
+    >
       <transition :name="slideDirection" mode="out-in">
         <div
           :key="currentCategory?.id"
@@ -55,7 +58,6 @@
 import { AddIcon, GestureUpIcon, SearchIcon } from "tdesign-icons-vue-next";
 import { useToolVisibleStore, type ToolItem } from "@/store/ToolVisibleStore.ts";
 import PanelEntryIcon from "@/pages/panel/PanelEntry/components/PanelEntryIcon.vue";
-import { computed, ref, watch } from "vue";
 
 const emit = defineEmits(['select']);
 
@@ -65,20 +67,26 @@ const toolStore = useToolVisibleStore();
 // 当前分类索引
 const currentCategoryIndex = ref(0);
 
-// 上一次的索引，用于判断滑动方向
-const prevIndex = ref(0);
-
 // 滑动方向
 const slideDirection = ref('slide-left');
 
+// 滚轮节流
+let wheelThrottle = false;
+
 // 监听索引变化，确定滑动方向
 watch(currentCategoryIndex, (newIndex, oldIndex) => {
-  if (newIndex > oldIndex) {
+  const total = visibleCategories.value.length;
+  if (total <= 1) return;
+  
+  // 判断是否是循环跳转
+  const isForwardJump = (newIndex === 0 && oldIndex === total - 1);
+  const isBackwardJump = (newIndex === total - 1 && oldIndex === 0);
+  
+  if (isForwardJump || newIndex > oldIndex) {
     slideDirection.value = 'slide-left';
-  } else {
+  } else if (isBackwardJump || newIndex < oldIndex) {
     slideDirection.value = 'slide-right';
   }
-  prevIndex.value = oldIndex;
 });
 
 // 获取可见的分类（排除 productivity，因为它在主区域显示）
@@ -104,9 +112,30 @@ const currentCategoryTools = computed(() => {
   return result;
 });
 
+// 处理滚轮事件
+function handleWheel(event: WheelEvent) {
+  if (wheelThrottle) return;
+  
+  const total = visibleCategories.value.length;
+  if (total <= 1) return;
+  
+  wheelThrottle = true;
+  setTimeout(() => {
+    wheelThrottle = false;
+  }, 500);
+  
+  if (event.deltaY > 0) {
+    // 向下滚动，下一页
+    currentCategoryIndex.value = (currentCategoryIndex.value + 1) % total;
+  } else {
+    // 向上滚动，上一页
+    currentCategoryIndex.value = (currentCategoryIndex.value - 1 + total) % total;
+  }
+}
+
 // 处理工具点击
 const handleToolClick = (tool: ToolItem) => {
-  emit('select', tool.id)
+  emit('select', tool.id);
 };
 </script>
 

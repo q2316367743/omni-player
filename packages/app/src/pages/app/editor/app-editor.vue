@@ -3,11 +3,6 @@
     <t-aside class="note-sidebar shrink-0" :width="collapsed ? '0px' : '232px'">
       <div class="note-side">
         <div class="sidebar-header">
-          <t-button theme="primary" variant="text" shape="square" @click="goBack">
-            <template #icon>
-              <chevron-left-icon/>
-            </template>
-          </t-button>
           <span class="ml-4px">笔记</span>
           <t-dropdown trigger="click">
             <t-button class="ml-auto" theme="primary" variant="text">
@@ -59,7 +54,7 @@
 </template>
 
 <script lang="ts" setup>
-import {AddIcon, ChevronLeftIcon, FileIcon, ViewListIcon} from 'tdesign-icons-vue-next';
+import {AddIcon, FileIcon, ViewListIcon} from 'tdesign-icons-vue-next';
 import {APP_DATA_NOTE_PATH} from "@/global/Constants.ts";
 import {NoteFs, type NoteNode} from "./func/noteFs.ts";
 import NoteTree from "./components/NoteTree.vue";
@@ -67,16 +62,12 @@ import NoteEditor from "./components/NoteEditor.vue";
 import {openNoteContextMenu} from "./func/NoteContextMenu.tsx";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 
-const router = useRouter();
-
 const treeNodes = ref<NoteNode[]>([]);
 const selectedArticlePath = ref('');
 const currentArticleTitle = ref('');
 const collapsed = ref(false);
 
 let noteFs: NoteFs | null = null;
-
-const goBack = () => router.back();
 
 const loadRootNodes = async () => {
   if (!noteFs) return;

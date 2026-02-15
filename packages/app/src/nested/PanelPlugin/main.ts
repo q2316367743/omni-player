@@ -44,9 +44,9 @@ if (id) {
   const tool = TOOL_MAP.get(id);
   if (tool) {
     // 额外引入图标库
-    tool.entry().then(comp => {
+    tool.entry().then(async comp => {
       // 初始化sql
-      useSql().getDb();
+      await useSql().getDb();
       // 删除 loading
       document.getElementById("init")?.remove();
       // 创建组件

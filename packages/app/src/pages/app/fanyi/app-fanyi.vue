@@ -1,10 +1,8 @@
 <template>
-  <app-tool-layout title="在线翻译">
     <div class="fanyi">
       <t-tabs v-model="active">
         <t-tab-panel v-for="f in fanyi" :key="f.value" :value="f.value" :label="f.label"/>
       </t-tabs>
-
       <div class="fanyi-container">
         <fanyi-u-api-pat v-if="active === 'uapis-post-ai-translate'"/>
         <fanyi-u-api-pts v-else-if="active === 'uapis-post-translate-stream'"/>
@@ -12,7 +10,6 @@
         <fanyi-pear-api303 v-else-if="active === 'pear-api-303'"/>
       </div>
     </div>
-  </app-tool-layout>
 </template>
 <script lang="ts" setup>
 import {LocalName} from "@/global/LocalName.ts";

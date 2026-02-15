@@ -23,12 +23,12 @@
 
 <script lang="ts" setup>
 import {SettingIcon} from 'tdesign-icons-vue-next';
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import {useToolVisibleStore} from "@/store/ToolVisibleStore.ts";
 import {platform} from "@tauri-apps/plugin-os";
 import PanelEntryMain from "@/pages/panel/PanelEntry/components/PanelEntryMain.vue";
 import PanelEntrySub from "@/pages/panel/PanelEntry/components/PanelEntrySub.vue";
 import PanelEntryPin from "@/pages/panel/PanelEntry/components/PanelEntryPin.vue";
-import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 
 // Store
 const toolStore = useToolVisibleStore();

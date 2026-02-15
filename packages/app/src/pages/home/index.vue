@@ -30,7 +30,6 @@
 
 <script lang="ts" setup>
 import {LocalName} from "@/global/LocalName.ts";
-import {SettingIcon, ViewListIcon} from "tdesign-icons-vue-next";
 
 
 const router = useRouter();
@@ -42,7 +41,6 @@ const navItems = [
   {id: 'moment', label: '朋友圈', icon: '🌸'},
   {id: 'diary', label: '日记', icon: '📅'},
   {id: 'memory', label: '记忆', icon: '🧠'},
-  {id: 'tool', label: '工具', icon: '🧰'}
 ]
 
 const currentPage = useSessionStorage(LocalName.PAGE_HOME_ASSISTANT_ACTIVE, 'chat');
@@ -52,10 +50,6 @@ watch(currentPage, val => {
 }, {
   immediate: true
 })
-
-const toSetting = () => {
-  router.push('/admin/global-setting')
-}
 </script>
 
 <style scoped lang="less">

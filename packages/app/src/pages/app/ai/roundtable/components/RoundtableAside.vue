@@ -2,7 +2,6 @@
   <div class="roundtable-aside">
     <div class="header">
       <div class="flex gap-8px items-center">
-        <app-tool-back/>
         <div class="title">圆桌派</div>
         <div class="ml-auto">
           <t-button theme="primary" variant="text" shape="square" @click="toggleCollapsed()">

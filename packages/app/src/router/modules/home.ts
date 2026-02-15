@@ -29,9 +29,5 @@ export const homeRouters: Array<RouteRecordRaw> = [{
     name: 'MemoDiary',
     path: 'diary',
     component: () => import('@/pages/home/diary/DiaryPage.vue')
-  },{
-    name: 'MemoTool',
-    path: 'tool',
-    component: () => import('@/pages/home/tool/ToolsPage.vue')
   }]
 }]

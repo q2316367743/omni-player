@@ -3,11 +3,6 @@
     <div class="todo-container">
       <div class="todo-sidebar">
         <div class="sidebar-header">
-          <t-button theme="default" variant="text" shape="square" @click="goBack">
-            <template #icon>
-              <chevron-left-icon/>
-            </template>
-          </t-button>
           <span class="sidebar-title">待办计划</span>
           <t-button variant="text" shape="square" @click="handleAddPlan">
             <template #icon><add-icon/></template>
@@ -85,12 +80,6 @@ const plans = ref<TodoPlan[]>([]);
 const groups = ref<TodoGroup[]>([]);
 const itemsMap = ref<Map<string, TodoItem[]>>(new Map());
 const selectedPlanId = ref('');
-
-const router = useRouter();
-
-const goBack = () => {
-  router.back();
-};
 
 const planTree = computed(() => {
   return buildTree(plans.value);

@@ -4,7 +4,6 @@
       <div class="header">
         <div class="flex justify-between items-center mb-12px">
           <div class="flex gap-8px items-center">
-            <app-tool-back/>
             <div style="font-weight: bold;font-size: var(--td-font-size-title-large)">问一问</div>
           </div>
           <t-space size="small">

@@ -26,7 +26,11 @@ export interface ToolItem {
   disabled?: boolean;
   platform?: string[];
   entry: () => Promise<{ default: Component }>;
-  router?: Array<RouteRecordRaw>
+  router?: Array<RouteRecordRaw>;
+  // 参数
+  param?: {
+    [key: string]: any;
+  };
 }
 
 export interface ToolSlot {

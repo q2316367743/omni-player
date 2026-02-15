@@ -1,316 +1,314 @@
 <template>
-  <app-tool-layout title="简单请求">
-    <div class="http-request-tool">
-      <div class="request-bar">
-        <t-select v-model="method" :options="methodOptions" class="method-select"/>
-        <t-input v-model="url" placeholder="输入请求地址" class="url-input" @press-enter="sendRequest"/>
-        <t-button theme="primary" :loading="loading" @click="sendRequest">发送请求</t-button>
-      </div>
-
-      <HorizontalSplitPanel :default-top-height="40" :min-top-height="20" :min-bottom-height="20">
-        <template #top>
-          <div class="request-section">
-            <t-tabs v-model="requestTab">
-              <t-tab-panel value="params" label="Params">
-                <t-table
-                  :data="params"
-                  :columns="tableColumns"
-                  size="small"
-                  bordered
-                  :pagination="{ disabled: true }"
-                >
-                  <template #enabled="{ row }">
-                    <t-checkbox v-model="row.enabled"/>
-                  </template>
-                  <template #key="{ row }">
-                    <t-input v-model="row.key" size="small" placeholder="Key"/>
-                  </template>
-                  <template #value="{ row }">
-                    <t-input v-model="row.value" size="small" placeholder="Value"/>
-                  </template>
-                  <template #action="{ rowIndex }">
-                    <t-button theme="danger" variant="text" size="small" @click="removeRow('params', rowIndex)">
-                      <template #icon>
-                        <delete-icon/>
-                      </template>
-                    </t-button>
-                  </template>
-                </t-table>
-                <t-button theme="default" variant="dashed" size="small" class="add-row-btn" @click="addRow('params')">
-                  <template #icon>
-                    <add-icon/>
-                  </template>
-                  添加参数
-                </t-button>
-              </t-tab-panel>
-
-              <t-tab-panel value="body" label="Body" v-if="method !== 'GET' && method !== 'get'">
-                <t-radio-group v-model="bodyType" variant="default-filled" class="body-type-group">
-                  <t-radio-button value="json">JSON</t-radio-button>
-                  <t-radio-button value="text">Text</t-radio-button>
-                  <t-radio-button value="form-data">Form Data</t-radio-button>
-                  <t-radio-button value="x-www-form-urlencoded">x-www-form-urlencoded</t-radio-button>
-                </t-radio-group>
-
-                <div v-if="bodyType === 'json' || bodyType === 'text'" class="body-editor">
-                  <MonacoEditor
-                    v-model="bodyContent"
-                    :language="bodyType === 'json' ? 'json' : 'plaintext'"
-                    height="400px"
-                  />
-                </div>
-
-                <t-table
-                  v-else
-                  :data="formData"
-                  :columns="tableColumns"
-                  size="small"
-                  bordered
-                  :pagination="{ disabled: true }"
-                >
-                  <template #enabled="{ row }">
-                    <t-checkbox v-model="row.enabled"/>
-                  </template>
-                  <template #key="{ row }">
-                    <t-input v-model="row.key" size="small" placeholder="Key"/>
-                  </template>
-                  <template #type="{ row }">
-                    <t-select v-model="row.type" size="small"
-                              :options="[{ label: 'Text', value: 'text' }, { label: 'File', value: 'file' }]"/>
-                  </template>
-                  <template #value="{ row }">
-                    <t-input v-if="row.type === 'text'" v-model="row.value" size="small" placeholder="Value"/>
-                    <div v-else class="file-input-wrapper">
-                      <input
-                        type="file"
-                        :ref="el => { if (el) fileInputRefs[row.key] = el as any }"
-                        @change="(e: any) => handleFileChange(e, row)"
-                        style="display: none"
-                      />
-                      <t-input
-                        :value="row.file?.name || row.value"
-                        size="small"
-                        placeholder="选择文件"
-                        readonly
-                        @click="triggerFileUpload(row)"
-                      />
-                    </div>
-                  </template>
-                  <template #action="{ rowIndex }">
-                    <t-button theme="danger" variant="text" size="small" @click="removeRow('formData', rowIndex)">
-                      <template #icon>
-                        <delete-icon/>
-                      </template>
-                    </t-button>
-                  </template>
-                </t-table>
-                <t-button
-                  v-if="bodyType === 'form-data' || bodyType === 'x-www-form-urlencoded'"
-                  theme="default"
-                  variant="dashed"
-                  size="small"
-                  class="add-row-btn"
-                  @click="addRow('formData')"
-                >
-                  <template #icon>
-                    <add-icon/>
-                  </template>
-                  添加参数
-                </t-button>
-              </t-tab-panel>
-
-              <t-tab-panel value="headers" label="Headers">
-                <t-table
-                  :data="headers"
-                  :columns="tableColumns"
-                  size="small"
-                  bordered
-                  :pagination="{ disabled: true }"
-                >
-                  <template #enabled="{ row }">
-                    <t-checkbox v-model="row.enabled"/>
-                  </template>
-                  <template #key="{ row }">
-                    <t-input v-model="row.key" size="small" placeholder="Key"/>
-                  </template>
-                  <template #value="{ row }">
-                    <t-input v-model="row.value" size="small" placeholder="Value"/>
-                  </template>
-                  <template #action="{ rowIndex }">
-                    <t-button theme="danger" variant="text" size="small" @click="removeRow('headers', rowIndex)">
-                      <template #icon>
-                        <delete-icon/>
-                      </template>
-                    </t-button>
-                  </template>
-                </t-table>
-                <t-button theme="default" variant="dashed" size="small" class="add-row-btn" @click="addRow('headers')">
-                  <template #icon>
-                    <add-icon/>
-                  </template>
-                  添加 Header
-                </t-button>
-              </t-tab-panel>
-
-              <t-tab-panel value="cookies" label="Cookies">
-                <t-table
-                  :data="cookies"
-                  :columns="tableColumns"
-                  size="small"
-                  bordered
-                  :pagination="{ disabled: true }"
-                >
-                  <template #enabled="{ row }">
-                    <t-checkbox v-model="row.enabled"/>
-                  </template>
-                  <template #key="{ row }">
-                    <t-input v-model="row.key" size="small" placeholder="Key"/>
-                  </template>
-                  <template #value="{ row }">
-                    <t-input v-model="row.value" size="small" placeholder="Value"/>
-                  </template>
-                  <template #action="{ rowIndex }">
-                    <t-button theme="danger" variant="text" size="small" @click="removeRow('cookies', rowIndex)">
-                      <template #icon>
-                        <delete-icon/>
-                      </template>
-                    </t-button>
-                  </template>
-                </t-table>
-                <t-button theme="default" variant="dashed" size="small" class="add-row-btn" @click="addRow('cookies')">
-                  <template #icon>
-                    <add-icon/>
-                  </template>
-                  添加 Cookie
-                </t-button>
-              </t-tab-panel>
-
-              <t-tab-panel value="auth" label="Auth">
-                <t-radio-group v-model="authType" variant="default-filled" class="auth-type-group">
-                  <t-radio-button value="none">No Auth</t-radio-button>
-                  <t-radio-button value="basic">Basic Auth</t-radio-button>
-                  <t-radio-button value="bearer">Bearer Token</t-radio-button>
-                  <t-radio-button value="api-key">API Key</t-radio-button>
-                </t-radio-group>
-
-                <div v-if="authType === 'basic'" class="auth-form">
-                  <t-form label-align="left">
-                    <t-form-item label="Username">
-                      <t-input v-model="auth.basic.username" placeholder="用户名"/>
-                    </t-form-item>
-                    <t-form-item label="Password">
-                      <t-input v-model="auth.basic.password" type="password" placeholder="密码"/>
-                    </t-form-item>
-                  </t-form>
-                </div>
-
-                <div v-if="authType === 'bearer'" class="auth-form">
-                  <t-form label-align="left">
-                    <t-form-item label="Token">
-                      <t-input v-model="auth.bearer.token" placeholder="Bearer Token"/>
-                    </t-form-item>
-                  </t-form>
-                </div>
-
-                <div v-if="authType === 'api-key'" class="auth-form">
-                  <t-form label-align="left">
-                    <t-form-item label="Key">
-                      <t-input v-model="auth.apiKey.key" placeholder="API Key 名称"/>
-                    </t-form-item>
-                    <t-form-item label="Value">
-                      <t-input v-model="auth.apiKey.value" placeholder="API Key 值"/>
-                    </t-form-item>
-                    <t-form-item label="Add to">
-                      <t-select v-model="auth.apiKey.addTo" :options="apiKeyAddToOptions"/>
-                    </t-form-item>
-                  </t-form>
-                </div>
-              </t-tab-panel>
-
-              <t-tab-panel value="proxy" label="Proxy">
-                <t-form label-align="left">
-                  <t-form-item>
-                    <t-checkbox v-model="proxy.enabled">启用代理</t-checkbox>
-                  </t-form-item>
-                  <template v-if="proxy.enabled">
-                    <t-form-item label="协议">
-                      <t-select v-model="proxy.protocol" :options="proxyProtocolOptions"/>
-                    </t-form-item>
-                    <t-form-item label="地址">
-                      <t-input v-model="proxy.host" placeholder="代理地址"/>
-                    </t-form-item>
-                    <t-form-item label="端口">
-                      <t-input-number v-model="proxy.port" placeholder="端口号" :min="1" :max="65535"/>
-                    </t-form-item>
-                    <t-form-item label="用户名">
-                      <t-input v-model="proxy.username" placeholder="用户名（可选）"/>
-                    </t-form-item>
-                    <t-form-item label="密码">
-                      <t-input v-model="proxy.password" type="password" placeholder="密码（可选）"/>
-                    </t-form-item>
-                  </template>
-                </t-form>
-              </t-tab-panel>
-            </t-tabs>
-          </div>
-        </template>
-
-        <template #bottom>
-          <div class="response-section">
-            <t-tabs v-model="responseTab">
-              <template #action>
-                <div v-if="response" class="response-info">
-                  <t-tag :theme="getStatusTheme(response.status)">{{ response.status }}</t-tag>
-                  <span class="response-time">{{ response.duration }}ms</span>
-                  <span class="response-size">{{ formatSize(response.size) }}</span>
-                </div>
-              </template>
-
-              <t-tab-panel value="body" label="Body">
-                <div v-if="response" class="response-body">
-                  <MonacoEditor
-                    :model-value="formatResponseBody(response.data)"
-                    :language="getResponseLanguage(response)"
-                    :readonly="true"
-                    height="400px"
-                  />
-                </div>
-                <t-empty v-else description="暂无响应数据" class="mt-12vh"/>
-              </t-tab-panel>
-
-              <t-tab-panel value="cookies" label="Cookies">
-                <div v-if="response?.cookies && response.cookies.length > 0" class="response-cookies">
-                  <t-table :data="response.cookies" :columns="responseCookieColumns" size="small" bordered
-                           :pagination="{ disabled: true }"/>
-                </div>
-                <t-empty v-else description="暂无 Cookie 数据" class="mt-12vh"/>
-              </t-tab-panel>
-
-              <t-tab-panel value="headers" label="Headers">
-                <div v-if="response?.headers" class="response-headers">
-                  <t-table :data="response.headers" :columns="responseHeaderColumns" size="small" bordered
-                           :pagination="{ disabled: true }"/>
-                </div>
-                <t-empty v-else description="暂无 Header 数据" class="mt-12vh"/>
-              </t-tab-panel>
-
-              <t-tab-panel value="request" label="Request">
-                <div v-if="requestConfig" class="request-config">
-                  <MonacoEditor
-                    :model-value="JSON.stringify(requestConfig, null, 2)"
-                    language="json"
-                    :readonly="true"
-                    height="400px"
-                  />
-                </div>
-                <t-empty v-else description="暂无请求配置" class="mt-12vh"/>
-              </t-tab-panel>
-            </t-tabs>
-          </div>
-        </template>
-      </HorizontalSplitPanel>
+  <div class="http-request-tool">
+    <div class="request-bar">
+      <t-select v-model="method" :options="methodOptions" class="method-select"/>
+      <t-input v-model="url" placeholder="输入请求地址" class="url-input" @press-enter="sendRequest"/>
+      <t-button theme="primary" :loading="loading" @click="sendRequest">发送请求</t-button>
     </div>
-  </app-tool-layout>
+
+    <HorizontalSplitPanel :default-top-height="40" :min-top-height="20" :min-bottom-height="20">
+      <template #top>
+        <div class="request-section">
+          <t-tabs v-model="requestTab">
+            <t-tab-panel value="params" label="Params">
+              <t-table
+                :data="params"
+                :columns="tableColumns"
+                size="small"
+                bordered
+                :pagination="{ disabled: true }"
+              >
+                <template #enabled="{ row }">
+                  <t-checkbox v-model="row.enabled"/>
+                </template>
+                <template #key="{ row }">
+                  <t-input v-model="row.key" size="small" placeholder="Key"/>
+                </template>
+                <template #value="{ row }">
+                  <t-input v-model="row.value" size="small" placeholder="Value"/>
+                </template>
+                <template #action="{ rowIndex }">
+                  <t-button theme="danger" variant="text" size="small" @click="removeRow('params', rowIndex)">
+                    <template #icon>
+                      <delete-icon/>
+                    </template>
+                  </t-button>
+                </template>
+              </t-table>
+              <t-button theme="default" variant="dashed" size="small" class="add-row-btn" @click="addRow('params')">
+                <template #icon>
+                  <add-icon/>
+                </template>
+                添加参数
+              </t-button>
+            </t-tab-panel>
+
+            <t-tab-panel value="body" label="Body" v-if="method !== 'GET' && method !== 'get'">
+              <t-radio-group v-model="bodyType" variant="default-filled" class="body-type-group">
+                <t-radio-button value="json">JSON</t-radio-button>
+                <t-radio-button value="text">Text</t-radio-button>
+                <t-radio-button value="form-data">Form Data</t-radio-button>
+                <t-radio-button value="x-www-form-urlencoded">x-www-form-urlencoded</t-radio-button>
+              </t-radio-group>
+
+              <div v-if="bodyType === 'json' || bodyType === 'text'" class="body-editor">
+                <MonacoEditor
+                  v-model="bodyContent"
+                  :language="bodyType === 'json' ? 'json' : 'plaintext'"
+                  height="400px"
+                />
+              </div>
+
+              <t-table
+                v-else
+                :data="formData"
+                :columns="tableColumns"
+                size="small"
+                bordered
+                :pagination="{ disabled: true }"
+              >
+                <template #enabled="{ row }">
+                  <t-checkbox v-model="row.enabled"/>
+                </template>
+                <template #key="{ row }">
+                  <t-input v-model="row.key" size="small" placeholder="Key"/>
+                </template>
+                <template #type="{ row }">
+                  <t-select v-model="row.type" size="small"
+                            :options="[{ label: 'Text', value: 'text' }, { label: 'File', value: 'file' }]"/>
+                </template>
+                <template #value="{ row }">
+                  <t-input v-if="row.type === 'text'" v-model="row.value" size="small" placeholder="Value"/>
+                  <div v-else class="file-input-wrapper">
+                    <input
+                      type="file"
+                      :ref="el => { if (el) fileInputRefs[row.key] = el as any }"
+                      @change="(e: any) => handleFileChange(e, row)"
+                      style="display: none"
+                    />
+                    <t-input
+                      :value="row.file?.name || row.value"
+                      size="small"
+                      placeholder="选择文件"
+                      readonly
+                      @click="triggerFileUpload(row)"
+                    />
+                  </div>
+                </template>
+                <template #action="{ rowIndex }">
+                  <t-button theme="danger" variant="text" size="small" @click="removeRow('formData', rowIndex)">
+                    <template #icon>
+                      <delete-icon/>
+                    </template>
+                  </t-button>
+                </template>
+              </t-table>
+              <t-button
+                v-if="bodyType === 'form-data' || bodyType === 'x-www-form-urlencoded'"
+                theme="default"
+                variant="dashed"
+                size="small"
+                class="add-row-btn"
+                @click="addRow('formData')"
+              >
+                <template #icon>
+                  <add-icon/>
+                </template>
+                添加参数
+              </t-button>
+            </t-tab-panel>
+
+            <t-tab-panel value="headers" label="Headers">
+              <t-table
+                :data="headers"
+                :columns="tableColumns"
+                size="small"
+                bordered
+                :pagination="{ disabled: true }"
+              >
+                <template #enabled="{ row }">
+                  <t-checkbox v-model="row.enabled"/>
+                </template>
+                <template #key="{ row }">
+                  <t-input v-model="row.key" size="small" placeholder="Key"/>
+                </template>
+                <template #value="{ row }">
+                  <t-input v-model="row.value" size="small" placeholder="Value"/>
+                </template>
+                <template #action="{ rowIndex }">
+                  <t-button theme="danger" variant="text" size="small" @click="removeRow('headers', rowIndex)">
+                    <template #icon>
+                      <delete-icon/>
+                    </template>
+                  </t-button>
+                </template>
+              </t-table>
+              <t-button theme="default" variant="dashed" size="small" class="add-row-btn" @click="addRow('headers')">
+                <template #icon>
+                  <add-icon/>
+                </template>
+                添加 Header
+              </t-button>
+            </t-tab-panel>
+
+            <t-tab-panel value="cookies" label="Cookies">
+              <t-table
+                :data="cookies"
+                :columns="tableColumns"
+                size="small"
+                bordered
+                :pagination="{ disabled: true }"
+              >
+                <template #enabled="{ row }">
+                  <t-checkbox v-model="row.enabled"/>
+                </template>
+                <template #key="{ row }">
+                  <t-input v-model="row.key" size="small" placeholder="Key"/>
+                </template>
+                <template #value="{ row }">
+                  <t-input v-model="row.value" size="small" placeholder="Value"/>
+                </template>
+                <template #action="{ rowIndex }">
+                  <t-button theme="danger" variant="text" size="small" @click="removeRow('cookies', rowIndex)">
+                    <template #icon>
+                      <delete-icon/>
+                    </template>
+                  </t-button>
+                </template>
+              </t-table>
+              <t-button theme="default" variant="dashed" size="small" class="add-row-btn" @click="addRow('cookies')">
+                <template #icon>
+                  <add-icon/>
+                </template>
+                添加 Cookie
+              </t-button>
+            </t-tab-panel>
+
+            <t-tab-panel value="auth" label="Auth">
+              <t-radio-group v-model="authType" variant="default-filled" class="auth-type-group">
+                <t-radio-button value="none">No Auth</t-radio-button>
+                <t-radio-button value="basic">Basic Auth</t-radio-button>
+                <t-radio-button value="bearer">Bearer Token</t-radio-button>
+                <t-radio-button value="api-key">API Key</t-radio-button>
+              </t-radio-group>
+
+              <div v-if="authType === 'basic'" class="auth-form">
+                <t-form label-align="left">
+                  <t-form-item label="Username">
+                    <t-input v-model="auth.basic.username" placeholder="用户名"/>
+                  </t-form-item>
+                  <t-form-item label="Password">
+                    <t-input v-model="auth.basic.password" type="password" placeholder="密码"/>
+                  </t-form-item>
+                </t-form>
+              </div>
+
+              <div v-if="authType === 'bearer'" class="auth-form">
+                <t-form label-align="left">
+                  <t-form-item label="Token">
+                    <t-input v-model="auth.bearer.token" placeholder="Bearer Token"/>
+                  </t-form-item>
+                </t-form>
+              </div>
+
+              <div v-if="authType === 'api-key'" class="auth-form">
+                <t-form label-align="left">
+                  <t-form-item label="Key">
+                    <t-input v-model="auth.apiKey.key" placeholder="API Key 名称"/>
+                  </t-form-item>
+                  <t-form-item label="Value">
+                    <t-input v-model="auth.apiKey.value" placeholder="API Key 值"/>
+                  </t-form-item>
+                  <t-form-item label="Add to">
+                    <t-select v-model="auth.apiKey.addTo" :options="apiKeyAddToOptions"/>
+                  </t-form-item>
+                </t-form>
+              </div>
+            </t-tab-panel>
+
+            <t-tab-panel value="proxy" label="Proxy">
+              <t-form label-align="left">
+                <t-form-item>
+                  <t-checkbox v-model="proxy.enabled">启用代理</t-checkbox>
+                </t-form-item>
+                <template v-if="proxy.enabled">
+                  <t-form-item label="协议">
+                    <t-select v-model="proxy.protocol" :options="proxyProtocolOptions"/>
+                  </t-form-item>
+                  <t-form-item label="地址">
+                    <t-input v-model="proxy.host" placeholder="代理地址"/>
+                  </t-form-item>
+                  <t-form-item label="端口">
+                    <t-input-number v-model="proxy.port" placeholder="端口号" :min="1" :max="65535"/>
+                  </t-form-item>
+                  <t-form-item label="用户名">
+                    <t-input v-model="proxy.username" placeholder="用户名（可选）"/>
+                  </t-form-item>
+                  <t-form-item label="密码">
+                    <t-input v-model="proxy.password" type="password" placeholder="密码（可选）"/>
+                  </t-form-item>
+                </template>
+              </t-form>
+            </t-tab-panel>
+          </t-tabs>
+        </div>
+      </template>
+
+      <template #bottom>
+        <div class="response-section">
+          <t-tabs v-model="responseTab">
+            <template #action>
+              <div v-if="response" class="response-info">
+                <t-tag :theme="getStatusTheme(response.status)">{{ response.status }}</t-tag>
+                <span class="response-time">{{ response.duration }}ms</span>
+                <span class="response-size">{{ formatSize(response.size) }}</span>
+              </div>
+            </template>
+
+            <t-tab-panel value="body" label="Body">
+              <div v-if="response" class="response-body">
+                <MonacoEditor
+                  :model-value="formatResponseBody(response.data)"
+                  :language="getResponseLanguage(response)"
+                  :readonly="true"
+                  height="400px"
+                />
+              </div>
+              <t-empty v-else description="暂无响应数据" class="mt-12vh"/>
+            </t-tab-panel>
+
+            <t-tab-panel value="cookies" label="Cookies">
+              <div v-if="response?.cookies && response.cookies.length > 0" class="response-cookies">
+                <t-table :data="response.cookies" :columns="responseCookieColumns" size="small" bordered
+                         :pagination="{ disabled: true }"/>
+              </div>
+              <t-empty v-else description="暂无 Cookie 数据" class="mt-12vh"/>
+            </t-tab-panel>
+
+            <t-tab-panel value="headers" label="Headers">
+              <div v-if="response?.headers" class="response-headers">
+                <t-table :data="response.headers" :columns="responseHeaderColumns" size="small" bordered
+                         :pagination="{ disabled: true }"/>
+              </div>
+              <t-empty v-else description="暂无 Header 数据" class="mt-12vh"/>
+            </t-tab-panel>
+
+            <t-tab-panel value="request" label="Request">
+              <div v-if="requestConfig" class="request-config">
+                <MonacoEditor
+                  :model-value="JSON.stringify(requestConfig, null, 2)"
+                  language="json"
+                  :readonly="true"
+                  height="400px"
+                />
+              </div>
+              <t-empty v-else description="暂无请求配置" class="mt-12vh"/>
+            </t-tab-panel>
+          </t-tabs>
+        </div>
+      </template>
+    </HorizontalSplitPanel>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -669,23 +667,23 @@ const formatResponseBody = (data: any) => {
   if (data === null || data === undefined) {
     return '';
   }
-  
+
   if (typeof data === 'object') {
     return JSON.stringify(data, null, 2);
   }
-  
+
   if (typeof data === 'string') {
     return data;
   }
-  
+
   if (data instanceof ArrayBuffer || data instanceof Uint8Array || data instanceof Blob) {
     return '[Binary data - cannot display]';
   }
-  
+
   if (typeof data === 'number' || typeof data === 'boolean') {
     return String(data);
   }
-  
+
   return '[Unsupported data type]';
 };
 
@@ -697,13 +695,13 @@ const formatSize = (bytes: number) => {
 
 const getResponseLanguage = (response: ResponseData): 'plaintext' | 'json' | 'html' | 'javascript' | 'xml' | 'css' | 'markdown' => {
   const contentType = response.headers?.find(h => h.key.toLowerCase() === 'content-type')?.value || '';
-  
+
   if (!contentType) {
     return typeof response.data === 'object' ? 'json' : 'plaintext';
   }
 
   const type = contentType.toLowerCase();
-  
+
   if (type.includes('application/json') || type.includes('text/json')) {
     return 'json';
   }
@@ -728,7 +726,7 @@ const getResponseLanguage = (response: ResponseData): 'plaintext' | 'json' | 'ht
   if (type.includes('multipart/form-data')) {
     return 'plaintext';
   }
-  
+
   return 'plaintext';
 };
 </script>

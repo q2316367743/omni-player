@@ -1,124 +1,124 @@
 <template>
-  <app-tool-layout title="系统工具 / 端口扫描">
-    <div class="port-tool">
-      <div class="toolbar">
-        <t-space size="small">
-          <t-button theme="primary" :loading="loading" @click="refresh">
-            <template #icon>
-              <refresh-icon/>
-            </template>
-            刷新
-          </t-button>
-        </t-space>
-        <div class="meta">
-          <span class="meta-item">共 {{ rows.length }} 条</span>
-          <span v-if="lastUpdated" class="meta-item">上次更新：{{ formatTime(lastUpdated) }}</span>
-        </div>
+  <div class="port-tool">
+    <div class="toolbar">
+      <t-space size="small">
+        <t-button theme="primary" :loading="loading" @click="refresh">
+          <template #icon>
+            <refresh-icon/>
+          </template>
+          刷新
+        </t-button>
+      </t-space>
+      <div class="meta">
+        <span class="meta-item">共 {{ rows.length }} 条</span>
+        <span v-if="lastUpdated" class="meta-item">上次更新：{{ formatTime(lastUpdated) }}</span>
       </div>
+    </div>
 
-      <t-alert
-        v-if="!tauri"
-        theme="warning"
-        title="当前环境不支持端口占用查询"
-        message="该功能依赖 Tauri 后端命令，请在桌面端使用。"
-        class="mb-12px"
-      />
+    <t-alert
+      v-if="!tauri"
+      theme="warning"
+      title="当前环境不支持端口占用查询"
+      message="该功能依赖 Tauri 后端命令，请在桌面端使用。"
+      class="mb-12px"
+    />
 
-      <t-table
-        v-else
-        row-key="key"
-        :data="displayRows"
-        :columns="columns"
-        bordered
-        :sort="sort"
-        height="calc(100vh - 136px)"
-        @sort-change="onSortChange"
-      >
-        <template #state="{ row }">
-          {{ row.state || '-' }}
-        </template>
-        <template #pid="{ row }">
-          {{ typeof row.pid === 'number' ? row.pid : '-' }}
-        </template>
-        <template #process="{ row }">
-          <t-link
-            v-if="typeof row.pid === 'number'"
-            theme="primary"
-            hover="color"
-            @click.stop="openProcessDialog(row)"
-          >
-            {{ row.process || `PID ${row.pid}` }}
-          </t-link>
-          <span v-else>{{ row.process || '-' }}</span>
-        </template>
-      </t-table>
+    <t-table
+      v-else
+      row-key="key"
+      :data="displayRows"
+      :columns="columns"
+      bordered
+      :sort="sort"
+      height="calc(100vh - 84px)"
+      @sort-change="onSortChange"
+    >
+      <template #state="{ row }">
+        {{ row.state || '-' }}
+      </template>
+      <template #pid="{ row }">
+        {{ typeof row.pid === 'number' ? row.pid : '-' }}
+      </template>
+      <template #process="{ row }">
+        <t-link
+          v-if="typeof row.pid === 'number'"
+          theme="primary"
+          hover="color"
+          @click.stop="openProcessDialog(row)"
+        >
+          {{ row.process || `PID ${row.pid}` }}
+        </t-link>
+        <span v-else>{{ row.process || '-' }}</span>
+      </template>
+    </t-table>
 
-      <t-dialog
-        v-model:visible="detailVisible"
-        header="进程详情"
-        width="720px"
-        placement="center"
-        :close-on-overlay-click="false"
-      >
-        <t-loading :loading="detailLoading">
-          <div class="process-detail">
-            <div class="process-detail__grid">
-              <div class="process-detail__item">
-                <div class="process-detail__key">协议</div>
-                <div class="process-detail__value">{{ detailRow?.protocol || '-' }}</div>
-              </div>
-              <div class="process-detail__item">
-                <div class="process-detail__key">地址</div>
-                <div class="process-detail__value">{{ detailRow?.local_addr || '-' }}</div>
-              </div>
-              <div class="process-detail__item">
-                <div class="process-detail__key">端口</div>
-                <div class="process-detail__value">{{ typeof detailRow?.local_port === 'number' ? detailRow.local_port : '-' }}</div>
-              </div>
-              <div class="process-detail__item">
-                <div class="process-detail__key">状态</div>
-                <div class="process-detail__value">{{ detailRow?.state || '-' }}</div>
-              </div>
-              <div class="process-detail__item">
-                <div class="process-detail__key">PID</div>
-                <div class="process-detail__value">{{ typeof detailRow?.pid === 'number' ? detailRow.pid : '-' }}</div>
-              </div>
-              <div class="process-detail__item">
-                <div class="process-detail__key">进程名</div>
-                <div class="process-detail__value">{{ detail?.name || detailRow?.process || '-' }}</div>
-              </div>
-              <div class="process-detail__item">
-                <div class="process-detail__key">PPID</div>
-                <div class="process-detail__value">{{ typeof detail?.ppid === 'number' ? detail.ppid : '-' }}</div>
-              </div>
-              <div class="process-detail__item">
-                <div class="process-detail__key">用户</div>
-                <div class="process-detail__value">{{ detail?.user || '-' }}</div>
-              </div>
-              <div class="process-detail__item">
-                <div class="process-detail__key">运行时长</div>
-                <div class="process-detail__value">{{ detail?.elapsed || '-' }}</div>
-              </div>
-              <div class="process-detail__item process-detail__item--full">
-                <div class="process-detail__key">命令行</div>
-                <div class="process-detail__value process-detail__value--mono">{{ detail?.command || '-' }}</div>
+    <t-dialog
+      v-model:visible="detailVisible"
+      header="进程详情"
+      width="720px"
+      placement="center"
+      :close-on-overlay-click="false"
+    >
+      <t-loading :loading="detailLoading">
+        <div class="process-detail">
+          <div class="process-detail__grid">
+            <div class="process-detail__item">
+              <div class="process-detail__key">协议</div>
+              <div class="process-detail__value">{{ detailRow?.protocol || '-' }}</div>
+            </div>
+            <div class="process-detail__item">
+              <div class="process-detail__key">地址</div>
+              <div class="process-detail__value">{{ detailRow?.local_addr || '-' }}</div>
+            </div>
+            <div class="process-detail__item">
+              <div class="process-detail__key">端口</div>
+              <div class="process-detail__value">
+                {{ typeof detailRow?.local_port === 'number' ? detailRow.local_port : '-' }}
               </div>
             </div>
+            <div class="process-detail__item">
+              <div class="process-detail__key">状态</div>
+              <div class="process-detail__value">{{ detailRow?.state || '-' }}</div>
+            </div>
+            <div class="process-detail__item">
+              <div class="process-detail__key">PID</div>
+              <div class="process-detail__value">{{ typeof detailRow?.pid === 'number' ? detailRow.pid : '-' }}</div>
+            </div>
+            <div class="process-detail__item">
+              <div class="process-detail__key">进程名</div>
+              <div class="process-detail__value">{{ detail?.name || detailRow?.process || '-' }}</div>
+            </div>
+            <div class="process-detail__item">
+              <div class="process-detail__key">PPID</div>
+              <div class="process-detail__value">{{ typeof detail?.ppid === 'number' ? detail.ppid : '-' }}</div>
+            </div>
+            <div class="process-detail__item">
+              <div class="process-detail__key">用户</div>
+              <div class="process-detail__value">{{ detail?.user || '-' }}</div>
+            </div>
+            <div class="process-detail__item">
+              <div class="process-detail__key">运行时长</div>
+              <div class="process-detail__value">{{ detail?.elapsed || '-' }}</div>
+            </div>
+            <div class="process-detail__item process-detail__item--full">
+              <div class="process-detail__key">命令行</div>
+              <div class="process-detail__value process-detail__value--mono">{{ detail?.command || '-' }}</div>
+            </div>
           </div>
-        </t-loading>
-        <template #footer>
-          <t-space size="small">
-            <t-button variant="outline" @click="detailVisible = false">关闭</t-button>
-            <t-button theme="danger" :loading="killing" :disabled="!canKill" @click="killSelected">
-              关闭进程
-            </t-button>
-          </t-space>
-        </template>
-      </t-dialog>
+        </div>
+      </t-loading>
+      <template #footer>
+        <t-space size="small">
+          <t-button variant="outline" @click="detailVisible = false">关闭</t-button>
+          <t-button theme="danger" :loading="killing" :disabled="!canKill" @click="killSelected">
+            关闭进程
+          </t-button>
+        </t-space>
+      </template>
+    </t-dialog>
 
-      <t-back-top container=".t-table__content" />
-    </div>
-  </app-tool-layout>
+    <t-back-top container=".t-table__content"/>
+  </div>
 </template>
 <script lang="ts" setup>
 import {invoke, isTauri} from "@tauri-apps/api/core";
@@ -203,7 +203,7 @@ const columns = computed(() => ([
   },
 ]));
 
-function normalizeSort(s: any): {sortBy?: string; descending?: boolean} {
+function normalizeSort(s: any): { sortBy?: string; descending?: boolean } {
   if (!s) return {};
   if (Array.isArray(s)) return s[0] || {};
   return s;
