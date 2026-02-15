@@ -5,7 +5,7 @@ use tauri::{
 };
 use tauri_plugin_log::{Target, TargetKind};
 mod commands;
-// 👇 导入插件（注意包名要和 Cargo.toml 中的 name 一致）
+// mod global_mouse;
 
 use commands::{system_port_list, system_process_detail, system_process_kill};
 
@@ -46,6 +46,11 @@ pub fn run() {
             system_process_kill
         ])
         .setup(|app| {
+//             #[cfg(target_os = "macos")]
+//             {
+//                 app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+//             }
+//
             let app_data_dir = app.path().app_data_dir().expect("Failed to get app data dir");
             let velesdb_dir = app_data_dir.join("velesdb_data");
             std::fs::create_dir_all(&velesdb_dir).expect("Failed to create velesdb data directory");
@@ -76,6 +81,8 @@ pub fn run() {
                 })
                 .build(app)?;
 
+//             global_mouse::start_global_mouse_listener(app.handle().clone());
+//
             Ok(())
         })
         .run(tauri::generate_context!())

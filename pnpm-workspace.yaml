@@ -1,5 +1,6 @@
 packages:
   - packages/*
+  - '@xiaohei-plugin/*'
 
 onlyBuiltDependencies:
   - esbuild

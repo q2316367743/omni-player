@@ -1,0 +1,23 @@
+{
+  "identifier": "@xiaohei/http-client",
+  "productName": "http 客户端",
+  "version": "1.0.0",
+  "description": "http 模块",
+  "main": "index.html",
+  "permissions": [
+    {
+      "identifier": "http:default",
+      "allow": [
+        {
+          "url": "https://*"
+        },
+        {
+          "url": "http://*"
+        },
+        {
+          "url": "http://*:*/*"
+        }
+      ]
+    }
+  ]
+}

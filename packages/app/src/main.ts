@@ -1,5 +1,5 @@
 import {createApp} from 'vue'
-import App from './App.vue'
+import App from './pages/panel/PanelEntry/PanelEntry.vue'
 import "@/assets/style/global.less"
 
 import 'virtual:uno.css'

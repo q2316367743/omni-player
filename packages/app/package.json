@@ -39,6 +39,7 @@
     "@tauri-apps/plugin-sql": "^2.3.1",
     "@tauri-apps/plugin-store": "~2.4.1",
     "@tauri-apps/plugin-updater": "~2",
+    "@xiaohei/common": "workspace:*",
     "@vueuse/core": "^14.1.0",
     "@vueuse/integrations": "^14.1.0",
     "@wiscale/tauri-plugin-velesdb": "^1.4.1",

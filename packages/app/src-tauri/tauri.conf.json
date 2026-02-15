@@ -12,14 +12,15 @@
   "app": {
     "windows": [
       {
-        "label": "main",
+        "label": "popup_main",
         "title": "楼下小黑",
-        "width": 1200,
-        "height": 800,
-        "minWidth": 1200,
-        "minHeight": 800,
-        "resizable": true,
-        "fullscreen": false
+        "width": 250,
+        "height": 469,
+        "minWidth": 250,
+        "minHeight": 469,
+        "resizable": false,
+        "fullscreen": false,
+        "decorations": false
       }
     ],
     "security": {

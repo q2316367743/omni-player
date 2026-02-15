@@ -1,0 +1,12 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "popup_main",
+  "description": "入口面板",
+  "windows": [
+    "popup_main"
+  ],
+  "permissions": [
+    "core:window:default",
+    "core:window:allow-start-dragging"
+  ]
+}
