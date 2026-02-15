@@ -4,9 +4,6 @@ import {useToolVisibleStore} from "@/store/ToolVisibleStore.ts";
 export const openPopupPlugin = async (toolId: string) => {
   const tool = useToolVisibleStore().getToolInfo(toolId);
   if (tool) {
-    // 创建
-
-
     const ww = new WebviewWindow(`plugin-inner-${toolId}-${Date.now()}`, {
       url: import.meta.env.DEV ? `http://localhost:5123/popup-plugin.html?id=${toolId}` : `./popup-plugin.html?id=${toolId}`,
       title: tool.label,

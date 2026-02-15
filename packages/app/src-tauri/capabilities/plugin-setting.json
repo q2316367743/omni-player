@@ -1,0 +1,23 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "plugin-setting",
+  "description": "插件设置",
+  "windows": [
+    "plugin-setting"
+  ],
+  "permissions": [
+    "core:default",
+    "store:allow-get",
+    "store:allow-set",
+    "store:allow-save",
+    "store:allow-load",
+    "store:allow-delete",
+    "sql:default",
+    "sql:allow-load",
+    "sql:allow-execute",
+    "sql:allow-select",
+    "velesdb:default",
+    "mcp:default",
+    "velesdb:allow-delete-points"
+  ]
+}
