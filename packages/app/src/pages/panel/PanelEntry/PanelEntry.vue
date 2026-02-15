@@ -4,12 +4,12 @@
     <div class="panel-header" data-tauri-drag-region>
       <div class="panel-title" data-tauri-drag-region>楼下小黑</div>
       <div class="panel-actions">
-        <t-button theme="default" variant="text" size="small" class="action-btn">
-          <setting-icon />
+        <t-button theme="default" variant="text" size="small" shape="square">
+          <template #icon>
+            <setting-icon />
+          </template>
         </t-button>
-        <t-button theme="default" variant="text" size="small" class="action-btn">
-          <pin-icon />
-        </t-button>
+        <panel-entry-pin />
       </div>
     </div>
 
@@ -84,6 +84,7 @@ import {
   ArrowRightIcon, PinIcon
 } from 'tdesign-icons-vue-next';
 import { markRaw } from 'vue';
+import PanelEntryPin from "@/pages/panel/PanelEntry/components/PanelEntryPin.vue";
 
 // 主分类数据
 const mainCategories = [
