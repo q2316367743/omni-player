@@ -18,6 +18,10 @@ const togglePin = async () => {
   pin.value = await win.isAlwaysOnTop();
 }
 
+onMounted(async () => {
+  const win = getCurrentWindow();
+  pin.value = await win.isAlwaysOnTop();
+})
 </script>
 <style scoped lang="less">
 

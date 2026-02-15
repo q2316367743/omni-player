@@ -26,6 +26,8 @@ export const LocalName = {
   // 开发者设置
   KEY_SETTING_DEV: '/key/setting/dev',
 
+  KEY_SETTING_TOOL: '/key/setting/tool',
+
   // 订阅收起
   STORE_SUBSCRIBE_COLLAPSED: '/store/subscribe/collapsed',
 
