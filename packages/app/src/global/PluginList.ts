@@ -6,6 +6,7 @@ import {map} from "@/util";
 import type {RouteRecordRaw} from "vue-router";
 import {homeRouters} from "@/router/modules/home.ts";
 import {memoRouters} from "@/router/modules/memo.ts";
+import {subscribeRouters} from "@/router/modules/subscribe.ts";
 
 export type ToolCategory = 'productivity' | 'ai' | 'programmer' | 'online' | 'system';
 
@@ -67,6 +68,11 @@ export const DEFAULT_TOOLS: ToolItem[] = [
   {
     id: 'bookkeeping', label: '记账', category: 'productivity', icon: 'MoneyIcon', tone: 'media', desc: '精打细算',
     entry: () => import("@/pages/app/bookkeeping/app-bookkeeping.vue")
+  },
+  {
+    id: 'subscribe', label: ' 订阅', category: 'productivity', icon: 'MoneyIcon', tone: 'media', desc: '',
+    entry: () => import("@/pages/subscribe/subscribe-home.vue"),
+    router: subscribeRouters
   },
   {
     id: 'memo', label: '聊愈室', category: 'productivity', icon: 'MoneyIcon', tone: 'media', desc: '',

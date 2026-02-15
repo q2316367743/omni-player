@@ -176,7 +176,7 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
-  padding: 6px 15px;
+  padding: 3px 8px;
   -webkit-user-select: none;
   user-select: none;
   overflow: visible;
@@ -438,7 +438,7 @@
 }
 
 .mx-menu-bar.mac, .mx-context-menu.mac {
-  padding: 8px 0;
+  padding: 4px 0;
   box-shadow: var(--fluent-card-shadow);
   border: 1px solid var(--fluent-border-subtle);
   backdrop-filter: var(--fluent-acrylic-blur);
@@ -509,8 +509,7 @@
 
 .mx-menu-bar.mac .mx-context-menu-item, .mx-context-menu.mac .mx-context-menu-item {
   border-radius: var(--fluent-radius-smooth);
-  margin: 0 8px;
-  padding: 6px 10px;
+  margin: 0 4px;
   transition: background-color var(--fluent-transition-fast), color var(--fluent-transition-fast)
 }
 

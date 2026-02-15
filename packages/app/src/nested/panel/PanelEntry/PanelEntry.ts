@@ -33,7 +33,6 @@ export const openPopupPlugin = async (toolId: string) => {
   }
 }
 
-
 export const openPopupSetting = async () => {
   // 创建
 

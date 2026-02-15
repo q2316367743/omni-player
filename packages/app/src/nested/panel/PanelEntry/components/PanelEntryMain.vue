@@ -9,6 +9,7 @@
         :data-row="rowIndex"
         :data-col="colIndex"
         @click="toolId && handleToolClick(toolId)"
+        @contextmenu="openMainContext(toolId, rowIndex, colIndex, $event)"
       >
         <template v-if="toolId">
           <div class="category-icon">
@@ -30,6 +31,7 @@
 import { AddIcon } from "tdesign-icons-vue-next";
 import { useToolVisibleStore } from "@/store/ToolVisibleStore.ts";
 import PanelEntryIcon from "@/nested/panel/PanelEntry/components/PanelEntryIcon.vue";
+import {openMainContext} from "@/nested/panel/PanelEntry/PanelEntryEdit.tsx";
 
 const emit = defineEmits(['select']);
 
