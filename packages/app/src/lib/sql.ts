@@ -67,7 +67,7 @@ export class SqlWrapper {
 
   private db: Database | null = null;
 
-  private async getDb(): Promise<Database> {
+  async getDb(): Promise<Database> {
     // 将新的 SQL 调用追加到 Promise 链尾部
     if (this.db) return this.db;
     const path = await APP_DATA_DB_PATH();

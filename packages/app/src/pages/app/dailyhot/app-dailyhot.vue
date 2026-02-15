@@ -1,12 +1,10 @@
 <template>
-  <app-tool-layout title="今日热榜">
     <div class="dailyhot">
       <div class="dailyhot-container">
         <dailyhost-platform :selected-platform="selectedPlatform" @choose="selectPlatform"/>
         <dailyhost-content :selected-platform="selectedPlatform"/>
       </div>
     </div>
-  </app-tool-layout>
 </template>
 
 <script lang="ts" setup>
@@ -25,7 +23,8 @@ const selectPlatform = (platform: string) => {
 .dailyhot {
   position: relative;
   width: 100%;
-  height: calc(100% - 32px);
+  height: 100vh;
+  overflow: hidden;
   background: var(--td-bg-color-container);
 
   .dailyhot-container {

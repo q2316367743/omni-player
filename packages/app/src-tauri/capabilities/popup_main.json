@@ -6,9 +6,48 @@
     "popup_main"
   ],
   "permissions": [
+    "dialog:default",
+    "updater:default",
+    "log:default",
+    "os:default",
+    "shell:default",
+    "store:allow-get",
+    "store:allow-set",
+    "store:allow-save",
+    "store:allow-load",
+    "store:allow-delete",
+    "core:default",
+    "core:event:allow-listen",
+    "core:webview:allow-create-webview",
+    "core:webview:allow-webview-show",
+    "core:webview:allow-create-webview-window",
+    "core:webview:allow-set-webview-position",
+    "core:webview:allow-webview-close",
+    "core:webview:allow-set-webview-size",
     "core:window:default",
     "core:window:allow-start-dragging",
     "core:window:allow-is-always-on-top",
-    "core:window:allow-set-always-on-top"
+    "core:window:allow-set-always-on-top",
+    "core:window:allow-hide",
+    "core:window:allow-show",
+    "core:window:allow-set-focus",
+    {
+      "identifier": "http:default",
+      "allow": [
+        {
+          "url": "https://*"
+        },
+        {
+          "url": "http://*"
+        },
+        {
+          "url": "http://*:*/*"
+        }
+      ]
+    },
+    "sql:default",
+    "sql:allow-load",
+    "sql:allow-execute",
+    "sql:allow-select"
   ]
 }

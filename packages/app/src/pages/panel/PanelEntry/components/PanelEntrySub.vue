@@ -1,7 +1,16 @@
 <template>
   <div class="sub-section">
     <div class="sub-header">
-      <span class="sub-title">工具</span>
+      <span class="sub-title">{{ currentCategory?.label || '工具' }}</span>
+      <div class="sub-pagination">
+        <span
+          v-for="(cat, index) in visibleCategories"
+          :key="cat.id"
+          class="pagination-dot"
+          :class="{ 'active': currentCategoryIndex === index }"
+          @click="currentCategoryIndex = index"
+        />
+      </div>
       <div class="sub-actions">
         <t-button theme="default" variant="text" size="small" class="action-btn-small">
           <search-icon/>
@@ -11,126 +20,159 @@
         </t-button>
       </div>
     </div>
-    <div ref="subGridRef" class="sub-grid">
-      <div
-        v-for="(tool, index) in subToolsWithEmpty"
-        :key="tool?.id || `sub-empty-${index}`"
-        class="sub-tool-item"
-        :class="{ 'empty': !tool }"
-        :data-tool-id="tool?.id || ''"
-        @click="tool && handleToolClick(tool)"
-      >
-        <template v-if="tool">
-          <div class="sub-tool-icon">
-            <PanelEntryIcon :name="tool.icon"/>
+    <div class="sub-grid-wrapper">
+      <transition :name="slideDirection" mode="out-in">
+        <div
+          :key="currentCategory?.id"
+          class="sub-grid"
+        >
+          <div
+            v-for="(tool, index) in currentCategoryTools"
+            :key="tool?.id || `empty-${index}`"
+            class="sub-tool-item"
+            :class="{ 'empty': !tool }"
+            @click="tool && handleToolClick(tool)"
+          >
+            <template v-if="tool">
+              <div class="sub-tool-icon">
+                <PanelEntryIcon :name="tool.icon"/>
+              </div>
+              <div class="sub-tool-name">{{ tool.label }}</div>
+            </template>
+            <template v-else>
+              <div class="empty-icon">
+                <add-icon/>
+              </div>
+            </template>
           </div>
-          <div class="sub-tool-name">{{ tool.label }}</div>
-        </template>
-        <template v-else>
-          <div class="empty-icon">
-            <add-icon/>
-          </div>
-        </template>
-      </div>
+        </div>
+      </transition>
     </div>
   </div>
 </template>
-<script lang="ts" setup>
-import {AddIcon, GestureUpIcon, SearchIcon} from "tdesign-icons-vue-next";
-import {type ToolItem, useToolVisibleStore} from "@/store/ToolVisibleStore.ts";
-import Sortable from "sortablejs";
-import PanelEntryIcon from "@/pages/panel/PanelEntry/components/PanelEntryIcon.vue";
-import {computed, onMounted, ref} from "vue";
 
+<script lang="ts" setup>
+import { AddIcon, GestureUpIcon, SearchIcon } from "tdesign-icons-vue-next";
+import { useToolVisibleStore, type ToolItem } from "@/store/ToolVisibleStore.ts";
+import PanelEntryIcon from "@/pages/panel/PanelEntry/components/PanelEntryIcon.vue";
+import { computed, ref, watch } from "vue";
+
+const emit = defineEmits(['select']);
 
 // Store
 const toolStore = useToolVisibleStore();
 
-const subGridRef = ref<HTMLElement>();
+// 当前分类索引
+const currentCategoryIndex = ref(0);
 
-// 子工具 - 使用其他分类的工具，最多 16 个
-const subTools = computed(() => {
-  const categories: Array<'ai' | 'programmer' | 'online' | 'system'> = ['ai', 'programmer', 'online', 'system'];
-  const tools: ToolItem[] = [];
-  categories.forEach(cat => {
-    tools.push(...toolStore.getVisibleToolsByCategory(cat));
-  });
-  return tools.slice(0, 16);
+// 上一次的索引，用于判断滑动方向
+const prevIndex = ref(0);
+
+// 滑动方向
+const slideDirection = ref('slide-left');
+
+// 监听索引变化，确定滑动方向
+watch(currentCategoryIndex, (newIndex, oldIndex) => {
+  if (newIndex > oldIndex) {
+    slideDirection.value = 'slide-left';
+  } else {
+    slideDirection.value = 'slide-right';
+  }
+  prevIndex.value = oldIndex;
 });
 
-// 子工具（填充空位到16个）
-const subToolsWithEmpty = computed(() => {
-  const tools = [...subTools.value];
-  while (tools.length < 16) {
-    tools.push(null as any);
-  }
-  return tools;
+// 获取可见的分类（排除 productivity，因为它在主区域显示）
+const visibleCategories = computed(() => {
+  return toolStore.visibleCategories.filter(cat => cat.id !== 'productivity');
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-let _subSortable: Sortable | null = null;
+// 当前分类
+const currentCategory = computed(() => {
+  return visibleCategories.value[currentCategoryIndex.value];
+});
 
+// 当前分类的工具列表（最多16个，填充空位）
+const currentCategoryTools = computed(() => {
+  const category = currentCategory.value;
+  if (!category) return Array(16).fill(null);
 
-// 处理子工具拖拽更新（列表内部排序）
-function handleSubSort(evt: Sortable.SortableEvent) {
-  const {oldIndex, newIndex} = evt;
-
-  if (oldIndex === newIndex) return;
-  if (oldIndex === undefined || newIndex === undefined) return;
-
-  // 获取子工具列表
-  const allSubTools: (ToolItem | undefined)[] = [...subTools.value];
-
-  // 子工具内部拖拽排序
-  const item = allSubTools.splice(oldIndex, 1)[0];
-  if (item) {
-    allSubTools.splice(newIndex, 0, item);
+  const tools = toolStore.getVisibleToolsByCategory(category.id);
+  const result: (ToolItem | null)[] = [...tools.slice(0, 16)];
+  while (result.length < 16) {
+    result.push(null);
   }
+  return result;
+});
 
-  // 更新子工具排序（从 100 开始，避免与主分类冲突）
-  const filteredTools = allSubTools.filter((t): t is ToolItem => t !== undefined);
-  filteredTools.forEach((tool, index) => {
-    toolStore.setToolOrder(tool.id, 100 + index);
-  });
-}
-
-// 初始化拖拽
-function initSortable() {
-  if (!subGridRef.value) {
-    console.warn('Sub grid ref not found');
-    return;
-  }
-
-  console.log('Initializing sub sortable on:', subGridRef.value);
-
-  // 子工具拖拽 - 只允许在子工具区域内排序
-  _subSortable = new Sortable(subGridRef.value, {
-    animation: 200,
-    ghostClass: 'sortable-ghost',
-    chosenClass: 'sortable-chosen',
-    dragClass: 'sortable-drag',
-    group: 'sub-tools', // 独立的组，不允许跨组拖拽
-    forceFallback: true, // 使用自定义的拖拽实现，避免原生 HTML5 拖拽在某些情况下的问题
-    fallbackClass: 'sortable-drag',
-    delay: 0,
-    delayOnTouchOnly: true,
-    touchStartThreshold: 5,
-    onStart: (evt) => {
-      console.log('Sub drag started:', evt.oldIndex);
-    },
-    onUpdate: handleSubSort,
-  });
-  console.log('Sub sortable initialized', _subSortable);
-}
-
-onMounted(() => {
-  initSortable()
-})
-
-const handleToolClick = (tool?: ToolItem) => {
-  console.log('Tool clicked:', tool?.id);
+// 处理工具点击
+const handleToolClick = (tool: ToolItem) => {
+  emit('select', tool.id)
 };
 </script>
-<style scoped lang="less">
 
+<style scoped lang="less">
+.sub-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sub-pagination {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+
+  .pagination-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--td-text-color-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: var(--td-brand-color);
+    }
+
+    &.active {
+      background-color: var(--td-brand-color);
+      border-color: var(--td-brand-color);
+    }
+  }
+}
+
+.sub-grid-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+// 左滑动画
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-left-enter-from {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.slide-left-leave-to {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.slide-right-enter-from {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.slide-right-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
 </style>

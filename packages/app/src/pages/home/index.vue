@@ -13,23 +13,6 @@
           <span class="nav-label">{{ item.label }}</span>
         </div>
       </div>
-      <div class="nav-time">
-        <t-dropdown trigger="click">
-          <t-button theme="primary" variant="text" shape="square">
-            <template #icon>
-              <view-list-icon/>
-            </template>
-          </t-button>
-          <t-dropdown-menu>
-            <t-dropdown-item @click="toSetting">
-              <template #prefix-icon>
-                <setting-icon/>
-              </template>
-              设置
-            </t-dropdown-item>
-          </t-dropdown-menu>
-        </t-dropdown>
-      </div>
     </div>
 
     <div class="monica-content">

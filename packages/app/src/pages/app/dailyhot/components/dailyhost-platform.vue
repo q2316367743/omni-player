@@ -110,7 +110,7 @@ onMounted(() => fetchPlatforms());
   flex-direction: column;
   background: var(--fluent-sidebar-bg);
   backdrop-filter: var(--fluent-acrylic-blur);
-  height: calc(100vh - 57px);
+  height: calc(100vh - 32px);
   overflow: hidden;
 
   .sidebar-header {

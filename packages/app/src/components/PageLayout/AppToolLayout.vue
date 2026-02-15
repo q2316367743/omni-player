@@ -1,7 +1,6 @@
 <template>
   <div class="app-layout">
     <div class="app-layout-header">
-      <app-tool-back :home/>
       <slot v-if="slot.title" name="title"/>
       <div v-else>{{ title }}</div>
       <div class="ml-auto mr-32px">

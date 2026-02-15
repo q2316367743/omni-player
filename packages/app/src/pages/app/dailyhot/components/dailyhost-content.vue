@@ -94,7 +94,7 @@ watch(() => props.selectedPlatform, async (platform) => {
 </script>
 <style scoped lang="less">
 .hot-content {
-  height: calc(100vh - 57px);
+  height: calc(100vh - 32px);
   overflow: hidden;
   flex: 1;
   display: flex;

@@ -1,15 +1,14 @@
-import {createApp} from 'vue'
-import App from './pages/panel/PanelEntry/PanelEntry.vue'
-import "@/assets/style/global.less"
+import {createPinia} from 'pinia';
 
 import 'virtual:uno.css'
-import {createPinia} from "pinia";
-import {router} from "@/router";
-import {useSql} from "@/lib/sql.ts";
-import {logError, logInfo} from "@/lib/log.ts";
+import '@/assets/style/global.less';
+import {TOOL_MAP} from "@/global/PluginList.ts";
 import {registerMonacoLanguages} from '@/modules/monaco';
+import {createRouter, createWebHashHistory} from "vue-router";
+import {useSql} from "@/lib/sql.ts";
 
 registerMonacoLanguages();
+
 
 // 👇 必须在 import monaco 之前设置！
 self.MonacoEnvironment = {
@@ -38,18 +37,30 @@ self.MonacoEnvironment = {
   },
 };
 
-useSql().migrate()
-  .then(() => {
-    logInfo("数据库合并成功")
-  })
-  .catch(e => {
-    logError("数据库合并失败");
-    console.error(e);
-  })
-  .finally(() => {
-    document.getElementById("init")?.remove();
-    createApp(App)
-      .use(createPinia())
-      .use(router)
-      .mount('#app')
-  })
+// 从连接中获取
+const usp = new URLSearchParams(location.search);
+const id = usp.get('id');
+if (id) {
+  const tool = TOOL_MAP.get(id);
+  if (tool) {
+    // 额外引入图标库
+    tool.entry().then(comp => {
+      // 初始化sql
+      useSql().getDb();
+      // 删除 loading
+      document.getElementById("init")?.remove();
+      // 创建组件
+      const app = createApp(comp.default);
+      if (tool.router) {
+        // 如果存在路由
+        app.use(createRouter({
+          history: createWebHashHistory(),
+          routes: tool.router
+        }));
+      }
+      app.use(createPinia());
+      app.mount('#app');
+    })
+  }
+}
+
