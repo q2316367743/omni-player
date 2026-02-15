@@ -22,5 +22,4 @@ export const openMainContext = async (toolId: string | undefined | null, row: nu
       }
     }]
   })
-
 }

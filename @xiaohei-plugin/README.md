@@ -18,6 +18,7 @@
   - minHeight: 最小高度
   - maxWidth: 最大宽度
   - maxHeight: 最大高度
+  - resizable: 是否可resize
   - singleton: 是否单例
 - permissions: 权限设置
   - fs: 文件系统权限

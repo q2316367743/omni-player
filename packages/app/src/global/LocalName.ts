@@ -28,6 +28,10 @@ export const LocalName = {
 
   KEY_SETTING_TOOL: '/key/setting/tool',
 
+  KEY_SETTING_TOOL_CATEGORY: '/key/setting/tool/category',
+  KEY_SETTING_TOOL_GRID: '/key/setting/tool/grid',
+  KEY_SETTING_TOOL_MAIN_GRID: '/key/setting/tool/main-grid',
+
   // 订阅收起
   STORE_SUBSCRIBE_COLLAPSED: '/store/subscribe/collapsed',
 

@@ -25,5 +25,9 @@ export const adminRouters: Array<RouteRecordRaw> = [{
     name: 'MCP 设置',
     path: 'mcp-setting',
     component: () => import('@/pages/admin/mcp-setting/McpSetting.vue')
+  }, {
+    name: '面板设置',
+    path: 'panel-setting',
+    component: () => import('@/pages/admin/panel-setting/panel-setting.vue')
   }]
 }]

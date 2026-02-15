@@ -1,14 +1,14 @@
 <template>
   <div class="sub-section">
     <div class="sub-header">
-      <span class="sub-title">{{ currentCategory?.label || '工具' }}</span>
+      <span class="sub-title">{{ currentPanel?.label || '工具' }}</span>
       <div class="sub-pagination">
         <span
-          v-for="(cat, index) in visibleCategories"
-          :key="cat.id"
+          v-for="(panel, index) in visiblePanels"
+          :key="panel.id"
           class="pagination-dot"
-          :class="{ 'active': currentCategoryIndex === index }"
-          @click="currentCategoryIndex = index"
+          :class="{ 'active': currentPanelIndex === index }"
+          @click="currentPanelIndex = index"
         />
       </div>
       <div class="sub-actions">
@@ -26,7 +26,7 @@
     >
       <transition :name="slideDirection" mode="out-in">
         <div
-          :key="currentCategory?.id"
+          :key="currentPanel?.id"
           class="sub-grid"
         >
           <template v-for="(row, rowIndex) in currentGrid" :key="rowIndex">
@@ -62,20 +62,19 @@
 import { AddIcon, GestureUpIcon, SearchIcon } from "tdesign-icons-vue-next";
 import { useToolVisibleStore } from "@/store/ToolVisibleStore.ts";
 import PanelEntryIcon from "@/nested/panel/PanelEntry/components/PanelEntryIcon.vue";
-import type { ToolCategory } from "@/global/PluginList.ts";
 
 const emit = defineEmits(['select']);
 
 const toolStore = useToolVisibleStore();
 
-const currentCategoryIndex = ref(0);
+const currentPanelIndex = ref(0);
 
 const slideDirection = ref('slide-left');
 
 let wheelThrottle = false;
 
-watch(currentCategoryIndex, (newIndex, oldIndex) => {
-  const total = visibleCategories.value.length;
+watch(currentPanelIndex, (newIndex, oldIndex) => {
+  const total = visiblePanels.value.length;
   if (total <= 1) return;
   
   const isForwardJump = (newIndex === 0 && oldIndex === total - 1);
@@ -88,26 +87,31 @@ watch(currentCategoryIndex, (newIndex, oldIndex) => {
   }
 });
 
-const visibleCategories = computed(() => {
-  return toolStore.visibleCategories.filter(cat => cat.id !== 'productivity');
+const visiblePanels = computed(() => {
+  return toolStore.visiblePanels;
 });
 
-const currentCategory = computed(() => {
-  return visibleCategories.value[currentCategoryIndex.value];
+const currentPanel = computed(() => {
+  return visiblePanels.value[currentPanelIndex.value];
 });
 
 const currentGrid = computed(() => {
-  const categoryId = currentCategory.value?.id as ToolCategory;
-  if (!categoryId) {
-    return [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]];
+  const panelId = currentPanel.value?.id;
+  if (!panelId) {
+    return [
+      [null, null, null, null],
+      [null, null, null, null],
+      [null, null, null, null],
+      [null, null, null, null]
+    ];
   }
-  return toolStore.getSubGrid(categoryId);
+  return toolStore.getSubGrid(panelId);
 });
 
 function handleWheel(event: WheelEvent) {
   if (wheelThrottle) return;
   
-  const total = visibleCategories.value.length;
+  const total = visiblePanels.value.length;
   if (total <= 1) return;
   
   wheelThrottle = true;
@@ -116,9 +120,9 @@ function handleWheel(event: WheelEvent) {
   }, 500);
   
   if (event.deltaY > 0) {
-    currentCategoryIndex.value = (currentCategoryIndex.value + 1) % total;
+    currentPanelIndex.value = (currentPanelIndex.value + 1) % total;
   } else {
-    currentCategoryIndex.value = (currentCategoryIndex.value - 1 + total) % total;
+    currentPanelIndex.value = (currentPanelIndex.value - 1 + total) % total;
   }
 }
 

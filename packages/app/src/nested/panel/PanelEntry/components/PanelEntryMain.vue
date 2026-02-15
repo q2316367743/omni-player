@@ -37,7 +37,7 @@ const emit = defineEmits(['select']);
 
 const toolStore = useToolVisibleStore();
 
-const mainGrid = toolStore.mainGrid;
+const mainGrid = computed(() => toolStore.mainGrid);
 
 function getToolIcon(toolId: string): string {
   const tool = toolStore.getToolInfo(toolId);
