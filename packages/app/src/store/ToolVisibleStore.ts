@@ -26,8 +26,9 @@ function generateDefaultMainGrid(): ToolGrid {
   for (let r = 0; r < MAIN_ROWS; r++) {
     for (let c = 0; c < MAIN_COLS; c++) {
       const index = r * MAIN_COLS + c;
-      if (index < tools.length) {
-        grid[r][c] = tools[index].id;
+      const tool = tools[index];
+      if (tool) {
+        grid[r]![c] = tool.id;
       }
     }
   }
@@ -42,8 +43,9 @@ function generateDefaultSubGrid(categoryId: ToolCategory): ToolGrid {
   for (let r = 0; r < SUB_ROWS; r++) {
     for (let c = 0; c < SUB_COLS; c++) {
       const index = r * SUB_COLS + c;
-      if (index < tools.length) {
-        grid[r][c] = tools[index].id;
+      const tool = tools[index];
+      if (tool) {
+        grid[r]![c] = tool.id;
       }
     }
   }
@@ -90,7 +92,7 @@ function migrateOldConfig(oldConfig: any): ToolPanelConfig {
         const r = Math.floor(idx / MAIN_COLS);
         const c = idx % MAIN_COLS;
         if (r < MAIN_ROWS) {
-          newConfig.mainGrid[r][c] = slot.toolId;
+          newConfig.mainGrid[r]![c] = slot.toolId;
         }
       }
     }
@@ -155,7 +157,7 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
   function setMainGridTool(row: number, col: number, toolId: string | null) {
     if (row >= 0 && row < MAIN_ROWS && col >= 0 && col < MAIN_COLS) {
       const newGrid = mainGrid.value.map(r => [...r]);
-      newGrid[row][col] = toolId;
+      newGrid[row]![col] = toolId;
       config.value = { ...config.value, mainGrid: newGrid };
     }
   }
@@ -166,17 +168,17 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
       if (!newSubGrids[categoryId]) {
         newSubGrids[categoryId] = createEmptyGrid(SUB_ROWS, SUB_COLS);
       }
-      newSubGrids[categoryId] = newSubGrids[categoryId].map(r => [...r]);
-      newSubGrids[categoryId][row][col] = toolId;
+      newSubGrids[categoryId] = newSubGrids[categoryId]!.map(r => [...r]);
+      newSubGrids[categoryId]![row]![col] = toolId;
       config.value = { ...config.value, subGrids: newSubGrids };
     }
   }
 
   function swapMainGridTools(r1: number, c1: number, r2: number, c2: number) {
     const newGrid = mainGrid.value.map(r => [...r]);
-    const temp = newGrid[r1][c1];
-    newGrid[r1][c1] = newGrid[r2][c2];
-    newGrid[r2][c2] = temp;
+    const temp = newGrid[r1]![c1]!;
+    newGrid[r1]![c1] = newGrid[r2]![c2]!;
+    newGrid[r2]![c2] = temp;
     config.value = { ...config.value, mainGrid: newGrid };
   }
 
@@ -185,10 +187,10 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
     if (!newSubGrids[categoryId]) {
       newSubGrids[categoryId] = createEmptyGrid(SUB_ROWS, SUB_COLS);
     }
-    newSubGrids[categoryId] = newSubGrids[categoryId].map(r => [...r]);
-    const temp = newSubGrids[categoryId][r1][c1];
-    newSubGrids[categoryId][r1][c1] = newSubGrids[categoryId][r2][c2];
-    newSubGrids[categoryId][r2][c2] = temp;
+    newSubGrids[categoryId] = newSubGrids[categoryId]!.map(r => [...r]);
+    const temp = newSubGrids[categoryId]![r1]![c1]!;
+    newSubGrids[categoryId]![r1]![c1] = newSubGrids[categoryId]![r2]![c2]!;
+    newSubGrids[categoryId]![r2]![c2] = temp;
     config.value = { ...config.value, subGrids: newSubGrids };
   }
 
