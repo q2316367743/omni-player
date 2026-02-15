@@ -20,5 +20,15 @@ export const memoRouters: Array<RouteRecordRaw> = [{
       path: "summary/chat/:id",
       component: () => import('@/pages/memo/summary/MemoSummaryChat.vue')
     },
+    {
+      name: "MemoFriendAdd",
+      path: "friend/add",
+      component: () => import('@/pages/memo/friend-add/FriendAdd.vue')
+    },
+    {
+      name: "MemoFriendEdit",
+      path: "friend/edit/:id",
+      component: () => import('@/pages/memo/friend-edit/FriendEdit.vue')
+    }
   ]
 }]

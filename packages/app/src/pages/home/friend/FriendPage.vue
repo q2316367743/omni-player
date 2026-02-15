@@ -20,7 +20,7 @@
           :class="{ active: selectedPartner?.id === friend.id }"
           @click="selectPartner(friend)"
         >
-          <XhAvatar :value="friend.avatar" :size="48" shape="circle" />
+          <XhAvatar :value="friend.avatar" :size="48" shape="circle"/>
           <div class="friend-info">
             <h3 class="friend-name">{{ friend.name }}</h3>
             <p class="friend-archetype">{{ getArchetypeText(friend.archetype) }}</p>
@@ -51,6 +51,13 @@
               <h2 class="detail-name">{{ friend.name }}</h2>
               <span class="detail-archetype">{{ getArchetypeText(friend.archetype) }}</span>
             </div>
+            <div class="detail-actions">
+              <t-button variant="outline" shape="circle" theme="default" @click="handleEdit(friend)">
+                <template #icon>
+                  <edit-icon />
+                </template>
+              </t-button>
+            </div>
           </div>
 
           <div class="detail-content local-scroll">
@@ -73,7 +80,9 @@
                   </div>
                   <div class="info-item">
                     <span class="info-label">年龄</span>
-                    <span class="info-value">{{ getAgeRangeText(friend.age_range) }}{{ friend.age_exact ? `(${friend.age_exact}岁)` : '' }}</span>
+                    <span class="info-value">{{
+                        getAgeRangeText(friend.age_range)
+                      }}{{ friend.age_exact ? `(${friend.age_exact}岁)` : '' }}</span>
                   </div>
                   <div class="info-item">
                     <span class="info-label">如何称呼我</span>
@@ -161,7 +170,9 @@
                   </div>
                   <div class="info-item">
                     <span class="info-label">活跃时段</span>
-                    <span class="info-value">{{ friend.active_hours.start }}:00 - {{ friend.active_hours.end }}:00</span>
+                    <span class="info-value">{{ friend.active_hours.start }}:00 - {{
+                        friend.active_hours.end
+                      }}:00</span>
                   </div>
                   <div class="info-item full-width">
                     <span class="info-label">触发方式</span>
@@ -234,7 +245,9 @@
                   </div>
                   <div class="stat-item">
                     <span class="stat-label">情绪持续时间</span>
-                    <span class="stat-value">{{ friend.mood_expires_at ? formatDate(friend.mood_expires_at) : '未设置' }}</span>
+                    <span class="stat-value">{{
+                        friend.mood_expires_at ? formatDate(friend.mood_expires_at) : '未设置'
+                      }}</span>
                   </div>
                 </div>
               </div>
@@ -275,7 +288,10 @@ import {
   moodToStatus,
   getPostingStyleText
 } from '@/entity/memo/MemoFriend.ts'
-import { formatDate } from '@/util/lang/DateUtil.ts'
+import {formatDate} from '@/util/lang/DateUtil.ts'
+import {EditIcon} from "tdesign-icons-vue-next";
+
+const router = useRouter();
 
 const searchQuery = ref('')
 const selectedPartner = ref<MemoFriendStaticView>()
@@ -286,7 +302,7 @@ const activeFriends = computed(() => {
   return useMemoFriendStore().friends.filter(f => f.is_active === 1)
 })
 
-const { results: fuseResults } = useFuse(searchQuery, activeFriends, {
+const {results: fuseResults} = useFuse(searchQuery, activeFriends, {
   fuseOptions: {
     keys: ['name', 'personality_prompt', 'personality_tags'],
     threshold: 0.3
@@ -333,7 +349,7 @@ const selectPartner = (partner: MemoFriendStaticView) => {
 }
 
 async function handleAvatarUpdate(newAvatar: string) {
-  await useMemoFriendStore().updateFriendStatic(selectedPartner.value!.id, { avatar: newAvatar })
+  await useMemoFriendStore().updateFriendStatic(selectedPartner.value!.id, {avatar: newAvatar})
 }
 
 function getPostingTriggersText(triggers: string[]): string {
@@ -387,6 +403,11 @@ function getTimeSinceLastInteraction(lastInteraction: number): string {
 
   const y = Math.floor(d / 365)
   return `${y}年前`
+}
+
+
+function handleEdit(friend: MemoFriendStaticView) {
+  router.push(`/memo/friend/edit/${friend.id}`)
 }
 </script>
 

@@ -1,0 +1,121 @@
+.friend-edit {
+  height: 100vh;
+  padding: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--monica-spacing-lg) var(--monica-spacing-xl);
+  background: linear-gradient(135deg, var(--monica-coral) 0%, var(--monica-coral-light) 100%);
+  flex-shrink: 0;
+}
+
+.back-btn {
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+}
+
+.edit-title {
+  color: white;
+  font-size: var(--monica-font-xl);
+  font-weight: 600;
+  margin: 0;
+}
+
+.save-btn {
+  background: white;
+  color: var(--monica-coral);
+  border: none;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.9);
+  }
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+}
+
+.edit-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--monica-spacing-lg);
+}
+
+.edit-card {
+  background: var(--td-bg-color-container);
+  border-radius: var(--monica-radius-lg);
+  border: 1px solid var(--monica-border);
+  box-shadow: 0 2px 8px var(--monica-shadow);
+}
+
+.form-section {
+  padding: var(--monica-spacing-lg) 0;
+  border-bottom: 1px solid var(--monica-border);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.section-title {
+  font-size: var(--monica-font-lg);
+  font-weight: 600;
+  color: var(--monica-text-primary);
+  margin: 0 0 var(--monica-spacing-lg) 0;
+  padding-bottom: var(--monica-spacing-sm);
+  border-bottom: 2px solid var(--monica-coral);
+  display: inline-block;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--monica-spacing-lg);
+}
+
+.avatar-item {
+  margin-bottom: var(--monica-spacing-lg);
+}
+
+.time-range {
+  display: flex;
+  align-items: center;
+  gap: var(--monica-spacing-xs);
+}
+
+.time-separator {
+  color: var(--monica-text-tertiary);
+}
+
+.time-suffix {
+  color: var(--monica-text-secondary);
+  font-size: var(--monica-font-sm);
+}
+
+.milestone-item {
+  display: flex;
+  align-items: center;
+  gap: var(--monica-spacing-md);
+  margin-bottom: var(--monica-spacing-md);
+  
+  .milestone-event {
+    flex: 1;
+  }
+  
+  .milestone-date {
+    width: 180px;
+  }
+}
