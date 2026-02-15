@@ -29,25 +29,29 @@
           :key="currentCategory?.id"
           class="sub-grid"
         >
-          <div
-            v-for="(tool, index) in currentCategoryTools"
-            :key="tool?.id || `empty-${index}`"
-            class="sub-tool-item"
-            :class="{ 'empty': !tool }"
-            @click="tool && handleToolClick(tool)"
-          >
-            <template v-if="tool">
-              <div class="sub-tool-icon">
-                <PanelEntryIcon :name="tool.icon"/>
-              </div>
-              <div class="sub-tool-name">{{ tool.label }}</div>
-            </template>
-            <template v-else>
-              <div class="empty-icon">
-                <add-icon/>
-              </div>
-            </template>
-          </div>
+          <template v-for="(row, rowIndex) in currentGrid" :key="rowIndex">
+            <div
+              v-for="(toolId, colIndex) in row"
+              :key="`${rowIndex}-${colIndex}`"
+              class="sub-tool-item"
+              :class="{ 'empty': !toolId }"
+              :data-row="rowIndex"
+              :data-col="colIndex"
+              @click="toolId && handleToolClick(toolId)"
+            >
+              <template v-if="toolId">
+                <div class="sub-tool-icon">
+                  <PanelEntryIcon :name="getToolIcon(toolId)"/>
+                </div>
+                <div class="sub-tool-name">{{ getToolLabel(toolId) }}</div>
+              </template>
+              <template v-else>
+                <div class="empty-icon">
+                  <add-icon/>
+                </div>
+              </template>
+            </div>
+          </template>
         </div>
       </transition>
     </div>
@@ -58,28 +62,22 @@
 import { AddIcon, GestureUpIcon, SearchIcon } from "tdesign-icons-vue-next";
 import { useToolVisibleStore } from "@/store/ToolVisibleStore.ts";
 import PanelEntryIcon from "@/nested/panel/PanelEntry/components/PanelEntryIcon.vue";
-import type {ToolItem} from "@/global/PluginList.ts";
+import type { ToolCategory } from "@/global/PluginList.ts";
 
 const emit = defineEmits(['select']);
 
-// Store
 const toolStore = useToolVisibleStore();
 
-// 当前分类索引
 const currentCategoryIndex = ref(0);
 
-// 滑动方向
 const slideDirection = ref('slide-left');
 
-// 滚轮节流
 let wheelThrottle = false;
 
-// 监听索引变化，确定滑动方向
 watch(currentCategoryIndex, (newIndex, oldIndex) => {
   const total = visibleCategories.value.length;
   if (total <= 1) return;
   
-  // 判断是否是循环跳转
   const isForwardJump = (newIndex === 0 && oldIndex === total - 1);
   const isBackwardJump = (newIndex === total - 1 && oldIndex === 0);
   
@@ -90,30 +88,22 @@ watch(currentCategoryIndex, (newIndex, oldIndex) => {
   }
 });
 
-// 获取可见的分类（排除 productivity，因为它在主区域显示）
 const visibleCategories = computed(() => {
   return toolStore.visibleCategories.filter(cat => cat.id !== 'productivity');
 });
 
-// 当前分类
 const currentCategory = computed(() => {
   return visibleCategories.value[currentCategoryIndex.value];
 });
 
-// 当前分类的工具列表（最多16个，填充空位）
-const currentCategoryTools = computed(() => {
-  const category = currentCategory.value;
-  if (!category) return Array(16).fill(null);
-
-  const tools = toolStore.getVisibleToolsByCategory(category.id);
-  const result: (ToolItem | null)[] = [...tools.slice(0, 16)];
-  while (result.length < 16) {
-    result.push(null);
+const currentGrid = computed(() => {
+  const categoryId = currentCategory.value?.id as ToolCategory;
+  if (!categoryId) {
+    return [[null, null, null, null], [null, null, null, null], [null, null, null, null], [null, null, null, null]];
   }
-  return result;
+  return toolStore.getSubGrid(categoryId);
 });
 
-// 处理滚轮事件
 function handleWheel(event: WheelEvent) {
   if (wheelThrottle) return;
   
@@ -126,17 +116,24 @@ function handleWheel(event: WheelEvent) {
   }, 500);
   
   if (event.deltaY > 0) {
-    // 向下滚动，下一页
     currentCategoryIndex.value = (currentCategoryIndex.value + 1) % total;
   } else {
-    // 向上滚动，上一页
     currentCategoryIndex.value = (currentCategoryIndex.value - 1 + total) % total;
   }
 }
 
-// 处理工具点击
-const handleToolClick = (tool: ToolItem) => {
-  emit('select', tool.id);
+function getToolIcon(toolId: string): string {
+  const tool = toolStore.getToolInfo(toolId);
+  return tool?.icon || 'HelpIcon';
+}
+
+function getToolLabel(toolId: string): string {
+  const tool = toolStore.getToolInfo(toolId);
+  return tool?.label || toolId;
+}
+
+const handleToolClick = (toolId: string) => {
+  emit('select', toolId);
 };
 </script>
 
@@ -178,7 +175,6 @@ const handleToolClick = (tool: ToolItem) => {
   overflow: hidden;
 }
 
-// 左滑动画
 .slide-left-enter-active,
 .slide-left-leave-active,
 .slide-right-enter-active,

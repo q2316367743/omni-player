@@ -33,14 +33,12 @@ export interface ToolItem {
   };
 }
 
-export interface ToolSlot {
-  slotIndex: number;
-  toolId: string | null;
-}
+export type ToolGrid = (string | null)[][];
 
 export interface ToolPanelConfig {
   categories: CategoryConfig[];
-  slots: ToolSlot[];
+  mainGrid: ToolGrid;
+  subGrids: Record<ToolCategory, ToolGrid>;
   version: number;
 }
 
