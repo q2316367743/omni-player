@@ -56,8 +56,9 @@
 
 <script lang="ts" setup>
 import { AddIcon, GestureUpIcon, SearchIcon } from "tdesign-icons-vue-next";
-import { useToolVisibleStore, type ToolItem } from "@/store/ToolVisibleStore.ts";
+import { useToolVisibleStore } from "@/store/ToolVisibleStore.ts";
 import PanelEntryIcon from "@/pages/panel/PanelEntry/components/PanelEntryIcon.vue";
+import type {ToolItem} from "@/global/PluginList.ts";
 
 const emit = defineEmits(['select']);
 
