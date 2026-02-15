@@ -4,7 +4,7 @@ export const adminRouters: Array<RouteRecordRaw> = [{
   name: "管理后台",
   path: "/admin",
   redirect: '/admin/global-setting',
-  component: () => import('@/layouts/admin.vue'),
+  component: () => import('@/layouts/LayoutAdmin.vue'),
   children: [{
     name: '全局设置',
     path: 'global-setting',

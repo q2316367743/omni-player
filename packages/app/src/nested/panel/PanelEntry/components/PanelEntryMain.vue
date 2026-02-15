@@ -27,7 +27,7 @@
 import { AddIcon } from "tdesign-icons-vue-next";
 import { useToolVisibleStore } from "@/store/ToolVisibleStore.ts";
 import { computed } from "vue";
-import PanelEntryIcon from "@/pages/panel/PanelEntry/components/PanelEntryIcon.vue";
+import PanelEntryIcon from "@/nested/panel/PanelEntry/components/PanelEntryIcon.vue";
 
 const emit = defineEmits(['select']);
 

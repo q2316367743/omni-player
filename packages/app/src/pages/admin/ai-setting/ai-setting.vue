@@ -1,5 +1,5 @@
 <template>
-  <div class="p-8px overflow-auto" style="height: calc(100% - 40px)">
+  <div class="p-8px overflow-auto">
     <t-card>
       <t-form :data="aiSetting">
         <t-form-item label="AI 类型" label-align="top">

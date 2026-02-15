@@ -1,5 +1,5 @@
 <template>
-  <div class="p-8px overflow-auto" style="height: calc(100% - 40px)">
+  <div class="p-8px overflow-auto">
     <t-card>
       <t-form :data="userSetting">
         <t-form-item label="头像" label-align="top">
