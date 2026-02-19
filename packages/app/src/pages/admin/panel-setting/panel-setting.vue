@@ -1,5 +1,5 @@
 <template>
-  <div class="panel-setting local-scroll">
+  <div class="panel-setting local-scroll monica-container">
     <div class="setting-header">
       <h2 class="page-title">面板设置</h2>
       <p class="page-subtitle">管理面板和工具布局</p>
@@ -49,7 +49,7 @@
             >
               <template v-if="toolId">
                 <div class="tool-icon">
-                  <span class="tool-icon-text">{{ getToolIconName(toolId) }}</span>
+                  <PanelEntryIcon :name="getToolIconName(toolId)" />
                 </div>
                 <div class="tool-name">{{ getToolLabel(toolId) }}</div>
                 <button
@@ -151,7 +151,7 @@
             >
               <template v-if="toolId">
                 <div class="tool-icon">
-                  <span class="tool-icon-text">{{ getToolIconName(toolId) }}</span>
+                  <PanelEntryIcon :name="getToolIconName(toolId)" />
                 </div>
                 <div class="tool-name">{{ getToolLabel(toolId) }}</div>
                 <button
@@ -228,7 +228,7 @@
             @click="selectTool(tool.id)"
           >
             <div class="tool-option-icon">
-              <span>{{ getToolIconName(tool.id) }}</span>
+              <PanelEntryIcon :name="getToolIconName(tool.id)" />
             </div>
             <div class="tool-option-info">
               <div class="tool-option-label">{{ tool.label }}</div>
@@ -244,17 +244,18 @@
 <script lang="ts" setup>
 import {
   AddIcon,
-  DeleteIcon,
-  ChevronUpIcon,
   ChevronDownIcon,
+  ChevronUpIcon,
   CloseIcon,
-  SearchIcon,
-  RefreshIcon
+  DeleteIcon,
+  RefreshIcon,
+  SearchIcon
 } from 'tdesign-icons-vue-next';
 import {useToolVisibleStore} from '@/store/ToolVisibleStore.ts';
 import type {PanelConfig} from '@/global/PluginList.ts';
 import {computed, ref} from 'vue';
 import MessageUtil from '@/util/model/MessageUtil.ts';
+import PanelEntryIcon from "@/nested/panel/PanelEntry/components/PanelEntryIcon.vue";
 
 const toolStore = useToolVisibleStore();
 
@@ -419,8 +420,7 @@ function getToolLabel(toolId: string): string {
 
 function getToolIconName(toolId: string): string {
   const tool = toolStore.getToolInfo(toolId);
-  const iconName = tool?.icon || 'HelpIcon';
-  return iconName.replace('Icon', '');
+  return tool?.icon || 'HelpIcon';
 }
 </script>
 

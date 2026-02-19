@@ -29,5 +29,9 @@ export const adminRouters: Array<RouteRecordRaw> = [{
     name: '面板设置',
     path: 'panel-setting',
     component: () => import('@/pages/admin/panel-setting/panel-setting.vue')
+  }, {
+    name: '插件设置',
+    path: 'plugin-setting',
+    component: () => import('@/pages/admin/plugin-setting/PluginSetting.vue')
   }]
 }]

@@ -6,7 +6,7 @@ import {
   type McpSettingViewCore
 } from "@/entity/setting";
 import {defineStore} from "pinia";
-import {addMcpSetting, deleteMcpSetting, listMcpSetting, updateMcpSetting} from "@/services/McpService.ts";
+import {addMcpSetting, deleteMcpSetting, listMcpSetting, updateMcpSetting} from "@/services/main/McpService.ts";
 import {list, add, remove} from '@tauri-apps/plugin-mcp';
 import {logDebug, logError} from "@/lib/log.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";

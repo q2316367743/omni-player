@@ -48,6 +48,16 @@
     "sql:default",
     "sql:allow-load",
     "sql:allow-execute",
-    "sql:allow-select"
+    "sql:allow-select",
+    "fs:allow-mkdir",
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [{ "path": "$APPDATA/**/*" }]
+    },
+    {
+      "identifier": "fs:allow-read-text-file",
+      "allow": [{ "path": "$APPDATA/**/*" }]
+    },
+    "log:default"
   ]
 }

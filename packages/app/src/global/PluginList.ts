@@ -4,7 +4,7 @@ import {homeRouters} from "@/router/modules/home.ts";
 import {memoRouters} from "@/router/modules/memo.ts";
 import {subscribeRouters} from "@/router/modules/subscribe.ts";
 import type {PluginDefine} from "@/global/PluginDefine.ts";
-import type {PluginEntity} from "@/entity/main/PluginEntity.ts";
+import type {PluginEntity, PluginEntityCore} from "@/entity/main/PluginEntity.ts";
 import {useAiRtSql, useMemoSql, useMpSql} from "@/lib/sql.ts";
 import {useMemoFriendStore} from "@/store";
 import {setupChatL1Summary} from "@/modules/ai/memo";
@@ -309,5 +309,16 @@ export function pluginEntityToOuter(plugin: PluginEntity): ToolItem<ToolItemType
     platform: plugin.platform.split(",") as Array<ToolItemPlatform>,
     payload: JSON.parse(plugin.payload),
     type: plugin.type as ToolItemTypeOuter
+  }
+}
+
+export function toolToPlugin(data: ToolItem<ToolItemTypeOuter>): PluginEntityCore {
+  return {
+    label: data.label,
+    icon: data.icon,
+    description: data.desc || '',
+    platform: data.platform?.join(",") || '',
+    type: data.type,
+    payload: JSON.stringify(data.payload),
   }
 }

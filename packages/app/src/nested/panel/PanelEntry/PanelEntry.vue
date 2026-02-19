@@ -25,7 +25,7 @@ import {platform} from "@tauri-apps/plugin-os";
 import PanelEntryMain from "@/nested/panel/PanelEntry/components/PanelEntryMain.vue";
 import PanelEntrySub from "@/nested/panel/PanelEntry/components/PanelEntrySub.vue";
 import PanelEntryPin from "@/nested/panel/PanelEntry/components/PanelEntryPin.vue";
-import {openPopupPlugin, openPopupSetting} from "@/nested/panel/PanelEntry/PanelEntry.ts";
+import {openPopupPlugin, openPopupSetting} from "@/lib/windows";
 
 const toolStore = useToolVisibleStore();
 

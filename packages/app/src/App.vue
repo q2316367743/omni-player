@@ -5,6 +5,7 @@
 </template>
 <script lang="ts" setup>
 import {setupRefreshFeedTask} from "@/modules/subscribe";
+import {setupWindow} from "@/lib/windows.ts";
 import {logError, logInfo} from "@/lib/log.ts";
 import {useMcpSettingStore} from "@/store";
 
@@ -12,9 +13,9 @@ import {useMcpSettingStore} from "@/store";
 setupRefreshFeedTask()
   .then(() => logInfo("注册定时刷新任务成功"))
   .catch(e => logError("注册定时刷新任务失败", e))
-// setupWindow()
-//   .then(() => logInfo("注册窗口隐藏事件成功"))
-//   .catch(e => logError("注册窗口隐藏事件失败", e))
+setupWindow()
+  .then(() => logInfo("注册窗口隐藏事件成功"))
+  .catch(e => logError("注册窗口隐藏事件失败", e))
 
 useMcpSettingStore().fetchMcps();
 

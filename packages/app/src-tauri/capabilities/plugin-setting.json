@@ -18,6 +18,7 @@
     "sql:allow-select",
     "velesdb:default",
     "mcp:default",
-    "velesdb:allow-delete-points"
+    "velesdb:allow-delete-points",
+    "log:default"
   ]
 }

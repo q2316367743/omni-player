@@ -8,6 +8,7 @@
         <t-menu-item value="/admin/dev-setting">开发者设置</t-menu-item>
         <t-menu-item value="/admin/mcp-setting">MCP 设置</t-menu-item>
         <t-menu-item value="/admin/panel-setting">面板设置</t-menu-item>
+        <t-menu-item value="/admin/plugin-setting">插件设置</t-menu-item>
       </t-menu>
     </t-aside>
     <t-content class="overflow-auto">
