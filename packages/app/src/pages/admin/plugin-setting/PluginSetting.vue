@@ -136,7 +136,7 @@ function handleAddPlugin() {
     getAllWindows().then((wins) => {
       for (let win of wins) {
         if (win.label === 'popup_main') {
-          win.emit('xiaohei://plugin/refresh');
+          win.emit('xiaohei://db/plugin/refresh');
           return;
         }
       }
@@ -165,7 +165,7 @@ const openMediaContextmenuWrap = (data: ToolItem<ToolItemTypeOuter>, e: PointerE
     getAllWindows().then((wins) => {
       for (let win of wins) {
         if (win.label === 'popup_main') {
-          win.emit('xiaohei://plugin/refresh');
+          win.emit('xiaohei://db/plugin/refresh');
           return;
         }
       }

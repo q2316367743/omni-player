@@ -137,5 +137,5 @@ export async function setupWindow() {
   });
 
   // 监听插件刷新事件
-  await appWindow.listen('xiaohei://plugin/refresh', () => useToolVisibleStore().initTool());
+  await appWindow.listen('xiaohei://db/plugin/refresh', () => useToolVisibleStore().initTool());
 }
