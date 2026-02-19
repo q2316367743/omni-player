@@ -1,4 +1,4 @@
-import {useSql} from "@/lib/sql.ts";
+import {useMpSql} from "@/lib/sql.ts";
 import type {ReleaseDeploy, ReleaseDeployCore} from "@/entity/app/release";
 
 /**
@@ -6,12 +6,12 @@ import type {ReleaseDeploy, ReleaseDeployCore} from "@/entity/app/release";
  * @param projectId 项目 ID
  */
 export async function listReleaseDeployService(projectId: string) {
-  return useSql().query<ReleaseDeploy>('release_deploy').eq('project_id', projectId).list();
+  return useMpSql().query<ReleaseDeploy>('release_deploy').eq('project_id', projectId).list();
 }
 
 
 export async function addReleaseDeployService(prop: ReleaseDeployCore) {
-  await useSql().mapper<ReleaseDeploy>('release_deploy').insert({
+  await useMpSql().mapper<ReleaseDeploy>('release_deploy').insert({
     ...prop,
     created_at: Date.now(),
     updated_at: Date.now(),

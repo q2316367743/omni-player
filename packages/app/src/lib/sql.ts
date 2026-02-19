@@ -1,12 +1,22 @@
 import Database, {type QueryResult} from '@tauri-apps/plugin-sql';
 import {resolveResource} from '@tauri-apps/api/path';
 import {readTextFile} from '@tauri-apps/plugin-fs';
-import {APP_DATA_DB_PATH, DB_MIGRATE_FILES} from "@/global/Constants.ts";
+import {
+  AI_RT_MIGRATE_FILES,
+  APP_DATA_DB_PATH,
+  MAIN_MIGRATE_FILES,
+  MEMO_MIGRATE_FILES, MP_MIGRATE_FILES,
+  SP_MIGRATE_FILES
+} from "@/global/Constants.ts";
 import {logDebug, logError, logInfo} from "@/lib/log.ts";
 import {QueryChain} from "@/util/file/QueryWrapper.ts";
 import {BaseMapper, generatePlaceholders, type TableLike} from "@/util";
 
-export type TableName =
+type TableName =
+  | 'mcp_setting'
+  | 'plugin';
+
+export type TableNameMp =
   | 'analysis_category'
   | 'analysis_session'
   | 'analysis_transaction'
@@ -23,7 +33,9 @@ export type TableName =
   | 'release_instance'
   | 'release_deploy'
   | 'release_asset_meta'
-  | 'release_asset_content'
+  | 'release_asset_content';
+
+export type TableNameAiRt =
   | 'ai_chat_group'
   | 'ai_chat_item'
   | 'ai_chat_message'
@@ -31,7 +43,9 @@ export type TableName =
   | 'ai_rt_meeting'
   | 'ai_rt_message'
   | 'ai_rt_participant'
-  | 'ai_rt_role'
+  | 'ai_rt_role';
+
+export type TableNameSp =
   | 'screenplay'
   | 'sp_dialogue'
   | 'sp_initiative_log'
@@ -45,7 +59,9 @@ export type TableName =
   | 'sp_log'
   | 'sp_director_instruction_log'
   | 'sp_chapter'
-  | 'sp_chapter_content'
+  | 'sp_chapter_content';
+
+export type TableNameMemo =
   | 'memo_item'
   | 'memo_chunk'
   | 'memo_comment'
@@ -59,18 +75,23 @@ export type TableName =
   | 'memo_session_summary'
   | 'memo_post'
   | 'memo_post_comment'
-  | 'mcp_setting'
   | 'memo_chat'
   | 'memo_chat_summary';
 
-export class SqlWrapper {
 
-  private db: Database | null = null;
+export class SqlBase<N extends string> {
+
+  protected db: Database | null = null;
+  private readonly fileName: string;
+
+  constructor(fileName: string) {
+    this.fileName = fileName;
+  }
 
   async getDb(): Promise<Database> {
     // 将新的 SQL 调用追加到 Promise 链尾部
     if (this.db) return this.db;
-    const path = await APP_DATA_DB_PATH();
+    const path = await APP_DATA_DB_PATH(this.fileName);
     logInfo("[sql] db path: ", path)
     this.db = await Database.load(`sqlite:${path}`);
     logInfo("[sql] db init success", this.db);
@@ -82,7 +103,7 @@ export class SqlWrapper {
   /**
    * 串行执行 SQL 命令，确保同一时间只有一个查询在运行
    */
-  private async execute(query: string, bindValues?: unknown[]): Promise<QueryResult> {
+  public async execute(query: string, bindValues?: unknown[]): Promise<QueryResult> {
     // 封装当前操作为一个函数
     const operation = () => this.db!.execute(query, bindValues);
 
@@ -106,6 +127,46 @@ export class SqlWrapper {
 
   async select<T>(query: string, bindValues?: unknown[]): Promise<T> {
     return this.db!.select<T>(query, bindValues);
+  }
+
+  query<T extends TableLike>(tableName: N) {
+    return new QueryChain<T, N>(tableName, this);
+  }
+
+  mapper<T extends TableLike>(tableName: N) {
+    return new BaseMapper<T, N>(tableName, this);
+  }
+
+  // 开启一个事务
+  async beginTransaction<T = any>(callback: (sql: SqlBase<N>) => Promise<T>): Promise<T> {
+    try {
+      logDebug("[sql] begin transaction")
+      await this.db!.execute(`BEGIN`);
+      const r = await callback(this);
+      logDebug("[sql] commit transaction")
+      await this.db!.execute(`COMMIT`);
+      return r;
+    } catch (e) {
+      logError("[sql] rollback transaction")
+      console.error(e)
+      try {
+        await this.db!.execute(`ROLLBACK`);
+      } catch (err) {
+        logError("[sql] 回滚失败");
+        console.error(err)
+      }
+      throw e;
+    }
+  }
+
+}
+
+export class SqlWrapper<N extends string> extends SqlBase<N>{
+
+  private readonly migrateFiles: Array<{file: string, version: number}>;
+  constructor(fileName: string,migrateFiles: Array<{file: string, version: number}>) {
+    super(fileName);
+    this.migrateFiles = migrateFiles;
   }
 
   private async getLatestVersion() {
@@ -144,7 +205,7 @@ export class SqlWrapper {
     logInfo("[sql] 2. 获取当前版本");
     const current = await this.getLatestVersion();
     logInfo("[sql] 当前版本: ", current);
-    const pending = DB_MIGRATE_FILES
+    const pending = this.migrateFiles
       .filter((m) => m.version > current)
       .sort((a, b) => a.version - b.version);
 
@@ -170,40 +231,16 @@ export class SqlWrapper {
     }
   }
 
-  query<T extends TableLike>(tableName: TableName) {
-    return new QueryChain<T>(tableName, this);
-  }
-
-  mapper<T extends TableLike>(tableName: TableName) {
-    return new BaseMapper<T>(tableName, this);
-  }
-
-  // 开启一个事务
-  async beginTransaction<T = any>(callback: (sql: SqlWrapper) => Promise<T>): Promise<T> {
-    try {
-      logDebug("[sql] begin transaction")
-      await this.db!.execute(`BEGIN`);
-      const r = await callback(this);
-      logDebug("[sql] commit transaction")
-      await this.db!.execute(`COMMIT`);
-      return r;
-    } catch (e) {
-      logError("[sql] rollback transaction")
-      console.error(e)
-      try {
-        await this.db!.execute(`ROLLBACK`);
-      } catch (err) {
-        logError("[sql] 回滚失败");
-        console.error(err)
-      }
-      throw e;
-    }
-  }
-
 }
 
-const sql = new SqlWrapper();
+const sql = new SqlWrapper<TableName>('main',MAIN_MIGRATE_FILES);
+const mpSql = new SqlWrapper<TableNameMp>('mp',MP_MIGRATE_FILES);
+const memoSql = new SqlWrapper<TableNameMemo>('memo',MEMO_MIGRATE_FILES);
+const aiRtSql = new SqlWrapper<TableNameAiRt>('ai-rt',AI_RT_MIGRATE_FILES);
+const spSql = new SqlWrapper<TableNameSp>('sp',SP_MIGRATE_FILES);
 
-export const useSql = () => {
-  return sql;
-}
+export const useSql = () => sql;
+export const useMpSql = () => mpSql;
+export const useMemoSql = () => memoSql;
+export const useAiRtSql = () => aiRtSql;
+export const useSpSql = () => spSql;

@@ -1,4 +1,4 @@
-import {useSql} from "@/lib/sql.ts";
+import {useMpSql} from "@/lib/sql.ts";
 import type {
   ReleaseProject,
   ReleaseProjectCore,
@@ -11,12 +11,12 @@ import type {
 } from "@/entity/app/release";
 
 export async function listReleaseProject() {
-  const query = useSql().query<ReleaseProject>('release_project');
+  const query = useMpSql().query<ReleaseProject>('release_project');
   return query.list();
 }
 
 export async function addReleaseProject(project: ReleaseProjectCore) {
-  const mapper = useSql().mapper<ReleaseProject>('release_project');
+  const mapper = useMpSql().mapper<ReleaseProject>('release_project');
   return mapper.insert({
     ...project,
     created_at: Date.now(),
@@ -25,7 +25,7 @@ export async function addReleaseProject(project: ReleaseProjectCore) {
 }
 
 export async function updateReleaseProject(id: string, project: Partial<ReleaseProject>) {
-  const mapper = useSql().mapper<ReleaseProject>('release_project');
+  const mapper = useMpSql().mapper<ReleaseProject>('release_project');
   return mapper.updateById(id, {
     name: project.name,
     desc: project.desc,
@@ -34,7 +34,7 @@ export async function updateReleaseProject(id: string, project: Partial<ReleaseP
 }
 
 export async function deleteReleaseProject(id: string) {
-  await useSql().beginTransaction(async sql => {
+  await useMpSql().beginTransaction(async sql => {
     const mapper = sql.mapper<ReleaseProject>('release_project');
     // 删除基础信息
     await mapper.deleteById(id);

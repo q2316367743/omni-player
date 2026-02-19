@@ -1,22 +1,22 @@
 import type {SpChapterContent, SpScene, SpSceneCore} from "@/entity/screenplay";
-import {useSql} from "@/lib/sql.ts";
+import {useSpSql} from "@/lib/sql.ts";
 
 export function listSpSceneService(screenplayId: string) {
-  return useSql().query<SpScene>('sp_scene').eq('screenplay_id', screenplayId).list();
+  return useSpSql().query<SpScene>('sp_scene').eq('screenplay_id', screenplayId).list();
 }
 
 export function getSpSceneService(id: string) {
-  return useSql().query<SpScene>('sp_scene').eq('id', id).get();
+  return useSpSql().query<SpScene>('sp_scene').eq('id', id).get();
 }
 
 export async function addSpSceneService(prop: SpSceneCore) {
-  const last = await useSql().query<SpScene>('sp_scene')
+  const last = await useSpSql().query<SpScene>('sp_scene')
     .select('order_index')
     .eq('screenplay_id', prop.screenplay_id)
     .orderByDesc('order_index')
     .get();
   const now = Date.now();
-  const {id} = await useSql().mapper<SpScene>('sp_scene').insert({
+  const {id} = await useSpSql().mapper<SpScene>('sp_scene').insert({
     ...prop,
     created_at: now,
     updated_at: now,
@@ -24,26 +24,26 @@ export async function addSpSceneService(prop: SpSceneCore) {
   });
   try {
     // 创建场景要同步创建一个场景内容
-    await useSql().mapper<SpChapterContent>('sp_chapter_content').insert({
+    await useSpSql().mapper<SpChapterContent>('sp_chapter_content').insert({
       screenplay_id: prop.screenplay_id,
       chapter_id: prop.chapter_id,
       scene_id: id,
       content: '',
     })
   } catch (e) {
-    await useSql().mapper<SpScene>('sp_scene').deleteById(id);
+    await useSpSql().mapper<SpScene>('sp_scene').deleteById(id);
     throw e;
   }
 }
 
 export async function updateSpSceneService(id: string, prop: SpSceneCore) {
   const now = Date.now();
-  return useSql().mapper<SpScene>('sp_scene').updateById(id, {
+  return useSpSql().mapper<SpScene>('sp_scene').updateById(id, {
     ...prop,
     updated_at: now
   });
 }
 
 export function deleteSpSceneService(id: string) {
-  return useSql().mapper<SpScene>('sp_scene').deleteById(id);
+  return useSpSql().mapper<SpScene>('sp_scene').deleteById(id);
 }

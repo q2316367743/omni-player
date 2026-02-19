@@ -1,12 +1,12 @@
 import {logDebug} from "@/lib/log";
 import {generatePlaceholders, stringifyJsonWithBigIntSupport} from "@/util";
 import type {PageResponse} from "@/global/PageResponse.ts";
-import {SqlWrapper} from "@/lib/sql.ts";
+import {SqlBase} from "@/lib/sql.ts";
 
 
-export class QueryChain<T extends Record<string, any>, K extends keyof T = keyof T> {
-  private readonly db: SqlWrapper;
-  private readonly tableName: string;
+export class QueryChain<T extends Record<string, any>, N extends string, K extends keyof T = keyof T> {
+  private readonly db: SqlBase<N>;
+  private readonly tableName: N;
 
   private readonly fields = new Array<K>();
   private readonly params = new Array<string>();
@@ -14,17 +14,17 @@ export class QueryChain<T extends Record<string, any>, K extends keyof T = keyof
   private readonly orders = new Array<string>();
   private readonly lastExpress = new Array<string>();
 
-  constructor(tableName: string, db: SqlWrapper) {
+  constructor(tableName: N, db: SqlBase<N>) {
     this.tableName = tableName;
     this.db = db;
   }
 
-  public static from<T extends Record<string, any>>(
-    tableName: string,
-    db: SqlWrapper,
+  public static from<T extends Record<string, any>, N extends string>(
+    tableName: N,
+    db: SqlBase<N>,
     p?: Partial<T>
-  ): QueryChain<T> {
-    const qw = new QueryChain<T>(tableName, db);
+  ): QueryChain<T, N> {
+    const qw = new QueryChain<T, N>(tableName, db);
     if (typeof p !== "undefined") {
       Object.entries(p).forEach(([k, v]) => {
         qw.simpleWhere(k, "=", v);
@@ -138,7 +138,7 @@ export class QueryChain<T extends Record<string, any>, K extends keyof T = keyof
     return sql;
   }
 
-  async execQuery(db: SqlWrapper) {
+  async execQuery(db: SqlBase<N>) {
     const sql = this.getSql();
     logDebug("[sql] select sql\t\t:" + sql);
     logDebug("[sql] select values\t:" + this.values);

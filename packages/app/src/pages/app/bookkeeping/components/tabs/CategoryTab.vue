@@ -98,7 +98,7 @@
 
 <script lang="ts" setup>
 import {ChartIcon, CalendarIcon, TimeIcon, PercentIcon} from "tdesign-icons-vue-next";
-import {useSql} from "@/lib/sql.ts";
+import {useMpSql} from "@/lib/sql.ts";
 import type {AnalysisTransaction} from "@/entity/analysis/AnalysisTransaction.ts";
 import * as echarts from 'echarts';
 
@@ -218,8 +218,8 @@ const loadData = async () => {
   loading.value = true;
   try {
     if (allTransactions.value.length === 0) {
-      const sql = useSql();
-      const query = await sql.query<AnalysisTransaction>('analysis_transaction');
+      const sql = useMpSql();
+      const query = sql.query<AnalysisTransaction>('analysis_transaction');
       allTransactions.value = await query.eq('session_id', props.sessionId).list();
       
       if (allTransactions.value.length === 0) {

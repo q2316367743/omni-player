@@ -1,4 +1,4 @@
-import {useSql} from "@/lib/sql.ts";
+import {useMpSql} from "@/lib/sql.ts";
 import type {AnalysisSession, AnalysisSessionSourceType} from "@/entity/analysis/AnalysisSession.ts";
 import type {AnalysisCategory} from "@/entity/analysis/AnalysisCategory.ts";
 import type {AnalysisTransaction, AnalysisTransactionCore} from "@/entity/analysis/AnalysisTransaction.ts";
@@ -9,7 +9,7 @@ export async function saveTransactions(
   sourceType: AnalysisSessionSourceType,
   transactions: AnalysisTransactionCore[]
 ) {
-  const sql = useSql();
+  const sql = useMpSql();
 
   const now = Date.now();
 
@@ -26,7 +26,7 @@ export async function saveTransactions(
     }
   }
 
-  const sessionMapper = await sql.mapper<AnalysisSession>('analysis_session');
+  const sessionMapper = sql.mapper<AnalysisSession>('analysis_session');
   const {id: sessionId} = await sessionMapper.insert({
     created_at: now,
     updated_at: now,
@@ -44,7 +44,7 @@ export async function saveTransactions(
     }
   }
 
-  const categoryMapper = await sql.mapper<AnalysisCategory>('analysis_category');
+  const categoryMapper = sql.mapper<AnalysisCategory>('analysis_category');
   let displayOrder = 1;
   for (const category of categories) {
     await categoryMapper.insert({
@@ -55,7 +55,7 @@ export async function saveTransactions(
     });
   }
 
-  const transactionMapper = await sql.mapper<AnalysisTransaction>('analysis_transaction');
+  const transactionMapper = sql.mapper<AnalysisTransaction>('analysis_transaction');
   for (const tx of transactions) {
     await transactionMapper.insert({
       created_at: now,

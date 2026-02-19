@@ -1,24 +1,24 @@
 import type {MemoFriend, MemoFriendDynamic, MemoFriendStatic} from "@/entity/memo";
-import {useSql} from "@/lib/sql.ts";
+import {useMemoSql} from "@/lib/sql.ts";
 
 export function listMemoFriend() {
-  return useSql().query<MemoFriend>('memo_friend').list();
+  return useMemoSql().query<MemoFriend>('memo_friend').list();
 }
 
 export function getMemoFriend(id: string) {
-  return useSql().query<MemoFriend>('memo_friend').eq('id', id).first();
+  return useMemoSql().query<MemoFriend>('memo_friend').eq('id', id).first();
 }
 
 export function updateMemoFriendStatic(id: string, data: Partial<MemoFriendStatic>) {
-  return useSql().mapper<MemoFriend>('memo_friend').updateById(id, data);
+  return useMemoSql().mapper<MemoFriend>('memo_friend').updateById(id, data);
 }
 
 export function updateMemoFriendDynamic(id: string, data: Partial<MemoFriendDynamic>) {
-  return useSql().mapper<MemoFriend>('memo_friend').updateById(id, data);
+  return useMemoSql().mapper<MemoFriend>('memo_friend').updateById(id, data);
 }
 
 export async function completeMemoFriendSession(id: string) {
-  const friend = await useSql().query<MemoFriend>('memo_friend').eq('id', id).first();
+  const friend = await useMemoSql().query<MemoFriend>('memo_friend').eq('id', id).first();
   if (!friend) return;
 
   const now = Date.now();

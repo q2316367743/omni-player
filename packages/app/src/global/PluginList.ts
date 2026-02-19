@@ -4,7 +4,10 @@ import {homeRouters} from "@/router/modules/home.ts";
 import {memoRouters} from "@/router/modules/memo.ts";
 import {subscribeRouters} from "@/router/modules/subscribe.ts";
 import type {PluginDefine} from "@/global/PluginDefine.ts";
-import type {PluginEntity} from "@/entity/PluginEntity.ts";
+import type {PluginEntity} from "@/entity/main/PluginEntity.ts";
+import {useAiRtSql, useMemoSql, useMpSql} from "@/lib/sql.ts";
+import {useMemoFriendStore} from "@/store";
+import {setupChatL1Summary} from "@/modules/ai/memo";
 
 export type ToolItemTypeInner = 'inner';
 
@@ -24,6 +27,9 @@ export type ToolItemType = ToolItemTypeInner | ToolItemTypeOuter;
 
 export type ToolItemPlatform = 'win32' | 'macos' | 'linux';
 
+/**
+ * 面板信息
+ */
 export interface PanelConfig {
   id: string;
   label: string;
@@ -42,6 +48,8 @@ interface ToolItemBase {
 export interface ToolItemInner {
   disabled?: boolean;
   entry: () => Promise<{ default: Component }>;
+  // 插件前完成
+  onBeforeLoad?: () => Promise<void>;
   router?: Array<RouteRecordRaw>;
   param?: {
     [key: string]: any;
@@ -82,7 +90,7 @@ export interface ToolItemMap {
   file: ToolItemFile
 }
 
-export interface ToolItem<T extends ToolItemType> extends ToolItemBase {
+export interface ToolItem<T extends ToolItemType = ToolItemType> extends ToolItemBase {
   type: T;
   payload: ToolItemMap[T];
 }
@@ -101,12 +109,14 @@ export const DEFAULT_PANELS: PanelConfig[] = [
   {id: 'system', label: '系统工具', order: 3, visible: true},
 ];
 
+// 内置工具
 export const DEFAULT_TOOLS: Array<ToolItem<ToolItemTypeInner>> = [
   {
     id: 'todo', label: '待办', icon: 'CheckRectangleIcon', desc: '井井有条',
     type: 'inner',
     payload: {
-      entry: () => import("@/pages/app/todo/app-todo.vue")
+      entry: () => import("@/pages/app/todo/app-todo.vue"),
+      onBeforeLoad: () => useMpSql().migrate()
     }
   },
   {
@@ -120,7 +130,8 @@ export const DEFAULT_TOOLS: Array<ToolItem<ToolItemTypeInner>> = [
     id: 'bookkeeping', label: '记账', icon: 'MoneyIcon', desc: '精打细算',
     type: 'inner',
     payload: {
-      entry: () => import("@/pages/app/bookkeeping/app-bookkeeping.vue")
+      entry: () => import("@/pages/app/bookkeeping/app-bookkeeping.vue"),
+      onBeforeLoad: () => useMpSql().migrate()
     }
   },
   {
@@ -129,6 +140,7 @@ export const DEFAULT_TOOLS: Array<ToolItem<ToolItemTypeInner>> = [
     payload: {
       entry: () => import("@/pages/subscribe/subscribe-home.vue"),
       router: subscribeRouters,
+      onBeforeLoad: () => useMpSql().migrate()
     }
   },
   {
@@ -144,7 +156,19 @@ export const DEFAULT_TOOLS: Array<ToolItem<ToolItemTypeInner>> = [
         },
         ...homeRouters,
         ...memoRouters
-      ]
+      ],
+      onBeforeLoad: async () => {
+        // 初始化 sql
+        await useMemoSql().migrate()
+        // 获取全部 memo 好友
+        await useMemoFriendStore().loadFriends().then(async () => {
+          // 好友初始化完毕
+          await Promise.all([
+            setupChatL1Summary(),
+          ])
+        });
+        await useMemoFriendStore().loadChatSession();
+      }
     }
   },
 
@@ -153,14 +177,16 @@ export const DEFAULT_TOOLS: Array<ToolItem<ToolItemTypeInner>> = [
     id: 'ai/chat', label: '聊天', icon: 'ChatIcon',
     type: 'inner',
     payload: {
-      entry: () => import("@/pages/app/ai/chat/ai-chat.vue")
+      entry: () => import("@/pages/app/ai/chat/ai-chat.vue"),
+      onBeforeLoad: () => useAiRtSql().migrate(),
     }
   },
   {
     id: 'ai/roundtable', label: '圆桌会', icon: 'UsergroupIcon',
     type: 'inner',
     payload: {
-      entry: () => import("@/pages/app/ai/roundtable/app-ai-roundtable.vue")
+      entry: () => import("@/pages/app/ai/roundtable/app-ai-roundtable.vue"),
+      onBeforeLoad: () => useAiRtSql().migrate(),
     }
   },
 
@@ -190,14 +216,16 @@ export const DEFAULT_TOOLS: Array<ToolItem<ToolItemTypeInner>> = [
     id: 'programmer/release', label: '发版助手', icon: 'GitMergeIcon',
     type: 'inner',
     payload: {
-      entry: () => import("@/pages/app/programmer/release/app-release.vue")
+      entry: () => import("@/pages/app/programmer/release/app-release.vue"),
+      onBeforeLoad: () => useMpSql().migrate()
     }
   },
   {
     id: 'programmer/snippet', label: '代码片段', icon: 'Code1Icon',
     type: 'inner',
     payload: {
-      entry: () => import("@/pages/app/programmer/snippet/app-snippet.vue")
+      entry: () => import("@/pages/app/programmer/snippet/app-snippet.vue"),
+      onBeforeLoad: () => useMpSql().migrate()
     }
   },
   {
@@ -277,6 +305,7 @@ export const TOOL_MAP = map(DEFAULT_TOOLS, 'id');
 export function pluginEntityToOuter(plugin: PluginEntity): ToolItem<ToolItemTypeOuter> {
   return {
     ...plugin,
+    desc: plugin.description,
     platform: plugin.platform.split(",") as Array<ToolItemPlatform>,
     payload: JSON.parse(plugin.payload),
     type: plugin.type as ToolItemTypeOuter

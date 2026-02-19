@@ -1,4 +1,4 @@
-import {useSql} from "@/lib/sql.ts";
+import {useMemoSql} from "@/lib/sql.ts";
 import {
   type MemoChat,
   type MemoChatCore,
@@ -10,7 +10,7 @@ import {
 
 export function saveMemoChat(data: MemoChatCoreView) {
   const now = Date.now();
-  return useSql().mapper<MemoChat>('memo_chat')
+  return useMemoSql().mapper<MemoChat>('memo_chat')
     .insert({
       ...memoChatCoreFromView(data),
       token_count: data.content.filter(e => e.type === 'text').reduce((sum, c) => sum + c.content.length, 0),
@@ -21,7 +21,7 @@ export function saveMemoChat(data: MemoChatCoreView) {
 
 export function updateMemoChat(id: string, data: Partial<MemoChatCore>) {
   const now = Date.now();
-  return useSql().mapper<MemoChat>('memo_chat')
+  return useMemoSql().mapper<MemoChat>('memo_chat')
     .updateById(id, {
       ...data,
       updated_at: now
@@ -33,7 +33,7 @@ export function updateMemoChat(id: string, data: Partial<MemoChatCore>) {
  * @param friendId
  */
 export async function listMemoChatUnSummary(friendId: string) {
-  const res = await useSql().query<MemoChat>('memo_chat')
+  const res = await useMemoSql().query<MemoChat>('memo_chat')
     .eq('friend_id', friendId)
     .eq('compression_level', 0)
     .in('role', ['user', 'system', 'assistant'])
@@ -46,7 +46,7 @@ export async function listMemoChatUnSummary(friendId: string) {
  * 获取全部未总结的聊天记录，处于处理中
  */
 export async function listMemoChatBetween(friendId: string, startTime: number, endTime: number) {
-  const res = await useSql().query<MemoChat>('memo_chat')
+  const res = await useMemoSql().query<MemoChat>('memo_chat')
     .eq('friend_id', friendId)
     .ge('created_at', startTime)
     .le('created_at', endTime)
@@ -62,7 +62,7 @@ export async function listMemoChatBetween(friendId: string, startTime: number, e
  * @param limit 限制数量
  */
 export async function listMemoChatTimestamp(friendId: string, createdAt: number, limit: number) {
-  const res = await useSql().query<MemoChat>('memo_chat')
+  const res = await useMemoSql().query<MemoChat>('memo_chat')
     .eq('friend_id', friendId)
     .lt('created_at', createdAt)
     .orderByAsc('created_at')
@@ -77,7 +77,7 @@ export async function listMemoChatTimestamp(friendId: string, createdAt: number,
  * @param limit
  */
 export async function listMemoChatAscUnSummary(friendId: string, limit = 10) {
-  const res = await useSql().query<MemoChat>('memo_chat')
+  const res = await useMemoSql().query<MemoChat>('memo_chat')
     .eq('compression_level', 0)
     .eq('friend_id', friendId)
     .orderByAsc('created_at')
@@ -91,7 +91,7 @@ export async function listMemoChatAscUnSummary(friendId: string, limit = 10) {
  * @param friendId
  */
 export function getMemoChatLastUnSummary(friendId: string) {
-  return useSql().query<MemoChat>('memo_chat')
+  return useMemoSql().query<MemoChat>('memo_chat')
     .eq('compression_level', 0)
     .eq('friend_id', friendId)
     .orderByDesc('created_at')
@@ -103,7 +103,7 @@ export function getMemoChatLastUnSummary(friendId: string) {
  * @param friendId
  */
 export function getMemoChatFirstUnSummary(friendId: string) {
-  return useSql().query<MemoChat>('memo_chat')
+  return useMemoSql().query<MemoChat>('memo_chat')
     .eq('compression_level', 0)
     .eq('friend_id', friendId)
     .orderByAsc('created_at')
@@ -116,7 +116,7 @@ export function getMemoChatFirstUnSummary(friendId: string) {
  * @return  数量
  */
 export async function getMemoChatTotalCountUnSummary(friendId: string): Promise<number> {
-  const items = await useSql().query<MemoChat>('memo_chat')
+  const items = await useMemoSql().query<MemoChat>('memo_chat')
     .select('token_count')
     .eq('friend_id', friendId)
     .eq('compression_level', 0)
@@ -128,7 +128,7 @@ export async function getMemoChatTotalCountUnSummary(friendId: string): Promise<
  * 获取指定好友的未总结的聊天数量
  */
 export async function countMemoChatUnSummary(friendId: string) {
-  return useSql().query<MemoChat>('memo_chat')
+  return useMemoSql().query<MemoChat>('memo_chat')
     .eq('friend_id', friendId)
     .eq('compression_level', 0)
     .count();

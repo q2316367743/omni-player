@@ -1,16 +1,16 @@
-import {useSql} from "@/lib/sql.ts";
+import {useMpSql} from "@/lib/sql.ts";
 import type {ReleaseInstance, ReleaseInstanceCore} from "@/entity/app/release";
 
 export async function listReleaseInstanceService(projectId: string) {
-  return useSql().query<ReleaseInstance>('release_instance').eq('project_id', projectId).list();
+  return useMpSql().query<ReleaseInstance>('release_instance').eq('project_id', projectId).list();
 }
 
 export async function getReleaseInstanceService(id: string, projectId: string) {
-  return useSql().query<ReleaseInstance>('release_instance').eq('id', id).eq('project_id', projectId).one();
+  return useMpSql().query<ReleaseInstance>('release_instance').eq('id', id).eq('project_id', projectId).one();
 }
 
 export async function addReleaseInstanceService(projectId: string, instance: Partial<ReleaseInstanceCore>) {
-  return useSql().mapper<ReleaseInstance>('release_instance').insert({
+  return useMpSql().mapper<ReleaseInstance>('release_instance').insert({
     ...instance,
     current_version_id: '',
     project_id: projectId,
@@ -22,7 +22,7 @@ export async function addReleaseInstanceService(projectId: string, instance: Par
 export async function updateReleaseInstanceService(id: string, instance: Partial<ReleaseInstanceCore & {
   current_version_id: string
 }>) {
-  return useSql().mapper<ReleaseInstance>('release_instance').updateById(id, {
+  return useMpSql().mapper<ReleaseInstance>('release_instance').updateById(id, {
     name: instance.name,
     desc: instance.desc,
     current_version_id: instance.current_version_id,
@@ -31,6 +31,6 @@ export async function updateReleaseInstanceService(id: string, instance: Partial
 }
 
 export async function deleteReleaseInstanceService(id: string) {
-  return useSql().mapper<ReleaseInstance>('release_instance').deleteById(id);
+  return useMpSql().mapper<ReleaseInstance>('release_instance').deleteById(id);
 }
 

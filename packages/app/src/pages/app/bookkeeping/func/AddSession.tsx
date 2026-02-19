@@ -5,7 +5,7 @@ import MessageUtil from "@/util/model/MessageUtil.ts";
 import {saveTransactions} from "./BookkeepingService.ts";
 import {parseAlipayToTransaction, readAlipayCsv} from "@/pages/app/bookkeeping/utils/AlipayUtil.ts";
 import {LogoAlipayIcon, LogoWechatpayIcon, DeleteIcon} from "tdesign-icons-vue-next";
-import {useSql} from "@/lib/sql.ts";
+import {useMpSql} from "@/lib/sql.ts";
 import type {AnalysisTransactionCore} from "@/entity/analysis/AnalysisTransaction.ts";
 import type {AnalysisSessionSourceType} from "@/entity/analysis/AnalysisSession.ts";
 import {parseWeChatPayToTransaction} from "@/pages/app/bookkeeping/utils/WechatPayUtil.ts";
@@ -105,7 +105,7 @@ export function openAddSession(onSuccess?: () => void) {
       }
       if (!type) type = 'mixin';
       const filename = type === 'mixin' ? `mixin_record_${type}.csv` : `${type}_record.csv`;
-      await useSql().beginTransaction(async () => {
+      await useMpSql().beginTransaction(async () => {
         await saveTransactions(filename, type!, tran);
       });
       MessageUtil.success("账单上传成功");

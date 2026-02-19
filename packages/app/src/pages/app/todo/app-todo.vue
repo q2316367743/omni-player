@@ -55,8 +55,7 @@
 </template>
 
 <script lang="ts" setup>
-import {AddIcon, ChevronLeftIcon} from "tdesign-icons-vue-next";
-import {Button as TButton} from "tdesign-vue-next";
+import {AddIcon} from "tdesign-icons-vue-next";
 import {useTodoStore} from "@/lib/store.ts";
 import {LocalName} from "@/global/LocalName.ts";
 import type {TodoPlan} from "@/entity/todo/TodoPlan.ts";

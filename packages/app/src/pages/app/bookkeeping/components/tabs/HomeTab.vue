@@ -59,7 +59,7 @@
 
 <script lang="ts" setup>
 import {ArrowUpIcon, ArrowDownIcon, ChartIcon} from "tdesign-icons-vue-next";
-import {useSql} from "@/lib/sql.ts";
+import {useMpSql} from "@/lib/sql.ts";
 import type {AnalysisTransaction} from "@/entity/analysis/AnalysisTransaction.ts";
 
 const props = defineProps<{
@@ -77,8 +77,8 @@ onMounted(async () => {
 const loadData = async () => {
   loading.value = true;
   try {
-    const sql = useSql();
-    const query = await sql.query<AnalysisTransaction>('analysis_transaction');
+    const sql = useMpSql();
+    const query = sql.query<AnalysisTransaction>('analysis_transaction');
     const transactions = await query.eq('session_id', props.sessionId).list();
     
     let incomeTotal = 0;

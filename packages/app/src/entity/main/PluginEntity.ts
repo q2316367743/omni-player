@@ -3,7 +3,7 @@ import type {BaseEntity} from "@/entity/BaseEntity.ts";
 export interface PluginEntityCore {
   label: string;
   icon: string;
-  desc: string;
+  description: string;
   platform: string;
   type: string;
   payload: string;

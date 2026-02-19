@@ -5,17 +5,17 @@ import Ctx from "@imengyu/vue3-context-menu";
 import {isDark} from "@/global/Constants.ts";
 import MessageBoxUtil from "@/util/model/MessageBoxUtil.tsx";
 import {DeleteIcon, EditIcon} from "tdesign-icons-vue-next";
-import {useSql} from "@/lib/sql.ts";
+import {useMpSql} from "@/lib/sql.ts";
 
 export async function updateAnalysisSession(id: string, filename: string) {
-  const sql = useSql();
-  const mapper = await sql.mapper<AnalysisSession>('analysis_session');
+  const sql = useMpSql();
+  const mapper = sql.mapper<AnalysisSession>('analysis_session');
   await mapper.updateById(id, { filename });
 }
 
 export async function deleteAnalysisSession(id: string) {
-  const sql = useSql();
-  const mapper = await sql.mapper<AnalysisSession>('analysis_session');
+  const sql = useMpSql();
+  const mapper = sql.mapper<AnalysisSession>('analysis_session');
   await mapper.deleteById(id);
 }
 

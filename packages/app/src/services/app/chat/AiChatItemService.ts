@@ -1,4 +1,4 @@
-import {useSql} from "@/lib/sql.ts";
+import {useAiRtSql} from "@/lib/sql.ts";
 import type {AiChatGroup, AiChatItem, AiChatItemCore, AiChatMessage} from "@/entity/app/ai/chat";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 import {askQuestionOpenAi} from "@/modules/ai";
@@ -6,7 +6,7 @@ import {appAiChatRename} from "@/global/EventBus.ts";
 import {logDebug, logError} from "@/lib/log.ts";
 
 export async function listAiChatItemService(groupId = "") {
-  return useSql().query<AiChatItem>('ai_chat_item')
+  return useAiRtSql().query<AiChatItem>('ai_chat_item')
     .eq('group_id', groupId)
     .orderByDesc('top')
     .orderByDesc('sort')
@@ -14,22 +14,22 @@ export async function listAiChatItemService(groupId = "") {
 }
 
 export async function getAiChatItemService(id: string) {
-  return useSql().query<AiChatItem>('ai_chat_item').eq('id', id).one();
+  return useAiRtSql().query<AiChatItem>('ai_chat_item').eq('id', id).one();
 }
 
 export async function moveAiChatItemService(id: string, groupId: string) {
-  await useSql().mapper<AiChatItem>('ai_chat_item').updateById(id, {
+  await useAiRtSql().mapper<AiChatItem>('ai_chat_item').updateById(id, {
     group_id: groupId,
     updated_at: Date.now(),
   })
 }
 
 export async function searchAiChatItemService(keyword: string, groupId = "") {
-  return useSql().query<AiChatItem>('ai_chat_item').like('name', keyword).eq('group_id', groupId).orderByDesc('top').list();
+  return useAiRtSql().query<AiChatItem>('ai_chat_item').like('name', keyword).eq('group_id', groupId).orderByDesc('top').list();
 }
 
 export async function updateAiChatItemService(id: string, core: Partial<AiChatItemCore>) {
-  return useSql().mapper<AiChatItem>('ai_chat_item').updateById(id, {
+  return useAiRtSql().mapper<AiChatItem>('ai_chat_item').updateById(id, {
     ...core,
     updated_at: Date.now(),
   });
@@ -37,8 +37,8 @@ export async function updateAiChatItemService(id: string, core: Partial<AiChatIt
 
 export async function removeAiChatItemService(id: string) {
   await Promise.all([
-    useSql().mapper<AiChatItem>('ai_chat_item').deleteById(id),
-    useSql().query<AiChatMessage>('ai_chat_message').eq('chat_id', id).delete()
+    useAiRtSql().mapper<AiChatItem>('ai_chat_item').deleteById(id),
+    useAiRtSql().query<AiChatMessage>('ai_chat_message').eq('chat_id', id).delete()
   ])
 }
 
@@ -51,7 +51,7 @@ export async function removeAiChatItemService(id: string) {
  * @returns 聊天项ID
  */
 export async function createAiChatItemService(groupId: string, message: string, model: string, think: boolean) {
-  const sql = useSql();
+  const sql = useAiRtSql();
   const now = Date.now();
   // 创建聊天记录
   const chat = await sql.mapper<AiChatItem>('ai_chat_item').insert({

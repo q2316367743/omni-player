@@ -420,20 +420,6 @@ CREATE TABLE memo_post_comment
     content    TEXT    NOT NULL DEFAULT ''
 );
 
-
-CREATE TABLE mcp_setting
-(
-    id          TEXT PRIMARY KEY,
-    created_at  INTEGER NOT NULL DEFAULT 0,
-    updated_at  INTEGER NOT NULL DEFAULT 0,
-    label       TEXT    NOT NULL DEFAULT '',
-    name        TEXT    NOT NULL DEFAULT '',
-    description TEXT    NOT NULL DEFAULT '',
-    args        TEXT    NOT NULL DEFAULT '',
-    command     TEXT    NOT NULL DEFAULT '',
-    env         TEXT    NOT NULL DEFAULT ''
-);
-
 create TABLE memo_chat
 (
     id                     TEXT PRIMARY KEY,

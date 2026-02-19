@@ -1,17 +1,17 @@
 import type {Screenplay, ScreenplayCoreView} from "@/entity/screenplay";
-import {useSql} from "@/lib/sql.ts";
+import {useSpSql} from "@/lib/sql.ts";
 
 export function listScreenplayService() {
-  return useSql().query<Screenplay>('screenplay').list();
+  return useSpSql().query<Screenplay>('screenplay').list();
 }
 
 export function getScreenplayService(id: string) {
-  return useSql().query<Screenplay>('screenplay').eq('id', id).get();
+  return useSpSql().query<Screenplay>('screenplay').eq('id', id).get();
 }
 
 export function addScreenplayService(prop: ScreenplayCoreView) {
   const now = Date.now();
-  return useSql().mapper<Screenplay>('screenplay')
+  return useSpSql().mapper<Screenplay>('screenplay')
     .insert({
       title: prop.title,
       background: prop.background,
@@ -23,7 +23,7 @@ export function addScreenplayService(prop: ScreenplayCoreView) {
 
 export function updateScreenplayService(id: string, prop: Partial<ScreenplayCoreView>) {
   const now = Date.now();
-  return useSql().mapper<Screenplay>('screenplay')
+  return useSpSql().mapper<Screenplay>('screenplay')
     .updateById(id, {
       title: prop.title,
       background: prop.background,
@@ -32,5 +32,5 @@ export function updateScreenplayService(id: string, prop: Partial<ScreenplayCore
     })
 }
 export function deleteScreenplayService(id: string) {
-  return useSql().mapper<Screenplay>('screenplay').deleteById(id);
+  return useSpSql().mapper<Screenplay>('screenplay').deleteById(id);
 }

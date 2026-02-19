@@ -105,7 +105,7 @@
 
 <script lang="ts" setup>
 import {FileIcon} from "tdesign-icons-vue-next";
-import {useSql} from "@/lib/sql.ts";
+import {useMpSql} from "@/lib/sql.ts";
 import type {AnalysisTransaction} from "@/entity/analysis/AnalysisTransaction.ts";
 
 const props = defineProps<{
@@ -142,8 +142,8 @@ onMounted(async () => {
 const loadTransactions = async () => {
   loading.value = true;
   try {
-    const sql = useSql();
-    let query = await sql.query<AnalysisTransaction>('analysis_transaction');
+    const sql = useMpSql();
+    let query = sql.query<AnalysisTransaction>('analysis_transaction');
     query = query.eq('session_id', props.sessionId);
     
     if (filterType.value === 'large') {
@@ -207,8 +207,7 @@ const handlePageSizeChange = (size: number) => {
   pageSize.value = size;
   currentPage.value = 1;
   const start = 0;
-  const end = size;
-  transactions.value = allTransactions.value.slice(start, end);
+  transactions.value = allTransactions.value.slice(start, size);
 };
 
 const formatAmount = (amount: number) => {

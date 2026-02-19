@@ -1,6 +1,6 @@
 import type {MemoSessionSummary, MemoSessionSummaryCore} from "@/entity/memo/MemoSessionSummary.ts";
 import type {MemoChatSummary} from "@/entity/memo";
-import {useSql} from "@/lib/sql.ts";
+import {useMemoSql} from "@/lib/sql.ts";
 import {useMemoVelesdb} from "@/lib/velesdb.ts";
 
 export interface DiaryItem {
@@ -43,7 +43,7 @@ export async function pageDiaryItems(pageNum: number, pageSize: number) {
     LIMIT ? OFFSET ?
   `;
   
-  const records = await useSql().select<DiaryItem[]>(sql, [pageSize, offset]);
+  const records = await useMemoSql().select<DiaryItem[]>(sql, [pageSize, offset]);
   
   const countSql = `
     SELECT COUNT(*) as total FROM (
@@ -53,7 +53,7 @@ export async function pageDiaryItems(pageNum: number, pageSize: number) {
     ) as mssimcsi
   `;
   
-  const countResult = await useSql().select<Array<{ total: number }>>(countSql);
+  const countResult = await useMemoSql().select<Array<{ total: number }>>(countSql);
   const total = countResult[0]?.total || 0;
   
   return {
@@ -65,22 +65,22 @@ export async function pageDiaryItems(pageNum: number, pageSize: number) {
 }
 
 export function pageMemoChatSummary(pageNum: number, pageSize: number) {
-  return useSql().query<MemoSessionSummary>('memo_session_summary')
+  return useMemoSql().query<MemoSessionSummary>('memo_session_summary')
     .orderByDesc('created_at')
     .page(pageNum, pageSize);
 }
 
 export async function getMemoSessionSummary(id: string) {
-  return useSql().query<MemoSessionSummary>('memo_session_summary').eq('id', id).get();
+  return useMemoSql().query<MemoSessionSummary>('memo_session_summary').eq('id', id).get();
 }
 
 export async function getMemoChatSummaryById(id: string) {
-  return useSql().query<MemoChatSummary>('memo_chat_summary').eq('id', id).get();
+  return useMemoSql().query<MemoChatSummary>('memo_chat_summary').eq('id', id).get();
 }
 
 export async function createMemoChatSummary(data: MemoSessionSummaryCore) {
   const now = Date.now();
-  const summary = await useSql().mapper<MemoSessionSummary>('memo_session_summary').insert({
+  const summary = await useMemoSql().mapper<MemoSessionSummary>('memo_session_summary').insert({
     ...data,
     created_at: now,
     updated_at: now

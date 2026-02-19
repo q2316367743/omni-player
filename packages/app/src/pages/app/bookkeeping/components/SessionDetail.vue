@@ -37,7 +37,7 @@
 <script lang="ts" setup>
 import {FileIcon} from "tdesign-icons-vue-next";
 import type {AnalysisSession} from "@/entity/analysis/AnalysisSession.ts";
-import {useSql} from "@/lib/sql.ts";
+import {useMpSql} from "@/lib/sql.ts";
 import HomeTab from "./tabs/HomeTab.vue";
 import YearlyTab from "./tabs/YearlyTab.vue";
 import MonthTab from "./tabs/MonthTab.vue";
@@ -55,8 +55,8 @@ const session = ref<AnalysisSession | null>(null);
 
 watch(() => props.sessionId, async (newId) => {
   if (newId) {
-    const sql = useSql();
-    const query = await sql.query<AnalysisSession>('analysis_session');
+    const sql = useMpSql();
+    const query = sql.query<AnalysisSession>('analysis_session');
     session.value = await query.eq('id', newId).first();
   } else {
     session.value = null;

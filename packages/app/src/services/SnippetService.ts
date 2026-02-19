@@ -1,6 +1,6 @@
 import type {PageResponse} from "@/global/PageResponse.ts";
 import type {SnippetMeta, SnippetMetaWithTag} from "@/entity/snippet/SnippetMeta.ts";
-import {useSql} from "@/lib/sql.ts";
+import {useMpSql} from "@/lib/sql.ts";
 import type {SnippetTag} from "@/entity/snippet/SnippetTag.ts";
 import {generatePlaceholders, group, map} from "@/util";
 import type {SnippetContent} from "@/entity/snippet/SnippetContent.ts";
@@ -10,10 +10,10 @@ export type {SnippetMetaWithTag};
 
 async function fillTag(metas: Array<SnippetMeta>): Promise<Array<SnippetMetaWithTag>> {
   // 查询关联表
-  const tagWiths = await useSql().query<SnippetTags>('snippet_tags').in('snippet_id', metas.map(e => e.id)).list();
+  const tagWiths = await useMpSql().query<SnippetTags>('snippet_tags').in('snippet_id', metas.map(e => e.id)).list();
   if (tagWiths.length === 0) return metas.map(e => ({...e, tags: []}));
   // 获取全部标签
-  const tags = await useSql().query<SnippetTag>('snippet_tag').in('id', tagWiths.map(e => e.tag_id)).list();
+  const tags = await useMpSql().query<SnippetTag>('snippet_tag').in('id', tagWiths.map(e => e.tag_id)).list();
   const tagMap = map(tags, 'id');
   const tagGroupMap = group(tagWiths, 'snippet_id');
   return metas.map(e => {
@@ -43,7 +43,7 @@ export async function pageSnippet(keyword: string, page: number, pageSize: numbe
   if (keyword.startsWith("#")) {
     const name = `%${keyword.substring(1)}%`;
     // 搜索标签
-    const totalWrap = await useSql().select<Array<{ total: number }>>(
+    const totalWrap = await useMpSql().select<Array<{ total: number }>>(
       `select count(*) as \`total\`
        from snippet_meta sm
                 left join snippet_tags sts on sm.id = sts.snippet_id
@@ -51,7 +51,7 @@ export async function pageSnippet(keyword: string, page: number, pageSize: numbe
        where st.name like ${generatePlaceholders(1)}`, [name]);
     const total = totalWrap[0]?.total || 0;
     if (total === 0) return {total, records: [], pageNum: page, pageSize};
-    const list = await useSql().select<Array<SnippetMeta>>(
+    const list = await useMpSql().select<Array<SnippetMeta>>(
       `select sm.*
        from snippet_meta sm
                 left join snippet_tags sts on sm.id = sts.snippet_id
@@ -63,7 +63,7 @@ export async function pageSnippet(keyword: string, page: number, pageSize: numbe
     return {total, records, pageNum: page, pageSize};
   }
   // 普通查询
-  const list = await useSql().query<SnippetMeta>('snippet_meta').like('name', keyword).page(page, pageSize);
+  const list = await useMpSql().query<SnippetMeta>('snippet_meta').like('name', keyword).page(page, pageSize);
   return {...list, records: await fillTag(list.records)};
 }
 
@@ -75,9 +75,9 @@ export type Snippet = SnippetContent & SnippetMetaWithTag;
  */
 export async function getSnippetContent(id: string): Promise<Snippet> {
   // 获取自己
-  const snippet = await useSql().query<SnippetMeta>('snippet_meta').eq('id', id).one();
+  const snippet = await useMpSql().query<SnippetMeta>('snippet_meta').eq('id', id).one();
   if (!snippet) return Promise.reject(new Error("代码片段不存在"));
-  const content = await useSql().query<SnippetContent>('snippet_content').eq('id', id).one();
+  const content = await useMpSql().query<SnippetContent>('snippet_content').eq('id', id).one();
   if (!content) return Promise.reject(new Error("代码片段异常"));
   const [snippetWithTags] = await fillTag([snippet]);
 
@@ -93,7 +93,7 @@ export async function getSnippetContent(id: string): Promise<Snippet> {
  * @param name 新名称
  */
 export async function renameSnippetContent(id: string, name: string) {
-  await useSql().mapper<SnippetMeta>('snippet_meta').updateById(id, {name, updated_at: Date.now()});
+  await useMpSql().mapper<SnippetMeta>('snippet_meta').updateById(id, {name, updated_at: Date.now()});
 }
 
 /**
@@ -103,27 +103,27 @@ export async function renameSnippetContent(id: string, name: string) {
  */
 export async function setSnippetTag(id: string, tagNames: Array<string>) {
   // 删除旧的标签关闭
-  await useSql().query<SnippetTags>('snippet_tags').eq('snippet_id', id).delete();
+  await useMpSql().query<SnippetTags>('snippet_tags').eq('snippet_id', id).delete();
   // 插入新的标签
-  const tags = await useSql().query<SnippetTag>('snippet_tag').in('name', tagNames).list();
+  const tags = await useMpSql().query<SnippetTag>('snippet_tag').in('name', tagNames).list();
   const tagMap = map(tags, 'name');
   const now = Date.now();
   for (const tagName of tagNames) {
     const tag = tagMap.get(tagName);
     if (tag) {
-      await useSql().mapper<SnippetTags>('snippet_tags').insert({
+      await useMpSql().mapper<SnippetTags>('snippet_tags').insert({
         snippet_id: id,
         tag_id: tag.id,
         created_at: now
       })
     } else {
       // 创建新的标签
-      const newTag = await useSql().mapper<SnippetTag>('snippet_tag').insert({
+      const newTag = await useMpSql().mapper<SnippetTag>('snippet_tag').insert({
         name: tagName,
         created_at: now,
         updated_at: now
       });
-      await useSql().mapper<SnippetTags>('snippet_tags').insert({
+      await useMpSql().mapper<SnippetTags>('snippet_tags').insert({
         snippet_id: id,
         tag_id: newTag.id,
         created_at: now
@@ -140,11 +140,11 @@ export async function setSnippetTag(id: string, tagNames: Array<string>) {
  */
 export async function deleteSnippet(id: string) {
   // 删除代码片段
-  await useSql().mapper<SnippetMeta>('snippet_meta').deleteById(id);
+  await useMpSql().mapper<SnippetMeta>('snippet_meta').deleteById(id);
   // 删除关联关系
-  await useSql().query<SnippetTags>('snippet_tags').eq('snippet_id', id).delete();
+  await useMpSql().query<SnippetTags>('snippet_tags').eq('snippet_id', id).delete();
   // 删除内容
-  await useSql().mapper<SnippetContent>('snippet_content').deleteById(id);
+  await useMpSql().mapper<SnippetContent>('snippet_content').deleteById(id);
 }
 
 /**
@@ -154,7 +154,7 @@ export async function deleteSnippet(id: string) {
  * @param language 语言
  */
 export async function addSnippet(name: string, content?: string, language = 'javascript') {
-  await useSql().beginTransaction(async (sql) => {
+  await useMpSql().beginTransaction(async (sql) => {
     // 新增代码片段元数据
     const newMeta = await sql.mapper<SnippetMeta>('snippet_meta').insert({
       name,
@@ -177,7 +177,7 @@ export async function addSnippet(name: string, content?: string, language = 'jav
  * @param language 语言
  */
 export async function updateSnippetContent(id: string, content: string, language: string) {
-  await useSql().beginTransaction(async (sql) => {
+  await useMpSql().beginTransaction(async (sql) => {
     // 更新内容
     await sql.mapper<SnippetContent>('snippet_content').updateById(id, {content, language});
     // 更新元数据时间

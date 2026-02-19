@@ -9,11 +9,10 @@ import type OpenAI from "openai";
 import {logDebug, logError, logInfo} from "@/lib/log";
 import {
   getMemoChatSummaryLast,
-  listMemoChatSummaryL1UnSummary, saveMemoChatSummary,
+  listMemoChatSummaryL1UnSummary, saveMemoChatSummary, updateL1Summaries,
 } from "@/services/memo/chat";
 import {handleToolCallsWithLoop} from "@/modules/ai/utils/ToolCallHandler.ts";
 import {formatDate} from "@/util/lang/DateUtil.ts";
-import {useSql} from "@/lib/sql.ts";
 import {type AiMcpWrapper, SelfPersonaMcp} from "@/modules/ai/mcp";
 import {saveMemoChat} from "@/services/memo/chat/MemoChatService.ts";
 
@@ -251,15 +250,5 @@ ${l1Content}
   } catch (error) {
     logError('[L2Summary] L2 总结失败', error);
     return Promise.reject(error);
-  }
-}
-
-async function updateL1Summaries(l1Ids: string[], l2Id: string) {
-  const now = Date.now();
-  for (const l1Id of l1Ids) {
-    await useSql().mapper('memo_chat_summary').updateById(l1Id, {
-      archived_to_l2_id: l2Id,
-      updated_at: now
-    });
   }
 }

@@ -1,5 +1,5 @@
 import {type MemoChatSummary, type MemoChatSummaryCoreView, memoChatSummaryToView} from "@/entity/memo";
-import {useSql} from "@/lib/sql.ts";
+import {useMemoSql} from "@/lib/sql.ts";
 
 /**
  * 获取最新的对话总结，只用于聊天
@@ -7,7 +7,7 @@ import {useSql} from "@/lib/sql.ts";
  * @param level 等级，默认 L1
  */
 export function getMemoChatSummaryLast(friendId: string, level = 1) {
-  return useSql().query<MemoChatSummary>('memo_chat_summary')
+  return useMemoSql().query<MemoChatSummary>('memo_chat_summary')
     .eq('friend_id', friendId)
     .eq('level', level)
     .orderByDesc('created_at')
@@ -15,11 +15,11 @@ export function getMemoChatSummaryLast(friendId: string, level = 1) {
 }
 
 export async function getMemoChatSummary(id: string) {
-  return useSql().query<MemoChatSummary>('memo_chat_summary').eq('id', id).get().then(e => e ? memoChatSummaryToView(e) : undefined);
+  return useMemoSql().query<MemoChatSummary>('memo_chat_summary').eq('id', id).get().then(e => e ? memoChatSummaryToView(e) : undefined);
 }
 
 export function listMemoChatSummaryL1UnSummary(friendId: string) {
-  return useSql().query<MemoChatSummary>('memo_chat_summary')
+  return useMemoSql().query<MemoChatSummary>('memo_chat_summary')
     .eq('friend_id', friendId)
     .eq('level', 1)
     .eq('archived_to_l2_id', '')
@@ -29,7 +29,7 @@ export function listMemoChatSummaryL1UnSummary(friendId: string) {
 
 export function saveMemoChatSummary(data: MemoChatSummaryCoreView) {
   const now = Date.now();
-  return useSql().mapper<MemoChatSummary>('memo_chat_summary').insert({
+  return useMemoSql().mapper<MemoChatSummary>('memo_chat_summary').insert({
     ...data,
     created_at: now,
     updated_at: now,
@@ -39,7 +39,7 @@ export function saveMemoChatSummary(data: MemoChatSummaryCoreView) {
 
 export function updateMemoChatSummary(id: string, data: Partial<MemoChatSummaryCoreView>) {
   const now = Date.now();
-  return useSql().mapper<MemoChatSummary>('memo_chat_summary').updateById(id, {
+  return useMemoSql().mapper<MemoChatSummary>('memo_chat_summary').updateById(id, {
     ...data,
     layer_operations: data.layer_operations ? JSON.stringify(data.layer_operations) : undefined,
     updated_at: now
@@ -52,7 +52,7 @@ export function listMemoChatSummaryByTimeRange(
   startTime: number,
   endTime: number
 ) {
-  return useSql().query<MemoChatSummary>('memo_chat_summary')
+  return useMemoSql().query<MemoChatSummary>('memo_chat_summary')
     .eq('friend_id', friendId)
     .eq('level', level)
     .ge('start_time', startTime)
@@ -66,10 +66,21 @@ export function listMemoChatSummaryRecent(
   level: 1 | 2,
   limit: number = 5
 ) {
-  return useSql().query<MemoChatSummary>('memo_chat_summary')
+  return useMemoSql().query<MemoChatSummary>('memo_chat_summary')
     .eq('friend_id', friendId)
     .eq('level', level)
     .orderByDesc('created_at')
     .lastSql(`LIMIT ${limit}`)
     .list();
+}
+
+
+export async function updateL1Summaries(l1Ids: string[], l2Id: string) {
+  const now = Date.now();
+  for (const l1Id of l1Ids) {
+    await useMemoSql().mapper('memo_chat_summary').updateById(l1Id, {
+      archived_to_l2_id: l2Id,
+      updated_at: now
+    });
+  }
 }

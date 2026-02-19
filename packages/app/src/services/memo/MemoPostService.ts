@@ -1,5 +1,5 @@
 import type {MemoPost, MemoPostComment, MemoPostCore, MemoPostUpdate} from "@/entity/memo";
-import {useSql} from "@/lib/sql.ts";
+import {useMemoSql} from "@/lib/sql.ts";
 import type {PageResponse} from "@/global/PageResponse.ts";
 import {group} from "@/util";
 
@@ -9,7 +9,7 @@ export interface MemoPostView extends MemoPost {
 }
 
 export async function pageMemoPost(pageNum: number, pageSize: number): Promise<PageResponse<MemoPostView>> {
-  const page = await useSql().query<MemoPost>('memo_post')
+  const page = await useMemoSql().query<MemoPost>('memo_post')
     .orderByDesc('created_at')
     .page(pageNum, pageSize);
   if (page.records.length === 0) {
@@ -19,7 +19,7 @@ export async function pageMemoPost(pageNum: number, pageSize: number): Promise<P
     };
   }
   const postIds = page.records.map(e => e.id);
-  const comments = await useSql().query<MemoPostComment>('memo_post_comment')
+  const comments = await useMemoSql().query<MemoPostComment>('memo_post_comment')
     .in('post_id', postIds)
     .list();
   const commentMap = group(comments, 'post_id');
@@ -33,7 +33,7 @@ export async function pageMemoPost(pageNum: number, pageSize: number): Promise<P
 }
 
 export function countMemoPostForWeek(friend_id: string, created_at: number) {
-  return useSql().query<MemoPost>('memo_post')
+  return useMemoSql().query<MemoPost>('memo_post')
     .eq('friend_id', friend_id)
     .gt('created_at', created_at)
     .count();
@@ -41,7 +41,7 @@ export function countMemoPostForWeek(friend_id: string, created_at: number) {
 
 export function createMemoPost(memoPost: MemoPostCore) {
   const now = Date.now();
-  return useSql().mapper<MemoPost>('memo_post')
+  return useMemoSql().mapper<MemoPost>('memo_post')
     .insert({
       ...memoPost,
       is_like: 0,
@@ -51,7 +51,7 @@ export function createMemoPost(memoPost: MemoPostCore) {
 }
 
 export function updateMemoPost(id: string, data: Partial<MemoPostUpdate>) {
-  return useSql().mapper<MemoPost>('memo_post')
+  return useMemoSql().mapper<MemoPost>('memo_post')
     .updateById(id, {
       ...data,
       updated_at: Date.now()

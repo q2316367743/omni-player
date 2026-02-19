@@ -4,10 +4,9 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {setupRefreshFeedTask} from "@/modules/subscribe/RefreshFeedTask.ts";
+import {setupRefreshFeedTask} from "@/modules/subscribe";
 import {logError, logInfo} from "@/lib/log.ts";
-import {useMcpSettingStore, useMemoFriendStore} from "@/store";
-import {setupChatL1Summary} from "@/modules/ai/memo";
+import {useMcpSettingStore} from "@/store";
 
 // 注册定时刷新任务
 setupRefreshFeedTask()
@@ -17,15 +16,8 @@ setupRefreshFeedTask()
 //   .then(() => logInfo("注册窗口隐藏事件成功"))
 //   .catch(e => logError("注册窗口隐藏事件失败", e))
 
-// 获取全部 memo 好友
-useMemoFriendStore().loadFriends().then(async () => {
-  // 好友初始化完毕
-  await Promise.all([
-    setupChatL1Summary(),
-  ])
-});
-useMemoFriendStore().loadChatSession();
 useMcpSettingStore().fetchMcps();
+
 </script>
 <style scoped lang="less">
 .app-content {

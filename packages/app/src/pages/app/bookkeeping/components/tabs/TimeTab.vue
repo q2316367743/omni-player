@@ -40,7 +40,7 @@
 
 <script lang="ts" setup>
 import {ChartIcon} from "tdesign-icons-vue-next";
-import {useSql} from "@/lib/sql.ts";
+import {useMpSql} from "@/lib/sql.ts";
 import type {AnalysisTransaction} from "@/entity/analysis/AnalysisTransaction.ts";
 import * as echarts from 'echarts';
 import dayjs from 'dayjs';
@@ -97,8 +97,8 @@ watch(isDark, () => {
 const loadData = async () => {
   loading.value = true;
   try {
-    const sql = useSql();
-    const query = await sql.query<AnalysisTransaction>('analysis_transaction');
+    const sql = useMpSql();
+    const query = sql.query<AnalysisTransaction>('analysis_transaction');
     const transactions = await query.eq('session_id', props.sessionId).list();
     
     if (transactions.length === 0) {

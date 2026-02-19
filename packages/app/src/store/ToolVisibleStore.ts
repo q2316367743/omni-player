@@ -4,11 +4,13 @@ import {computed, ref} from "vue";
 import {
   DEFAULT_PANELS,
   DEFAULT_TOOLS,
+  type PanelConfig, pluginEntityToOuter,
   type ToolGrid,
   type ToolItem,
-  type ToolItemInner,
-  type PanelConfig
+  type ToolItemPlatform,
+  type ToolItemTypeInner
 } from "@/global/PluginList.ts";
+import {listPlugin} from "@/services/main/PluginService.ts";
 
 const MAIN_GRID_ROWS = 3;
 const MAIN_GRID_COLS = 4;
@@ -17,36 +19,41 @@ const SUB_GRID_ROWS = 4;
 const SUB_GRID_COLS = 4;
 
 function createEmptyMainGrid(): ToolGrid {
-  return Array.from({ length: MAIN_GRID_ROWS }, () => Array(MAIN_GRID_COLS).fill(null));
+  return Array.from({length: MAIN_GRID_ROWS}, () => Array(MAIN_GRID_COLS).fill(null));
 }
 
 function createEmptySubGrid(): ToolGrid {
-  return Array.from({ length: SUB_GRID_ROWS }, () => Array(SUB_GRID_COLS).fill(null));
+  return Array.from({length: SUB_GRID_ROWS}, () => Array(SUB_GRID_COLS).fill(null));
 }
 
 function generateDefaultSubGrids(): Record<string, ToolGrid> {
   const grids: Record<string, ToolGrid> = {};
-  
+
   DEFAULT_PANELS.forEach(panel => {
     grids[panel.id] = createEmptySubGrid();
   });
-  
+
   return grids;
 }
 
-function isInnerTool(tool: ToolItem): tool is ToolItemInner {
+function isInnerTool(tool: ToolItem): tool is ToolItem<ToolItemTypeInner> {
   return tool.type === 'inner';
 }
 
 export const useToolVisibleStore = defineStore('tool-visible', () => {
 
+  // 面板配置
   const rawPanelConfig = useLocalStorage<PanelConfig[]>(LocalName.KEY_SETTING_TOOL_CATEGORY, DEFAULT_PANELS);
+  // 主面板配置
   const rawMainGrid = useLocalStorage<ToolGrid>(LocalName.KEY_SETTING_TOOL_MAIN_GRID, createEmptyMainGrid());
+  // 子面板配置
   const rawSubGridConfig = useLocalStorage<Record<string, ToolGrid>>(LocalName.KEY_SETTING_TOOL_GRID, generateDefaultSubGrids());
+  // 工具列表
+  const tools = ref<ToolItem[]>([]);
+  // 当前的平台
+  const currentPlatform = ref<ToolItemPlatform | ''>('');
 
-  const currentPlatform = ref<string>('');
-
-  function setPlatform(platform: string) {
+  function setPlatform(platform: ToolItemPlatform) {
     currentPlatform.value = platform;
   }
 
@@ -58,11 +65,14 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
     return panels.value.filter(panel => panel.visible).sort((a, b) => a.order - b.order);
   });
 
-  const allTools = computed<ToolItem[]>(() => DEFAULT_TOOLS);
+  const allTools = computed<ToolItem[]>(() => ({
+    ...tools.value,
+    ...DEFAULT_TOOLS
+  }));
 
   const availableTools = computed<ToolItem[]>(() => {
     return DEFAULT_TOOLS.filter(tool => {
-      if (isInnerTool(tool) && tool.disabled) return false;
+      if (isInnerTool(tool) && tool.payload.disabled) return false;
       if (tool.platform && tool.platform.length > 0) {
         if (!currentPlatform.value || !tool.platform.includes(currentPlatform.value)) {
           return false;
@@ -75,6 +85,11 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
   const mainGrid = computed<ToolGrid>(() => {
     return rawMainGrid.value || createEmptyMainGrid();
   });
+
+  async function initTool() {
+    const plugins = await listPlugin();
+    tools.value = plugins.map(pluginEntityToOuter)
+  }
 
   function getSubGrid(panelId: string): ToolGrid {
     return rawSubGridConfig.value[panelId] || createEmptySubGrid();
@@ -94,7 +109,7 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
 
   function setSubGridTool(panelId: string, row: number, col: number, toolId: string | null) {
     if (row >= 0 && row < SUB_GRID_ROWS && col >= 0 && col < SUB_GRID_COLS) {
-      const newGrids = { ...rawSubGridConfig.value };
+      const newGrids = {...rawSubGridConfig.value};
       if (!newGrids[panelId]) {
         newGrids[panelId] = createEmptySubGrid();
       }
@@ -113,7 +128,7 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
   }
 
   function swapSubGridTools(panelId: string, r1: number, c1: number, r2: number, c2: number) {
-    const newGrids = { ...rawSubGridConfig.value };
+    const newGrids = {...rawSubGridConfig.value};
     if (!newGrids[panelId]) {
       newGrids[panelId] = createEmptySubGrid();
     }
@@ -125,10 +140,9 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
   }
 
   function addPanel(panel: PanelConfig) {
-    const newPanels = [...panels.value, panel];
-    rawPanelConfig.value = newPanels;
-    
-    const newGrids = { ...rawSubGridConfig.value };
+    rawPanelConfig.value = [...panels.value, panel];
+
+    const newGrids = {...rawSubGridConfig.value};
     if (!newGrids[panel.id]) {
       newGrids[panel.id] = createEmptySubGrid();
     }
@@ -136,17 +150,15 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
   }
 
   function updatePanel(panelId: string, updates: Partial<PanelConfig>) {
-    const newPanels = panels.value.map(panel => 
-      panel.id === panelId ? { ...panel, ...updates } : panel
+    rawPanelConfig.value = panels.value.map(panel =>
+      panel.id === panelId ? {...panel, ...updates} : panel
     );
-    rawPanelConfig.value = newPanels;
   }
 
   function removePanel(panelId: string) {
-    const newPanels = panels.value.filter(panel => panel.id !== panelId);
-    rawPanelConfig.value = newPanels;
-    
-    const newGrids = { ...rawSubGridConfig.value };
+    rawPanelConfig.value = panels.value.filter(panel => panel.id !== panelId);
+
+    const newGrids = {...rawSubGridConfig.value};
     delete newGrids[panelId];
     rawSubGridConfig.value = newGrids;
   }
@@ -156,7 +168,7 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
     newOrder.forEach((id, index) => {
       const existing = panels.value.find(p => p.id === id);
       if (existing) {
-        newPanels.push({ ...existing, order: index });
+        newPanels.push({...existing, order: index});
       }
     });
     rawPanelConfig.value = newPanels;
@@ -167,7 +179,7 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
   }
 
   function resetSubGrid(panelId: string) {
-    const newGrids = { ...rawSubGridConfig.value };
+    const newGrids = {...rawSubGridConfig.value};
     newGrids[panelId] = createEmptySubGrid();
     rawSubGridConfig.value = newGrids;
   }
@@ -185,6 +197,7 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
     allTools,
     availableTools,
     mainGrid,
+    initTool,
     getSubGrid,
     setPlatform,
     getToolInfo,

@@ -1,5 +1,5 @@
 import type {MemoChunk, MemoComment, MemoItem, MemoItemCore} from "@/entity/memo";
-import {useSql} from "@/lib/sql.ts";
+import {useMemoSql} from "@/lib/sql.ts";
 import type {PageResponse} from "@/global/PageResponse.ts";
 import {group} from "@/util";
 import {chunkMemo} from "@/util/text/ChunkUtil.ts";
@@ -21,7 +21,7 @@ export interface MemoItemView extends MemoItem {
 }
 
 export async function pageMemoItem(pageNum: number, pageSize: number): Promise<PageResponse<MemoItemView>> {
-  const itemPage = await useSql().query<MemoItem>('memo_item')
+  const itemPage = await useMemoSql().query<MemoItem>('memo_item')
   .orderByDesc('created_at')
   .page(pageNum, pageSize);
   if (itemPage.records.length === 0) {
@@ -33,11 +33,11 @@ export async function pageMemoItem(pageNum: number, pageSize: number): Promise<P
     };
   }
   const itemIds = itemPage.records.map(e => e.id);
-  const chunks = await useSql().query<MemoChunk>('memo_chunk').in('memo_id', itemIds).list();
+  const chunks = await useMemoSql().query<MemoChunk>('memo_chunk').in('memo_id', itemIds).list();
   const chunkMap = group(chunks, 'memo_id');
 
   // 获取全部相关的评论
-  const comments = await useSql().query<MemoComment>('memo_comment').in('memo_id', itemIds).list();
+  const comments = await useMemoSql().query<MemoComment>('memo_comment').in('memo_id', itemIds).list();
   // 分组
   const commentMap = group(comments, 'memo_id');
 
@@ -85,7 +85,7 @@ export async function addMemoService(data: MemoItemAdd) {
   const chunks = chunkMemo(data.content);
   logDebug('[MemoItemService] memo 内容分段完成', chunks.length);
   // 1. 新增 memo
-  const newMemo = await useSql().mapper<MemoItem>('memo_item').insert({
+  const newMemo = await useMemoSql().mapper<MemoItem>('memo_item').insert({
     type: data.type,
     friend_ids: data.friend_ids,
     consumed: 0,
@@ -98,7 +98,7 @@ export async function addMemoService(data: MemoItemAdd) {
   const chunkDbs = new Array<MemoChunk>();
   for (const chunk of chunks) {
     // 3. 新增分块
-    const res = await useSql().mapper<MemoChunk>('memo_chunk').insert({
+    const res = await useMemoSql().mapper<MemoChunk>('memo_chunk').insert({
       memo_id: newMemo.id,
       content: chunk,
       index: index,
@@ -139,7 +139,7 @@ export async function addMemoService(data: MemoItemAdd) {
       source: 'memo'
     }).finally(() => {
       // 消费
-      useSql().mapper<MemoItem>('memo_item').updateById(newMemo.id, {
+      useMemoSql().mapper<MemoItem>('memo_item').updateById(newMemo.id, {
         consumed: 1
       })
       logDebug('[MemoItemService] AI 分析完成', newMemo.id);
@@ -158,7 +158,7 @@ export async function addMemoService(data: MemoItemAdd) {
           friend: f!,
           memo: data
         }).then(comment => {
-          useSql().mapper<MemoComment>('memo_comment').insert({
+          useMemoSql().mapper<MemoComment>('memo_comment').insert({
             memo_id: newMemo.id,
             content: comment,
             created_at: now,
@@ -184,9 +184,9 @@ export async function addMemoService(data: MemoItemAdd) {
 
 export async function removeMemoService(id: string) {
   // 查询全部的分块
-  const chunks = await useSql().query<MemoChunk>('memo_chunk').eq('memo_id', id).select('id').list();
+  const chunks = await useMemoSql().query<MemoChunk>('memo_chunk').eq('memo_id', id).select('id').list();
   // 查询全部的评论
-  const comments = await useSql().query<MemoComment>('memo_comment').eq('memo_id', id).select('id').list();
+  const comments = await useMemoSql().query<MemoComment>('memo_comment').eq('memo_id', id).select('id').list();
   // 删除
   for (const chunk of chunks) {
     await useMemoVelesdb().delete(chunk.created_at);
@@ -195,9 +195,9 @@ export async function removeMemoService(id: string) {
     await useMemoVelesdb().delete(comment.created_at);
   }
   // 删除分块
-  await useSql().query<MemoChunk>('memo_chunk').eq('memo_id', id).delete();
+  await useMemoSql().query<MemoChunk>('memo_chunk').eq('memo_id', id).delete();
   // 删除评论
-  await useSql().query<MemoComment>('memo_comment').eq('memo_id', id).delete();
+  await useMemoSql().query<MemoComment>('memo_comment').eq('memo_id', id).delete();
   // 删除自身
-  await useSql().mapper<MemoItem>('memo_item').deleteById(id);
+  await useMemoSql().mapper<MemoItem>('memo_item').deleteById(id);
 }

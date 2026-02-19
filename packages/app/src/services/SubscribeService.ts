@@ -1,5 +1,5 @@
 import type {FeedContent, FeedItem, SubscribeItem, SubscribeItemEdit} from "@/entity/subscribe";
-import {useSql} from "@/lib/sql.ts";
+import {useMpSql} from "@/lib/sql.ts";
 import {logError} from "@/lib/log.ts";
 import {getFaviconUrl} from "@/util/file/website.ts";
 import {refreshFeed} from "@/services/FeedService.ts";
@@ -7,12 +7,12 @@ import {LocalName} from "@/global/LocalName.ts";
 import {useSubscribeStore} from "@/store/SubscribeStore.ts";
 
 export async function listSubscribe() {
-  const query =  useSql().query<SubscribeItem>("subscribe_item")
+  const query =  useMpSql().query<SubscribeItem>("subscribe_item")
   return query.list();
 }
 
 export async function addSubscribe(subscribe: SubscribeItemEdit) {
-  const mapper =  useSql().mapper<SubscribeItem>("subscribe_item")
+  const mapper =  useMpSql().mapper<SubscribeItem>("subscribe_item")
   const item = await mapper.insert({
     created_at: Date.now(),
     updated_at: Date.now(),
@@ -38,8 +38,8 @@ export async function addSubscribe(subscribe: SubscribeItemEdit) {
 }
 
 export async function updateSubscribe(id: string, subscribe: SubscribeItemEdit) {
-  const query = useSql().query<SubscribeItem>("subscribe_item")
-  const mapper = useSql().mapper<SubscribeItem>("subscribe_item")
+  const query = useMpSql().query<SubscribeItem>("subscribe_item")
+  const mapper = useMpSql().mapper<SubscribeItem>("subscribe_item")
   // 获取旧的
   const old = await query.eq('id', id).one();
   if (!old) {
@@ -59,7 +59,7 @@ export async function updateSubscribe(id: string, subscribe: SubscribeItemEdit) 
 
   if (old.url !== subscribe.url) {
     // 链接发生改变，删除旧的全部 rss
-    await useSql().beginTransaction(async (sql) => {
+    await useMpSql().beginTransaction(async (sql) => {
       const feedItemQuery = sql.query<FeedItem>("feed_item")
       await feedItemQuery.eq('subscribe_id', id).delete();
       const feedContentQuery = sql.query<FeedItem>("feed_content")
@@ -79,7 +79,7 @@ export async function updateSubscribe(id: string, subscribe: SubscribeItemEdit) 
 }
 
 export async function removeSubscribe(id: string) {
-  await useSql().beginTransaction(async (sql) => {
+  await useMpSql().beginTransaction(async (sql) => {
     const feedItemQuery = sql.query<FeedItem>("feed_item")
     await feedItemQuery.eq('subscribe_id', id).delete();
     const feedContentQuery = sql.query<FeedContent>("feed_content")
@@ -91,7 +91,7 @@ export async function removeSubscribe(id: string) {
 }
 
 export async function getSubscribe(id: string) {
-  const query = useSql().query<SubscribeItem>("subscribe_item")
+  const query = useMpSql().query<SubscribeItem>("subscribe_item")
   const res = await query.eq('id', id).one();
   if (res && res.un_read_count > 0) {
     await useSubscribeStore().read(id)

@@ -5,7 +5,6 @@ import '@/assets/style/global.less';
 import {TOOL_MAP} from "@/global/PluginList.ts";
 import {registerMonacoLanguages} from '@/modules/monaco';
 import {createRouter, createWebHashHistory} from "vue-router";
-import {useSql} from "@/lib/sql.ts";
 
 registerMonacoLanguages();
 
@@ -44,18 +43,18 @@ if (id) {
   const tool = TOOL_MAP.get(id);
   if (tool) {
     // 额外引入图标库
-    tool.entry().then(async comp => {
+    tool.payload.entry().then(async comp => {
       // 初始化sql
-      await useSql().getDb();
+        await tool.payload.onBeforeLoad?.();
       // 删除 loading
       document.getElementById("init")?.remove();
       // 创建组件
       const app = createApp(comp.default);
-      if (tool.router) {
+      if (tool.payload.router) {
         // 如果存在路由
         app.use(createRouter({
           history: createWebHashHistory(),
-          routes: tool.router
+          routes: tool.payload.router
         }));
       }
       app.use(createPinia());

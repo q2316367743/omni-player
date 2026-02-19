@@ -49,7 +49,7 @@ import {FileIcon, AddIcon, LogoWechatpayIcon, LogoAlipayIcon} from "tdesign-icon
 import {type AnalysisSession, getSourceTypeName} from "@/entity/analysis/AnalysisSession.ts";
 import {openSessionContextmenu} from "@/pages/app/bookkeeping/func/SessionEdit.tsx";
 import {openAddSession} from "@/pages/app/bookkeeping/func/AddSession.tsx";
-import {useSql} from "@/lib/sql.ts";
+import {useMpSql} from "@/lib/sql.ts";
 
 const emit = defineEmits<{
   select: [session: AnalysisSession | null]
@@ -63,8 +63,8 @@ onMounted(async () => {
 });
 
 const loadSessions = async () => {
-  const sql = useSql();
-  const query = await sql.query<AnalysisSession>('analysis_session');
+  const sql = useMpSql();
+  const query = sql.query<AnalysisSession>('analysis_session');
   sessions.value = await query.orderByDesc('created_at').list();
 };
 
