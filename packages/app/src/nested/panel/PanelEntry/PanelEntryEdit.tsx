@@ -4,26 +4,33 @@ import {
   AddIcon,
   AppIcon, CodeIcon,
   CommandIcon,
-  DeleteIcon,
+  DeleteIcon, EditIcon,
   FileIcon,
   FolderIcon,
   InternetIcon, KeyboardIcon,
   Share1Icon, TextboxIcon
 } from "tdesign-icons-vue-next";
 import {useToolVisibleStore} from "@/store/ToolVisibleStore.ts";
-import {openPopupAdd} from "@/lib/windows.ts";
+import {openPopupAdd, openPopupEdit} from "@/lib/windows.ts";
+import type {ToolItem} from "@/global/PluginList.ts";
 
-export const openMainContext = async (toolId: string | undefined | null, row: number, col: number, e: PointerEvent) => {
+export const openMainContext = async (tool: ToolItem | undefined | null, row: number, col: number, e: PointerEvent) => {
   e.preventDefault();
   e.stopPropagation();
 
-  if (!toolId) return;
+  if (!tool) return;
 
   Ctx.showContextMenu({
     x: e.x,
     y: e.y,
     theme: isDark.value ? 'mac dark' : 'mac',
-    items: [{
+    items: [
+      ...(tool.type === 'inner' ? [] : [{
+        label: '编辑',
+        icon: () => <EditIcon />,
+        onClick: () => openPopupEdit(tool.id, '', row, col)
+      }]),
+      {
       label: () => <span class={'label color-red'}>删除</span>,
       icon: () => <DeleteIcon class={'color-red'}/>,
       onClick: () => {
@@ -37,6 +44,7 @@ export const openMainContext = async (toolId: string | undefined | null, row: nu
 /**
  * 打开插件新增上下文菜单
  * @param e 鼠标事件
+ * @param panel 所选面板
  * @param x 所选位置横坐标
  * @param y 所选位置纵坐标
  */

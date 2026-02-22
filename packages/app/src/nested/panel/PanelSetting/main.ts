@@ -9,6 +9,7 @@ import {settingAddRouter, settingMainRouter} from "@/nested/panel/PanelSetting/r
 
 const usp = new URLSearchParams(location.search);
 const type = usp.get('type');
+const edit = usp.get('edit');
 
 
 document.getElementById("init")?.remove();
@@ -16,6 +17,6 @@ useSql().getDb().then(() => {
   createApp(App)
     .use(createPinia())
     .use(
-      type ? settingAddRouter : settingMainRouter)
+      type || edit ? settingAddRouter : settingMainRouter)
     .mount('#app');
 })

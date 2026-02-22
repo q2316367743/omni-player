@@ -11,13 +11,20 @@ export async function listPlugin(): Promise<Array<ToolList>> {
 }
 
 export async function addPluginService(data: ToolList) {
-  // 设置 ID
   data.id = useSnowflake().nextId();
   data.createdAt = Date.now();
-  // 添加
   await usePluginStore().set<ToolList>(data.id, data);
   return data.id;
 
+}
+
+export async function updatePluginService(data: ToolList) {
+  await usePluginStore().set<ToolList>(data.id, data);
+  return data.id;
+}
+
+export async function getPlugin(id: string): Promise<ToolList | undefined> {
+  return await usePluginStore().get<ToolList>(id);
 }
 
 export async function removePlugin(id: string) {

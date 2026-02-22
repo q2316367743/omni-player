@@ -10,7 +10,7 @@
         :data-col="colIndex"
         :title="tool?.desc"
         @click="tool && handleToolClick(tool)"
-        @contextmenu="openMainContext(tool?.id, rowIndex, colIndex, $event)"
+        @contextmenu="openMainContext(tool, rowIndex, colIndex, $event)"
       >
         <template v-if="tool">
           <div class="category-icon">

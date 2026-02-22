@@ -93,8 +93,6 @@ export const openPopupSetting = async () => {
 
 }
 export const openPopupAdd = async (type: ToolItemType, panel: string, x: number, y: number) => {
-  // 创建
-
   const ww = new WebviewWindow(`plugin-setting`, {
     url: import.meta.env.DEV ?
       `http://localhost:5123/popup-setting.html?type=${type}&panel=${panel}&x=${x}&y=${y}` :
@@ -110,11 +108,37 @@ export const openPopupAdd = async (type: ToolItemType, panel: string, x: number,
 
 
   await ww.once('tauri://created', async () => {
-    // webview successfully created
     console.log('webview successfully created')
   });
   await ww.once('tauri://error', function (e) {
-    // an error happened creating the webview
+    console.error('an error happened creating the webview');
+    console.error(e);
+  });
+
+  await ww.show();
+  await ww.setFocus();
+
+}
+
+export const openPopupEdit = async (id: string, panel: string, x: number, y: number) => {
+  const ww = new WebviewWindow(`plugin-setting`, {
+    url: import.meta.env.DEV ?
+      `http://localhost:5123/popup-setting.html?edit=${id}&panel=${panel}&x=${x}&y=${y}` :
+      `./popup-setting.html?edit=${id}&panel=${panel}&x=${x}&y=${y}`,
+    title: '编辑',
+    width: 1200,
+    height: 800,
+    minWidth: 1200,
+    minHeight: 800,
+    resizable: true,
+    fullscreen: false
+  })
+
+
+  await ww.once('tauri://created', async () => {
+    console.log('webview successfully created')
+  });
+  await ww.once('tauri://error', function (e) {
     console.error('an error happened creating the webview');
     console.error(e);
   });
