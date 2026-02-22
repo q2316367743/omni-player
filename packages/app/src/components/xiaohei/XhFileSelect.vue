@@ -1,6 +1,6 @@
 <template>
   <div class="flex gap-8px w-full">
-    <t-input v-model="data" readonly class="w-full" :placeholder/>
+    <t-input v-model="data" class="w-full" :placeholder/>
     <t-button variant="outline" theme="primary" @click="handleSelect">选择文件</t-button>
   </div>
 </template>

@@ -1,6 +1,8 @@
-import {openUrl} from '@tauri-apps/plugin-opener';
+import {openUrl, openPath} from '@tauri-apps/plugin-opener';
 import type {ToolItem} from "@/global/PluginList.ts";
 import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
+import {Command} from '@tauri-apps/plugin-shell';
+import {logInfo, logError} from '@/lib/log';
 
 
 const openPopupPluginInner = async (tool: ToolItem<'inner'>) => {
@@ -54,10 +56,125 @@ const openPopupLink = async (tool: ToolItem<'link'>) => {
   }
 }
 
+const openPopupExe = async (tool: ToolItem<'exe'>) => {
+  const {path} = tool.payload;
+  await openPath(path);
+}
+
+const openPopupFolder = async (tool: ToolItem<'folder'>) => {
+  const {path} = tool.payload;
+  await openPath(path);
+}
+
+const openPopupFile = async (tool: ToolItem<'file'>) => {
+  const {path, openWith} = tool.payload;
+  if (openWith) {
+    await openPath(path, openWith);
+  } else {
+    await openPath(path);
+  }
+}
+
+const openPopupScript = async (tool: ToolItem<'script'>) => {
+  const {path, interpreter, cwd} = tool.payload;
+  try {
+    const interpreterMap: Record<string, string> = {
+      'sh': 'exec-sh',
+      'bash': 'exec-bash',
+      'cmd': 'exec-cmd',
+      'powershell': 'exec-powershell',
+      'python': 'exec-python',
+      'python3': 'exec-python3',
+      'node': 'exec-node'
+    };
+    const commandName = interpreterMap[interpreter] || interpreter;
+    const command = Command.create(commandName, [path], {
+      cwd: cwd || undefined
+    });
+    const result = await command.execute();
+    logInfo(`Script executed: ${path}, code: ${result.code}`);
+  } catch (e) {
+    logError(`Script execution failed: ${path}, error: ${e}`);
+  }
+}
+
+const openPopupCommand = async (tool: ToolItem<'command'>) => {
+  const {command: cmd, openWith, cwd} = tool.payload;
+  try {
+    const platform = (await import('@tauri-apps/plugin-os')).platform();
+    let commandName: string;
+    let args: string[];
+    
+    if (openWith) {
+      const shellMap: Record<string, string> = {
+        'sh': 'exec-sh',
+        'bash': 'exec-bash',
+        'cmd': 'exec-cmd',
+        'powershell': 'exec-powershell'
+      };
+      commandName = shellMap[openWith] || openWith;
+      args = openWith === 'cmd' ? ['/c', cmd] : 
+             openWith === 'powershell' ? ['-Command', cmd] : ['-c', cmd];
+    } else if (platform === 'windows') {
+      commandName = 'exec-cmd';
+      args = ['/c', cmd];
+    } else {
+      commandName = 'exec-sh';
+      args = ['-c', cmd];
+    }
+    
+    const command = Command.create(commandName, args, {
+      cwd: cwd || undefined
+    });
+    const result = await command.execute();
+    logInfo(`Command executed: ${cmd}, code: ${result.code}`);
+  } catch (e) {
+    logError(`Command execution failed: ${cmd}, error: ${e}`);
+  }
+}
+
+const openPopupKeyboard = async (tool: ToolItem<'keyboard'>) => {
+  const {key} = tool.payload;
+  logInfo(`Keyboard simulation not implemented yet. Key: ${key}`);
+}
+
 export const handlePopupToolClick = async (tool: ToolItem) => {
-  if (tool.type === 'inner') {
-    await openPopupPluginInner(tool as ToolItem<'inner'>)
-  } else if (tool.type === 'link') {
-    await openPopupLink(tool as ToolItem<'link'>);
+  switch (tool.type) {
+    case 'inner': {
+      await openPopupPluginInner(tool as ToolItem<'inner'>);
+      break;
+    }
+    case 'link': {
+      await openPopupLink(tool as ToolItem<'link'>);
+      break;
+    }
+    case 'exe': {
+      await openPopupExe(tool as ToolItem<'exe'>);
+      break;
+    }
+    case 'folder': {
+      await openPopupFolder(tool as ToolItem<'folder'>);
+      break;
+    }
+    case 'file': {
+      await openPopupFile(tool as ToolItem<'file'>);
+      break;
+    }
+    case 'script': {
+      await openPopupScript(tool as ToolItem<'script'>);
+      break;
+    }
+    case 'command': {
+      await openPopupCommand(tool as ToolItem<'command'>);
+      break;
+    }
+    case 'keyboard': {
+      await openPopupKeyboard(tool as ToolItem<'keyboard'>);
+      break;
+    }
+    case 'plugin': {
+      logInfo(`Plugin type not implemented yet. Tool: ${tool.id}`);
+      break;
+    }
   }
 }

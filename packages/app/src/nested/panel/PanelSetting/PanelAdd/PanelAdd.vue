@@ -7,7 +7,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import type {ToolItem, ToolItemType, ToolItemTypeOuter} from "@/global/PluginList.ts";
+import type {ToolItem, ToolItemType, ToolItemTypeOuter, ToolItemInner, ToolItemPlugin} from "@/global/PluginList.ts";
 import PluginAdd from "@/pages/admin/plugin-setting/PluginAdd.vue";
 import {useToolVisibleStore} from "@/store/ToolVisibleStore.ts";
 import {addPluginService} from "@/services/main/PluginService.ts";
@@ -31,37 +31,55 @@ const data = ref<ToolItem>({
 
 watch(() => data.value.type, (type) => {
   data.value.id = '';
-  if (type === 'exe') {
-    data.value.payload = {
-      path: ''
-    }
-  } else if (type === 'script') {
-    data.value.payload = {
-      path: ''
-    }
-  } else if (type === 'folder') {
-    data.value.payload = {
-      path: ''
-    }
-  } else if (type === 'file') {
-    data.value.payload = {
-      path: ''
-    }
-  } else if (type === 'command') {
-    data.value.payload = {
-      path: '',
-      openWith: ''
-    }
-  } else if (type === 'keyboard') {
-    data.value.payload = {
-      path: ''
-    }
-  } else if (type === 'link') {
-    data.value.payload = {
-      url: '',
-      openWith: 'default',
-      program: ''
-    }
+  switch (type) {
+    case 'inner':
+      data.value.payload = {} as ToolItemInner;
+      break;
+    case 'plugin':
+      data.value.payload = {} as ToolItemPlugin;
+      break;
+    case 'link':
+      data.value.payload = {
+        url: '',
+        openWith: 'default',
+        program: ''
+      };
+      break;
+    case 'exe':
+      data.value.payload = {
+        path: ''
+      };
+      break;
+    case 'script':
+      data.value.payload = {
+        path: '',
+        interpreter: '',
+        cwd: ''
+      };
+      break;
+    case 'folder':
+      data.value.payload = {
+        path: ''
+      };
+      break;
+    case 'file':
+      data.value.payload = {
+        path: '',
+        openWith: ''
+      };
+      break;
+    case 'command':
+      data.value.payload = {
+        command: '',
+        openWith: '',
+        cwd: ''
+      };
+      break;
+    case 'keyboard':
+      data.value.payload = {
+        key: ''
+      };
+      break;
   }
 });
 

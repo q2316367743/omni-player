@@ -27,7 +27,7 @@ export type ToolItemTypeOuter = 'plugin' | 'link' | 'exe' | 'script' | 'folder' 
 export type ToolItemType = ToolItemTypeInner | ToolItemTypeOuter;
 
 export type ToolItemPlatform =
-  'linux'
+  | 'linux'
   | 'macos'
   | 'ios'
   | 'freebsd'
@@ -62,12 +62,6 @@ export const ToolItemTypeOptions: Array<SelectOption> = [
   {label: '打开网址', value: 'link'},
   {label: '执行脚本', value: 'script'},
   {label: '模拟按键', value: 'keyboard'},
-];
-
-export const ToolItemPlatformOptions = [
-  {label: 'Windows', value: 'windows'},
-  {label: 'Mac OS', value: 'macos'},
-  {label: 'Linux', value: 'linux'},
 ];
 
 /**
@@ -105,14 +99,6 @@ export interface ToolItemInner {
 
 export type ToolItemPlugin = PluginDefine;
 
-//     {label: '默认浏览器', value: 'default'},
-//           {label: 'Edge', value: 'edge'},
-//           {label: 'Chrome', value: 'chrome'},
-//           {label: 'Firefox', value: 'firefox'},
-//           {label: 'Safari', value: 'safari'},
-//           {label: '本地浏览器窗口', value: 'tauri'},
-//           {label: '自定义浏览器程序', value: 'customer'}
-
 export type ToolItemLinkOpenWith =
   | 'default'
   | 'edge'
@@ -129,28 +115,42 @@ export interface ToolItemLink {
 }
 
 export interface ToolItemExe {
+  // 执行文件
   path: string;
 }
 
 export interface ToolItemScript {
+  // 脚本所在位置
   path: string;
+  // 使用的脚本解释器
+  interpreter: string;
+  // 执行的所在目录
+  cwd: string;
 }
 
 export interface ToolItemFolder {
+  // 文件夹路径
   path: string;
 }
 
 export interface ToolItemFile {
+  // 文件路径
   path: string;
+  // 使用的软件
   openWith: string;
 }
 
 export interface ToolItemCommand {
-  path: string;
+  // 命令
+  command: string;
+  // 执行命令的软件
   openWith: string;
+  // 执行的所在目录
+  cwd: string;
 }
 
 export interface ToolItemKeyboard {
+  // 按键
   key: string
 }
 

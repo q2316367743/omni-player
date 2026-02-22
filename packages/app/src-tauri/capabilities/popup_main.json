@@ -11,6 +11,54 @@
     "log:default",
     "os:default",
     "shell:default",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "exec-sh",
+          "cmd": "sh",
+          "args": ["-c", { "validator": "\\S+" }],
+          "sidecar": false
+        },
+        {
+          "name": "exec-bash",
+          "cmd": "bash",
+          "args": ["-c", { "validator": "\\S+" }],
+          "sidecar": false
+        },
+        {
+          "name": "exec-cmd",
+          "cmd": "cmd",
+          "args": ["/c", { "validator": "\\S+" }],
+          "sidecar": false
+        },
+        {
+          "name": "exec-powershell",
+          "cmd": "powershell",
+          "args": ["-Command", { "validator": "\\S+" }],
+          "sidecar": false
+        },
+        {
+          "name": "exec-python",
+          "cmd": "python",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "exec-python3",
+          "cmd": "python3",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "exec-node",
+          "cmd": "node",
+          "args": true,
+          "sidecar": false
+        }
+      ]
+    },
+    "shell:allow-spawn",
     "store:allow-get",
     "store:allow-set",
     "store:allow-save",
@@ -60,6 +108,22 @@
       "allow": [{ "path": "$APPDATA/**/*" }]
     },
     "log:default",
-    "opener:allow-open-url"
+    "opener:allow-open-url",
+    "opener:allow-reveal-item-in-dir",
+    {
+      "identifier": "opener:allow-open-path",
+      "allow": [
+        { "path": "$HOME/**/*" },
+        { "path": "$APPDATA/**/*" },
+        { "path": "$LOCALAPPDATA/**/*" },
+        { "path": "$DESKTOP/**/*" },
+        { "path": "$DOCUMENT/**/*" },
+        { "path": "$DOWNLOAD/**/*" },
+        { "path": "$PICTURE/**/*" },
+        { "path": "$MUSIC/**/*" },
+        { "path": "$VIDEO/**/*" },
+        { "path": "/**/*" }
+      ]
+    }
   ]
 }
