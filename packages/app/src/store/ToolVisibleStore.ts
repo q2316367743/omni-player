@@ -4,13 +4,15 @@ import {computed, ref} from "vue";
 import {
   DEFAULT_PANELS,
   DEFAULT_TOOLS,
-  type PanelConfig, pluginEntityToOuter,
+  type PanelConfig,
   type ToolGrid,
   type ToolItem,
   type ToolItemPlatform,
   type ToolItemTypeInner
 } from "@/global/PluginList.ts";
-import {listPlugin} from "@/services/main/PluginService.ts";
+import {listPlugin, onPluginChange} from "@/services/main/PluginService.ts";
+import {logError, logInfo} from "@/lib/log.ts";
+import {map} from "@/util";
 
 const MAIN_GRID_ROWS = 3;
 const MAIN_GRID_COLS = 4;
@@ -65,13 +67,15 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
     return panels.value.filter(panel => panel.visible).sort((a, b) => a.order - b.order);
   });
 
-  const allTools = computed<ToolItem[]>(() => ({
+  const allTools = computed<ToolItem[]>(() => ([
     ...tools.value,
     ...DEFAULT_TOOLS
-  }));
+  ]));
+
+  const toolMap = computed(() => map(allTools.value, 'id'));
 
   const availableTools = computed<ToolItem[]>(() => {
-    return DEFAULT_TOOLS.filter(tool => {
+    return allTools.value.filter(tool => {
       if (isInnerTool(tool) && tool.payload.disabled) return false;
       if (tool.platform && tool.platform.length > 0) {
         if (!currentPlatform.value || !tool.platform.includes(currentPlatform.value)) {
@@ -82,13 +86,22 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
     });
   });
 
-  const mainGrid = computed<ToolGrid>(() => {
-    return rawMainGrid.value || createEmptyMainGrid();
+  const mainGrid = computed<Array<Array<ToolItem | undefined>>>(() => {
+    return (rawMainGrid.value || createEmptyMainGrid()).map(row => {
+      return row.map(col => {
+        if (col) return toolMap.value.get(col);
+        return undefined
+      })
+    });
   });
 
+  // 注册插件变更事件
+  onPluginChange(res => tools.value = res)
+    .then(() => logInfo("[ToolVisibleStore] 注册插件变更事件成功"))
+    .catch(e => logError("[ToolVisibleStore] 注册插件变更事件错误", e));
+
   async function initTool() {
-    const plugins = await listPlugin();
-    tools.value = plugins.map(pluginEntityToOuter)
+    tools.value = await listPlugin();
   }
 
   function getSubGrid(panelId: string): ToolGrid {
@@ -96,7 +109,7 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
   }
 
   function getToolInfo(toolId: string): ToolItem | undefined {
-    return DEFAULT_TOOLS.find(t => t.id === toolId);
+    return toolMap.value.get(toolId);
   }
 
   function setMainGridTool(row: number, col: number, toolId: string | null) {
@@ -197,6 +210,7 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
     allTools,
     availableTools,
     mainGrid,
+    toolMap,
     initTool,
     getSubGrid,
     setPlatform,

@@ -41,17 +41,17 @@
             class="grid-row"
           >
             <div
-              v-for="(toolId, colIndex) in row"
+              v-for="(tool, colIndex) in row"
               :key="`${rowIndex}-${colIndex}`"
               class="grid-cell"
-              :class="{ 'empty': !toolId }"
+              :class="{ 'empty': !tool }"
               @click="openMainToolSelector(rowIndex, colIndex)"
             >
-              <template v-if="toolId">
+              <template v-if="tool">
                 <div class="tool-icon">
-                  <PanelEntryIcon :name="getToolIconName(toolId)" />
+                  <PanelEntryIcon :name="tool?.icon" />
                 </div>
-                <div class="tool-name">{{ getToolLabel(toolId) }}</div>
+                <div class="tool-name">{{ tool?.label }}</div>
                 <button
                   class="remove-btn"
                   @click.stop="removeToolFromMainGrid(rowIndex, colIndex)"

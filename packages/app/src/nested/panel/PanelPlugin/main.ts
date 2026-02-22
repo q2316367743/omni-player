@@ -45,7 +45,7 @@ if (id) {
     // 额外引入图标库
     tool.payload.entry().then(async comp => {
       // 初始化sql
-        await tool.payload.onBeforeLoad?.();
+      await tool.payload.onBeforeLoad?.();
       // 删除 loading
       document.getElementById("init")?.remove();
       // 创建组件
@@ -57,6 +57,7 @@ if (id) {
           routes: tool.payload.router
         }));
       }
+      await tool.payload.onBeforeMount?.();
       app.use(createPinia());
       app.mount('#app');
     })

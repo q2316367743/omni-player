@@ -84,16 +84,14 @@
 import {AddIcon, DeleteIcon} from 'tdesign-icons-vue-next';
 import {listPlugin} from '@/services/main/PluginService.ts';
 import {
-  pluginEntityToOuter,
   type ToolItem,
   type ToolItemTypeOuter,
-  type ToolItemPlatform
+  type ToolItemPlatform, ToolItemPlatformLabels
 } from '@/global/PluginList.ts';
 import {addPluginDrawer, openMediaContextmenu} from './func.tsx';
 import MessageUtil from '@/util/model/MessageUtil.ts';
 import MessageBoxUtil from '@/util/model/MessageBoxUtil.tsx';
 import {removePlugin} from '@/services/main/PluginService.ts';
-import {getAllWindows} from "@tauri-apps/api/window";
 
 const activeTab = ref<ToolItemTypeOuter>('plugin');
 const plugins = ref<Array<ToolItem<ToolItemTypeOuter>>>([]);
@@ -107,14 +105,9 @@ const pluginTypes = [
   {label: '文件', value: 'file' as ToolItemTypeOuter},
 ];
 
-const platformLabels: Record<ToolItemPlatform, string> = {
-  win32: 'Windows',
-  macos: 'Mac OS',
-  linux: 'Linux',
-};
 
 function getPlatformLabel(platform: ToolItemPlatform): string {
-  return platformLabels[platform] || platform;
+  return ToolItemPlatformLabels[platform] || platform;
 }
 
 function getPluginsByType(type: ToolItemTypeOuter): Array<ToolItem<ToolItemTypeOuter>> {
@@ -123,8 +116,7 @@ function getPluginsByType(type: ToolItemTypeOuter): Array<ToolItem<ToolItemTypeO
 
 async function loadPlugins() {
   try {
-    const result = await listPlugin();
-    plugins.value = result.map(pluginEntityToOuter);
+    plugins.value = await listPlugin();
   } catch (e) {
     MessageUtil.error('加载插件列表失败', e);
   }
@@ -133,14 +125,14 @@ async function loadPlugins() {
 function handleAddPlugin() {
   addPluginDrawer(() => {
     loadPlugins();
-    getAllWindows().then((wins) => {
-      for (let win of wins) {
-        if (win.label === 'popup_main') {
-          win.emit('xiaohei://db/plugin/refresh');
-          return;
-        }
-      }
-    });
+    // getAllWindows().then((wins) => {
+    //   for (let win of wins) {
+    //     if (win.label === 'popup_main') {
+    //       win.emit('xiaohei://store/plugin/refresh');
+    //       return;
+    //     }
+    //   }
+    // });
   });
 }
 
@@ -162,14 +154,14 @@ async function handleDeletePlugin(plugin: ToolItem<ToolItemTypeOuter>) {
 const openMediaContextmenuWrap = (data: ToolItem<ToolItemTypeOuter>, e: PointerEvent) => {
   openMediaContextmenu(data, e, () => {
     loadPlugins();
-    getAllWindows().then((wins) => {
-      for (let win of wins) {
-        if (win.label === 'popup_main') {
-          win.emit('xiaohei://db/plugin/refresh');
-          return;
-        }
-      }
-    });
+    // getAllWindows().then((wins) => {
+    //   for (let win of wins) {
+    //     if (win.label === 'popup_main') {
+    //       win.emit('xiaohei://store/plugin/refresh');
+    //       return;
+    //     }
+    //   }
+    // });
   })
 }
 

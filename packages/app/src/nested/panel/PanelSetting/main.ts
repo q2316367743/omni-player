@@ -1,25 +1,21 @@
-import { createPinia } from 'pinia';
+import {createPinia} from 'pinia';
 import App from './App.vue'
 
 import 'virtual:uno.css'
 import '@/assets/style/global.less';
-import {createRouter, createWebHashHistory} from "vue-router";
-import {adminRouters} from "@/router/modules/admin.ts";
 import {useSql} from "@/lib/sql.ts";
+import {settingAddRouter, settingMainRouter} from "@/nested/panel/PanelSetting/router.ts";
+
+
+const usp = new URLSearchParams(location.search);
+const type = usp.get('type');
+
 
 document.getElementById("init")?.remove();
 useSql().getDb().then(() => {
   createApp(App)
     .use(createPinia())
-    .use(createRouter({
-      history: createWebHashHistory(),
-      routes: [
-        {
-          path: '/',
-          redirect: '/admin/global-setting'
-        },
-        ...adminRouters
-      ],
-    }))
+    .use(
+      type ? settingAddRouter : settingMainRouter)
     .mount('#app');
 })

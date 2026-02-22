@@ -1,5 +1,5 @@
+import {setTheme} from '@tauri-apps/api/app';
 import {LocalName} from "@/global/LocalName";
-import type {Ref, ComputedRef} from "vue";
 
 export type ColorModeType = "auto" | "light" | "dark";
 
@@ -19,14 +19,10 @@ export const useColorMode = (): ColorModeResult => {
 
   function renderColorMode() {
 
-    if (colorMode.value === "auto") {
-      isDark.value = isDarkColors();
-    } else if (colorMode.value === "light") {
-      isDark.value = false;
-    } else if (colorMode.value === "dark") {
-      isDark.value = true;
-    }
+    // 获取系统主题
+    isDark.value = isDarkColors();
 
+    // 渲染主题css
     const htmlElement = document.documentElement;
 
     if (isDark.value) {
@@ -40,17 +36,17 @@ export const useColorMode = (): ColorModeResult => {
     }
   }
 
-  watch(colorMode, renderColorMode, {immediate: true});
+  watch(colorMode, async () => {
+    // 设置系统主题
+    await setTheme(colorMode.value === 'auto' ? null : colorMode.value);
+    // 渲染主题css
+    renderColorMode();
+  }, {immediate: true});
   const mql = window.matchMedia?.("(prefers-color-scheme: dark)");
   mql?.addEventListener?.("change", renderColorMode);
+
   return {
-    colorMode, isDark: computed({
-      get() {
-        return isDark.value;
-      },
-      set(value) {
-        colorMode.value = value ? "dark" : "light";
-      }
-    })
+    colorMode,
+    isDark: computed(() => isDark.value)
   };
 };

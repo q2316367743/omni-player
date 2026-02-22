@@ -53,7 +53,7 @@ import type {MemoChatContent, MemoFriendStaticView} from '@/entity/memo'
 import {listMemoChatTimestamp, saveMemoChat} from '@/services/memo/chat'
 import {aiMemoChat, setupChatL2Summary, triggerChatL1SummaryActive} from '@/modules/ai/memo'
 import {debounce} from '@/pages/memo/chat/utils.ts'
-import XhAvatar from '@/components/avatar/XhAvatar.vue'
+import XhAvatar from '@/components/xiaohei/XhAvatar.vue'
 import MessageBubble from './MessageBubble.vue'
 import ChatInput from './ChatInput.vue'
 import ChatFriendStaticDetail from "@/pages/home/chat/ChatFriendStaticDetail.vue";

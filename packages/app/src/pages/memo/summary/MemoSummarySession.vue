@@ -62,7 +62,7 @@
 import {useRoute, useRouter} from 'vue-router';
 import {getMemoSessionSummary} from '@/services/memo/MemoSessionSummaryService.ts';
 import {listMemoMessage} from '@/services/memo/MemoMessageService';
-import XhAvatar from '@/components/avatar/XhAvatar.vue';
+import XhAvatar from '@/components/xiaohei/XhAvatar.vue';
 import MarkdownPreview from '@/components/common/MarkdownPreview.vue';
 import type {MemoSessionSummary} from '@/entity/memo/MemoSessionSummary.ts';
 import type {MemoMessage} from '@/entity/memo';

@@ -62,8 +62,8 @@
 import { AddIcon, GestureUpIcon, SearchIcon } from "tdesign-icons-vue-next";
 import { useToolVisibleStore } from "@/store/ToolVisibleStore.ts";
 import PanelEntryIcon from "@/nested/panel/PanelEntry/components/PanelEntryIcon.vue";
-
-const emit = defineEmits(['select']);
+import type {ToolItem} from "@/global/PluginList.ts";
+import {handlePopupToolClick} from "@/lib/tool.ts";
 
 const toolStore = useToolVisibleStore();
 
@@ -136,8 +136,8 @@ function getToolLabel(toolId: string): string {
   return tool?.label || toolId;
 }
 
-const handleToolClick = (toolId: string) => {
-  emit('select', toolId);
+const handleToolClick = (tool: ToolItem) => {
+  handlePopupToolClick(tool)
 };
 </script>
 

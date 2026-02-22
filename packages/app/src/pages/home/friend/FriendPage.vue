@@ -277,7 +277,7 @@
 import {useMemoFriendStore} from '@/store/MemoFriendStore.ts'
 import type {MemoFriendStaticView, MemoFriendView} from '@/entity/memo'
 import {useFuse} from '@vueuse/integrations/useFuse'
-import XhAvatar from '@/components/avatar/XhAvatar.vue'
+import XhAvatar from '@/components/xiaohei/XhAvatar.vue'
 import {
   getArchetypeText,
   getMoodText,

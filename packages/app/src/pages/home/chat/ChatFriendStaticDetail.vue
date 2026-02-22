@@ -144,7 +144,7 @@ import {
   getPostingStyleText,
   getRelationText, type MemoFriendStaticView
 } from "@/entity/memo";
-import XhAvatar from "@/components/avatar/XhAvatar.vue";
+import XhAvatar from "@/components/xiaohei/XhAvatar.vue";
 
 defineProps({
   friend: {

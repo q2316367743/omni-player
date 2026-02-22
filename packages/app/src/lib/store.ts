@@ -1,6 +1,7 @@
 import {Store} from "@tauri-apps/plugin-store";
 import {APP_DATA_STORE_PATH} from "@/global/Constants";
 import {cloneDeep} from "es-toolkit";
+import type {UnlistenFn} from "@tauri-apps/api/event";
 
 
 class StoreWrapper {
@@ -20,7 +21,7 @@ class StoreWrapper {
       .then(() => this._getStore())
       .catch((err) => {
         console.error('get store error:', err);
-        throw err; // 保证错误能被调用者捕获
+        // 失败也继续
       });
 
     return this.promiseChain as Promise<Store>;
@@ -57,6 +58,16 @@ class StoreWrapper {
   async save<T = any>(key: string, value: Array<T>) {
     await this.set(key, value);
   }
+
+
+  async entries<T>(): Promise<Array<[key: string, value: T]>> {
+    const store = await this.getStore();
+    return store.entries<T>();
+  }
+  async onChange<T>(cb: (key: string, value: T | undefined) => void): Promise<UnlistenFn> {
+    const store = await this.getStore();
+    return store.onChange(cb);
+  }
 }
 
 const instance = new StoreWrapper("store");
@@ -70,3 +81,7 @@ export const useTodoStore = () => todoStore;
 const commandStore = new StoreWrapper("command");
 
 export const useCommandStore = () => commandStore;
+
+const pluginStore = new StoreWrapper("plugin");
+
+export const usePluginStore = () => pluginStore;

@@ -1,23 +1,35 @@
-import {useSql} from "@/lib/sql.ts";
-import type {PluginEntity} from "@/entity/main/PluginEntity.ts";
-import {type ToolItem, type ToolItemTypeOuter, toolToPlugin} from "@/global/PluginList.ts";
+import {type ToolItem, type ToolItemTypeOuter} from "@/global/PluginList.ts";
+import {usePluginStore} from "@/lib/store.ts";
+import {useSnowflake} from "@/util";
+import type {UnlistenFn} from "@tauri-apps/api/event";
 
-export function listPlugin() {
-  return useSql().query<PluginEntity>('plugin')
-    .list();
+type ToolList = ToolItem<ToolItemTypeOuter>;
+
+export async function listPlugin(): Promise<Array<ToolList>> {
+  const entries = await usePluginStore().entries<ToolList>();
+  return entries.map(e => e[1]);
 }
 
-export function addPluginService(data: ToolItem<ToolItemTypeOuter>) {
-  const now = Date.now();
-  return useSql().mapper<PluginEntity>('plugin')
-    .insert({
-      ...toolToPlugin(data),
-      created_at: now,
-      updated_at: now
-    });
+export async function addPluginService(data: ToolList) {
+  // 设置 ID
+  data.id = useSnowflake().nextId();
+  data.createdAt = Date.now();
+  // 添加
+  await usePluginStore().set<ToolList>(data.id, data);
+  return data.id;
+
 }
 
-export function removePlugin(id: string) {
-  return useSql().mapper<PluginEntity>('plugin')
-    .deleteById(id);
+export async function removePlugin(id: string) {
+  await usePluginStore().delete(id);
+}
+
+let unlistenFn: (undefined | UnlistenFn) = undefined;
+
+export async function onPluginChange(callback: (plugin: Array<ToolList>) => void) {
+  unlistenFn?.();
+  listPlugin().then(callback);
+  unlistenFn = await usePluginStore().onChange(() => {
+    listPlugin().then(callback);
+  });
 }

@@ -10,15 +10,21 @@ export const APP_PASSWORD = "vpj13Q7AFKjpin"
 export const APP_DATA_DIR = () => appDataDir();
 export const APP_DATA_ASSET_DIR = async () => join(await APP_DATA_DIR(), "asset");
 export const APP_DATA_DB_DIR = async () => join(await APP_DATA_DIR(), "db");
+export const APP_DATA_STORE_DIR = async () => join(await APP_DATA_DIR(), "store");
+export const APP_DATA_HOLD_DIR = async () => join(await APP_DATA_DIR(), "hold");
+
+
 export const APP_DATA_DB_PATH = async (fileName:string) => join(await APP_DATA_DB_DIR(), `${fileName}.sqlite`);
-export const APP_DATA_VAULT_PATH = async (vaultName: string) => join(await APP_DATA_DIR(), `${vaultName}.hold`);
-export const APP_DATA_STORE_PATH = async (storeName: string) => join(await APP_DATA_DIR(), `${storeName}.json`);
+export const APP_DATA_VAULT_PATH = async (vaultName: string) => join(await APP_DATA_HOLD_DIR(), `${vaultName}.hold`);
+export const APP_DATA_STORE_PATH = async (storeName: string) => join(await APP_DATA_STORE_DIR(), `${storeName}.json`);
 export const APP_DATA_NOTE_PATH = async () => join(await APP_DATA_DIR(), 'note');
 
 export const initPath = async () => {
   const items = await Promise.all([
     APP_DATA_ASSET_DIR(),
     APP_DATA_DB_DIR(),
+    APP_DATA_STORE_DIR(),
+    APP_DATA_HOLD_DIR(),
     APP_DATA_NOTE_PATH()
   ])
   for (const dir of items) {
@@ -32,11 +38,6 @@ export const initPath = async () => {
 
 export const {colorMode, isDark} = useColorMode();
 
-export const toggleColorMode = () => {
-  colorMode.value = colorMode.value === 'light' ? 'dark' : 'light';
-}
-
-export const SUPPORT_MOVIE = /mp4|mkv|flv/i
 
 // 主要
 export const MAIN_MIGRATE_FILES = [{

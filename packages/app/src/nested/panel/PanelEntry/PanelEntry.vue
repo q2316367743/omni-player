@@ -12,9 +12,9 @@
       </div>
     </div>
 
-    <panel-entry-main @select="handleClick"/>
+    <panel-entry-main/>
 
-    <panel-entry-sub @select="handleClick"/>
+    <panel-entry-sub/>
   </div>
 </template>
 
@@ -22,10 +22,10 @@
 import {SettingIcon} from 'tdesign-icons-vue-next';
 import {useToolVisibleStore} from "@/store/ToolVisibleStore.ts";
 import {platform} from "@tauri-apps/plugin-os";
+import {openPopupSetting} from "@/lib/windows";
 import PanelEntryMain from "@/nested/panel/PanelEntry/components/PanelEntryMain.vue";
 import PanelEntrySub from "@/nested/panel/PanelEntry/components/PanelEntrySub.vue";
 import PanelEntryPin from "@/nested/panel/PanelEntry/components/PanelEntryPin.vue";
-import {openPopupPlugin, openPopupSetting} from "@/lib/windows";
 
 const toolStore = useToolVisibleStore();
 
@@ -34,9 +34,6 @@ onMounted(() => {
   toolStore.setPlatform(p);
 });
 
-const handleClick = (toolId: string) => {
-  openPopupPlugin(toolId);
-}
 </script>
 
 <style lang="less">

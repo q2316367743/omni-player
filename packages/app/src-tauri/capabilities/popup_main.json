@@ -16,6 +16,7 @@
     "store:allow-save",
     "store:allow-load",
     "store:allow-delete",
+    "store:allow-entries",
     "core:default",
     "core:event:allow-listen",
     "core:webview:allow-create-webview",
@@ -58,6 +59,7 @@
       "identifier": "fs:allow-read-text-file",
       "allow": [{ "path": "$APPDATA/**/*" }]
     },
-    "log:default"
+    "log:default",
+    "opener:allow-open-url"
   ]
 }

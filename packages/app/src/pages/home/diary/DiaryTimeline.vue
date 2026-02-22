@@ -20,7 +20,7 @@
 </template>
 <script lang="ts" setup>
 import type {DiaryItem} from "@/services/memo";
-import XhAvatar from "@/components/avatar/XhAvatar.vue";
+import XhAvatar from "@/components/xiaohei/XhAvatar.vue";
 import { prettyMessageDate} from "@/util/lang/DateUtil.ts";
 import {useMemoFriendStore} from "@/store";
 

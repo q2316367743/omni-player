@@ -4,28 +4,71 @@ import {homeRouters} from "@/router/modules/home.ts";
 import {memoRouters} from "@/router/modules/memo.ts";
 import {subscribeRouters} from "@/router/modules/subscribe.ts";
 import type {PluginDefine} from "@/global/PluginDefine.ts";
-import type {PluginEntity, PluginEntityCore} from "@/entity/main/PluginEntity.ts";
-import {useAiRtSql, useMemoSql, useMpSql} from "@/lib/sql.ts";
-import {useMemoFriendStore} from "@/store";
-import {setupChatL1Summary} from "@/modules/ai/memo";
+import {useAiRtSql, useMpSql} from "@/lib/sql.ts";
+import type {SelectOption} from "tdesign-vue-next";
 
+// - inner：内置工具
 export type ToolItemTypeInner = 'inner';
-
-export type ToolItemTypeOuter = 'plugin' | 'link' | 'exe' | 'script' | 'folder' | 'file';
 
 /**
  * 类型
- * - inner：内置工具
  * - plugin：第三方插件
  * - link: 网页链接
  * - exe：可执行文件
  * - script：脚本
  * - folder：文件夹
  * - file： 使用指定程序打开文件
+ * - command：制定命令
+ * - keyboard：模拟按键
+ * -
  */
+export type ToolItemTypeOuter = 'plugin' | 'link' | 'exe' | 'script' | 'folder' | 'file' | 'command' | 'keyboard';
+
 export type ToolItemType = ToolItemTypeInner | ToolItemTypeOuter;
 
-export type ToolItemPlatform = 'win32' | 'macos' | 'linux';
+export type ToolItemPlatform =
+  'linux'
+  | 'macos'
+  | 'ios'
+  | 'freebsd'
+  | 'dragonfly'
+  | 'netbsd'
+  | 'openbsd'
+  | 'solaris'
+  | 'android'
+  | 'windows';
+
+export const ToolItemPlatformLabels: Record<ToolItemPlatform, string> = {
+  windows: 'Windows',
+  macos: 'Mac OS',
+  linux: 'Linux',
+  freebsd: 'FreeBSD',
+  dragonfly: 'Dragonfly',
+  netbsd: 'NetBSD',
+  openbsd: 'OpenBSD',
+  solaris: 'Solaris',
+  android: 'Android',
+  ios: 'iOS',
+};
+
+export const ToolItemTypeOptions: Array<SelectOption> = [
+  {label: '第三方插件', value: 'plugin'},
+
+  {label: '启动软件', value: 'exe'},
+  {label: '打开文件', value: 'file'},
+  {label: '打开文件夹', value: 'folder'},
+  {label: '执行命令', value: 'command'},
+
+  {label: '打开网址', value: 'link'},
+  {label: '执行脚本', value: 'script'},
+  {label: '模拟按键', value: 'keyboard'},
+];
+
+export const ToolItemPlatformOptions = [
+  {label: 'Windows', value: 'windows'},
+  {label: 'Mac OS', value: 'macos'},
+  {label: 'Linux', value: 'linux'},
+];
 
 /**
  * 面板信息
@@ -41,6 +84,8 @@ interface ToolItemBase {
   id: string;
   label: string;
   icon: string;
+  // 创建时间
+  createdAt?: number;
   desc?: string;
   platform?: Array<ToolItemPlatform>;
 }
@@ -48,8 +93,10 @@ interface ToolItemBase {
 export interface ToolItemInner {
   disabled?: boolean;
   entry: () => Promise<{ default: Component }>;
-  // 插件前完成
+  // 加载前完成
   onBeforeLoad?: () => Promise<void>;
+  // 挂载前完成
+  onBeforeMount?: () => Promise<void>;
   router?: Array<RouteRecordRaw>;
   param?: {
     [key: string]: any;
@@ -58,9 +105,27 @@ export interface ToolItemInner {
 
 export type ToolItemPlugin = PluginDefine;
 
+//     {label: '默认浏览器', value: 'default'},
+//           {label: 'Edge', value: 'edge'},
+//           {label: 'Chrome', value: 'chrome'},
+//           {label: 'Firefox', value: 'firefox'},
+//           {label: 'Safari', value: 'safari'},
+//           {label: '本地浏览器窗口', value: 'tauri'},
+//           {label: '自定义浏览器程序', value: 'customer'}
+
+export type ToolItemLinkOpenWith =
+  | 'default'
+  | 'edge'
+  | 'chrome'
+  | 'firefox'
+  | 'safari'
+  | 'tauri'
+  | 'customer';
+
 export interface ToolItemLink {
   url: string;
-  openWith: string;
+  openWith: ToolItemLinkOpenWith;
+  program: string
 }
 
 export interface ToolItemExe {
@@ -80,6 +145,15 @@ export interface ToolItemFile {
   openWith: string;
 }
 
+export interface ToolItemCommand {
+  path: string;
+  openWith: string;
+}
+
+export interface ToolItemKeyboard {
+  key: string
+}
+
 export interface ToolItemMap {
   inner: ToolItemInner;
   plugin: ToolItemPlugin;
@@ -87,7 +161,9 @@ export interface ToolItemMap {
   exe: ToolItemExe;
   script: ToolItemScript;
   folder: ToolItemFolder;
-  file: ToolItemFile
+  file: ToolItemFile;
+  command: ToolItemCommand;
+  keyboard: ToolItemKeyboard;
 }
 
 export interface ToolItem<T extends ToolItemType = ToolItemType> extends ToolItemBase {
@@ -157,18 +233,6 @@ export const DEFAULT_TOOLS: Array<ToolItem<ToolItemTypeInner>> = [
         ...homeRouters,
         ...memoRouters
       ],
-      onBeforeLoad: async () => {
-        // 初始化 sql
-        await useMemoSql().migrate()
-        // 获取全部 memo 好友
-        await useMemoFriendStore().loadFriends().then(async () => {
-          // 好友初始化完毕
-          await Promise.all([
-            setupChatL1Summary(),
-          ])
-        });
-        await useMemoFriendStore().loadChatSession();
-      }
     }
   },
 
@@ -301,24 +365,3 @@ export const DEFAULT_TOOLS: Array<ToolItem<ToolItemTypeInner>> = [
 ];
 
 export const TOOL_MAP = map(DEFAULT_TOOLS, 'id');
-
-export function pluginEntityToOuter(plugin: PluginEntity): ToolItem<ToolItemTypeOuter> {
-  return {
-    ...plugin,
-    desc: plugin.description,
-    platform: plugin.platform.split(",") as Array<ToolItemPlatform>,
-    payload: JSON.parse(plugin.payload),
-    type: plugin.type as ToolItemTypeOuter
-  }
-}
-
-export function toolToPlugin(data: ToolItem<ToolItemTypeOuter>): PluginEntityCore {
-  return {
-    label: data.label,
-    icon: data.icon,
-    description: data.desc || '',
-    platform: data.platform?.join(",") || '',
-    type: data.type,
-    payload: JSON.stringify(data.payload),
-  }
-}

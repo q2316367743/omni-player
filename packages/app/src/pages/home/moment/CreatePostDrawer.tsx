@@ -1,5 +1,5 @@
 import {DrawerPlugin, Input, Textarea, Button} from "tdesign-vue-next";
-import XhUploadImage from "@/components/avatar/XhUploadImage.vue";
+import XhUploadImage from "@/components/xiaohei/XhUploadImage.vue";
 import {createPostByUser} from "@/services/memo/post/CreatePostByUser.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import "./CreatePostDrawer.less";

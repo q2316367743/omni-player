@@ -96,8 +96,9 @@ declare module 'vue' {
     TTree: typeof import('tdesign-vue-next')['Tree']
     UtoolsWebview: typeof import('./src/components/webview/UtoolsWebview.vue')['default']
     VerticalSplitPanel: typeof import('./src/components/common/VerticalSplitPanel.vue')['default']
-    XhAvatar: typeof import('./src/components/avatar/XhAvatar.vue')['default']
-    XhUploadImage: typeof import('./src/components/avatar/XhUploadImage.vue')['default']
+    XhAvatar: typeof import('./src/components/xiaohei/XhAvatar.vue')['default']
+    XhFileSelect: typeof import('./src/components/xiaohei/XhFileSelect.vue')['default']
+    XhUploadImage: typeof import('./src/components/xiaohei/XhUploadImage.vue')['default']
   }
 }
 
@@ -187,6 +188,7 @@ declare global {
   const TTree: typeof import('tdesign-vue-next')['Tree']
   const UtoolsWebview: typeof import('./src/components/webview/UtoolsWebview.vue')['default']
   const VerticalSplitPanel: typeof import('./src/components/common/VerticalSplitPanel.vue')['default']
-  const XhAvatar: typeof import('./src/components/avatar/XhAvatar.vue')['default']
-  const XhUploadImage: typeof import('./src/components/avatar/XhUploadImage.vue')['default']
+  const XhAvatar: typeof import('./src/components/xiaohei/XhAvatar.vue')['default']
+  const XhFileSelect: typeof import('./src/components/xiaohei/XhFileSelect.vue')['default']
+  const XhUploadImage: typeof import('./src/components/xiaohei/XhUploadImage.vue')['default']
 }

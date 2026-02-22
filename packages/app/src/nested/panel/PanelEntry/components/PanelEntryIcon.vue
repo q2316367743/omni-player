@@ -1,5 +1,6 @@
 <template>
-  <component :is="getIconComponent(name)" />
+  <component v-if="isIconComponent(name)" :is="getIconComponent(name)"/>
+  <XhAvatar v-else :value="name" :size="20"/>
 </template>
 <script lang="ts" setup>
 import {
@@ -42,6 +43,10 @@ const iconComponentMap: Record<string, any> = {
   ImageIcon,
   PortraitIcon,
 };
+
+function isIconComponent(iconName?: string) {
+  return iconName ? !!iconComponentMap[iconName] : false;
+}
 
 // 获取图标组件
 function getIconComponent(iconName?: string) {

@@ -60,7 +60,7 @@
 
 <script lang="ts" setup>
 import type {MemoChatItemView, MemoFriendStaticView} from '@/entity/memo'
-import XhAvatar from '@/components/avatar/XhAvatar.vue'
+import XhAvatar from '@/components/xiaohei/XhAvatar.vue'
 import MarkdownPreview from '@/components/common/MarkdownPreview.vue'
 import {useSettingStore} from "@/store";
 import {prettyMessageDate} from "@/util/lang/DateUtil.ts";

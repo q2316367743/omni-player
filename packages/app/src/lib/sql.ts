@@ -13,8 +13,7 @@ import {QueryChain} from "@/util/file/QueryWrapper.ts";
 import {BaseMapper, generatePlaceholders, type TableLike} from "@/util";
 
 type TableName =
-  | 'mcp_setting'
-  | 'plugin';
+  | 'mcp_setting';
 
 export type TableNameMp =
   | 'analysis_category'

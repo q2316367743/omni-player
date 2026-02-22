@@ -1,6 +1,6 @@
 import type {ToolItem, ToolItemTypeOuter} from "@/global/PluginList.ts";
 import {DrawerPlugin, Form, FormItem, Input, Select, Textarea} from "tdesign-vue-next";
-import XhAvatar from "@/components/avatar/XhAvatar.vue";
+import XhAvatar from "@/components/xiaohei/XhAvatar.vue";
 import {addPluginService, removePlugin} from "@/services/main/PluginService.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
 import Ctx from "@imengyu/vue3-context-menu";
@@ -31,7 +31,7 @@ export function addPluginDrawer(onUpdate: () => void) {
   ];
 
   const platformOptions = [
-    { label: 'Windows', value: 'win32' },
+    { label: 'Windows', value: 'windows' },
     { label: 'Mac OS', value: 'macos' },
     { label: 'Linux', value: 'linux' },
   ];

@@ -43,7 +43,7 @@
 <script lang="ts" setup>
 import type {MemoFriendStaticView} from '@/entity/memo'
 import {getArchetypeText} from '@/entity/memo'
-import XhAvatar from '@/components/avatar/XhAvatar.vue'
+import XhAvatar from '@/components/xiaohei/XhAvatar.vue'
 
 defineProps<{
   friends: MemoFriendStaticView[]
