@@ -49,7 +49,7 @@ export const openMainContext = async (tool: ToolItem | undefined | null, row: nu
  * @param y 所选位置纵坐标
  */
 export const openPluginAdd = async (
-  e: PointerEvent, panel: '', x: number, y: number) => {
+  e: PointerEvent, panel: string, x: number, y: number) => {
   e.preventDefault();
   e.stopPropagation();
   Ctx.showContextMenu({

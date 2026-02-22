@@ -104,8 +104,13 @@ export const useToolVisibleStore = defineStore('tool-visible', () => {
     tools.value = await listPlugin();
   }
 
-  function getSubGrid(panelId: string): ToolGrid {
-    return rawSubGridConfig.value[panelId] || createEmptySubGrid();
+  function getSubGrid(panelId: string): Array<Array<ToolItem | undefined>> {
+    return (rawSubGridConfig.value[panelId] || createEmptySubGrid()).map(row => {
+      return row.map(col => {
+        if (col) return toolMap.value.get(col);
+        return undefined
+      })
+    });
   }
 
   function getToolInfo(toolId: string): ToolItem | undefined {

@@ -66,6 +66,7 @@
     "store:allow-delete",
     "store:allow-entries",
     "core:default",
+    "core:app:allow-set-app-theme",
     "core:event:allow-listen",
     "core:webview:allow-create-webview",
     "core:webview:allow-webview-show",

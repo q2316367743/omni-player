@@ -31,22 +31,22 @@
         >
           <template v-for="(row, rowIndex) in currentGrid" :key="rowIndex">
             <div
-              v-for="(toolId, colIndex) in row"
+              v-for="(tool, colIndex) in row"
               :key="`${rowIndex}-${colIndex}`"
               class="sub-tool-item"
-              :class="{ 'empty': !toolId }"
+              :class="{ 'empty': !tool }"
               :data-row="rowIndex"
               :data-col="colIndex"
-              @click="toolId && handleToolClick(toolId)"
+              @click="tool && handleToolClick(tool)"
             >
-              <template v-if="toolId">
+              <template v-if="tool">
                 <div class="sub-tool-icon">
-                  <PanelEntryIcon :name="getToolIcon(toolId)"/>
+                  <PanelEntryIcon :name="tool.icon"/>
                 </div>
-                <div class="sub-tool-name">{{ getToolLabel(toolId) }}</div>
+                <div class="sub-tool-name">{{ tool.label }}</div>
               </template>
               <template v-else>
-                <div class="empty-icon">
+                <div class="empty-icon" @click="openPluginAdd($event, currentPanel?.id || '', colIndex, rowIndex)">
                   <add-icon/>
                 </div>
               </template>
@@ -64,6 +64,7 @@ import { useToolVisibleStore } from "@/store/ToolVisibleStore.ts";
 import PanelEntryIcon from "@/nested/panel/PanelEntry/components/PanelEntryIcon.vue";
 import type {ToolItem} from "@/global/PluginList.ts";
 import {handlePopupToolClick} from "@/lib/tool.ts";
+import {openPluginAdd} from "@/nested/panel/PanelEntry/PanelEntryEdit.tsx";
 
 const toolStore = useToolVisibleStore();
 
@@ -124,16 +125,6 @@ function handleWheel(event: WheelEvent) {
   } else {
     currentPanelIndex.value = (currentPanelIndex.value - 1 + total) % total;
   }
-}
-
-function getToolIcon(toolId: string): string {
-  const tool = toolStore.getToolInfo(toolId);
-  return tool?.icon || 'HelpIcon';
-}
-
-function getToolLabel(toolId: string): string {
-  const tool = toolStore.getToolInfo(toolId);
-  return tool?.label || toolId;
 }
 
 const handleToolClick = (tool: ToolItem) => {
