@@ -1,12 +1,8 @@
 import type {ToolItem, ToolItemTypeOuter} from "@/global/PluginList.ts";
 import {DrawerPlugin, Form, FormItem, Input, Select, Textarea} from "tdesign-vue-next";
 import XhAvatar from "@/components/xiaohei/XhAvatar.vue";
-import {addPluginService, removePlugin} from "@/services/main/PluginService.ts";
+import {addPluginService} from "@/services/main/PluginService.ts";
 import MessageUtil from "@/util/model/MessageUtil.ts";
-import Ctx from "@imengyu/vue3-context-menu";
-import {isDark} from "@/global/Constants.ts";
-import {DeleteIcon} from "tdesign-icons-vue-next";
-import MessageBoxUtil from "@/util/model/MessageBoxUtil.tsx";
 
 export function addPluginDrawer(onUpdate: () => void) {
   const data = ref<ToolItem<ToolItemTypeOuter>>({
@@ -148,36 +144,4 @@ export function addPluginDrawer(onUpdate: () => void) {
       </Form>
     )
   });
-}
-
-
-export function openMediaContextmenu(data: ToolItem<ToolItemTypeOuter>, e: PointerEvent, onUpdate: () => void) {
-  e.preventDefault();
-  e.stopPropagation();
-  Ctx.showContextMenu({
-    x: e.x,
-    y: e.y,
-    theme: isDark.value ? 'mac dark' : 'mac',
-    items: [
-      {
-        label: () => <span style={{color: 'var(--td-error-color)'}} class={'label'}>删除</span>,
-        icon: () => <DeleteIcon style={{color: 'var(--td-error-color)'}}/>,
-        onClick: () => {
-          MessageBoxUtil.confirm("确定要删除吗？", "提示", {
-            confirmButtonText: "确定",
-          }).then(() => {
-            removePlugin(data.id)
-              .then(() => {
-                MessageUtil.success("删除成功");
-                onUpdate();
-              })
-              .catch((e) => MessageUtil.error("删除失败", e))
-          }).catch(() => {
-            console.log('删除已取消');
-          });
-        }
-      }
-    ]
-  })
-
 }

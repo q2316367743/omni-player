@@ -5,7 +5,7 @@ import {memoRouters} from "@/router/modules/memo.ts";
 import {subscribeRouters} from "@/router/modules/subscribe.ts";
 import type {PluginDefine} from "@/global/PluginDefine.ts";
 import {useAiRtSql, useMpSql} from "@/lib/sql.ts";
-import type {TdOptionProps} from "tdesign-vue-next";
+import type {CommonOption} from "@/global/CommonType.ts";
 
 // - inner：内置工具
 export type ToolItemTypeInner = 'inner';
@@ -51,7 +51,7 @@ export const ToolItemPlatformLabels: Record<ToolItemPlatform, string> = {
   ios: 'iOS',
 };
 
-export const ToolItemTypeOptions: Array<TdOptionProps> = [
+export const ToolItemTypeOptions: Array<CommonOption<ToolItemTypeOuter>> = [
   {label: '第三方插件', value: 'plugin'},
 
   {label: '启动软件', value: 'exe'},

@@ -1,6 +1,6 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import type {AiRtRoleAdd, AiRtRoleType} from "@/entity/app/ai/roundtable/AiRtRole.ts";
-import type {YesOrNo} from "@/global/YesOrNo.ts";
+import type {YesOrNo} from "@/global/CommonType.ts";
 import type {AiRtMeeting} from "@/entity/app/ai/roundtable";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
 

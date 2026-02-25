@@ -36,13 +36,6 @@
   overflow: hidden;
 }
 
-.plugin-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--monica-spacing-lg);
-  min-height: 200px;
-}
-
 .empty-state {
   grid-column: 1 / -1;
   display: flex;
@@ -50,6 +43,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+  min-height: 300px;
 
   .empty-icon {
     font-size: 48px;

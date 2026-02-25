@@ -1,7 +1,9 @@
-export interface CommonOption {
+export interface CommonOption<V = string> {
   label: string;
-  value: string;
+  value: V;
 }
+
+export type YesOrNo = 1 | 0;
 
 /**
  * AI聊天支持的角色

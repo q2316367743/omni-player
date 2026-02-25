@@ -1,5 +1,5 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
-import type {YesOrNo} from "@/global/YesOrNo.ts";
+import type {YesOrNo} from "@/global/CommonType.ts";
 import type {AiRtParticipantCore} from "@/entity/app/ai/roundtable/AiRtParticipant.ts";
 
 /**

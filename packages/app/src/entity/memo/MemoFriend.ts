@@ -1,5 +1,5 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
-import type {YesOrNo} from "@/global/YesOrNo.ts";
+import type {YesOrNo} from "@/global/CommonType.ts";
 import {formatDate, getTimeSinceLastInteraction} from "@/util/lang/DateUtil.ts";
 import {logError} from "@/lib/log.ts";
 import {

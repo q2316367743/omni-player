@@ -16,7 +16,7 @@
     <div class="setting-content">
       <t-tabs v-model="activeTab" class="plugin-tabs">
         <t-tab-panel
-          v-for="type in pluginTypes"
+          v-for="type in ToolItemTypeOptions"
           :key="type.value"
           :value="type.value"
           :label="type.label"
@@ -27,52 +27,31 @@
               <p class="empty-text">暂无{{ type.label }}插件</p>
               <p class="empty-hint">点击右上角"新增插件"按钮添加</p>
             </div>
-            <div
-              v-for="plugin in getPluginsByType(type.value)"
-              :key="plugin.id"
-              class="plugin-card monica-card"
-              @contextmenu="(e) => openMediaContextmenuWrap(plugin, e)"
-            >
-              <div class="plugin-icon">
-                <XhAvatar :src="plugin.icon" :size="48" folder="setting/plugin"/>
-              </div>
-              <div class="plugin-info">
-                <div class="plugin-header">
-                  <h3 class="plugin-name">{{ plugin.label }}</h3>
-                  <t-tag
-                    v-for="platform in plugin.platform"
-                    :key="platform"
-                    size="small"
-                    class="plugin-tag"
-                  >
-                    {{ getPlatformLabel(platform) }}
-                  </t-tag>
-                </div>
-                <p class="plugin-desc">{{ plugin.desc || '暂无描述' }}</p>
-                <div class="plugin-meta">
-                  <span class="meta-item">
-                    <span class="meta-label">类型:</span>
-                    <span class="meta-value">{{ type.label }}</span>
-                  </span>
-                  <span class="meta-item">
-                    <span class="meta-label">ID:</span>
-                    <span class="meta-value">{{ plugin.id }}</span>
-                  </span>
-                </div>
-              </div>
-              <div class="plugin-actions">
-                <t-button
-                  variant="text"
-                  size="small"
-                  class="action-btn"
-                  @click="handleDeletePlugin(plugin)"
-                >
-                  <template #icon>
-                    <DeleteIcon/>
+            <t-list :split="true">
+              <t-list-item
+                v-for="plugin in getPluginsByType(type.value)"
+                :key="plugin.id"
+              >
+                <t-list-item-meta :title="plugin.label" :description="plugin.desc">
+                  <template #avatar>
+                    <XhAvatar :src="plugin.icon" :size="56" folder="setting/plugin"/>
                   </template>
-                </t-button>
-              </div>
-            </div>
+                </t-list-item-meta>
+                <template #action>
+                  <t-button
+                    variant="text"
+                    theme="danger"
+                    shape="square"
+                    class="action-btn"
+                    @click="handleDeletePlugin(plugin)"
+                  >
+                    <template #icon>
+                      <DeleteIcon/>
+                    </template>
+                  </t-button>
+                </template>
+              </t-list-item>
+            </t-list>
           </div>
         </t-tab-panel>
       </t-tabs>
@@ -84,31 +63,16 @@
 import {AddIcon, DeleteIcon} from 'tdesign-icons-vue-next';
 import {listPlugin} from '@/services/main/PluginService.ts';
 import {
-  type ToolItem,
+  type ToolItem, ToolItemTypeOptions,
   type ToolItemTypeOuter,
-  type ToolItemPlatform, ToolItemPlatformLabels
 } from '@/global/PluginList.ts';
-import {addPluginDrawer, openMediaContextmenu} from './func.tsx';
+import {addPluginDrawer} from './func.tsx';
 import MessageUtil from '@/util/model/MessageUtil.ts';
 import MessageBoxUtil from '@/util/model/MessageBoxUtil.tsx';
 import {removePlugin} from '@/services/main/PluginService.ts';
 
 const activeTab = ref<ToolItemTypeOuter>('plugin');
 const plugins = ref<Array<ToolItem<ToolItemTypeOuter>>>([]);
-
-const pluginTypes = [
-  {label: '第三方插件', value: 'plugin' as ToolItemTypeOuter},
-  {label: '网页链接', value: 'link' as ToolItemTypeOuter},
-  {label: '可执行文件', value: 'exe' as ToolItemTypeOuter},
-  {label: '脚本', value: 'script' as ToolItemTypeOuter},
-  {label: '文件夹', value: 'folder' as ToolItemTypeOuter},
-  {label: '文件', value: 'file' as ToolItemTypeOuter},
-];
-
-
-function getPlatformLabel(platform: ToolItemPlatform): string {
-  return ToolItemPlatformLabels[platform] || platform;
-}
 
 function getPluginsByType(type: ToolItemTypeOuter): Array<ToolItem<ToolItemTypeOuter>> {
   return plugins.value.filter(p => p.type === type);
@@ -149,20 +113,6 @@ async function handleDeletePlugin(plugin: ToolItem<ToolItemTypeOuter>) {
       MessageUtil.error('删除失败', e);
     }
   }
-}
-
-const openMediaContextmenuWrap = (data: ToolItem<ToolItemTypeOuter>, e: PointerEvent) => {
-  openMediaContextmenu(data, e, () => {
-    loadPlugins();
-    // getAllWindows().then((wins) => {
-    //   for (let win of wins) {
-    //     if (win.label === 'popup_main') {
-    //       win.emit('xiaohei://store/plugin/refresh');
-    //       return;
-    //     }
-    //   }
-    // });
-  })
 }
 
 onMounted(() => {

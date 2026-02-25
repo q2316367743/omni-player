@@ -1,6 +1,6 @@
 import type {BaseEntity} from "@/entity/BaseEntity.ts";
 import {logError} from "@/lib/log.ts";
-import type {YesOrNo} from "@/global/YesOrNo.ts";
+import type {YesOrNo} from "@/global/CommonType.ts";
 
 export interface McpSettingCore {
   // 标签
