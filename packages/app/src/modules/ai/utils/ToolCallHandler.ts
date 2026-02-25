@@ -119,7 +119,7 @@ export async function handleToolCallsWithLoop(prop: ToolCallHandlerProp): Promis
 
       const iterationResult = await processStreamResponse(response, toolHandlers);
 
-      finalResult.think += iterationResult.think;
+      finalResult.think += iterationResult.thinkContent;
       finalResult.content += iterationResult.content;
       finalResult.toolResults.push(...iterationResult.toolCalls);
 
@@ -247,7 +247,7 @@ async function processStreamResponse(
       logError('[ToolCallHandler] 解析工具参数失败', {
         functionName: toolCall.functionName,
         arguments: toolCall.arguments
-      });
+      }, e);
       continue;
     }
 

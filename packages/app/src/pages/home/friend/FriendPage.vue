@@ -18,9 +18,10 @@
           :key="friend.id"
           class="friend-item"
           :class="{ active: selectedPartner?.id === friend.id }"
-          @click="selectPartner(friend)"
-        >
-          <XhAvatar :value="friend.avatar" :size="48" shape="circle"/>
+          @click="selectPartner(friend)">
+          <t-badge :count="hasSession(friend) ? 1 : 0" size="small">
+            <XhAvatar :value="friend.avatar" :size="48" shape="circle"/>
+          </t-badge>
           <div class="friend-info">
             <h3 class="friend-name">{{ friend.name }}</h3>
             <p class="friend-archetype">{{ getArchetypeText(friend.archetype) }}</p>
@@ -51,10 +52,13 @@
               <h2 class="detail-name">{{ friend.name }}</h2>
               <span class="detail-archetype">{{ getArchetypeText(friend.archetype) }}</span>
             </div>
-            <div class="detail-actions">
+            <div class="detail-actions flex gap-8px">
+              <t-button theme="primary" shape="round" @click.stop="handleChat(friend)">
+                {{ hasSession(friend) ? '继续聊天' : '开始聊天' }}
+              </t-button>
               <t-button variant="outline" shape="circle" theme="default" @click="handleEdit(friend)">
                 <template #icon>
-                  <edit-icon />
+                  <edit-icon/>
                 </template>
               </t-button>
             </div>
@@ -290,6 +294,8 @@ import {
 } from '@/entity/memo/MemoFriend.ts'
 import {formatDate} from '@/util/lang/DateUtil.ts'
 import {EditIcon} from "tdesign-icons-vue-next";
+import {createMemoSession} from "@/services/memo";
+import MessageUtil from "@/util/model/MessageUtil.ts";
 
 const router = useRouter();
 
@@ -408,6 +414,24 @@ function getTimeSinceLastInteraction(lastInteraction: number): string {
 
 function handleEdit(friend: MemoFriendStaticView) {
   router.push(`/memo/friend/edit/${friend.id}`)
+}
+
+const hasSession = (friend: MemoFriendStaticView) => useMemoFriendStore().chatFriendMap.has(friend.id);
+
+const handleChat = (friend: MemoFriendStaticView) => {
+  const sessionId = useMemoFriendStore().chatFriendMap.get(friend.id);
+  if (sessionId) {
+    router.push(`/memo/chat/${sessionId}`);
+    return;
+  }
+  createMemoSession(friend.id)
+    .then((session) => {
+      router.push(`/memo/chat/${session.id}`);
+      useMemoFriendStore().loadChatSession();
+    })
+    .catch(e => {
+      MessageUtil.error("创建聊天失败", e);
+    })
 }
 </script>
 

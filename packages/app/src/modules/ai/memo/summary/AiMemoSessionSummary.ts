@@ -1,12 +1,10 @@
 import {memoFriendToPrompt, type MemoFriendView, type MemoMessage} from "@/entity/memo";
 import {useSettingStore} from "@/store/GlobalSettingStore.ts";
-import {CHAT_SUMMARY_TOOL_SCHEMA} from "@/modules/ai/schema/ChatSummarySchema.ts";
 import {createMemoChatSummary} from "@/services/memo/MemoSessionSummaryService.ts";
-import {updateMemoFriendDynamic} from "@/services/memo/MemoFriendService.ts";
-import {addMemoLayerPersona, updateMemoLayerPersona} from "@/services/memo";
 import {handleStreamingToolCalls} from "@/modules/ai/utils/ToolCallHandler.ts";
-import type OpenAI from "openai";
+import OpenAI from "openai";
 import {formatDate} from "@/util/lang/DateUtil.ts";
+import {type AiMcpResult, type AiMcpWrapper, SelfPersonaMcp} from "@/modules/ai/mcp";
 
 interface AiMemoChatSummaryProp {
   // 谁
@@ -21,6 +19,65 @@ export interface ChatSummaryResult {
   summary: string;
   key_insights: any;
   ai_journal: string;
+}
+
+class SessionSummaryMcp implements AiMcpWrapper {
+
+  private readonly friendId: string;
+  private readonly sessionId: string;
+
+  constructor(friendId: string, sessionId: string) {
+    this.friendId = friendId;
+    this.sessionId = sessionId;
+  }
+
+  getSchema(): Array<OpenAI.Chat.Completions.ChatCompletionTool> {
+    return [{
+      type: "function",
+      function: {
+        name: "create_chat_summary",
+        description: "创建聊天记录的总结，包括标题、总结内容和AI小记",
+        parameters: {
+          type: "object",
+          properties: {
+            title: {type: "string", description: "聊天记录的标题，10字以内诗意标题"},
+            summary: {type: "string", description: "聊天记录的详细总结，150字内，含关键洞察"},
+            role_notes: {type: "string", description: "AI小记，第一人称日记，表达共情或反思"}
+          },
+          required: ["title", "summary", "role_notes"]
+        }
+      }
+    }]
+  }
+
+  check(functionName: string): boolean {
+    return functionName === 'create_chat_summary';
+  }
+
+  async execute(functionName: string, args: any): Promise<AiMcpResult> {
+    if (functionName === 'create_chat_summary') {
+      await createMemoChatSummary({
+        session_id: this.sessionId,
+        title: args.title,
+        friend_id: this.friendId,
+        summary: args.summary,
+        key_insights: JSON.stringify({}),
+        ai_journal: args.role_notes
+      });
+      return {
+        functionName: functionName,
+        args: args,
+        result: {
+          title: args.title,
+          summary: args.summary,
+          key_insights: {},
+          ai_journal: args.role_notes
+        }
+      }
+    }
+    return Promise.reject(new Error("Method not implemented."));
+  }
+
 }
 
 export async function aiMemoSessionSummary(prop: AiMemoChatSummaryProp): Promise<ChatSummaryResult> {
@@ -101,10 +158,14 @@ ${chatContent}
     }
   ];
 
+  const toolHandlers = [
+    new SessionSummaryMcp(prop.sessionId,friend.id),
+    new SelfPersonaMcp(friend.id)];
+
   const response = await client.chat?.completions.create({
     model: friend.model,
     messages: messagesForAI,
-    tools: CHAT_SUMMARY_TOOL_SCHEMA,
+    tools: toolHandlers.flatMap(e => e.getSchema()),
     tool_choice: "required",
     stream: true,
     // 禁用思考
@@ -115,59 +176,12 @@ ${chatContent}
     throw new Error('AI response is null');
   }
 
-  let summaryResult: ChatSummaryResult | null = null;
+  const toolCallResult = await handleStreamingToolCalls(response, toolHandlers);
 
-  const toolHandlers = {
-      create_chat_summary: async (args: any) => {
-        await createMemoChatSummary({
-          session_id: prop.sessionId,
-          title: args.title,
-          friend_id: friend.id,
-          summary: args.summary,
-          key_insights: JSON.stringify({}),
-          ai_journal: args.role_notes
-        });
-        summaryResult = {
-          title: args.title,
-          summary: args.summary,
-          key_insights: {},
-          ai_journal: args.role_notes
-        };
-      },
-    update_friend_dynamic: async (args: any) => {
-      await updateMemoFriendDynamic(args.friend_id, {
-        current_mood: args.mood,
-        last_interaction: args.last_interaction
-      });
-    }, 
-    add_persona: async (args: any) => {
-      await addMemoLayerPersona({
-        source: 'chat',
-        source_id: friend.id,
-        trait_name: args.trait_name,
-        delta: args.delta,
-        baseline_trait: args.baseline_trait,
-        confidence: args.confidence,
-        evidence_snippet: args.evidence_snippet || '',
-        expire_at: args.expire_at
-      });
-    },
-    update_persona: async (args: any) => {
-      if (!args.id) return;
-      await updateMemoLayerPersona(args.id, {
-        delta: args.delta,
-        baseline_trait: args.baseline_trait,
-        confidence: args.confidence,
-        expire_at: args.expire_at
-      });
-    }
+
+  return {
+    ...toolCallResult.toolResults
+      .filter(e => e.functionName === 'create_chat_summary')
+      .map(e => e.result)[0]
   };
-
-  await handleStreamingToolCalls(response, toolHandlers);
-
-  if (!summaryResult) {
-    throw new Error('Failed to create chat summary');
-  }
-
-  return summaryResult;
 }
