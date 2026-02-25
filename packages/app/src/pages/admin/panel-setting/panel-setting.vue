@@ -16,10 +16,12 @@
             <span class="action-desc">恢复所有面板和工具布局到默认状态</span>
           </div>
           <t-popconfirm content="确定要重置所有设置吗？此操作不可撤销。" @confirm="handleResetAll">
-            <button class="monica-btn monica-btn-secondary danger-btn">
-              <refresh-icon class="btn-icon"/>
+            <t-button variant="outline" shape="round" theme="danger">
+              <template #icon>
+                <refresh-icon/>
+              </template>
               重置全部
-            </button>
+            </t-button>
           </t-popconfirm>
         </div>
       </div>
@@ -28,9 +30,9 @@
     <div class="monica-card grid-section">
       <div class="section-header">
         <span class="section-title">全局布局</span>
-        <button class="monica-btn monica-btn-secondary" @click="resetMainGrid">
+        <t-button theme="default" shape="round" variant="outline" @click="resetMainGrid">
           清空布局
-        </button>
+        </t-button>
       </div>
 
       <div class="grid-manager">
@@ -49,15 +51,18 @@
             >
               <template v-if="tool">
                 <div class="tool-icon">
-                  <PanelEntryIcon :name="tool?.icon" />
+                  <PanelEntryIcon :name="tool?.icon"/>
                 </div>
                 <div class="tool-name">{{ tool?.label }}</div>
-                <button
+                <t-button
                   class="remove-btn"
+                  variant="text"
                   @click.stop="removeToolFromMainGrid(rowIndex, colIndex)"
                 >
-                  <close-icon/>
-                </button>
+                  <template #icon>
+                    <close-icon/>
+                  </template>
+                </t-button>
               </template>
               <template v-else>
                 <div class="empty-placeholder">
@@ -74,10 +79,12 @@
     <div class="monica-card panel-section">
       <div class="section-header">
         <span class="section-title">子面板管理</span>
-        <button class="monica-btn" @click="showAddPanelDialog = true">
-          <add-icon class="btn-icon"/>
+        <t-button theme="primary" shape="round" @click="showAddPanelDialog = true">
+          <template #icon>
+            <add-icon class="btn-icon"/>
+          </template>
           添加面板
-        </button>
+        </t-button>
       </div>
       <div class="panel-list local-scroll">
         <div
@@ -90,29 +97,42 @@
             <span class="panel-id">ID: {{ panel.id }}</span>
           </div>
           <div class="panel-actions">
-            <button
-              class="action-btn"
+            <t-button
+              variant="outline"
+              shape="square"
+              theme="primary"
               :disabled="index === 0"
               @click="movePanelUp(panel.id)"
             >
-              <chevron-up-icon/>
-            </button>
-            <button
-              class="action-btn"
+              <template #icon>
+                <chevron-up-icon/>
+              </template>
+            </t-button>
+            <t-button
+              variant="outline"
+              shape="square"
+              theme="primary"
               :disabled="index === sortedPanels.length - 1"
               @click="movePanelDown(panel.id)"
             >
-              <chevron-down-icon/>
-            </button>
+              <template #icon>
+                <chevron-down-icon/>
+              </template>
+            </t-button>
             <t-switch
               v-model="panel.visible"
               size="small"
               @change="updatePanelVisible(panel.id, $event as boolean)"
             />
             <t-popconfirm content="确定删除此面板？" @confirm="handleDeletePanel(panel.id)">
-              <button class="action-btn danger">
-                <delete-icon/>
-              </button>
+              <t-button
+                variant="outline"
+                shape="square"
+                theme="danger">
+                <template #icon>
+                  <delete-icon/>
+                </template>
+              </t-button>
             </t-popconfirm>
           </div>
         </div>
@@ -129,9 +149,9 @@
             placeholder="选择面板"
             class="panel-select"
           />
-          <button class="monica-btn monica-btn-secondary" @click="resetCurrentSubGrid">
+          <t-button theme="default" shape="round" variant="outline" @click="resetCurrentSubGrid">
             清空布局
-          </button>
+          </t-button>
         </div>
       </div>
 
@@ -143,23 +163,26 @@
             class="grid-row"
           >
             <div
-              v-for="(toolId, colIndex) in row"
+              v-for="(tool, colIndex) in row"
               :key="`${rowIndex}-${colIndex}`"
               class="grid-cell"
-              :class="{ 'empty': !toolId }"
+              :class="{ 'empty': !tool }"
               @click="openSubToolSelector(rowIndex, colIndex)"
             >
-              <template v-if="toolId">
+              <template v-if="tool">
                 <div class="tool-icon">
-                  <PanelEntryIcon :name="getToolIconName(toolId)" />
+                  <PanelEntryIcon :name="tool.icon"/>
                 </div>
-                <div class="tool-name">{{ getToolLabel(toolId) }}</div>
-                <button
+                <div class="tool-name">{{ tool.label }}</div>
+                <t-button
                   class="remove-btn"
+                  variant="text"
                   @click.stop="removeToolFromSubGrid(rowIndex, colIndex)"
                 >
-                  <close-icon/>
-                </button>
+                  <template #icon>
+                    <close-icon/>
+                  </template>
+                </t-button>
               </template>
               <template v-else>
                 <div class="empty-placeholder">
@@ -201,43 +224,6 @@
       </div>
     </t-dialog>
 
-    <t-dialog
-      v-model:visible="showToolSelector"
-      header="选择工具"
-      width="600px"
-      class="monica-dialog"
-      placement="center"
-      :footer="false"
-    >
-      <div class="tool-selector">
-        <div class="search-box">
-          <t-input
-            v-model="toolSearchKeyword"
-            placeholder="搜索工具"
-          >
-            <template #prefix-icon>
-              <search-icon/>
-            </template>
-          </t-input>
-        </div>
-        <div class="tool-list local-scroll">
-          <div
-            v-for="tool in filteredTools"
-            :key="tool.id"
-            class="tool-option"
-            @click="selectTool(tool.id)"
-          >
-            <div class="tool-option-icon">
-              <PanelEntryIcon :name="getToolIconName(tool.id)" />
-            </div>
-            <div class="tool-option-info">
-              <div class="tool-option-label">{{ tool.label }}</div>
-              <div class="tool-option-desc">{{ tool.desc || '无描述' }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </t-dialog>
   </div>
 </template>
 
@@ -249,21 +235,19 @@ import {
   CloseIcon,
   DeleteIcon,
   RefreshIcon,
-  SearchIcon
 } from 'tdesign-icons-vue-next';
 import {useToolVisibleStore} from '@/store/ToolVisibleStore.ts';
 import type {PanelConfig} from '@/global/PluginList.ts';
 import {computed, ref} from 'vue';
 import MessageUtil from '@/util/model/MessageUtil.ts';
 import PanelEntryIcon from "@/nested/panel/PanelEntry/components/PanelEntryIcon.vue";
+import {toolSelector} from "@/pages/admin/panel-setting/func/ToolSelector.tsx";
 
 const toolStore = useToolVisibleStore();
 
 const selectedPanelId = ref<string>('');
 const showAddPanelDialog = ref(false);
-const showToolSelector = ref(false);
-const toolSearchKeyword = ref('');
-const editingCell = ref<{ row: number; col: number; isMain: boolean } | null>(null);
+const editingCell = ref<{ row: number; col: number; isMain: boolean }>();
 
 const newPanelForm = ref({
   id: '',
@@ -286,17 +270,6 @@ const mainGrid = computed(() => toolStore.mainGrid);
 const currentSubGrid = computed(() => {
   if (!selectedPanelId.value) return [];
   return toolStore.getSubGrid(selectedPanelId.value);
-});
-
-const filteredTools = computed(() => {
-  const keyword = toolSearchKeyword.value.toLowerCase();
-  return toolStore.availableTools.filter(tool => {
-    if (keyword) {
-      return tool.label.toLowerCase().includes(keyword) ||
-        tool.id.toLowerCase().includes(keyword);
-    }
-    return true;
-  });
 });
 
 function movePanelUp(panelId: string) {
@@ -376,14 +349,12 @@ function handleResetAll() {
 
 function openMainToolSelector(row: number, col: number) {
   editingCell.value = {row, col, isMain: true};
-  toolSearchKeyword.value = '';
-  showToolSelector.value = true;
+  toolSelector(selectTool);
 }
 
 function openSubToolSelector(row: number, col: number) {
   editingCell.value = {row, col, isMain: false};
-  toolSearchKeyword.value = '';
-  showToolSelector.value = true;
+  toolSelector(selectTool);
 }
 
 function selectTool(toolId: string) {
@@ -398,8 +369,6 @@ function selectTool(toolId: string) {
         toolId
       );
     }
-    showToolSelector.value = false;
-    editingCell.value = null;
   }
 }
 
@@ -413,15 +382,6 @@ function removeToolFromSubGrid(row: number, col: number) {
   }
 }
 
-function getToolLabel(toolId: string): string {
-  const tool = toolStore.getToolInfo(toolId);
-  return tool?.label || toolId;
-}
-
-function getToolIconName(toolId: string): string {
-  const tool = toolStore.getToolInfo(toolId);
-  return tool?.icon || 'HelpIcon';
-}
 </script>
 
 <style scoped lang="less">
